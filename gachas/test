@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FNTD 2 Gacha Simulator</title>
+    <style>
+        /* ===== CORE VARIABLES ===== */
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --accent: #ff6600;
+            --accent-hover: #ff8533;
+            --success: #4CAF50;
+            --danger: #f44336;
+            --rarity-uncommon: #4CAF50;
+            --rarity-rare: #2196F3;
+            --rarity-epic: #9C27B0;
+            --rarity-legendary: #FF9800;
+            --rarity-mythic: #c83232;
+            --rarity-long: #438972;
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --item-width: 130px;
+            --item-height: 90px;
+            --item-small-width: 80px;
+            --item-small-height: 70px;
+        }
+
+        /* ===== BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* ===== GACHA SIMULATOR STYLES ===== */
+        .gacha-container {
+            max-width: 800px;
+            width: 100%;
+            border: 2px solid var(--accent);
+            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(255, 102, 0, 0.1);
+        }
+
+        .top-accent-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        h1 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--accent);
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: var(--bg-primary);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 102, 0, 0.3);
+            border-color: var(--accent-hover);
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius);
+            border: 1px solid #383838;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            flex-direction: column;
+            margin-top: 15px;
+        }
+
+        .stats-section {
+            display: flex;
+            gap: 20px;
+            justify-content: space-around;
+            width: 100%;
+            min-width: 0px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 0px;
+            flex: 1 1 0px;
+            max-width: 33%;
+            
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            text-align: center;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .results-section {
+            height: 315px;
+            overflow-y: auto;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius);
+            border: 1px solid #383838;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        /* Scrollbar styling */
+        .results-section::-webkit-scrollbar,
+        .inventory-container::-webkit-scrollbar,
+        .auto-roll-targets::-webkit-scrollbar,
+        .index-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .results-section::-webkit-scrollbar-track,
+        .inventory-container::-webkit-scrollbar-track,
+        .auto-roll-targets::-webkit-scrollbar-track,
+        .index-container::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+
+        .results-section::-webkit-scrollbar-thumb,
+        .inventory-container::-webkit-scrollbar-thumb,
+        .auto-roll-targets::-webkit-scrollbar-thumb,
+        .index-container::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        /* ===== ITEM STYLING ===== */
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(var(--item-width), 1fr));
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .item-grid-small {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(var(--item-small-width), 1fr));
+            gap: 10px;
+        }
+
+        .item-container {
+            position: relative;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            aspect-ratio: 1/1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            flex: 1;
+        }
+
+        .item-image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            flex: 1;
+        }
+
+        .item-name-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--text-primary);
+            padding: 5px;
+            font-size: 0.85rem;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .item-count {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .drop-rate {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            z-index: 2;
+        }
+
+        /* ===== AUTO ROLL STYLING ===== */
+        .controls-section,
+        .stats-section-container {
+            transition: opacity 0.3s ease, max-height 0.3s ease;
+        }
+
+        .auto-roll-options {
+            position: absolute;
+            top: 75px;
+            left: 20px;
+            right: 20px;
+            background-color: var(--bg-tertiary);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 10;
+            max-height: 400px; /* Increased from 220px */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auto-roll-options.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .auto-roll-targets {
+            flex: 1;
+            min-height: 120px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding: 5px;
+            border: 1px solid var(--bg-secondary);
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+        }
+
+        .auto-roll-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .hidden {
+            pointer-events: none;
+        }
+
+        .auto-roll-target-item:not(.selected) {
+            filter: grayscale(100%);
+            opacity: 0.6;
+            transition: var(--transition);
+        }
+
+        .auto-roll-target-item:not(.selected):hover {
+            filter: grayscale(35%);
+            opacity: 0.8;
+        }
+
+        .auto-roll-target-item.selected {
+            filter: grayscale(0%);
+            opacity: 1;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .auto-roll-stats {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .auto-roll-active {
+            background-color: var(--danger) !important;
+            border-color: var(--danger) !important;
+        }
+
+        .auto-roll-active:hover {
+            background-color: #e53935 !important;
+            border-color: #e53935 !important;
+        }
+
+        /* ===== INDEX STYLING ===== */
+        .index-container {
+            display: flex;
+            flex-direction: column;
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .rarity-group {
+            margin-bottom: 15px;
+        }
+
+        .rarity-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid;
+        }
+
+        .rarity-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(var(--item-width), 1fr));
+            gap: 12px;
+        }
+
+        /* ===== PITY SYSTEM ===== */
+        .pity-counters {
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            border: 1px solid #383838;
+            margin-top: 10px;
+        }
+
+        .pity-counter-item {
+            margin-bottom: 10px;
+        }
+
+        .pity-counter-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        .result-card {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .result-card:nth-child(1) { animation-delay: 0.05s; }
+        .result-card:nth-child(2) { animation-delay: 0.1s; }
+        .result-card:nth-child(3) { animation-delay: 0.15s; }
+        .result-card:nth-child(4) { animation-delay: 0.2s; }
+        .result-card:nth-child(5) { animation-delay: 0.25s; }
+        .result-card:nth-child(6) { animation-delay: 0.3s; }
+        .result-card:nth-child(7) { animation-delay: 0.35s; }
+        .result-card:nth-child(8) { animation-delay: 0.4s; }
+        .result-card:nth-child(9) { animation-delay: 0.45s; }
+        .result-card:nth-child(10) { animation-delay: 0.5s; }
+
+        .index-item {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .rarity-group .index-item:nth-child(1) { animation-delay: 0.05s; }
+        .rarity-group .index-item:nth-child(2) { animation-delay: 0.1s; }
+        .rarity-group .index-item:nth-child(3) { animation-delay: 0.15s; }
+        .rarity-group .index-item:nth-child(4) { animation-delay: 0.2s; }
+        .rarity-group .index-item:nth-child(5) { animation-delay: 0.25s; }
+        .rarity-group .index-item:nth-child(6) { animation-delay: 0.3s; }
+        .rarity-group .index-item:nth-child(7) { animation-delay: 0.35s; }
+        .rarity-group .index-item:nth-child(8) { animation-delay: 0.4s; }
+        .rarity-group .index-item:nth-child(9) { animation-delay: 0.45s; }
+        .rarity-group .index-item:nth-child(10) { animation-delay: 0.5s; }
+
+        /* Single roll styling */
+        .results-single {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .result-single-item {
+            width: 80%;
+            max-width: 250px;
+            height: auto;
+            aspect-ratio: 1/1;
+            animation: fadeInScale 0.6s ease forwards;
+        }
+
+        .result-single-item .item-image,
+        .result-single-item .item-image-placeholder {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Keyframes */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Button variants */
+        .button-secondary {
+            background-color: #3a3a3a;
+            color: var(--text-primary);
+        }
+
+        .button-secondary:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .button-danger {
+            background: linear-gradient(135deg, var(--danger), var(--danger));
+            border-color: var(--danger);
+        }
+
+        .button-danger:hover {
+            background: linear-gradient(135deg, var(--danger), var(--danger));
+            border-color: var(--danger);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.3);
+        }
+
+        /* Currency stats */
+        .currency-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-direction: row-reverse;
+            min-width: 0;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .currency-stat > div {
+            min-width: 0;
+        }
+
+        .currency-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .gacha-container {
+                padding: 15px;
+            }
+
+            .item-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+
+            .auto-roll-options {
+                left: 15px;
+                right: 15px;
+            }
+                
+            .currency-icon {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gacha-container">
+        <div class="top-accent-line"></div>
+        <h1 id="previewTitle">FNTD 2 Gacha Simulator</h1>
+
+        <div class="controls">
+            <button id="indexBtn">Index</button>
+            <button id="inventoryBtn">Inventory</button>
+            <button id="resetStatsBtn" class="button-danger">Reset</button>
+        </div>
+
+        <div id="autoRollOptions" class="auto-roll-options">
+            <div id="autoRollTargets" class="auto-roll-targets">
+                <!-- Target items will be populated dynamically -->
+            </div>
+            <div class="auto-roll-controls">
+                <button id="startAutoRollBtn" class="flex-1">Start Auto Roll</button>
+                <button id="closeAutoRollBtn" class="flex-1 button-secondary">Close Settings</button>
+            </div>
+            <div class="auto-roll-stats">
+                <span>Rolls performed: <span id="autoRollCount">0</span></span>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stats-section">
+                <div class="stat-item">
+                    <span class="stat-value" id="totalRolls">0</span>
+                    <span class="stat-label">Total Rolls</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="uniqueItems">0</span>
+                    <span class="stat-label">Unique Items</span>
+                </div>
+                <div class="stat-item currency-stat" id="currencyStat">
+                    
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div class="stat-value" id="currencySpent">0</div>
+                        <div class="stat-label">Coins Spent</div>
+                    </div>
+                </div>
+            </div>
+            <div class="pity-counters" id="pityCounters" style="display: none;">
+                <div id="pityCountersList">
+                    <!-- Pity counters will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        
+
+        <div class="results-section">
+            <div id="resultsContainer" class="item-grid">
+                <!-- Roll results will appear here -->
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="singleRollBtn">Single Roll</button>
+            <button id="multiRollBtn">10-Roll</button>
+            <button id="autoRollBtn">Auto Roll</button>
+        </div>
+    </div>
+
+    <div id="indexModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background-color: var(--bg-secondary); padding: 20px; border-radius: var(--border-radius); width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3>Item Index</h3>
+                <button class="close-modal" style="background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; width: auto;">&times;</button>
+            </div>
+            <div id="indexContainer" class="index-container">
+                <!-- Index content will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification" style="position: fixed; top: 20px; right: 20px; padding: 15px 20px; background-color: var(--success); color: white; border-radius: var(--border-radius); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); z-index: 1000; transform: translateX(150%); transition: transform 0.3s ease;"></div>
+
+    <script>
+        // ===== GACHA SIMULATOR EXPORT =====
+        class GachaSimulatorExported {
+            constructor(data) {
+                this.data = data;
+                this.autoRollInterval = null;
+                this.autoRollCountValue = 0;
+                this.autoRollTargetItems = [];
+                this.isInventoryView = false;
+                this.isIndexView = false;
+                this.lastResultsState = null;
+                this.lastResultsClass = null;
+                
+                this.data.rollHistory = [];
+                this.data.uniqueItemsObtained = new Set();
+                this.data.rarityCounts = {};
+                this.data.totalRollsCount = 0;
+                this.data.currencySpent = 0;
+                this.data.inventory = {};
+                this.data.itemCounts = {};
+                this.data.currentPityCounters = {};
+                
+                this.data.rarities.forEach(rarity => {
+                    this.data.rarityCounts[rarity.id] = 0;
+                    this.data.currentPityCounters[rarity.id] = 0;
+                });
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.updateUI();
+                this.updatePityUI();
+                this.updateAutoRollTargets();
+            }
+
+            // ===== GACHA MECHANICS =====
+            performRoll(count) {
+                const results = [];
+                const rolledInThisMulti = new Set();
+                if (this.isIndexView || this.isInventoryView) {
+                    this.closeAllViews();
+                }
+
+                for (let i = 0; i < count; i++) {
+                    let item;
+                    let attempts = 0;
+
+                    const pityItem = this.checkPitySystem();
+                    if (pityItem) {
+                        item = pityItem;
+                    } else {
+                        do {
+                            item = this.data.useIndividualRates ?
+                                this.rollWithIndividualRates() :
+                                this.rollWithRarityRates();
+                            attempts++;
+
+                            if (attempts > 100) break;
+                        } while (!this.data.allowDuplicates && rolledInThisMulti.has(item.id) && attempts <= 100);
+                    }
+
+                    rolledInThisMulti.add(item.id);
+                    results.push(item);
+                    
+                    this.updatePityCounters(item);
+                    this.updateInventory([item]);
+                }
+
+                this.data.totalRollsCount += count;
+                this.data.currencySpent += count * this.data.costPerRoll;
+
+                this.displayResults(results);
+                this.updateStats(results);
+
+                this.data.rollHistory.push({
+                    timestamp: new Date().toISOString(),
+                    results: results,
+                    count: results.length
+                });
+
+                this.updateRollStats();
+                this.updatePityUI();
+            }
+
+            checkPitySystem() {
+                for (const rarity of this.data.rarities) {
+                    const pitySetting = this.data.pitySettings[rarity.id];
+                    if (pitySetting && pitySetting.enabled && 
+                        this.data.currentPityCounters[rarity.id] >= pitySetting.pityCount) {
+                        
+                        const rarityItems = this.data.items.filter(item => item.rarity === rarity.id);
+                        if (rarityItems.length > 0) {
+                            const randomIndex = Math.floor(Math.random() * rarityItems.length);
+                            return rarityItems[randomIndex];
+                        }
+                    }
+                }
+                return null;
+            }
+
+            updatePityCounters(item) {
+                for (const rarity of this.data.rarities) {
+                    const pitySetting = this.data.pitySettings[rarity.id];
+                    if (pitySetting && pitySetting.enabled) {
+                        this.data.currentPityCounters[rarity.id]++;
+                    }
+                }
+                
+                const itemRarity = item.rarity;
+                if (itemRarity && this.data.pitySettings[itemRarity]?.enabled) {
+                    this.data.currentPityCounters[itemRarity] = 0;
+                }
+            }
+
+            rollWithRarityRates() {
+                const totalRate = this.data.rarities.reduce((sum, rarity) => sum + rarity.rate, 0);
+
+                const random = Math.random() * totalRate;
+
+                let cumulativeRate = 0;
+                let selectedRarity = null;
+
+                for (const rarity of this.data.rarities) {
+                    cumulativeRate += rarity.rate;
+                    if (random <= cumulativeRate) {
+                        selectedRarity = rarity;
+                        break;
+                    }
+                }
+
+                if (!selectedRarity) {
+                    selectedRarity = this.data.rarities[0];
+                }
+
+                const rarityItems = this.data.items.filter(item => item.rarity === selectedRarity.id);
+
+                if (rarityItems.length === 0) {
+                    return {
+                        id: 'placeholder',
+                        name: `No ${selectedRarity.name} items`,
+                        image: null,
+                        rarity: selectedRarity.id
+                    };
+                }
+
+                const randomIndex = Math.floor(Math.random() * rarityItems.length);
+                return rarityItems[randomIndex];
+            }
+
+            rollWithIndividualRates() {
+                const totalRate = this.data.items.reduce((sum, item) => sum + item.dropRate, 0);
+
+                if (this.data.items.length === 0 || totalRate === 0) {
+                    return {
+                        id: 'placeholder',
+                        name: 'No items in pool',
+                        image: null,
+                        rarity: 'common'
+                    };
+                }
+
+                const normalizationFactor = totalRate !== 100 ? 100 / totalRate : 1;
+
+                const random = Math.random() * 100;
+                let cumulativeRate = 0;
+
+                for (const item of this.data.items) {
+                    cumulativeRate += item.dropRate * normalizationFactor;
+                    if (random <= cumulativeRate) {
+                        return item;
+                    }
+                }
+
+                return this.data.items[0];
+            }
+
+            // ===== UI UPDATES =====
+            updateUI() {
+                document.getElementById('previewTitle').textContent = this.data.title;
+                document.getElementById('multiRollBtn').textContent = `${this.data.multiRollCount}-Roll`;
+            }
+
+            displayResults(results) {
+                const resultsContainer = document.getElementById('resultsContainer');
+                resultsContainer.innerHTML = '';
+                
+                if (results.length === 1) {
+                    resultsContainer.className = 'results-single';
+                    const resultCard = this.createItemElement(results[0], 'result-card result-single-item');
+                    resultsContainer.appendChild(resultCard);
+                } else {
+                    resultsContainer.className = 'item-grid';
+                    results.forEach((item, index) => {
+                        const resultCard = this.createItemElement(item, 'result-card');
+                        resultCard.style.animationDelay = `${index * 0.05}s`;
+                        resultsContainer.appendChild(resultCard);
+                    });
+                }
+            }
+
+            updateInventory(results) {
+                results.forEach(item => {
+                    if (item.id && item.id !== 'placeholder') {
+                        if (!this.data.inventory[item.id]) {
+                            this.data.inventory[item.id] = item;
+                            this.data.itemCounts[item.id] = 0;
+                        }
+                        this.data.itemCounts[item.id]++;
+                    }
+                });
+            }
+
+            updateStats(results) {
+                results.forEach(item => {
+                    if (item.id && item.id !== 'placeholder') {
+                        this.data.uniqueItemsObtained.add(item.id);
+                    }
+                    if (item.rarity) {
+                        if (!this.data.rarityCounts[item.rarity]) {
+                            this.data.rarityCounts[item.rarity] = 0;
+                        }
+                        this.data.rarityCounts[item.rarity]++;
+                    }
+                });
+                
+                this.updateRollStats();
+            }
+
+            updateRollStats() {
+                document.getElementById('totalRolls').textContent = this.data.totalRollsCount;
+                document.getElementById('uniqueItems').textContent = `${this.data.uniqueItemsObtained.size}/${this.data.items.length}`;
+                document.getElementById('currencySpent').textContent = this.data.currencySpent;
+            }
+
+            updatePityUI() {
+                const pityCounters = document.getElementById('pityCounters');
+                const pityCountersList = document.getElementById('pityCountersList');
+                
+                const enabledPitySystems = this.data.rarities.filter(rarity => 
+                    this.data.pitySettings[rarity.id]?.enabled
+                );
+                
+                if (enabledPitySystems.length > 0) {
+                    pityCounters.style.display = 'block';
+                    pityCountersList.innerHTML = '';
+                    
+                    enabledPitySystems.forEach(rarity => {
+                        const pitySetting = this.data.pitySettings[rarity.id];
+                        const currentCount = this.data.currentPityCounters[rarity.id];
+                        const pityCounter = document.createElement('div');
+                        pityCounter.className = 'pity-counter-item';
+                        pityCounter.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <span style="color: ${rarity.color}; font-weight: bold; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${rarity.name} Pity</span>
+                                <span>${currentCount}/${pitySetting.pityCount}</span>
+                            </div>
+                            <div style="background: var(--bg-secondary); height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: ${rarity.color}; height: 100%; width: ${Math.min(100, (currentCount / pitySetting.pityCount) * 100)}%; transition: width 0.3s ease;"></div>
+                            </div>
+                        `;
+                        pityCountersList.appendChild(pityCounter);
+                    });
+                } else {
+                    pityCounters.style.display = 'none';
+                }
+            }
+
+            // ===== AUTO ROLL =====
+            updateAutoRollTargets() {
+                const autoRollTargets = document.getElementById('autoRollTargets');
+                autoRollTargets.innerHTML = '';
+
+                if (this.data.items.length === 0) {
+                    autoRollTargets.innerHTML = '<p>No items available.</p>';
+                    return;
+                }
+
+                const sortedItems = this.getSortedItemsByRarity(this.data.items);
+
+                const grid = document.createElement('div');
+                grid.className = 'item-grid-small';
+
+                sortedItems.forEach(item => {
+                    const targetItem = this.createItemElement(item, 'auto-roll-target-item');
+                    targetItem.setAttribute('data-id', item.id);
+
+                    if (this.autoRollTargetItems.includes(item.id)) {
+                        targetItem.classList.add('selected');
+                    }
+
+                    targetItem.addEventListener('click', () => {
+                        this.handleAutoRollTargetClick(targetItem, item.id);
+                    });
+
+                    grid.appendChild(targetItem);
+                });
+
+                autoRollTargets.appendChild(grid);
+            }
+
+            handleAutoRollTargetClick(targetElement, itemId) {
+                targetElement.classList.toggle('selected');
+                
+                if (targetElement.classList.contains('selected')) {
+                    if (!this.autoRollTargetItems.includes(itemId)) {
+                        this.autoRollTargetItems.push(itemId);
+                    }
+                } else {
+                    this.autoRollTargetItems = this.autoRollTargetItems.filter(id => id !== itemId);
+                }
+            }
+
+            // ===== AUTO ROLL METHODS =====
+            startAutoRoll() {
+                if (this.autoRollTargetItems.length === 0) {
+                    alert("Please select at least one target item");
+                    return;
+                }
+
+                this.closeAutoRollSettings();
+
+                const autoRollBtn = document.getElementById('autoRollBtn');
+                autoRollBtn.textContent = 'Stop Auto Roll';
+                autoRollBtn.classList.add('auto-roll-active');
+
+                this.autoRollCountValue = 0;
+                document.getElementById('autoRollCount').textContent = this.autoRollCountValue;
+
+                this.autoRollInterval = setInterval(() => {
+                    this.performRoll(1);
+                    this.autoRollCountValue++;
+                    document.getElementById('autoRollCount').textContent = this.autoRollCountValue;
+
+                    const lastRoll = this.data.rollHistory[this.data.rollHistory.length - 1];
+                    if (lastRoll && lastRoll.results.length > 0) {
+                        const lastItem = lastRoll.results[0];
+                        if (this.autoRollTargetItems.includes(lastItem.id)) {
+                            this.stopAutoRoll();
+                            this.showNotification(`Auto-roll stopped! Obtained target item: ${lastItem.name}`);
+                        }
+                    }
+                }, 500);
+            }
+
+            stopAutoRoll() {
+                if (this.autoRollInterval) {
+                    clearInterval(this.autoRollInterval);
+                    this.autoRollInterval = null;
+                }
+
+                const autoRollBtn = document.getElementById('autoRollBtn');
+                autoRollBtn.textContent = 'Auto Roll';
+                autoRollBtn.classList.remove('auto-roll-active');
+            }
+
+            toggleAutoRollOptions() {
+                if (this.autoRollInterval) {
+                    this.stopAutoRoll();
+                    this.showNotification('Auto-roll stopped!');
+                    return;
+                }
+
+                const autoRollOptions = document.getElementById('autoRollOptions');
+                const controlsSection = document.querySelector('.controls');
+                const statsContainer = document.querySelector('.stats-container');
+
+                if (autoRollOptions.classList.contains('open')) {
+                    autoRollOptions.classList.remove('open');
+                    controlsSection.classList.remove('hidden');
+                    statsContainer.classList.remove('hidden');
+                } else {
+                    autoRollOptions.classList.add('open');
+                    controlsSection.classList.add('hidden');
+                    statsContainer.classList.add('hidden');
+                    this.updateAutoRollTargets();
+                }
+            }
+
+            closeAutoRollSettings() {
+                const autoRollOptions = document.getElementById('autoRollOptions');
+                const controlsSection = document.querySelector('.controls');
+                const statsContainer = document.querySelector('.stats-container');
+
+                autoRollOptions.classList.remove('open');
+                controlsSection.classList.remove('hidden');
+                statsContainer.classList.remove('hidden');
+            }
+
+            // ===== INVENTORY & INDEX =====
+            animateExistingResults() {
+                const resultCards = document.querySelectorAll('.result-card');
+                resultCards.forEach((card, index) => {
+                    card.style.animation = 'none';
+                    card.offsetHeight;
+                    card.style.animation = `fadeInUp 0.5s ease ${index * 0.05}s forwards`;
+                });
+            }
+
+            toggleInventory() {
+                const resultsContainer = document.getElementById('resultsContainer');
+                const inventoryBtn = document.getElementById('inventoryBtn');
+                
+                if (!this.isInventoryView) {
+                    if (this.isIndexView) {
+                        this.toggleIndex();
+                    }
+                    
+                    this.lastResultsState = resultsContainer.innerHTML;
+                    this.lastResultsClass = resultsContainer.className;
+                    this.showInventory();
+                    this.isInventoryView = true;
+                    inventoryBtn.textContent = 'Results';
+                } else {
+                    resultsContainer.innerHTML = this.lastResultsState || '';
+                    resultsContainer.className = this.lastResultsClass || 'item-grid';
+                    this.isInventoryView = false;
+                    inventoryBtn.textContent = 'Inventory';
+                    
+                    this.animateExistingResults();
+                }
+            }
+
+            showInventory() {
+                const resultsContainer = document.getElementById('resultsContainer');
+                resultsContainer.innerHTML = '';
+                resultsContainer.className = 'index-container';
+                
+                const inventoryItems = Object.values(this.data.inventory);
+                
+                if (inventoryItems.length === 0) {
+                    resultsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 20px;">No items in inventory yet</p>';
+                    return;
+                }
+                
+                const sortedInventory = this.getSortedItemsByRarity(inventoryItems);
+                
+                const rarityGroups = {};
+                
+                sortedInventory.forEach(item => {
+                    if (!rarityGroups[item.rarity]) {
+                        rarityGroups[item.rarity] = [];
+                    }
+                    rarityGroups[item.rarity].push(item);
+                });
+                
+                const sortedRarities = [...this.data.rarities].sort((a, b) => a.rate - b.rate);
+                
+                sortedRarities.forEach((rarity, rarityIndex) => {
+                    const itemsInRarity = rarityGroups[rarity.id];
+                    if (!itemsInRarity || itemsInRarity.length === 0) return;
+                    
+                    const rarityGroup = document.createElement('div');
+                    rarityGroup.className = 'rarity-group';
+                    
+                    const rarityHeader = document.createElement('div');
+                    rarityHeader.className = 'rarity-header';
+                    rarityHeader.style.color = rarity.color;
+                    rarityHeader.textContent = `${rarity.name}`;
+                    
+                    const itemsContainer = document.createElement('div');
+                    itemsContainer.className = 'rarity-items';
+                    
+                    itemsInRarity.forEach((item, itemIndex) => {
+                        const inventoryItem = this.createItemElement(item, 'index-item result-card');
+                        inventoryItem.style.borderColor = rarity.color;
+                        inventoryItem.style.animationDelay = `${(rarityIndex * 0.1) + (itemIndex * 0.05)}s`;
+                        
+                        const count = this.data.itemCounts[item.id] || 0;
+                        const countBadge = document.createElement('div');
+                        countBadge.className = 'drop-rate';
+                        countBadge.textContent = count;
+                        inventoryItem.appendChild(countBadge);
+                        
+                        itemsContainer.appendChild(inventoryItem);
+                    });
+                    
+                    rarityGroup.appendChild(rarityHeader);
+                    rarityGroup.appendChild(itemsContainer);
+                    resultsContainer.appendChild(rarityGroup);
+                });
+            }
+
+            toggleIndex() {
+                const resultsContainer = document.getElementById('resultsContainer');
+                const indexBtn = document.getElementById('indexBtn');
+                
+                if (!this.isIndexView) {
+                    if (this.isInventoryView) {
+                        this.toggleInventory();
+                    }
+                    
+                    this.lastResultsState = resultsContainer.innerHTML;
+                    this.lastResultsClass = resultsContainer.className;
+                    this.showIndex();
+                    this.isIndexView = true;
+                    indexBtn.textContent = 'Results';
+                } else {
+                    resultsContainer.innerHTML = this.lastResultsState || '';
+                    resultsContainer.className = this.lastResultsClass || 'item-grid';
+                    this.isIndexView = false;
+                    indexBtn.textContent = 'Index';
+                    
+                    this.animateExistingResults();
+                }
+            }
+
+            showIndex() {
+                const resultsContainer = document.getElementById('resultsContainer');
+                resultsContainer.innerHTML = '';
+                resultsContainer.className = 'index-container';
+                
+                if (this.data.useIndividualRates) {
+                    this.showIndividualRatesIndex(resultsContainer);
+                } else {
+                    this.showRarityBasedIndex(resultsContainer);
+                }
+            }
+
+            showIndividualRatesIndex(container) {
+                const sortedItems = [...this.data.items].sort((a, b) => a.dropRate - b.dropRate);
+                
+                const gridContainer = document.createElement('div');
+                gridContainer.className = 'item-grid';
+                
+                sortedItems.forEach((item, index) => {
+                    const indexItem = this.createItemElement(item, 'index-item result-card');
+                    indexItem.style.animationDelay = `${index * 0.05}s`;
+                    
+                    const dropRate = document.createElement('div');
+                    dropRate.className = 'drop-rate';
+                    dropRate.textContent = `${item.dropRate}%`;
+                    indexItem.appendChild(dropRate);
+                    
+                    gridContainer.appendChild(indexItem);
+                });
+                
+                container.appendChild(gridContainer);
+            }
+
+            showRarityBasedIndex(container) {
+                const sortedRarities = [...this.data.rarities].sort((a, b) => a.rate - b.rate);
+                
+                sortedRarities.forEach((rarity, rarityIndex) => {
+                    const rarityItems = this.data.items.filter(item => item.rarity === rarity.id);
+                    if (rarityItems.length === 0) return;
+                    
+                    const rarityGroup = document.createElement('div');
+                    rarityGroup.className = 'rarity-group';
+                    
+                    const rarityHeader = document.createElement('div');
+                    rarityHeader.className = 'rarity-header';
+                    rarityHeader.style.color = rarity.color;
+                    rarityHeader.textContent = `${rarity.name} (${rarity.rate}%)`;
+                    
+                    const itemsContainer = document.createElement('div');
+                    itemsContainer.className = 'rarity-items';
+                    
+                    rarityItems.forEach((item, itemIndex) => {
+                        const indexItem = this.createItemElement(item, 'index-item result-card');
+                        indexItem.style.borderColor = rarity.color;
+                        indexItem.style.animationDelay = `${(rarityIndex * 0.1) + (itemIndex * 0.05)}s`;
+                        itemsContainer.appendChild(indexItem);
+                    });
+                    
+                    rarityGroup.appendChild(rarityHeader);
+                    rarityGroup.appendChild(itemsContainer);
+                    container.appendChild(rarityGroup);
+                });
+            }
+
+            closeAllViews() {
+                const resultsContainer = document.getElementById('resultsContainer');
+                const indexBtn = document.getElementById('indexBtn');
+                const inventoryBtn = document.getElementById('inventoryBtn');
+                
+                if (this.isIndexView) {
+                    resultsContainer.innerHTML = this.lastResultsState || '';
+                    resultsContainer.className = this.lastResultsClass || 'item-grid';
+                    this.isIndexView = false;
+                    indexBtn.textContent = 'Index';
+                }
+                
+                if (this.isInventoryView) {
+                    resultsContainer.innerHTML = this.lastResultsState || '';
+                    resultsContainer.className = this.lastResultsClass || 'item-grid';
+                    this.isInventoryView = false;
+                    inventoryBtn.textContent = 'Inventory';
+                }
+                
+                this.animateExistingResults();
+            }
+
+            // ===== UTILITIES =====
+            createItemElement(item, additionalClass = '') {
+                const itemElement = document.createElement('div');
+                itemElement.className = `item-container ${additionalClass}`;
+                
+                const rarity = this.data.rarities.find(r => r.id === item.rarity);
+                const rarityColor = rarity ? rarity.color : '#b0b0b0';
+                
+                itemElement.style.borderColor = rarityColor;
+                
+                if (item.image) {
+                    const img = document.createElement('img');
+                    img.src = item.image;
+                    img.alt = item.name;
+                    img.className = 'item-image';
+                    itemElement.appendChild(img);
+                } else {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'item-image-placeholder';
+                    placeholder.textContent = 'No Image';
+                    itemElement.appendChild(placeholder);
+                }
+                
+                const nameOverlay = document.createElement('div');
+                nameOverlay.className = 'item-name-overlay';
+                nameOverlay.textContent = item.name;
+                itemElement.appendChild(nameOverlay);
+                
+                return itemElement;
+            }
+
+            getSortedItemsByRarity(items) {
+                const sortedItems = [...items];
+                
+                if (this.data.useIndividualRates) {
+                    return sortedItems.sort((a, b) => b.dropRate - a.dropRate);
+                } else {
+                    return sortedItems.sort((a, b) => {
+                        const rarityA = this.data.rarities.find(r => r.id === a.rarity);
+                        const rarityB = this.data.rarities.find(r => r.id === b.rarity);
+                        
+                        const rateA = rarityA ? rarityA.rate : 0;
+                        const rateB = rarityB ? rarityB.rate : 0;
+                        
+                        return rateB - rateA;
+                    });
+                }
+            }
+
+            resetStats() {
+                this.data.rollHistory = [];
+                this.data.uniqueItemsObtained = new Set();
+                this.data.rarityCounts = {};
+                this.data.totalRollsCount = 0;
+                this.data.currencySpent = 0;
+                this.data.inventory = {};
+                this.data.itemCounts = {};
+                
+                this.data.rarities.forEach(rarity => {
+                    this.data.rarityCounts[rarity.id] = 0;
+                });
+
+                for (const rarity of this.data.rarities) {
+                    this.data.currentPityCounters[rarity.id] = 0;
+                }
+                
+                this.updateRollStats();
+                this.updatePityUI();
+                this.closeAllViews();
+                document.getElementById('resultsContainer').innerHTML = '';
+                
+                this.showNotification('Statistics reset successfully!');
+            }
+
+            setupEventListeners() {
+                document.getElementById('singleRollBtn').addEventListener('click', () => this.performRoll(1));
+                document.getElementById('multiRollBtn').addEventListener('click', () => this.performRoll(this.data.multiRollCount));
+                document.getElementById('autoRollBtn').addEventListener('click', () => this.toggleAutoRollOptions());
+                document.getElementById('startAutoRollBtn').addEventListener('click', () => this.startAutoRoll());
+                document.getElementById('closeAutoRollBtn').addEventListener('click', () => this.closeAutoRollSettings());
+                
+                document.getElementById('indexBtn').addEventListener('click', () => this.toggleIndex());
+                document.getElementById('inventoryBtn').addEventListener('click', () => this.toggleInventory());
+                document.getElementById('resetStatsBtn').addEventListener('click', () => this.resetStats());
+
+                document.querySelector('.close-modal').addEventListener('click', () => {
+                    document.getElementById('indexModal').style.display = 'none';
+                });
+
+                window.addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('indexModal')) {
+                        document.getElementById('indexModal').style.display = 'none';
+                    }
+                });
+            }
+
+            showNotification(message) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.classList.add('show');
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const exportData = {
+  "title": "FNTD 2 Gacha Simulator",
+  "multiRollCount": 10,
+  "allowDuplicates": true,
+  "useIndividualRates": false,
+  "currencyName": "Coins",
+  "currencyIcon": "",
+  "costPerRoll": 150,
+  "items": [
+    {
+      "id": "1762192159542",
+      "name": "Mangle Nightmare",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/mangle-nightmare-fntd-2.png",
+      "rarity": "epic",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159543",
+      "name": "Purple Guy",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/purple-guy-five-nights-td-2.png",
+      "rarity": "legendary",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159544",
+      "name": "Withered Golden Freddy",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/withered-golden-freddy-five-nights-td-2.png",
+      "rarity": "epic",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159545",
+      "name": "Endo 0 2",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/endo-02-five-nights-td-2.png",
+      "rarity": "mythic",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159547",
+      "name": "Puppet",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/puppet-hero-five-nights-td-2.png",
+      "rarity": "legendary",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159548",
+      "name": "Fazcade",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/fazcade-fntd-2.png",
+      "rarity": "legendary",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159550",
+      "name": "Bobby",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/withered-freddy-five-nights-td-2.png",
+      "rarity": "long",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159552",
+      "name": "Endo 0 1",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/endo-0-1-fntd-2.png",
+      "rarity": "legendary",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159553",
+      "name": "Cupcake",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/cupcake-fntd-2.png",
+      "rarity": "epic",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159556",
+      "name": "Party Glock Freddy",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/party-glock-freddy-fntd-2.png",
+      "rarity": "legendary",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159558",
+      "name": "Party Packer Cupcake",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/party-packer-cupcake-fntd-2.png",
+      "rarity": "legendary",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159560",
+      "name": "Golden Freddy",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/golden-freddy-fntd-2.png",
+      "rarity": "legendary",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159563",
+      "name": "Shadow Freddy",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/shadow-freddy-fntd-2.png",
+      "rarity": "mythic",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159566",
+      "name": "Withered Foxy",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/withered-foxy-fntd-2.png",
+      "rarity": "legendary",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159569",
+      "name": "Toy JJ",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/toy-jj-fntd-2.png",
+      "rarity": "epic",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159572",
+      "name": "Toy Chica",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/toy-chica-fntd-2.png",
+      "rarity": "legendary",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159575",
+      "name": "JJ",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/jj-fntd-2.png",
+      "rarity": "rare",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159579",
+      "name": "Toy Teddy",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/toy-freddy-fntd-2.png",
+      "rarity": "epic",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159583",
+      "name": "Withered Bonnie",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/withered-bonnie-fntd-2.png",
+      "rarity": "legendary",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159586",
+      "name": "Toy Bonnie",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/toy-bonnie-fntd-2.png",
+      "rarity": "epic",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159590",
+      "name": "Paperpals",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/paperpals-fntd-2.png",
+      "rarity": "rare",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159595",
+      "name": "Freddy",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/freddy-fntd2.png",
+      "rarity": "uncommon",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159600",
+      "name": "Withered Chica",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/withered-chica-fntd-2.png",
+      "rarity": "epic",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159604",
+      "name": "Bonnie",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/bonnie-fntd-2.png",
+      "rarity": "uncommon",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159609",
+      "name": "Chica",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/chica-fntd-2.png",
+      "rarity": "uncommon",
+      "dropRate": 1,
+      "weight": 1
+    },
+    {
+      "id": "1762192159615",
+      "name": "Foxy",
+      "image": "https://www.destructoid.com/wp-content/uploads/2025/10/foxy-fntd2.png",
+      "rarity": "uncommon",
+      "dropRate": 1,
+      "weight": 1
+    }
+  ],
+  "rarities": [
+    {
+      "id": "uncommon",
+      "name": "Uncommon",
+      "color": "#4CAF50",
+      "rate": 25
+    },
+    {
+      "id": "rare",
+      "name": "Rare",
+      "color": "#2196F3",
+      "rate": 15
+    },
+    {
+      "id": "epic",
+      "name": "Epic",
+      "color": "#9C27B0",
+      "rate": 6
+    },
+    {
+      "id": "legendary",
+      "name": "Legendary",
+      "color": "#FF9800",
+      "rate": 3
+    },
+    {
+      "id": "mythic",
+      "name": "Mythic",
+      "color": "#c83232",
+      "rate": 1
+    },
+    {
+      "id": "long",
+      "name": "Long",
+      "color": "#438972",
+      "rate": 33
+    }
+  ],
+  "pitySettings": {
+    "common": {
+      "enabled": false,
+      "pityCount": 50
+    },
+    "uncommon": {
+      "enabled": false,
+      "pityCount": 50
+    },
+    "rare": {
+      "enabled": false,
+      "pityCount": 50
+    },
+    "epic": {
+      "enabled": false,
+      "pityCount": 50
+    },
+    "legendary": {
+      "enabled": true,
+      "pityCount": 50
+    },
+    "mythic": {
+      "enabled": true,
+      "pityCount": 400
+    },
+    "long": {
+      "enabled": false,
+      "pityCount": 50
+    }
+  }
+};
+            window.gachaSimulator = new GachaSimulatorExported(exportData);
+        });
+    </script>
+</body>
+</html>
