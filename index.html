@@ -176,27 +176,10 @@
         // Array of gacha simulators - add new ones here
         const simulators = [
             {
-                name: "Anime Characters Gacha",
+                name: "Test Gacha",
                 description: "Collect your favorite anime characters with different rarities",
-                file: "simulators/anime-characters.html",
-                embedWidth: "100%",
-                embedHeight: "700px"
-            },
-            {
-                name: "Fantasy Weapons Gacha",
-                description: "Roll for epic fantasy weapons and artifacts",
-                file: "simulators/fantasy-weapons.html", 
-                embedWidth: "100%",
-                embedHeight: "700px"
-            },
-            {
-                name: "Pixel Art Monsters",
-                description: "Collect cute pixel art monsters and creatures",
-                file: "simulators/pixel-monsters.html",
-                embedWidth: "100%", 
-                embedHeight: "700px"
+                file: "https://blox-informer-gachas.github.io/blox-informer-gachas/gachas/test.html",
             }
-            // Add more simulators here as you create them
         ];
 
         const grid = document.getElementById('simulatorsGrid');
@@ -207,15 +190,13 @@
 
             const embedCode = `<div class="gacha-simulator-wrapper" style="width: 100%; margin: 20px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);">
                 <iframe 
-                    src="https://staticfile-6dfdf.wasmer.app/" 
+                    src="${simulator.file}"
                     style="width: 100%; height: 755px; border: none; display: block;"
-                    title="Verse Piece Race Gacha Simulator"
+                    title="${simulator.name}"
                     loading="lazy"
                     allowfullscreen>
                 </iframe>
             </div>`;
-            
-            const embedCode = `<iframe src="${simulator.file}" width="${simulator.embedWidth}" height="${simulator.embedHeight}" frameborder="0" allowfullscreen></iframe>`;
             
             card.innerHTML = `
                 <h3>${simulator.name}</h3>
