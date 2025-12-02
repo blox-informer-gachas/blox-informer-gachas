@@ -45,6 +45,12 @@
             line-height: 1.5;
         }
 
+        body.modal-open {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+
         .container {
             display: flex;
             flex-direction: column;
@@ -1343,13 +1349,13 @@
 
             if (activeFilter !== 'all') {
                 if (activeFilter === 'has-trait') {
-                    filteredOres = oreData.filter(ore => ore.traits.some(trait => trait.type === 'weapon' || trait.type === 'all' || trait.type === 'armor') );
-                } 
-                
+                    filteredOres = oreData.filter(ore => ore.traits.some(trait => trait.type === 'weapon' || trait.type === 'all' || trait.type === 'armor'));
+                }
+
                 else if (activeFilter === 'has-weapon-trait') {
                     filteredOres = oreData.filter(ore => ore.traits.some(trait => trait.type === 'weapon' || trait.type === 'all'));
-                } 
-                
+                }
+
                 else if (activeFilter === 'has-armor-trait') {
                     filteredOres = oreData.filter(ore => ore.traits.some(trait => trait.type === 'armor' || trait.type === 'all'));
                 }
@@ -1593,19 +1599,50 @@
         function setupQuickCraft() {
             quickCraftBtn.addEventListener('click', () => {
                 quickCraftModal.style.display = 'flex';
+                document.body.classList.add('modal-open');
                 resetQuickCraft();
                 showStep(0);
+
+                setTimeout(() => quickCraftModal.focus(), 10);
             });
 
             modalClose.addEventListener('click', () => {
                 quickCraftModal.style.display = 'none';
+                document.body.classList.remove('modal-open');
             });
 
             quickCraftModal.addEventListener('click', (e) => {
                 if (e.target === quickCraftModal) {
                     quickCraftModal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
                 }
             });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && quickCraftModal.style.display === 'flex') {
+                    quickCraftModal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                }
+            });
+
+            quickCraftModal.addEventListener('wheel', (e) => {
+                const modalContent = document.querySelector('.modal-content');
+                const atTop = modalContent.scrollTop === 0;
+                const atBottom = modalContent.scrollHeight - modalContent.scrollTop === modalContent.clientHeight;
+
+                if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, { passive: false });
+
+            quickCraftModal.addEventListener('touchmove', (e) => {
+                if (e.target === quickCraftModal || e.target.closest('.modal-content')) {
+                    return;
+                }
+                e.preventDefault();
+            }, { passive: false });
 
             prevBtn.addEventListener('click', () => {
                 if (currentStep > 0) {
@@ -1621,7 +1658,11 @@
                 }
             });
 
-            craftBtn.addEventListener('click', applyQuickCraft);
+            craftBtn.addEventListener('click', () => {
+                applyQuickCraft();
+                quickCraftModal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+            });
 
             document.querySelectorAll('.modal-option[data-type]').forEach(option => {
                 option.addEventListener('click', () => {
@@ -1897,6 +1938,8 @@
             updateProbabilities();
 
             quickCraftModal.style.display = 'none';
+
+            document.body.classList.remove('modal-open');
 
             if (quickCraftType !== currentMode) {
                 currentMode = quickCraftType;
