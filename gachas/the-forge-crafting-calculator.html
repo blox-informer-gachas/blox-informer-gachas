@@ -498,7 +498,7 @@
 
         .slots-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             margin-bottom: 20px;
         }
@@ -757,16 +757,16 @@
         }
 
         @media (min-width: 769px) {
-            .slots-container {
-                grid-template-columns: repeat(4, 1fr);
-            }
-
             .ores-grid {
                 grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             }
         }
 
         @media (max-width: 480px) {
+            .slots-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
             .ores-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -947,6 +947,8 @@
                 <button class="filter-btn" data-filter="goblin">Goblin Cave</button>
                 <button class="filter-btn" data-filter="enemy">Enemy Drops</button>
                 <button class="filter-btn" data-filter="has-trait">With Traits</button>
+                <button class="filter-btn" data-filter="has-weapon-trait">With Weapon Traits</button>
+                <button class="filter-btn" data-filter="has-armor-trait">With Armor Traits</button>
             </div>
 
             <div class="ores-grid" id="ore-inventory">
@@ -1341,8 +1343,17 @@
 
             if (activeFilter !== 'all') {
                 if (activeFilter === 'has-trait') {
-                    filteredOres = oreData.filter(ore => ore.traits.length > 0);
-                } else {
+                    filteredOres = oreData.filter(ore => ore.traits.some(trait => trait.type === 'weapon' || trait.type === 'all' || trait.type === 'armor') );
+                } 
+                
+                else if (activeFilter === 'has-weapon-trait') {
+                    filteredOres = oreData.filter(ore => ore.traits.some(trait => trait.type === 'weapon' || trait.type === 'all'));
+                } 
+                
+                else if (activeFilter === 'has-armor-trait') {
+                    filteredOres = oreData.filter(ore => ore.traits.some(trait => trait.type === 'armor' || trait.type === 'all'));
+                }
+                else {
                     filteredOres = oreData.filter(ore => ore.area === activeFilter);
                 }
             }
