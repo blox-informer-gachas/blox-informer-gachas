@@ -111,7 +111,6 @@
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
         }
 
-        /* Quick Craft Button */
         .quick-craft-btn {
             padding: 8px 15px;
             background-color: white;
@@ -134,7 +133,6 @@
             border-color: var(--primary);
         }
 
-        /* Modal Overlay */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -294,7 +292,6 @@
             color: var(--text);
         }
 
-        /* Ore Inventory Section */
         .inventory-section {
             background-color: var(--card-bg);
             border-radius: 10px;
@@ -415,7 +412,6 @@
                 1px 1px 0 rgba(0, 0, 0, 0.5);
         }
 
-        /* For enemy drop ores without images */
         .ore-item.no-image {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
             position: relative;
@@ -493,7 +489,6 @@
             z-index: 2;
         }
 
-        /* Ore Mix Section */
         .mix-section {
             background-color: var(--card-bg);
             border-radius: 10px;
@@ -664,7 +659,6 @@
             color: var(--primary);
         }
 
-        /* Probability Section */
         .probability-section {
             background-color: var(--card-bg);
             border-radius: 10px;
@@ -722,7 +716,6 @@
             color: var(--text-secondary);
         }
 
-        /* Controls */
         .controls {
             display: flex;
             justify-content: center;
@@ -766,7 +759,6 @@
             -ms-user-select: none;
         }
 
-        /* Responsive Design */
         @media (min-width: 769px) {
             .slots-container {
                 grid-template-columns: repeat(4, 1fr);
@@ -808,7 +800,6 @@
             }
         }
 
-        /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -827,7 +818,6 @@
             background: var(--primary-dark);
         }
 
-        /* Rarity colors */
         .common {
             border-color: var(--common);
         }
@@ -903,7 +893,6 @@
 
         </header>
 
-        <!-- Quick Craft Modal -->
         <div class="modal-overlay" id="quick-craft-modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -928,14 +917,12 @@
                 <div class="modal-step" id="step-item">
                     <div class="modal-step-title">2. Select Item</div>
                     <div class="modal-options" id="item-options">
-                        <!-- Items will be dynamically added here -->
                     </div>
                 </div>
 
                 <div class="modal-step" id="step-traits">
                     <div class="modal-step-title">3. Select Traits (Max 4)</div>
                     <div id="trait-options">
-                        <!-- Traits will be dynamically added here -->
                     </div>
                     <div id="selected-traits-count" style="margin-top: 10px; color: var(--text-secondary);">
                         Selected: 0/4 traits
@@ -946,7 +933,6 @@
                     <div class="modal-step-title">4. Summary</div>
                     <div id="summary-content"
                         style="padding: 10px; background-color: rgba(0,0,0,0.2); border-radius: 8px;">
-                        <!-- Summary will be dynamically added here -->
                     </div>
                 </div>
 
@@ -958,7 +944,6 @@
             </div>
         </div>
 
-        <!-- Ore Inventory Section -->
         <section class="inventory-section">
             <div class="section-title">
                 <span><i class="fas fa-gem"></i> Ore List / Select Ores</span>
@@ -974,11 +959,9 @@
             </div>
 
             <div class="ores-grid" id="ore-inventory">
-                <!-- Ores will be dynamically added here -->
             </div>
         </section>
 
-        <!-- Ore Mix Section -->
         <section class="mix-section">
             <div class="section-title">
                 <span><i class="fas fa-fire"></i> Forge</span>
@@ -1033,20 +1016,17 @@
             </div>
         </section>
 
-        <!-- Probability Section -->
         <section class="probability-section">
             <div class="section-title">
                 <span><i class="fas fa-chart-pie"></i> Forge Chances</span>
             </div>
 
             <div class="probability-grid" id="probability-list">
-                <!-- Probabilities will be dynamically added here -->
             </div>
         </section>
     </div>
 
     <script>
-        // Image URLs for ores
         const oreImages = {
             "Stone": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/stone-the-forge-calculator.png",
             "Sand Stone": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/sand-stone-the-forge-calculator.png",
@@ -1092,7 +1072,6 @@
             "Arcane Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/arcane-crystal-the-forge-calculator.png"
         };
 
-        // Ore data based on the provided information
         const oreData = [
             // Stonewake's Cross
             { id: 1, name: "Stone", multiplier: 0.2, rarity: "common", area: "stonewake", color: "#8c8c8c", traitType: null, traits: [] },
@@ -1675,27 +1654,22 @@
         function showStep(step) {
             currentStep = step;
 
-            // Hide all steps
             [stepType, stepItem, stepTraits, stepSummary].forEach(s => s.classList.remove('active'));
 
-            // Show current step
             const steps = [stepType, stepItem, stepTraits, stepSummary];
             steps[step].classList.add('active');
-
-            // Update navigation buttons
             prevBtn.style.display = step === 0 ? 'none' : 'inline-block';
             nextBtn.style.display = step < 3 ? 'inline-block' : 'none';
             craftBtn.style.display = step === 3 ? 'inline-block' : 'none';
 
-            // Load step content
             switch (step) {
-                case 1: // Item selection
+                case 1:
                     loadItemOptions();
                     break;
-                case 2: // Traits selection
+                case 2:
                     loadTraitOptions();
                     break;
-                case 3: // Summary
+                case 3:
                     loadSummary();
                     break;
             }
@@ -1755,7 +1729,6 @@
             traitOptions.innerHTML = '';
             selectedTraits = [];
 
-            // Get ores with traits that apply to the selected type
             const availableTraits = oreData.filter(ore =>
                 ore.traits.length > 0 &&
                 ore.traits.some(trait => trait.type === 'all' || trait.type === quickCraftType)
@@ -1769,7 +1742,6 @@
                         option.dataset.oreId = ore.id;
 
                         let desc = trait.description;
-                        // Replace placeholders with min-max values to show range
                         Object.keys(trait.scaling).forEach(key => {
                             const scale = trait.scaling[key];
                             desc = desc.replace(`{${key}}`, `${scale.min}-${scale.max}`);
@@ -1782,18 +1754,14 @@
                     </div>
                 `;
 
-                        // Add click event to toggle selection
                         option.addEventListener('click', () => {
-                            // Check if already selected
                             const isSelected = option.classList.contains('selected');
 
                             if (!isSelected) {
-                                // Check if we can add more traits
                                 if (selectedTraits.length >= 4) {
-                                    return; // Silent fail - max traits reached
+                                    return; 
                                 }
 
-                                // Add to selected traits
                                 selectedTraits.push({
                                     oreId: ore.id,
                                     oreName: ore.name,
@@ -1802,7 +1770,6 @@
                                 });
                                 option.classList.add('selected');
                             } else {
-                                // Remove from selected traits
                                 selectedTraits = selectedTraits.filter(t => t.oreId !== ore.id);
                                 option.classList.remove('selected');
                             }
@@ -1827,13 +1794,10 @@
             let mixPlan = [];
 
             if (selectedTraits.length === 0) {
-                // Just use optimal count with filler ore
-                mixPlan = [{ id: 1, count: optimalCount }]; // Stone as filler
+                mixPlan = [{ id: 1, count: optimalCount }]; 
             } else {
-                // Calculate distribution WITHOUT adding stone ore
-                const traitCount = selectedTraits.length;
 
-                // Start with 1 ore per trait (minimum)
+                const traitCount = selectedTraits.length;
                 selectedTraits.forEach(trait => {
                     mixPlan.push({
                         id: trait.oreId,
@@ -1844,46 +1808,37 @@
                 let totalOres = traitCount;
                 const remainingOres = optimalCount - traitCount;
 
-                // Distribute remaining ores among the existing traits
                 if (remainingOres > 0) {
-                    // Calculate how many ores to add to each trait
                     const baseAddition = Math.floor(remainingOres / traitCount);
                     const extraOres = remainingOres % traitCount;
 
-                    // Add base amount to each trait
                     mixPlan.forEach((item, index) => {
                         item.count += baseAddition;
                     });
 
-                    // Distribute any extra ores
                     for (let i = 0; i < extraOres; i++) {
                         mixPlan[i].count++;
                     }
                 }
 
-                // Now check if we're below the optimal count and add more to existing traits
                 totalOres = mixPlan.reduce((sum, item) => sum + item.count, 0);
 
                 if (totalOres < optimalCount) {
                     const shortfall = optimalCount - totalOres;
 
-                    // Add the shortfall to the traits in a round-robin fashion
                     for (let i = 0; i < shortfall; i++) {
                         const traitIndex = i % traitCount;
                         mixPlan[traitIndex].count++;
                     }
                 }
 
-                // Ensure we don't exceed the optimal count
                 totalOres = mixPlan.reduce((sum, item) => sum + item.count, 0);
                 if (totalOres > optimalCount) {
-                    // Remove excess from the last trait
                     const excess = totalOres - optimalCount;
                     mixPlan[mixPlan.length - 1].count -= excess;
                 }
             }
 
-            // Format summary
             let summaryHTML = `
                 <div style="margin-bottom: 10px;">
                     <strong>Item:</strong> ${quickCraftItem.name}<br>
@@ -1940,19 +1895,15 @@
 
             summaryContent.innerHTML = summaryHTML;
 
-            // Store mix plan for crafting
             summaryContent.dataset.mixPlan = JSON.stringify(mixPlan);
         }
 
         function applyQuickCraft() {
             const mixPlan = JSON.parse(summaryContent.dataset.mixPlan);
 
-            // Clear current mix
             oreMix = [];
 
-            // Apply new mix
             mixPlan.forEach(item => {
-                // Check if ore already in mix
                 const existingIndex = oreMix.findIndex(ore => ore.id === item.id);
                 if (existingIndex !== -1) {
                     oreMix[existingIndex].count += item.count;
@@ -1961,14 +1912,11 @@
                 }
             });
 
-            // Update display
             updateOreSlots();
             updateProbabilities();
 
-            // Close modal
             quickCraftModal.style.display = 'none';
 
-            // Switch mode if needed
             if (quickCraftType !== currentMode) {
                 currentMode = quickCraftType;
                 if (currentMode === 'weapon') {
@@ -1992,9 +1940,7 @@
             document.querySelectorAll('.trait-checkbox').forEach(cb => cb.checked = false);
         }
 
-        // Setup event listeners
         function setupEventListeners() {
-            // Mode toggles
             weaponToggle.addEventListener('click', () => {
                 currentMode = 'weapon';
                 weaponToggle.classList.add('active');
@@ -2011,7 +1957,6 @@
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
             });
 
-            // Filter buttons
             filterButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
                     filterButtons.forEach(b => b.classList.remove('active'));
@@ -2021,7 +1966,6 @@
                 });
             });
 
-            // Reset button
             resetBtn.addEventListener('click', () => {
                 oreMix = [];
                 updateOreSlots();
@@ -2030,7 +1974,6 @@
 
         }
 
-        // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
