@@ -45,12 +45,6 @@
             line-height: 1.5;
         }
 
-        body.modal-open {
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-        }
-
         .container {
             display: flex;
             flex-direction: column;
@@ -766,9 +760,23 @@
             .ores-grid {
                 grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             }
+
+            body.modal-open {
+                overflow: auto;
+                width: auto;
+                height: auto;
+            }
         }
 
         @media (max-width: 480px) {
+            body.modal-open {
+                position: fixed;
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+                touch-action: none;
+            }
+
             .slots-container {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -1090,7 +1098,7 @@
             { id: 22, name: "Sapphire", multiplier: 2.25, rarity: "rare", area: "kingdom", color: "#0f52ba", traitType: null, traits: [] },
             { id: 23, name: "Cuprite", multiplier: 2.43, rarity: "epic", area: "kingdom", color: "#b87333", traitType: null, traits: [] },
             {
-                id: 24, name: "Obsidian", multiplier: 2.35, rarity: "epic", area: "kingdom", color: "#0b0b0b", traitType: null, traits: [
+                id: 24, name: "Obsidian", multiplier: 2.35, rarity: "epic", area: "kingdom", color: "#0b0b0b", traitType: "armor", traits: [
                     { description: "+{health}% extra health.", scaling: { health: { min: 3, max: 30 } }, type: "armor" }
                 ]
             },
@@ -1481,7 +1489,7 @@
                 return;
             }
 
-            const traitMap = {};
+            const traitsList = [];
 
             oreMix.forEach(item => {
                 const ore = oreData.find(o => o.id === item.id);
@@ -1489,7 +1497,9 @@
 
                 if (ore.traits && ore.traits.length > 0 && percentage >= 10) {
                     ore.traits.forEach(trait => {
-                        if (trait.type === 'all' || trait.type === currentMode) {
+                        const isApplicable = trait.type === 'all' || trait.type === currentMode;
+
+                        if (isApplicable) {
                             let scaledValues = {};
                             Object.keys(trait.scaling).forEach(key => {
                                 const scale = trait.scaling[key];
@@ -1510,36 +1520,35 @@
                                 formattedDesc = formattedDesc.replace(`{${key}}`, scaledValues[key]);
                             });
 
-                            const traitKey = trait.description.split('{')[0];
-
-                            if (!traitMap[traitKey]) {
-                                traitMap[traitKey] = {
-                                    description: formattedDesc,
-                                    oreName: ore.name
-                                };
-                            }
+                            traitsList.push({
+                                oreName: ore.name,
+                                description: formattedDesc,
+                                percentage: percentage,
+                                oreId: ore.id,
+                                rawDescription: trait.description
+                            });
                         }
                     });
                 }
             });
 
-            const traits = Object.values(traitMap);
-
-            if (traits.length === 0) {
+            if (traitsList.length === 0) {
                 activeTraitsContainer.innerHTML = '<div class="trait-placeholder">No active traits (need at least 10% of an ore with traits)</div>';
                 return;
             }
 
-            traits.forEach(traitInfo => {
+            traitsList.forEach(traitInfo => {
                 const traitElement = document.createElement('div');
                 traitElement.className = 'trait';
+                traitElement.dataset.oreId = traitInfo.oreId;
+                traitElement.dataset.percentage = traitInfo.percentage.toFixed(1);
 
                 traitElement.innerHTML = `
-                    <div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: bold;">${traitInfo.oreName}</div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span>${traitInfo.description}</span>
-                    </div>
-                `;
+            <div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: bold;">${traitInfo.oreName}</div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span>${traitInfo.description}</span>
+            </div>
+        `;
 
                 activeTraitsContainer.appendChild(traitElement);
             });
@@ -1599,7 +1608,9 @@
         function setupQuickCraft() {
             quickCraftBtn.addEventListener('click', () => {
                 quickCraftModal.style.display = 'flex';
-                document.body.classList.add('modal-open');
+                if (window.innerWidth <= 480) {
+                    document.body.classList.add('modal-open');
+                }
                 resetQuickCraft();
                 showStep(0);
 
