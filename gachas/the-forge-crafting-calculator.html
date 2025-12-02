@@ -336,7 +336,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
-            max-height: 310px;
+            max-height: 270px;
             overflow-y: auto;
             padding: 5px;
         }
@@ -608,9 +608,6 @@
         }
 
         .mix-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
             margin-bottom: 20px;
         }
 
@@ -628,7 +625,7 @@
         }
 
         .stat-value {
-            font-size: 1.8rem;
+            font-size: 1.2rem;
             font-weight: bold;
             color: var(--primary);
         }
@@ -778,17 +775,8 @@
                 grid-template-columns: 1fr;
             }
 
-            .mix-stats {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-            }
-
             .stat-box {
                 padding: 10px;
-            }
-
-            .stat-value {
-                font-size: 1.5rem;
             }
 
             .filter-controls {
@@ -947,6 +935,9 @@
         <section class="inventory-section">
             <div class="section-title">
                 <span><i class="fas fa-gem"></i> Ore List / Select Ores</span>
+                <button class="quick-craft-btn" id="quick-craft-btn">
+                    <i class="fas fa-bolt"></i> Quick Craft
+                </button>
             </div>
 
             <div class="filter-controls">
@@ -965,6 +956,9 @@
         <section class="mix-section">
             <div class="section-title">
                 <span><i class="fas fa-fire"></i> Forge</span>
+                <button class="control-btn reset-btn" id="reset-btn">
+                    <i class="fas fa-redo"></i> Reset Forge
+                </button>
             </div>
 
             <div class="slots-container" id="ore-slots">
@@ -984,28 +978,9 @@
 
             <div class="mix-stats">
                 <div class="stat-box">
-                    <div class="stat-title">Multiplier</div>
                     <div class="stat-value" id="multiplier-value">0.0x</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-title">Total Ores</div>
-                    <div class="stat-value" id="total-ores-value">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-title">Unique Ores</div>
-                    <div class="stat-value" id="unique-ores-value">0</div>
-                </div>
             </div>
-
-            <div class="controls">
-                <button class="control-btn reset-btn" id="reset-btn">
-                    <i class="fas fa-redo"></i> Reset Mix
-                </button>
-                <button class="quick-craft-btn" id="quick-craft-btn">
-                    <i class="fas fa-bolt"></i> Quick Craft
-                </button>
-            </div>
-
             <div class="traits-container">
                 <div class="section-title">
                     <span><i class="fas fa-magic"></i> Ore Traits</span>
@@ -1330,9 +1305,6 @@
         const probabilityList = document.getElementById('probability-list');
         const activeTraitsContainer = document.getElementById('active-traits');
         const multiplierValue = document.getElementById('multiplier-value');
-        const totalOresValue = document.getElementById('total-ores-value');
-        const uniqueOresValue = document.getElementById('unique-ores-value');
-        const mixCount = document.getElementById('mix-count');
         const totalOresDisplay = document.getElementById('total-ores');
         const weaponToggle = document.getElementById('weapon-toggle');
         const armorToggle = document.getElementById('armor-toggle');
@@ -1446,9 +1418,7 @@
 
             const multiplier = totalOres > 0 ? (multiplierSum / totalOres).toFixed(2) : 0;
 
-            multiplierValue.textContent = `${multiplier}x`;
-            totalOresValue.textContent = totalOres;
-            uniqueOresValue.textContent = uniqueOres;
+            multiplierValue.textContent = `Multiplier: ${multiplier}x`;
 
             slots.forEach(slot => {
                 slot.innerHTML = '<div class="slot-placeholder">Empty slot</div>';
@@ -1759,7 +1729,7 @@
 
                             if (!isSelected) {
                                 if (selectedTraits.length >= 4) {
-                                    return; 
+                                    return;
                                 }
 
                                 selectedTraits.push({
@@ -1794,7 +1764,7 @@
             let mixPlan = [];
 
             if (selectedTraits.length === 0) {
-                mixPlan = [{ id: 1, count: optimalCount }]; 
+                mixPlan = [{ id: 1, count: optimalCount }];
             } else {
 
                 const traitCount = selectedTraits.length;
