@@ -27,6 +27,7 @@
             --legendary: #f0b209;
             --mythical: #d13429;
             --relic: #ffeb3b;
+            --stonewake-teal: #084e4e;
         }
 
         * {
@@ -43,12 +44,6 @@
             margin: 0 auto;
             padding: 10px;
             line-height: 1.5;
-        }
-
-        body.modal-open {
-            overflow: auto;
-            width: auto;
-            height: auto;
         }
 
         .container {
@@ -329,7 +324,6 @@
             border-radius: 15px;
             cursor: pointer;
             font-size: 0.8rem;
-            font-weight: 600;
             transition: all 0.2s;
         }
 
@@ -523,6 +517,13 @@
         .slot.filled {
             border: 2px solid var(--primary);
             background-color: rgba(255, 102, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .slot.filled:hover {
+            box-shadow: var(--glow);
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
         }
 
         .slot-placeholder {
@@ -681,21 +682,27 @@
             border-radius: 8px;
             padding: 12px;
             border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .probability-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--glow);
+            transition: all 0.3s ease;
         }
 
         .item-name {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.2s ease;
         }
 
         .optimal-count-display {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: var(--text-secondary);
-            background-color: rgba(255, 102, 0, 0.1);
-            padding: 2px 8px;
-            border-radius: 10px;
         }
 
         .probability-bar {
@@ -714,9 +721,110 @@
         }
 
         .probability-value {
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             text-align: right;
             color: var(--text-secondary);
+        }
+
+        .tooltip {
+            display: none;
+            position: fixed;
+            background-color: var(--card-bg);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 1001;
+            max-width: 300px;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .tooltip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tooltip-title {
+            font-size: 1rem;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .tooltip-close {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        .tooltip-content {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .variant-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .variant-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .variant-name {
+            font-weight: bold;
+        }
+
+        .variant-chance {
+            color: var(--primary);
+            font-weight: bold;
+            background-color: rgba(255, 102, 0, 0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+        }
+
+        .area-exclusive {
+            color: var(--warning);
+            font-size: 0.8rem;
+            margin-top: 3px;
+        }
+
+        .area-toggle-btn.kingdom {
+            background-color: var(--primary);
+            border: 1px solid var(--primary);
+            color: var(--background);
+            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.18);
+        }
+
+        .area-toggle-btn.stonewake {
+            background-color: var(--stonewake-teal);
+            border: 1px solid var(--stonewake-teal);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(8, 78, 78, 0.18);
+        }
+
+        .area-toggle-btn {
+            transition: all 0.3s ease;
+        }
+
+        .area-toggle-btn:hover {
+            background-color: var(--primary-light) !important;
+            border-color: var(--primary) !important;
         }
 
         .controls {
@@ -769,6 +877,12 @@
         }
 
         @media (max-width: 480px) {
+            body.modal-open {
+                position: fixed;
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+            }
 
             .slots-container {
                 grid-template-columns: repeat(2, 1fr);
@@ -988,6 +1102,7 @@
             <div class="mix-stats">
                 <div class="stat-box">
                     <div class="stat-value" id="multiplier-value">0.0x</div>
+                    <div class="stat-title" id="expected-item" style="color: var(--success)">Expected: None (0%)</div>
                 </div>
             </div>
             <div class="traits-container">
@@ -1003,11 +1118,28 @@
         <section class="probability-section">
             <div class="section-title">
                 <span><i class="fas fa-chart-pie"></i> Forge Chances</span>
-            </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button class="area-toggle-btn" id="area-toggle-btn"
+                        style="font-size: 0.8rem; padding: 5px 12px; border-radius: 15px; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                        <i class="fas fa-map-marker-alt"></i> <span id="area-label">Forgotten Kingdom</span>
+                    </button>
+                </div>
 
-            <div class="probability-grid" id="probability-list">
             </div>
-        </section>
+            <div class="probability-grid" id="probability-list"></div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px; text-align: center;">(Click on an item type for specific item forge odds)</div>
+    </div>
+
+    <div class="tooltip" id="variant-tooltip">
+        <div class="tooltip-header">
+            <h3 class="tooltip-title" id="tooltip-item-name">Item Variants</h3>
+            <button class="tooltip-close" id="tooltip-close">&times;</button>
+        </div>
+        <div class="tooltip-content" id="tooltip-content">
+        </div>
+    </div>
+    </section>
+
     </div>
 
     <script>
@@ -1276,6 +1408,142 @@
             50: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.14, "Heavy Chestplate": 0.84 },
         };
 
+        const specificItemVariants = {
+            weapon: {
+                "Dagger": {
+                    "stonewake": [
+                        { name: "Dagger", chance: "1/1", probability: 1.0 },
+                        { name: "Falchion Knife", chance: "1/2", probability: 0.5 },
+                        { name: "Gladius Dagger", chance: "1/16", probability: 0.0625 }
+                    ],
+                    "kingdom": [
+                        { name: "Dagger", chance: "1/1", probability: 1.0 },
+                        { name: "Gladius Dagger", chance: "1/4", probability: 0.25 },
+                        { name: "Hook", chance: "1/16", probability: 0.0625 }
+                    ]
+                },
+                "Straight Sword": {
+                    "stonewake": [
+                        { name: "Gladius", chance: "1/1", probability: 1.0 },
+                        { name: "Falchion", chance: "1/3", probability: 0.3333 },
+                        { name: "Cutlass", chance: "1/8", probability: 0.125 }
+                    ],
+                    "kingdom": [
+                        { name: "Falchion", chance: "1/1", probability: 1.0 },
+                        { name: "Cutlass", chance: "1/2", probability: 0.5 },
+                        { name: "Rapier", chance: "1/4", probability: 0.25 },
+                        { name: "Chaos", chance: "1/16", probability: 0.0625 }
+                    ]
+                },
+                "Gauntlet": {
+                    "stonewake": [
+                        { name: "Ironhand", chance: "1/1", probability: 1.0 },
+                        { name: "Boxing Gloves", chance: "1/4", probability: 0.25 }
+                    ],
+                    "kingdom": [
+                        { name: "Ironhand", chance: "1/1", probability: 1.0 },
+                        { name: "Relevator", chance: "1/4", probability: 0.25 }
+                    ]
+                },
+                "Katana": {
+                    "stonewake": [
+                        { name: "Uchigatana", chance: "1/1", probability: 1.0 }
+                    ],
+                    "kingdom": [
+                        { name: "Uchigatana", chance: "1/1", probability: 1.0 },
+                        { name: "Tachi", chance: "1/4", probability: 0.25 }
+                    ]
+                },
+                "Great Sword": {
+                    "stonewake": [
+                        { name: "Crusader Sword", chance: "1/1", probability: 1.0 }
+                    ],
+                    "kingdom": [
+                        { name: "Crusader Sword", chance: "1/1", probability: 1.0 },
+                        { name: "Long Sword", chance: "1/2", probability: 0.5 }
+                    ]
+                },
+                "Great Axe": {
+                    "stonewake": [
+                        { name: "Double Battle Axe", chance: "1/1", probability: 1.0 }
+                    ],
+                    "kingdom": [
+                        { name: "Double Battle Axe", chance: "1/1", probability: 1.0 },
+                        { name: "Scythe", chance: "1/4", probability: 0.25 }
+                    ]
+                },
+                "Colossal Sword": {
+                    "stonewake": [
+                        { name: "Great Sword", chance: "1/1", probability: 1.0 },
+                        { name: "Hammer", chance: "1/4", probability: 0.25 },
+                        { name: "Comically Large Spoon", chance: "1/16", probability: 0.0625 }
+                    ],
+                    "kingdom": [
+                        { name: "Great Sword", chance: "1/1", probability: 1.0 },
+                        { name: "Hammer", chance: "1/4", probability: 0.25 },
+                        { name: "Skull Crusher", chance: "1/8", probability: 0.125 },
+                        { name: "Dragon Slayer", chance: "1/16", probability: 0.0625 }
+                    ]
+                }
+            },
+            armor: {
+                "Light Helmet": {
+                    "stonewake": [{ name: "Light Helmet", chance: "1/1", probability: 1.0 }],
+                    "kingdom": [{ name: "Light Helmet", chance: "1/1", probability: 1.0 }]
+                },
+                "Light Leggings": {
+                    "stonewake": [{ name: "Light Leggings", chance: "1/1", probability: 1.0 }],
+                    "kingdom": [{ name: "Light Leggings", chance: "1/1", probability: 1.0 }]
+                },
+                "Light Chestplate": {
+                    "stonewake": [{ name: "Light Chestplate", chance: "1/1", probability: 1.0 }],
+                    "kingdom": [{ name: "Light Chestplate", chance: "1/1", probability: 1.0 }]
+                },
+                "Medium Helmet": {
+                    "stonewake": [{ name: "Medium Helmet", chance: "1/1", probability: 1.0 }],
+                    "kingdom": [
+                        { name: "Medium Helmet", chance: "1/1", probability: 1.0 },
+                        { name: "Samurai Helmet", chance: "1/2", probability: 0.5 }
+                    ]
+                },
+                "Medium Leggings": {
+                    "stonewake": [{ name: "Medium Leggings", chance: "1/1", probability: 1.0 }],
+                    "kingdom": [
+                        { name: "Medium Leggings", chance: "1/1", probability: 1.0 },
+                        { name: "Samurai Leggings", chance: "1/2", probability: 0.5 }
+                    ]
+                },
+                "Medium Chestplate": {
+                    "stonewake": [{ name: "Medium Chestplate", chance: "1/1", probability: 1.0 }],
+                    "kingdom": [
+                        { name: "Medium Chestplate", chance: "1/1", probability: 1.0 },
+                        { name: "Samurai Chestplate", chance: "1/2", probability: 0.5 }
+                    ]
+                },
+                "Heavy Helmet": {
+                    "stonewake": [{ name: "Knight Helmet", chance: "1/1", probability: 1.0 }],
+                    "kingdom": [
+                        { name: "Knight Helmet", chance: "1/1", probability: 1.0 },
+                        { name: "Dark Knight Helmet", chance: "1/2", probability: 0.5 }
+                    ]
+                },
+                "Heavy Leggings": {
+                    "stonewake": [{ name: "Knight Leggings", chance: "1/1", probability: 1.0 }],
+                    "kingdom": [
+                        { name: "Knight Leggings", chance: "1/1", probability: 1.0 },
+                        { name: "Dark Knight Leggings", chance: "1/2", probability: 0.5 }
+                    ]
+                },
+                "Heavy Chestplate": {
+                    "stonewake": [{ name: "Knight Chestplate", chance: "1/1", probability: 1.0 }],
+                    "kingdom": [
+                        { name: "Knight Chestplate", chance: "1/1", probability: 1.0 },
+                        { name: "Dark Knight Chestplate", chance: "1/2", probability: 0.5 }
+                    ]
+                }
+            }
+        };
+
         // Optimal ore counts for each item type
         const optimalCounts = {
             weapon: {
@@ -1308,6 +1576,8 @@
         let quickCraftItem = null;
         let selectedTraits = [];
         let currentStep = 0;
+        let currentArea = 'kingdom';
+        let highestProbabilityItem = null;
 
         const oreInventory = document.getElementById('ore-inventory');
         const oreSlotsContainer = document.getElementById('ore-slots');
@@ -1341,6 +1611,158 @@
             updateProbabilities();
             setupEventListeners();
             setupQuickCraft();
+            updateExpectedItem();
+            updateAreaToggle();
+        }
+
+        document.getElementById('tooltip-close').addEventListener('click', () => {
+            document.getElementById('variant-tooltip').style.display = 'none';
+        });
+
+        document.addEventListener('click', (e) => {
+            const tooltip = document.getElementById('variant-tooltip');
+            if (tooltip.style.display === 'block' && !tooltip.contains(e.target) && !e.target.closest('.probability-item')) {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        function updateExpectedItem() {
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+            const probabilities = currentMode === 'weapon' ? weaponProbabilities : armorProbabilities;
+            const expectedItemEl = document.getElementById('expected-item');
+
+            if (totalOres >= 3) {
+                let closestCount = 3;
+                if (totalOres >= 50) {
+                    closestCount = 50;
+                } else if (totalOres >= 3) {
+                    const counts = Object.keys(probabilities).map(Number);
+                    closestCount = counts.reduce((prev, curr) => {
+                        return (Math.abs(curr - totalOres) < Math.abs(prev - totalOres) ? curr : prev);
+                    });
+                }
+
+                const currentProbs = probabilities[closestCount] || {};
+                let highestProb = 0;
+                let highestItem = null;
+
+                Object.entries(currentProbs).forEach(([itemName, probability]) => {
+                    if (probability > highestProb) {
+                        highestProb = probability;
+                        highestItem = itemName;
+                    }
+                });
+
+                highestProbabilityItem = highestItem;
+
+                if (highestItem) {
+                    const percent = (highestProb * 100).toFixed(1);
+                    expectedItemEl.textContent = `Expected: ${highestItem} (${percent}%)`;
+                } else {
+                    expectedItemEl.textContent = 'Expected: None (0%)';
+                }
+            } else {
+                expectedItemEl.textContent = 'Expected: None (Add 3+ ores)';
+                highestProbabilityItem = null;
+            }
+        }
+
+        function showVariantTooltip(itemName, event) {
+            const tooltip = document.getElementById('variant-tooltip');
+            const tooltipTitle = document.getElementById('tooltip-item-name');
+            const tooltipContent = document.getElementById('tooltip-content');
+
+            const variants = specificItemVariants[currentMode]?.[itemName]?.[currentArea];
+
+            if (!variants || variants.length === 0) {
+                tooltipContent.innerHTML = `<p>No specific variants available for ${itemName} in ${currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross'}.</p>`;
+            } else {
+                let html = `<p style="margin-bottom: 10px; color: var(--text-secondary);">Available in ${currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross'}:</p>`;
+                html += '<ul class="variant-list">';
+
+                variants.forEach(variant => {
+                    const areaExclusive = variant.name.includes('[') ? variant.name.match(/\[(.*?)\]/)?.[1] : null;
+                    const cleanName = variant.name.replace(/\s*\[.*?\]\s*/, '');
+
+                    html += `
+                <li class="variant-item">
+                    <div>
+                        <div class="variant-name">${cleanName}</div>
+                        ${areaExclusive ? `<div class="area-exclusive">Exclusive to ${areaExclusive}</div>` : ''}
+                    </div>
+                    <div class="variant-chance">${variant.chance}</div>
+                </li>
+            `;
+                });
+
+                html += '</ul>';
+                tooltipContent.innerHTML = html;
+            }
+
+            tooltipTitle.textContent = `${itemName} Variants`;
+
+            positionTooltip(tooltip, event);
+
+            tooltip.style.display = 'block';
+        }
+
+        function positionTooltip(tooltip, event) {
+            tooltip.style.display = 'block';
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            const clickX = event.clientX;
+            const clickY = event.clientY;
+
+            let top = clickY + 10;
+            let left = clickX;
+
+            if (left + tooltipRect.width > viewportWidth - 10) {
+                left = viewportWidth - tooltipRect.width - 10;
+            }
+
+            if (left < 10) {
+                left = 10;
+            }
+
+            if (top + tooltipRect.height > viewportHeight - 10) {
+                top = clickY - tooltipRect.height - 10;
+
+                if (top < 10) {
+                    top = viewportHeight - tooltipRect.height - 10;
+                }
+            }
+
+            if (top < 10) {
+                top = 10;
+            }
+
+            tooltip.style.position = 'fixed';
+            tooltip.style.top = `${top}px`;
+            tooltip.style.left = `${left}px`;
+            tooltip.style.transform = 'none';
+        }
+
+        function updateAreaToggle() {
+            const areaToggle = document.getElementById('area-toggle-btn');
+            const areaLabel = document.getElementById('area-label');
+
+            function applyAreaClasses() {
+                areaLabel.textContent = currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross';
+                areaToggle.classList.toggle('kingdom', currentArea === 'kingdom');
+                areaToggle.classList.toggle('stonewake', currentArea === 'stonewake');
+            }
+
+            applyAreaClasses();
+
+            areaToggle.addEventListener('click', () => {
+                currentArea = currentArea === 'kingdom' ? 'stonewake' : 'kingdom';
+                applyAreaClasses();
+
+                updateProbabilities();
+                updateExpectedItem();
+            });
         }
 
         function renderOreInventory() {
@@ -1472,6 +1894,7 @@
             });
 
             updateActiveTraits(totalOres);
+            updateExpectedItem();
         }
 
         function updateActiveTraits(totalOres) {
@@ -1571,19 +1994,29 @@
 
                 const itemElement = document.createElement('div');
                 itemElement.className = 'probability-item';
+                itemElement.dataset.itemName = itemName;
 
                 itemElement.innerHTML = `
-                    <div class="item-name">
-                        <span>${itemName}</span>
-                        <span class="optimal-count-display">Optimal: ${optimal[itemName] || 'N/A'}</span>
-                    </div>
-                    <div class="probability-bar">
-                        <div class="probability-fill" style="width: ${probabilityPercent}%"></div>
-                    </div>
-                    <div class="probability-value">
-                        ${probabilityPercent}%
-                    </div>
-                `;
+        <div class="item-name">
+            <span>${itemName}</span>
+            <span class="optimal-count-display">Optimal: ${optimal[itemName] || 'N/A'}</span>
+        </div>
+        <div class="probability-bar">
+            <div class="probability-fill" style="width: ${probabilityPercent}%"></div>
+        </div>
+        <div class="probability-value">
+            ${probabilityPercent}%
+        </div>
+    `;
+
+                itemElement.addEventListener('click', (e) => {
+                    showVariantTooltip(itemName, e);
+                    e.stopPropagation();
+                });
+
+                itemElement.addEventListener('mouseenter', () => {
+                    itemElement.style.cursor = 'pointer';
+                });
 
                 probabilityList.appendChild(itemElement);
             });
@@ -1601,10 +2034,13 @@
         function setupQuickCraft() {
             quickCraftBtn.addEventListener('click', () => {
                 quickCraftModal.style.display = 'flex';
-                document.body.classList.add('modal-open');
+                
+                if (window.innerWidth <= 480) {
+                    document.body.classList.add('modal-open');
+                }
+                
                 resetQuickCraft();
                 showStep(0);
-
                 setTimeout(() => quickCraftModal.focus(), 10);
             });
 
@@ -1627,17 +2063,19 @@
                 }
             });
 
-            quickCraftModal.addEventListener('wheel', (e) => {
-                const modalContent = document.querySelector('.modal-content');
-                const atTop = modalContent.scrollTop === 0;
-                const atBottom = modalContent.scrollHeight - modalContent.scrollTop === modalContent.clientHeight;
-
-                if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                }
-            }, { passive: false });
+            if (window.innerWidth <= 480) {
+                quickCraftModal.addEventListener('wheel', (e) => {
+                    const modalContent = document.querySelector('.modal-content');
+                    const atTop = modalContent.scrollTop === 0;
+                    const atBottom = modalContent.scrollHeight - modalContent.scrollTop === modalContent.clientHeight;
+                    
+                    if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+                }, { passive: false });
+            }
 
             quickCraftModal.addEventListener('touchmove', (e) => {
                 if (e.target === quickCraftModal || e.target.closest('.modal-content')) {
@@ -1924,7 +2362,7 @@
 
         function applyQuickCraft() {
             const mixPlan = JSON.parse(summaryContent.dataset.mixPlan);
-
+            
             if (quickCraftType !== currentMode) {
                 currentMode = quickCraftType;
                 if (currentMode === 'weapon') {
@@ -1934,12 +2372,10 @@
                     armorToggle.classList.add('active');
                     weaponToggle.classList.remove('active');
                 }
-
                 updateProbabilities();
             }
-
+            
             oreMix = [];
-
             mixPlan.forEach(item => {
                 const existingIndex = oreMix.findIndex(ore => ore.id === item.id);
                 if (existingIndex !== -1) {
@@ -1948,13 +2384,12 @@
                     oreMix.push({ id: item.id, count: item.count });
                 }
             });
-
+            
             updateOreSlots();
-
             if (quickCraftType === currentMode) {
                 updateProbabilities();
             }
-
+            
             quickCraftModal.style.display = 'none';
             document.body.classList.remove('modal-open');
         }
@@ -1975,6 +2410,7 @@
                 weaponToggle.classList.add('active');
                 armorToggle.classList.remove('active');
                 updateProbabilities();
+                updateExpectedItem();
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
             });
 
@@ -1983,6 +2419,7 @@
                 armorToggle.classList.add('active');
                 weaponToggle.classList.remove('active');
                 updateProbabilities();
+                updateExpectedItem();
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
             });
 
