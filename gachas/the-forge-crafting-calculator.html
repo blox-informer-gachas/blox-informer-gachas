@@ -1923,6 +1923,19 @@
         function applyQuickCraft() {
             const mixPlan = JSON.parse(summaryContent.dataset.mixPlan);
 
+            if (quickCraftType !== currentMode) {
+                currentMode = quickCraftType;
+                if (currentMode === 'weapon') {
+                    weaponToggle.classList.add('active');
+                    armorToggle.classList.remove('active');
+                } else {
+                    armorToggle.classList.add('active');
+                    weaponToggle.classList.remove('active');
+                }
+
+                updateProbabilities();
+            }
+
             oreMix = [];
 
             mixPlan.forEach(item => {
@@ -1935,23 +1948,13 @@
             });
 
             updateOreSlots();
-            updateProbabilities();
 
-            quickCraftModal.style.display = 'none';
-
-            document.body.classList.remove('modal-open');
-
-            if (quickCraftType !== currentMode) {
-                currentMode = quickCraftType;
-                if (currentMode === 'weapon') {
-                    weaponToggle.classList.add('active');
-                    armorToggle.classList.remove('active');
-                } else {
-                    armorToggle.classList.add('active');
-                    weaponToggle.classList.remove('active');
-                }
+            if (quickCraftType === currentMode) {
                 updateProbabilities();
             }
+
+            quickCraftModal.style.display = 'none';
+            document.body.classList.remove('modal-open');
         }
 
         function resetQuickCraft() {
