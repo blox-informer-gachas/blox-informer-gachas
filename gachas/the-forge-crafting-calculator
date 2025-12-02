@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forging Calculator - Roblox Experience</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF6600;
+            --primary-dark: #cc5200;
+            --primary-light: rgba(255, 102, 0, 0.1);
+            --background: #1d1d1d;
+            --card-bg: #2a2a2a;
+            --text: #f0f0f0;
+            --text-secondary: #ff812d;
+            --border: #444;
+            --success: #4CAF50;
+            --warning: #ff9800;
+            --error: #f44336;
+            --glow: 0 0 15px rgba(255, 102, 0, 0.5);
+            --common: #8c8c8c;
+            --uncommon: #4CAF50;
+            --rare: #2196F3;
+            --epic: #9c27b0;
+            --legendary: #f0b209;
+            --mythical: #d13429;
+            --relic: #ffeb3b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10px;
+            line-height: 1.5;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        header {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            border-radius: 10px;
+            box-shadow: var(--glow);
+            position: relative;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        button {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn {
+            padding: 8px 20px;
+            border: 2px solid var(--border);
+            background-color: var(--card-bg);
+            color: var(--text);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: white;
+            color: var(--primary);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--primary);
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            background-color: white;
+            color: var(--primary)
+        }
+
+        .toggle-btn.active:hover {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Quick Craft Button */
+        .quick-craft-btn {
+            padding: 8px 15px;
+            background-color: white;
+            color: var(--primary-dark);
+            border: 2px solid white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .quick-craft-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .modal-step {
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .modal-step.active {
+            display: block;
+        }
+
+        .modal-step-title {
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .modal-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .modal-option {
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(255, 102, 0, 0.1);
+        }
+
+        .modal-option:hover {
+            transform: translateY(-3px);
+        }
+
+        .trait-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            transform-origin: center;
+        }
+
+        .trait-option:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-light);
+            background-color: rgba(255, 102, 0, 0.05);
+        }
+
+        .trait-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(255, 102, 0, 0.15);
+            box-shadow: 0 0 10px rgba(255, 102, 0, 0.2);
+        }
+
+        .trait-option.selected:hover {
+            background-color: rgba(255, 102, 0, 0.2);
+            border-color: var(--primary);
+        }
+
+        .trait-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .trait-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .trait-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .modal-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: var(--background);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .modal-btn.secondary {
+            background-color: var(--border);
+            color: var(--text);
+        }
+
+        /* Ore Inventory Section */
+        .inventory-section {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 5px 12px;
+            border: 1px solid var(--border);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .ores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            max-height: 310px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .ore-item {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 232/173;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .ore-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: var(--glow);
+        }
+
+        .ore-item.has-trait .trait-indicator {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: var(--primary);
+            font-size: 1rem;
+            text-shadow: 0 0 5px rgba(255, 102, 0, 0.7);
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .ore-item.has-trait .trait-indicator i {
+            font-size: 1rem;
+        }
+
+        .ore-name {
+            position: absolute;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: bold;
+            padding: 3px 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                -1px -1px 0 rgba(0, 0, 0, 0.5),
+                1px -1px 0 rgba(0, 0, 0, 0.5),
+                -1px 1px 0 rgba(0, 0, 0, 0.5),
+                1px 1px 0 rgba(0, 0, 0, 0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ore-multiplier {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                -1px -1px 0 rgba(0, 0, 0, 0.5),
+                1px -1px 0 rgba(0, 0, 0, 0.5),
+                -1px 1px 0 rgba(0, 0, 0, 0.5),
+                1px 1px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* For enemy drop ores without images */
+        .ore-item.no-image {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ore-item.no-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.03) 0%,
+                    rgba(255, 255, 255, 0) 50%,
+                    rgba(0, 0, 0, 0.1) 100%);
+            z-index: 1;
+        }
+
+        .ore-item.no-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(45deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.02) 75%, transparent 75%, transparent);
+            background-size: 8px 8px;
+            z-index: 0;
+        }
+
+        .ore-item.no-image .ore-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            opacity: 0.7;
+            z-index: 1;
+        }
+
+        .ore-item.no-image .ore-name {
+            position: absolute;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: bold;
+            padding: 3px 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                -1px -1px 0 rgba(0, 0, 0, 0.5),
+                1px -1px 0 rgba(0, 0, 0, 0.5),
+                -1px 1px 0 rgba(0, 0, 0, 0.5),
+                1px 1px 0 rgba(0, 0, 0, 0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 2;
+        }
+
+        .ore-item.no-image .ore-multiplier {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                -1px -1px 0 rgba(0, 0, 0, 0.5),
+                1px -1px 0 rgba(0, 0, 0, 0.5),
+                -1px 1px 0 rgba(0, 0, 0, 0.5),
+                1px 1px 0 rgba(0, 0, 0, 0.5);
+            z-index: 2;
+        }
+
+        /* Ore Mix Section */
+        .mix-section {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .slots-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .slot {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            text-align: center;
+            border: 2px dashed var(--border);
+            transition: all 0.3s;
+            aspect-ratio: 232/173;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slot.filled {
+            border: 2px solid var(--primary);
+            background-color: rgba(255, 102, 0, 0.05);
+        }
+
+        .slot-placeholder {
+            color: var(--border);
+            font-size: 0.9rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .slot-ore {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .slot-ore-name {
+            position: absolute;
+            top: 8px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 3px 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                -1px -1px 0 rgba(0, 0, 0, 0.5),
+                1px -1px 0 rgba(0, 0, 0, 0.5),
+                -1px 1px 0 rgba(0, 0, 0, 0.5),
+                1px 1px 0 rgba(0, 0, 0, 0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .slot-ore-count {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                -1px -1px 0 rgba(0, 0, 0, 0.5),
+                1px -1px 0 rgba(0, 0, 0, 0.5),
+                -1px 1px 0 rgba(0, 0, 0, 0.5),
+                1px 1px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .slot-ore-percentage {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                -1px -1px 0 rgba(0, 0, 0, 0.5),
+                1px -1px 0 rgba(0, 0, 0, 0.5),
+                -1px 1px 0 rgba(0, 0, 0, 0.5),
+                1px 1px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .remove-ore {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .remove-ore:hover {
+            background-color: var(--error);
+        }
+
+        .mix-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .traits-container {
+            margin-top: 5px;
+        }
+
+        .traits-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .trait {
+            background-color: rgba(255, 102, 0, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 15px;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .trait-icon {
+            color: var(--primary);
+        }
+
+        /* Probability Section */
+        .probability-section {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .probability-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .probability-item {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .item-name {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .optimal-count-display {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background-color: rgba(255, 102, 0, 0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .probability-bar {
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .probability-fill {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .probability-value {
+            font-size: 0.85rem;
+            text-align: right;
+            color: var(--text-secondary);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reset-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .forge-btn {
+            background-color: var(--primary);
+            color: var(--background);
+            box-shadow: 0 4px 10px rgba(255, 102, 0, 0.3);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 769px) {
+            .slots-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .ores-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .ores-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .probability-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mix-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .stat-box {
+                padding: 10px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .filter-controls {
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Rarity colors */
+        .common {
+            border-color: var(--common);
+        }
+
+        .common .ore-name {
+            color: var(--common);
+        }
+
+        .uncommon {
+            border-color: var(--uncommon);
+        }
+
+        .uncommon .ore-name {
+            color: var(--uncommon);
+        }
+
+        .rare {
+            border-color: var(--rare);
+        }
+
+        .rare .ore-name {
+            color: var(--rare);
+        }
+
+        .epic {
+            border-color: var(--epic);
+        }
+
+        .epic .ore-name {
+            color: var(--epic);
+        }
+
+        .legendary {
+            border-color: var(--legendary);
+        }
+
+        .legendary .ore-name {
+            color: var(--legendary);
+        }
+
+        .mythical {
+            border-color: var(--mythical);
+        }
+
+        .mythical .ore-name {
+            color: var(--mythical);
+        }
+
+        .relic {
+            border-color: var(--relic);
+        }
+
+        .relic .ore-name {
+            color: var(--relic);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-hammer"></i> The Forge Crafting Calculator</h1>
+
+            <div class="mode-toggle">
+                <button class="toggle-btn active" id="weapon-toggle">
+                    &#9876; Weapons
+                </button>
+                <button class="toggle-btn" id="armor-toggle">
+                    <i class="fas fa-shield-alt"></i> Armor
+                </button>
+            </div>
+
+
+        </header>
+
+        <!-- Quick Craft Modal -->
+        <div class="modal-overlay" id="quick-craft-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-bolt"></i> Quick Craft</h3>
+                    <button class="modal-close" id="modal-close">&times;</button>
+                </div>
+
+                <div class="modal-step active" id="step-type">
+                    <div class="modal-step-title">1. Select Item Type</div>
+                    <div class="modal-options">
+                        <div class="modal-option" data-type="weapon" style="display: flex; flex-direction: column;">
+                            <span style="font-size: 36px; margin-top: -15px; margin-bottom: -5px;">&#9876;</span>
+                            <div>Weapons</div>
+                        </div>
+                        <div class="modal-option" data-type="armor">
+                            <i class="fas fa-shield-alt fa-2x"></i>
+                            <div>Armor</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-step" id="step-item">
+                    <div class="modal-step-title">2. Select Item</div>
+                    <div class="modal-options" id="item-options">
+                        <!-- Items will be dynamically added here -->
+                    </div>
+                </div>
+
+                <div class="modal-step" id="step-traits">
+                    <div class="modal-step-title">3. Select Traits (Max 4)</div>
+                    <div id="trait-options">
+                        <!-- Traits will be dynamically added here -->
+                    </div>
+                    <div id="selected-traits-count" style="margin-top: 10px; color: var(--text-secondary);">
+                        Selected: 0/4 traits
+                    </div>
+                </div>
+
+                <div class="modal-step" id="step-summary">
+                    <div class="modal-step-title">4. Summary</div>
+                    <div id="summary-content"
+                        style="padding: 10px; background-color: rgba(0,0,0,0.2); border-radius: 8px;">
+                        <!-- Summary will be dynamically added here -->
+                    </div>
+                </div>
+
+                <div class="modal-nav">
+                    <button class="modal-btn secondary" id="prev-btn">Previous</button>
+                    <button class="modal-btn" id="next-btn">Next</button>
+                    <button class="modal-btn" id="craft-btn" style="display: none;">Craft Item</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ore Inventory Section -->
+        <section class="inventory-section">
+            <div class="section-title">
+                <span><i class="fas fa-gem"></i> Ore List / Select Ores</span>
+            </div>
+
+            <div class="filter-controls">
+                <button class="filter-btn active" data-filter="all">All Ores</button>
+                <button class="filter-btn" data-filter="stonewake">Stonewake's Cross</button>
+                <button class="filter-btn" data-filter="kingdom">Forgotten Kingdom</button>
+                <button class="filter-btn" data-filter="goblin">Goblin Cave</button>
+                <button class="filter-btn" data-filter="enemy">Enemy Drops</button>
+                <button class="filter-btn" data-filter="has-trait">With Traits</button>
+            </div>
+
+            <div class="ores-grid" id="ore-inventory">
+                <!-- Ores will be dynamically added here -->
+            </div>
+        </section>
+
+        <!-- Ore Mix Section -->
+        <section class="mix-section">
+            <div class="section-title">
+                <span><i class="fas fa-fire"></i> Forge</span>
+            </div>
+
+            <div class="slots-container" id="ore-slots">
+                <div class="slot" id="slot-1">
+                    <div class="slot-placeholder">Click an ore to add</div>
+                </div>
+                <div class="slot" id="slot-2">
+                    <div class="slot-placeholder">Empty slot</div>
+                </div>
+                <div class="slot" id="slot-3">
+                    <div class="slot-placeholder">Empty slot</div>
+                </div>
+                <div class="slot" id="slot-4">
+                    <div class="slot-placeholder">Empty slot</div>
+                </div>
+            </div>
+
+            <div class="mix-stats">
+                <div class="stat-box">
+                    <div class="stat-title">Multiplier</div>
+                    <div class="stat-value" id="multiplier-value">0.0x</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Total Ores</div>
+                    <div class="stat-value" id="total-ores-value">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Unique Ores</div>
+                    <div class="stat-value" id="unique-ores-value">0</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="control-btn reset-btn" id="reset-btn">
+                    <i class="fas fa-redo"></i> Reset Mix
+                </button>
+                <button class="quick-craft-btn" id="quick-craft-btn">
+                    <i class="fas fa-bolt"></i> Quick Craft
+                </button>
+            </div>
+
+            <div class="traits-container">
+                <div class="section-title">
+                    <span><i class="fas fa-magic"></i> Ore Traits</span>
+                </div>
+                <div class="traits-list" id="active-traits">
+                    <div class="trait-placeholder">Add ores with traits to see effects...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Probability Section -->
+        <section class="probability-section">
+            <div class="section-title">
+                <span><i class="fas fa-chart-pie"></i> Forge Chances</span>
+            </div>
+
+            <div class="probability-grid" id="probability-list">
+                <!-- Probabilities will be dynamically added here -->
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Image URLs for ores
+        const oreImages = {
+            "Stone": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/stone-the-forge-calculator.png",
+            "Sand Stone": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/sand-stone-the-forge-calculator.png",
+            "Copper": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/copper-the-forge-calculator.png",
+            "Iron": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/iron-the-forge-calculator.png",
+            "Tin": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/tin-the-forge-calculator.png",
+            "Silver": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/silver-the-forge-calculator.png",
+            "Gold": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/gold-the-forge-calculator.png",
+            "Mushroomite": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/mushroomite-the-forge-calculator.png",
+            "Platinum": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/platinum-the-forge-calculator.png",
+            "Bananite": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/bananite-the-forge-calculator.png",
+            "Cardboardite": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/carboardite-the-forge-calculator.png",
+            "Aite": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/aite-the-forge-calculator.png",
+            "Poopite": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/poopite-the-forge-calculator.png",
+            "Cobalt": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/cobalt-the-forge-calculator.png",
+            "Titanium": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/titanium-the-forge-calculator.png",
+            "Volcanic Rock": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/volcanic-rock-the-forge-calculator.png",
+            "Lapis Lazuli": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/lapis-lazuli-the-forge-calculator.png",
+            "Quartz": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/quartz-the-forge-calculator.png",
+            "Amethyst": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/amethyst-the-forge-calculator.png",
+            "Topaz": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/topaz-the-forge-calculator.png",
+            "Diamond": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/diamond-the-forge-calculator.png",
+            "Sapphire": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/sapphire-the-forge-calculator.png",
+            "Cuprite": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/cuprite-the-forge-calculator.png",
+            "Obsidian": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/obsidian-the-forge-calculator.png",
+            "Emerald": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/emerald-the-forge-calculator.png",
+            "Ruby": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/ruby-the-forge-calculator.png",
+            "Rivalite": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/rivalite-the-forge-calculator.png",
+            "Uranium": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/uranium-the-forge-calculator.png",
+            "Mythril": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/mythril-the-forge-calculator.png",
+            "Eye Ore": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/eye-ore-the-forge-calculator.png",
+            "Fireite": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/fireite-the-forge-calculator.png",
+            "Magmaite": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/magmaite-the-forge-calculator.png",
+            "Lightite": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/lightite-the-forge-calculator.png",
+            "Demonite": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/demonite-the-forge-calculator.png",
+            "Darkryte": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/darkryte-the-forge-calculator.png",
+            "Magenta Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/magenta-crystal-the-forge-calculator.png",
+            "Crimson Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/crimson-crystal-the-forge-calculator.png",
+            "Green Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/green-crystal-the-forge-calculator.png",
+            "Orange Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/orange-crystal-the-forge-calculator.png",
+            "Blue Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/blue-crystal-the-forge-calculator.png",
+            "Rainbow Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/rainbow-crystal-the-forge-calculator.png",
+            "Arcane Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/arcane-crystal-the-forge-calculator.png"
+        };
+
+        // Ore data based on the provided information
+        const oreData = [
+            // Stonewake's Cross
+            { id: 1, name: "Stone", multiplier: 0.2, rarity: "common", area: "stonewake", color: "#8c8c8c", traitType: null, traits: [] },
+            { id: 2, name: "Sand Stone", multiplier: 0.25, rarity: "common", area: "stonewake", color: "#d2b48c", traitType: null, traits: [] },
+            { id: 3, name: "Copper", multiplier: 0.3, rarity: "common", area: "stonewake", color: "#b87333", traitType: null, traits: [] },
+            { id: 4, name: "Iron", multiplier: 0.35, rarity: "common", area: "stonewake", color: "#a19d94", traitType: null, traits: [] },
+            { id: 5, name: "Tin", multiplier: 0.425, rarity: "uncommon", area: "stonewake", color: "#c0c0c0", traitType: null, traits: [] },
+            { id: 6, name: "Silver", multiplier: 0.5, rarity: "uncommon", area: "stonewake", color: "#d3d3d3", traitType: null, traits: [] },
+            { id: 7, name: "Gold", multiplier: 0.65, rarity: "uncommon", area: "stonewake", color: "#ffd700", traitType: null, traits: [] },
+            { id: 8, name: "Mushroomite", multiplier: 0.8, rarity: "rare", area: "stonewake", color: "#ff6bc9", traitType: null, traits: [] },
+            { id: 9, name: "Platinum", multiplier: 0.8, rarity: "rare", area: "stonewake", color: "#e5e4e2", traitType: null, traits: [] },
+            { id: 10, name: "Bananite", multiplier: 0.85, rarity: "uncommon", area: "stonewake", color: "#ffeb3b", traitType: null, traits: [] },
+            { id: 11, name: "Cardboardite", multiplier: 0.7, rarity: "common", area: "stonewake", color: "#8b4513", traitType: null, traits: [] },
+            { id: 12, name: "Aite", multiplier: 1.0, rarity: "epic", area: "stonewake", color: "#4CAF50", traitType: null, traits: [] },
+            {
+                id: 13, name: "Poopite", multiplier: 1.2, rarity: "epic", area: "stonewake", color: "#795548", traitType: "all", traits: [
+                    {
+                        description: "Deal {damage}% Poison DMG in AoE for {duration}s, fearing enemies (15s CD). Activates when HP drops below 35%.",
+                        scaling: { damage: { min: 1.5, max: 15 }, duration: { min: 0.5, max: 5 } }, type: "all"
+                    }
+                ]
+            },
+
+            // Forgotten Kingdom
+            { id: 14, name: "Cobalt", multiplier: 1.0, rarity: "uncommon", area: "kingdom", color: "#0047ab", traitType: null, traits: [] },
+            { id: 15, name: "Titanium", multiplier: 1.15, rarity: "uncommon", area: "kingdom", color: "#878681", traitType: null, traits: [] },
+            { id: 16, name: "Volcanic Rock", multiplier: 1.55, rarity: "rare", area: "kingdom", color: "#8b0000", traitType: null, traits: [] },
+            { id: 17, name: "Lapis Lazuli", multiplier: 1.3, rarity: "uncommon", area: "kingdom", color: "#26619c", traitType: null, traits: [] },
+            { id: 18, name: "Quartz", multiplier: 1.5, rarity: "rare", area: "kingdom", color: "#f5f5f5", traitType: null, traits: [] },
+            { id: 19, name: "Amethyst", multiplier: 1.65, rarity: "rare", area: "kingdom", color: "#9966cc", traitType: null, traits: [] },
+            { id: 20, name: "Topaz", multiplier: 1.75, rarity: "rare", area: "kingdom", color: "#ffcc00", traitType: null, traits: [] },
+            { id: 21, name: "Diamond", multiplier: 2.0, rarity: "rare", area: "kingdom", color: "#b9f2ff", traitType: null, traits: [] },
+            { id: 22, name: "Sapphire", multiplier: 2.25, rarity: "rare", area: "kingdom", color: "#0f52ba", traitType: null, traits: [] },
+            { id: 23, name: "Cuprite", multiplier: 2.43, rarity: "epic", area: "kingdom", color: "#b87333", traitType: null, traits: [] },
+            {
+                id: 24, name: "Obsidian", multiplier: 2.35, rarity: "epic", area: "kingdom", color: "#0b0b0b", traitType: null, traits: [
+                    { description: "+{health}% extra health.", scaling: { health: { min: 3, max: 30 } }, type: "armor" }
+                ]
+            },
+            { id: 25, name: "Emerald", multiplier: 2.55, rarity: "epic", area: "kingdom", color: "#50c878", traitType: null, traits: [] },
+            { id: 26, name: "Ruby", multiplier: 2.95, rarity: "epic", area: "kingdom", color: "#e0115f", traitType: null, traits: [] },
+            {
+                id: 27, name: "Rivalite", multiplier: 3.33, rarity: "epic", area: "kingdom", color: "#ff6b6b", traitType: "weapon", traits: [
+                    { description: "+{crit}% critical chance.", scaling: { crit: { min: 2, max: 20 } }, type: "weapon" }
+                ]
+            },
+            {
+                id: 28, name: "Uranium", multiplier: 3.0, rarity: "legendary", area: "kingdom", color: "#008000", traitType: "armor", traits: [
+                    { description: "Deal {damage}% of max health as AoE DMG while in-combat.", scaling: { damage: { min: 0.5, max: 5 } }, type: "armor" }
+                ]
+            },
+            {
+                id: 29, name: "Mythril", multiplier: 3.5, rarity: "legendary", area: "kingdom", color: "#76d7ea", traitType: "armor", traits: [
+                    { description: "+{health}% extra health.", scaling: { health: { min: 1.5, max: 15 } }, type: "armor" }
+                ]
+            },
+            {
+                id: 30, name: "Eye Ore", multiplier: 4.0, rarity: "legendary", area: "kingdom", color: "#800080", traitType: "all", traits: [
+                    {
+                        description: "Increase physical damage by {damage}% and decrease health by {health}%.",
+                        scaling: { damage: { min: 1.5, max: 15 }, health: { min: 1, max: 10 } }, type: "all"
+                    }
+                ]
+            },
+            {
+                id: 31, name: "Fireite", multiplier: 4.5, rarity: "legendary", area: "kingdom", color: "#ff4500", traitType: "weapon", traits: [
+                    {
+                        description: "Deals {damage}% of weapon damage as fire per second for 2 seconds. 30% chance on hit.",
+                        scaling: { damage: { min: 2, max: 20 } }, type: "weapon"
+                    }
+                ]
+            },
+            {
+                id: 32, name: "Magmaite", multiplier: 5.0, rarity: "legendary", area: "kingdom", color: "#ff0000", traitType: "weapon", traits: [
+                    {
+                        description: "Cause an explosion at location of victim, dealing {damage}% of weapon damage as AoE damage. 35% chance on hit.",
+                        scaling: { damage: { min: 5, max: 50 } }, type: "weapon"
+                    }
+                ]
+            },
+            {
+                id: 33, name: "Lightite", multiplier: 4.6, rarity: "legendary", area: "kingdom", color: "#ffff00", traitType: "armor", traits: [
+                    { description: "+{speed}% extra movement speed.", scaling: { speed: { min: 1.5, max: 15 } }, type: "armor" }
+                ]
+            },
+            {
+                id: 34, name: "Demonite", multiplier: 5.5, rarity: "mythical", area: "kingdom", color: "#8b0000", traitType: "armor", traits: [
+                    {
+                        description: "Deals {damage}% of weapon damage as fire per second for 2 seconds. 15% chance on hit and 25% chance when hit by an enemy.",
+                        scaling: { damage: { min: 2, max: 20 } }, type: "armor"
+                    }
+                ]
+            },
+            {
+                id: 35, name: "Darkryte", multiplier: 6.3, rarity: "mythical", area: "kingdom", color: "#4b0082", traitType: "armor", traits: [
+                    {
+                        description: "Upon taking damage, there is a {chance}% chance to turn into a shadow and dodge the attack.",
+                        scaling: { chance: { min: 1.5, max: 15 } }, type: "armor"
+                    }
+                ]
+            },
+
+            // Goblin Cave
+            { id: 36, name: "Magenta Crystal", multiplier: 3.1, rarity: "epic", area: "goblin", color: "#ff00ff", traitType: null, traits: [] },
+            { id: 37, name: "Crimson Crystal", multiplier: 3.3, rarity: "epic", area: "goblin", color: "#dc143c", traitType: null, traits: [] },
+            { id: 38, name: "Green Crystal", multiplier: 3.2, rarity: "epic", area: "goblin", color: "#00ff00", traitType: null, traits: [] },
+            { id: 39, name: "Orange Crystal", multiplier: 3.0, rarity: "epic", area: "goblin", color: "#ffa500", traitType: null, traits: [] },
+            { id: 40, name: "Blue Crystal", multiplier: 3.4, rarity: "epic", area: "goblin", color: "#0000ff", traitType: null, traits: [] },
+            { id: 41, name: "Rainbow Crystal", multiplier: 5.25, rarity: "legendary", area: "goblin", color: "#ff0000", traitType: null, traits: [] },
+            { id: 42, name: "Arcane Crystal", multiplier: 7.5, rarity: "mythical", area: "goblin", color: "#9400d3", traitType: null, traits: [] },
+
+            // Enemy Drops
+            { id: 43, name: "Boneite", multiplier: 1.2, rarity: "rare", area: "enemy", color: "#f5f5dc", traitType: null, traits: [] },
+            { id: 44, name: "Dark Boneite", multiplier: 2.25, rarity: "rare", area: "enemy", color: "#696969", traitType: null, traits: [] },
+            { id: 45, name: "Slimite", multiplier: 2.25, rarity: "epic", area: "enemy", color: "#32cd32", traitType: null, traits: [] }
+        ];
+
+        // Weapon probability data
+        const weaponProbabilities = {
+            3: { "Dagger": 1.0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            4: { "Dagger": 0.86, "Straight Sword": 0.14, "Gauntlet": 0, "Katana": 0, "Great Sword": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            5: { "Dagger": 0.35, "Straight Sword": 0.65, "Gauntlet": 0, "Katana": 0, "Great Sword": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            6: { "Dagger": 0.14, "Straight Sword": 0.86, "Gauntlet": 0, "Katana": 0, "Great Sword": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            7: { "Dagger": 0.06, "Straight Sword": 0.74, "Gauntlet": 0.2, "Katana": 0, "Great Sword": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            8: { "Dagger": 0.02, "Straight Sword": 0.44, "Gauntlet": 0.54, "Katana": 0, "Great Sword": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            9: { "Dagger": 0.01, "Straight Sword": 0.24, "Gauntlet": 0.65, "Katana": 0.1, "Great Sword": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            10: { "Dagger": 0, "Straight Sword": 0.11, "Gauntlet": 0.47, "Katana": 0.42, "Great Sword": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            11: { "Dagger": 0, "Straight Sword": 0.05, "Gauntlet": 0.32, "Katana": 0.63, "Great Sword": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            12: { "Dagger": 0, "Straight Sword": 0.03, "Gauntlet": 0.22, "Katana": 0.72, "Great Sword": 0.03, "Great Axe": 0, "Colossal Sword": 0 },
+            13: { "Dagger": 0, "Straight Sword": 0.01, "Gauntlet": 0.15, "Katana": 0.62, "Great Sword": 0.22, "Great Axe": 0, "Colossal Sword": 0 },
+            14: { "Dagger": 0, "Straight Sword": 0.01, "Gauntlet": 0.08, "Katana": 0.46, "Great Sword": 0.45, "Great Axe": 0, "Colossal Sword": 0 },
+            15: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0.05, "Katana": 0.35, "Great Sword": 0.6, "Great Axe": 0, "Colossal Sword": 0 },
+            16: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0.03, "Katana": 0.26, "Great Sword": 0.70, "Great Axe": 0.01, "Colossal Sword": 0 },
+            17: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0.02, "Katana": 0.19, "Great Sword": 0.68, "Great Axe": 0.11, "Colossal Sword": 0 },
+            18: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0.02, "Katana": 0.13, "Great Sword": 0.57, "Great Axe": 0.28, "Colossal Sword": 0 },
+            19: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0.01, "Katana": 0.08, "Great Sword": 0.46, "Great Axe": 0.45, "Colossal Sword": 0 },
+            20: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0.01, "Katana": 0.06, "Great Sword": 0.36, "Great Axe": 0.57, "Colossal Sword": 0 },
+            21: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0.04, "Great Sword": 0.29, "Great Axe": 0.65, "Colossal Sword": 0.02 },
+            22: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0.03, "Great Sword": 0.23, "Great Axe": 0.67, "Colossal Sword": 0.07 },
+            23: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0.02, "Great Sword": 0.19, "Great Axe": 0.66, "Colossal Sword": 0.13 },
+            24: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0.02, "Great Sword": 0.15, "Great Axe": 0.63, "Colossal Sword": 0.2 },
+            25: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0.01, "Great Sword": 0.12, "Great Axe": 0.6, "Colossal Sword": 0.27 },
+            26: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0.01, "Great Sword": 0.1, "Great Axe": 0.56, "Colossal Sword": 0.32 },
+            27: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0.01, "Great Sword": 0.09, "Great Axe": 0.53, "Colossal Sword": 0.37 },
+            28: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0.01, "Great Sword": 0.07, "Great Axe": 0.5, "Colossal Sword": 0.42 },
+            29: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0.01, "Great Sword": 0.07, "Great Axe": 0.47, "Colossal Sword": 0.46 },
+            30: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0.01, "Great Sword": 0.06, "Great Axe": 0.45, "Colossal Sword": 0.49 },
+            31: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.05, "Great Axe": 0.44, "Colossal Sword": 0.51 },
+            32: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.05, "Great Axe": 0.41, "Colossal Sword": 0.54 },
+            33: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.04, "Great Axe": 0.39, "Colossal Sword": 0.57 },
+            34: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.04, "Great Axe": 0.38, "Colossal Sword": 0.58 },
+            35: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.04, "Great Axe": 0.37, "Colossal Sword": 0.59 },
+            36: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.03, "Great Axe": 0.36, "Colossal Sword": 0.61 },
+            37: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.03, "Great Axe": 0.35, "Colossal Sword": 0.62 },
+            38: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.03, "Great Axe": 0.34, "Colossal Sword": 0.63 },
+            39: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.03, "Great Axe": 0.33, "Colossal Sword": 0.64 },
+            40: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.03, "Great Axe": 0.32, "Colossal Sword": 0.65 },
+            41: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.03, "Great Axe": 0.32, "Colossal Sword": 0.65 },
+            42: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.03, "Great Axe": 0.31, "Colossal Sword": 0.66 },
+            43: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.31, "Colossal Sword": 0.67 },
+            44: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.3, "Colossal Sword": 0.68 },
+            45: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.3, "Colossal Sword": 0.68 },
+            46: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.29, "Colossal Sword": 0.69 },
+            47: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.29, "Colossal Sword": 0.69 },
+            48: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
+            49: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
+            50: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 }
+        };
+        // Armor probability data
+        const armorProbabilities = {
+            3: { "Light Helmet": 1.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            4: { "Light Helmet": 1.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            5: { "Light Helmet": 0.89, "Light Leggings": 0.11, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            6: { "Light Helmet": 0.56, "Light Leggings": 0.44, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            7: { "Light Helmet": 0.32, "Light Leggings": 0.67, "Light Chestplate": 0.01, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            8: { "Light Helmet": 0.16, "Light Leggings": 0.67, "Light Chestplate": 0.17, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            9: { "Light Helmet": 0.08, "Light Leggings": 0.51, "Light Chestplate": 0.41, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            10: { "Light Helmet": 0.04, "Light Leggings": 0.34, "Light Chestplate": 0.53, "Medium Helmet": 0.09, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            11: { "Light Helmet": 0.02, "Light Leggings": 0.2, "Light Chestplate": 0.47, "Medium Helmet": 0.31, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            12: { "Light Helmet": 0.01, "Light Leggings": 0.12, "Light Chestplate": 0.37, "Medium Helmet": 0.5, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            13: { "Light Helmet": 0, "Light Leggings": 0.07, "Light Chestplate": 0.28, "Medium Helmet": 0.6, "Medium Leggings": 0.04, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            14: { "Light Helmet": 0, "Light Leggings": 0.04, "Light Chestplate": 0.19, "Medium Helmet": 0.55, "Medium Leggings": 0.22, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            15: { "Light Helmet": 0, "Light Leggings": 0.02, "Light Chestplate": 0.12, "Medium Helmet": 0.43, "Medium Leggings": 0.43, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            16: { "Light Helmet": 0, "Light Leggings": 0.01, "Light Chestplate": 0.08, "Medium Helmet": 0.32, "Medium Leggings": 0.57, "Medium Chestplate": 0.02, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            17: { "Light Helmet": 0, "Light Leggings": 0.01, "Light Chestplate": 0.05, "Medium Helmet": 0.22, "Medium Leggings": 0.57, "Medium Chestplate": 0.16, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            18: { "Light Helmet": 0, "Light Leggings": 0, "Light Chestplate": 0.03, "Medium Helmet": 0.14, "Medium Leggings": 0.48, "Medium Chestplate": 0.35, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            19: { "Light Helmet": 0, "Light Leggings": 0, "Light Chestplate": 0.02, "Medium Helmet": 0.09, "Medium Leggings": 0.39, "Medium Chestplate": 0.5, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            20: { "Light Helmet": 0, "Light Leggings": 0, "Light Chestplate": 0.01, "Medium Helmet": 0.06, "Medium Leggings": 0.32, "Medium Chestplate": 0.6, "Heavy Helmet": 0.01, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            21: { "Light Helmet": 0, "Light Leggings": 0, "Light Chestplate": 0.01, "Medium Helmet": 0.04, "Medium Leggings": 0.25, "Medium Chestplate": 0.63, "Heavy Helmet": 0.07, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            22: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0.03, "Medium Leggings": 0.19, "Medium Chestplate": 0.59, "Heavy Helmet": 0.19, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            23: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0.02, "Medium Leggings": 0.14, "Medium Chestplate": 0.52, "Heavy Helmet": 0.32, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            24: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0.01, "Medium Leggings": 0.11, "Medium Chestplate": 0.44, "Heavy Helmet": 0.44, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
+            25: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0.01, "Medium Leggings": 0.07, "Medium Chestplate": 0.36, "Heavy Helmet": 0.51, "Heavy Leggings": 0.05, "Heavy Chestplate": 0 },
+            26: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0.01, "Medium Leggings": 0.05, "Medium Chestplate": 0.28, "Heavy Helmet": 0.51, "Heavy Leggings": 0.15, "Heavy Chestplate": 0 },
+            27: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0.04, "Medium Chestplate": 0.21, "Heavy Helmet": 0.47, "Heavy Leggings": 0.28, "Heavy Chestplate": 0 },
+            28: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0.03, "Medium Chestplate": 0.16, "Heavy Helmet": 0.42, "Heavy Leggings": 0.39, "Heavy Chestplate": 0 },
+            29: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0.02, "Medium Chestplate": 0.11, "Heavy Helmet": 0.35, "Heavy Leggings": 0.48, "Heavy Chestplate": 0.04 },
+            30: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0.01, "Medium Chestplate": 0.08, "Heavy Helmet": 0.28, "Heavy Leggings": 0.50, "Heavy Chestplate": 0.13 },
+            31: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0.01, "Medium Chestplate": 0.06, "Heavy Helmet": 0.22, "Heavy Leggings": 0.46, "Heavy Chestplate": 0.25 },
+            32: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0.01, "Medium Chestplate": 0.04, "Heavy Helmet": 0.17, "Heavy Leggings": 0.42, "Heavy Chestplate": 0.36 },
+            33: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0.03, "Heavy Helmet": 0.13, "Heavy Leggings": 0.37, "Heavy Chestplate": 0.47 },
+            34: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0.02, "Heavy Helmet": 0.1, "Heavy Leggings": 0.33, "Heavy Chestplate": 0.55 },
+            35: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0.02, "Heavy Helmet": 0.08, "Heavy Leggings": 0.3, "Heavy Chestplate": 0.6 },
+            36: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0.01, "Heavy Helmet": 0.07, "Heavy Leggings": 0.27, "Heavy Chestplate": 0.65 },
+            37: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0.01, "Heavy Helmet": 0.06, "Heavy Leggings": 0.25, "Heavy Chestplate": 0.68 },
+            38: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0.01, "Heavy Helmet": 0.05, "Heavy Leggings": 0.23, "Heavy Chestplate": 0.71 },
+            39: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0.01, "Heavy Helmet": 0.04, "Heavy Leggings": 0.22, "Heavy Chestplate": 0.73 },
+            40: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0.01, "Heavy Helmet": 0.04, "Heavy Leggings": 0.2, "Heavy Chestplate": 0.75 },
+            41: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0.01, "Heavy Helmet": 0.04, "Heavy Leggings": 0.19, "Heavy Chestplate": 0.77 },
+            42: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.03, "Heavy Leggings": 0.18, "Heavy Chestplate": 0.79 },
+            43: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.03, "Heavy Leggings": 0.17, "Heavy Chestplate": 0.8 },
+            44: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.03, "Heavy Leggings": 0.17, "Heavy Chestplate": 0.8 },
+            45: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.03, "Heavy Leggings": 0.16, "Heavy Chestplate": 0.81 },
+            46: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.16, "Heavy Chestplate": 0.82 },
+            47: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.15, "Heavy Chestplate": 0.83 },
+            48: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.15, "Heavy Chestplate": 0.83 },
+            49: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.14, "Heavy Chestplate": 0.84 },
+            50: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.14, "Heavy Chestplate": 0.84 },
+        };
+
+        // Optimal ore counts for each item type
+        const optimalCounts = {
+            weapon: {
+                "Dagger": 3,
+                "Straight Sword": 6,
+                "Gauntlet": 9,
+                "Katana": 12,
+                "Great Sword": 16,
+                "Great Axe": 22,
+                "Colossal Sword": 36
+            },
+            armor: {
+                "Light Helmet": 3,
+                "Light Leggings": 7,
+                "Light Chestplate": 10,
+                "Medium Helmet": 13,
+                "Medium Leggings": 16,
+                "Medium Chestplate": 21,
+                "Heavy Helmet": 26,
+                "Heavy Leggings": 30,
+                "Heavy Chestplate": 40
+            }
+        };
+
+        let currentMode = 'weapon';
+        let oreMix = [];
+        let activeFilter = 'all';
+
+        let quickCraftType = null;
+        let quickCraftItem = null;
+        let selectedTraits = [];
+        let currentStep = 0;
+
+        const oreInventory = document.getElementById('ore-inventory');
+        const oreSlotsContainer = document.getElementById('ore-slots');
+        const probabilityList = document.getElementById('probability-list');
+        const activeTraitsContainer = document.getElementById('active-traits');
+        const multiplierValue = document.getElementById('multiplier-value');
+        const totalOresValue = document.getElementById('total-ores-value');
+        const uniqueOresValue = document.getElementById('unique-ores-value');
+        const mixCount = document.getElementById('mix-count');
+        const totalOresDisplay = document.getElementById('total-ores');
+        const weaponToggle = document.getElementById('weapon-toggle');
+        const armorToggle = document.getElementById('armor-toggle');
+        const resetBtn = document.getElementById('reset-btn');
+        const forgeBtn = document.getElementById('forge-btn');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const quickCraftBtn = document.getElementById('quick-craft-btn');
+        const quickCraftModal = document.getElementById('quick-craft-modal');
+        const modalClose = document.getElementById('modal-close');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const craftBtn = document.getElementById('craft-btn');
+        const stepType = document.getElementById('step-type');
+        const stepItem = document.getElementById('step-item');
+        const stepTraits = document.getElementById('step-traits');
+        const stepSummary = document.getElementById('step-summary');
+        const itemOptions = document.getElementById('item-options');
+        const traitOptions = document.getElementById('trait-options');
+        const selectedTraitsCount = document.getElementById('selected-traits-count');
+        const summaryContent = document.getElementById('summary-content');
+
+        function init() {
+            renderOreInventory();
+            updateOreSlots();
+            updateProbabilities();
+            setupEventListeners();
+            setupQuickCraft();
+        }
+
+        function renderOreInventory() {
+            oreInventory.innerHTML = '';
+
+            let filteredOres = oreData;
+
+            if (activeFilter !== 'all') {
+                if (activeFilter === 'has-trait') {
+                    filteredOres = oreData.filter(ore => ore.traits.length > 0);
+                } else {
+                    filteredOres = oreData.filter(ore => ore.area === activeFilter);
+                }
+            }
+
+            filteredOres.forEach(ore => {
+                const oreElement = document.createElement('div');
+                oreElement.className = `ore-item ${ore.rarity} ${ore.traits.length > 0 ? 'has-trait' : ''}`;
+                oreElement.dataset.id = ore.id;
+
+                if (oreImages[ore.name]) {
+                    oreElement.style.backgroundImage = `url('${oreImages[ore.name]}')`;
+                } else {
+                    oreElement.classList.add('no-image');
+                    oreElement.innerHTML = `<i class="fas fa-gem" style="color: ${ore.color}; font-size: 40px; margin-bottom: 10px;"></i>`;
+                }
+
+                oreElement.innerHTML = `
+    ${ore.traits.length > 0 ? '<div class="trait-indicator"><i class="fas fa-magic"></i></div>' : ''}
+    ${!oreImages[ore.name] ? `<div class="ore-icon"><i class="fas fa-gem" style="color: ${ore.color};"></i></div>` : ''}
+    <div class="ore-name">${ore.name}</div>
+    <div class="ore-multiplier">${ore.multiplier}x</div>
+`;
+
+                oreElement.addEventListener('click', () => addOreToMix(ore.id));
+                oreInventory.appendChild(oreElement);
+            });
+        }
+
+        function addOreToMix(oreId) {
+            const uniqueOres = oreMix.map(item => item.id);
+            const oreIndex = uniqueOres.indexOf(oreId);
+
+            if (oreIndex === -1 && uniqueOres.length >= 4) {
+                return;
+            }
+
+            if (oreIndex === -1) {
+                oreMix.push({ id: oreId, count: 1 });
+            } else {
+                oreMix[oreIndex].count++;
+            }
+
+            updateOreSlots();
+            updateProbabilities();
+        }
+
+        function removeOreFromMix(oreId) {
+            const oreIndex = oreMix.findIndex(item => item.id === oreId);
+
+            if (oreIndex !== -1) {
+                if (oreMix[oreIndex].count > 1) {
+                    oreMix[oreIndex].count--;
+                } else {
+                    oreMix.splice(oreIndex, 1);
+                }
+            }
+
+            updateOreSlots();
+            updateProbabilities();
+        }
+
+        function updateOreSlots() {
+            const slots = document.querySelectorAll('.slot');
+            let totalOres = 0;
+            let uniqueOres = oreMix.length;
+
+            let multiplierSum = 0;
+            oreMix.forEach(item => {
+                const ore = oreData.find(o => o.id === item.id);
+                totalOres += item.count;
+                multiplierSum += ore.multiplier * item.count;
+            });
+
+            const multiplier = totalOres > 0 ? (multiplierSum / totalOres).toFixed(2) : 0;
+
+            multiplierValue.textContent = `${multiplier}x`;
+            totalOresValue.textContent = totalOres;
+            uniqueOresValue.textContent = uniqueOres;
+
+            slots.forEach(slot => {
+                slot.innerHTML = '<div class="slot-placeholder">Empty slot</div>';
+                slot.classList.remove('filled');
+            });
+
+            oreMix.forEach((item, index) => {
+                if (index >= 4) return;
+
+                const ore = oreData.find(o => o.id === item.id);
+                const slot = slots[index];
+                const percentage = totalOres > 0 ? ((item.count / totalOres) * 100).toFixed(1) : 0;
+
+                let backgroundStyle = '';
+                if (oreImages[ore.name]) {
+                    backgroundStyle = `style="background-image: url('${oreImages[ore.name]}')"`;
+                }
+
+                slot.innerHTML = `
+                    <div class="slot-ore" ${backgroundStyle} data-id="${ore.id}">
+                        ${!oreImages[ore.name] ? `<i class="fas fa-gem" style="color: ${ore.color}; font-size: 30px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>` : ''}
+                        <div class="slot-ore-name">${ore.name}</div>
+                        <div class="slot-ore-count">${item.count}</div>
+                        <div class="slot-ore-percentage">${percentage}%</div>
+                    </div>
+                `;
+                slot.classList.add('filled');
+
+                slot.querySelector('.slot-ore').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeOreFromMix(ore.id);
+                });
+            });
+
+            updateActiveTraits(totalOres);
+        }
+
+        function updateActiveTraits(totalOres) {
+            activeTraitsContainer.innerHTML = '';
+
+            if (oreMix.length === 0) {
+                activeTraitsContainer.innerHTML = '<div class="trait-placeholder">Add ores with traits to see effects...</div>';
+                return;
+            }
+
+            const traitMap = {};
+
+            oreMix.forEach(item => {
+                const ore = oreData.find(o => o.id === item.id);
+                const percentage = (item.count / totalOres) * 100;
+
+                if (ore.traits && ore.traits.length > 0 && percentage >= 10) {
+                    ore.traits.forEach(trait => {
+                        if (trait.type === 'all' || trait.type === currentMode) {
+                            let scaledValues = {};
+                            Object.keys(trait.scaling).forEach(key => {
+                                const scale = trait.scaling[key];
+                                let value = 0;
+
+                                if (percentage >= 30) {
+                                    value = scale.max;
+                                } else if (percentage >= 10) {
+                                    const scaleFactor = (percentage - 10) / 20;
+                                    value = scale.min + (scale.max - scale.min) * scaleFactor;
+                                }
+
+                                scaledValues[key] = Math.round(value * 10) / 10;
+                            });
+
+                            let formattedDesc = trait.description;
+                            Object.keys(scaledValues).forEach(key => {
+                                formattedDesc = formattedDesc.replace(`{${key}}`, scaledValues[key]);
+                            });
+
+                            const traitKey = trait.description.split('{')[0];
+
+                            if (!traitMap[traitKey]) {
+                                traitMap[traitKey] = {
+                                    description: formattedDesc,
+                                    oreName: ore.name
+                                };
+                            }
+                        }
+                    });
+                }
+            });
+
+            const traits = Object.values(traitMap);
+
+            if (traits.length === 0) {
+                activeTraitsContainer.innerHTML = '<div class="trait-placeholder">No active traits (need at least 10% of an ore with traits)</div>';
+                return;
+            }
+
+            traits.forEach(traitInfo => {
+                const traitElement = document.createElement('div');
+                traitElement.className = 'trait';
+
+                traitElement.innerHTML = `
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: bold;">${traitInfo.oreName}</div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span>${traitInfo.description}</span>
+                    </div>
+                `;
+
+                activeTraitsContainer.appendChild(traitElement);
+            });
+        }
+
+        function updateProbabilities() {
+            probabilityList.innerHTML = '';
+
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+            const probabilities = currentMode === 'weapon' ? weaponProbabilities : armorProbabilities;
+            const optimal = currentMode === 'weapon' ? optimalCounts.weapon : optimalCounts.armor;
+
+            let closestCount = 3;
+            if (totalOres >= 50) {
+                closestCount = 50;
+            } else if (totalOres >= 3) {
+                const counts = Object.keys(probabilities).map(Number);
+                closestCount = counts.reduce((prev, curr) => {
+                    return (Math.abs(curr - totalOres) < Math.abs(prev - totalOres) ? curr : prev);
+                });
+            }
+
+            const currentProbs = probabilities[closestCount] || {};
+
+            Object.entries(currentProbs).forEach(([itemName, probability]) => {
+                const probabilityPercent = (probability * 100).toFixed(1);
+
+                const itemElement = document.createElement('div');
+                itemElement.className = 'probability-item';
+
+                itemElement.innerHTML = `
+                    <div class="item-name">
+                        <span>${itemName}</span>
+                        <span class="optimal-count-display">Optimal: ${optimal[itemName] || 'N/A'}</span>
+                    </div>
+                    <div class="probability-bar">
+                        <div class="probability-fill" style="width: ${probabilityPercent}%"></div>
+                    </div>
+                    <div class="probability-value">
+                        ${probabilityPercent}%
+                    </div>
+                `;
+
+                probabilityList.appendChild(itemElement);
+            });
+
+            if (totalOres < 3) {
+                probabilityList.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 30px; color: var(--text-secondary);">
+                        <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Add at least 3 ores to see forge chances</p>
+                    </div>
+                `;
+            }
+        }
+
+        function setupQuickCraft() {
+            quickCraftBtn.addEventListener('click', () => {
+                quickCraftModal.style.display = 'flex';
+                resetQuickCraft();
+                showStep(0);
+            });
+
+            modalClose.addEventListener('click', () => {
+                quickCraftModal.style.display = 'none';
+            });
+
+            quickCraftModal.addEventListener('click', (e) => {
+                if (e.target === quickCraftModal) {
+                    quickCraftModal.style.display = 'none';
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 0) {
+                    showStep(currentStep - 1);
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (validateStep(currentStep)) {
+                    if (currentStep < 3) {
+                        showStep(currentStep + 1);
+                    }
+                }
+            });
+
+            craftBtn.addEventListener('click', applyQuickCraft);
+
+            document.querySelectorAll('.modal-option[data-type]').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.modal-option[data-type]').forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+                    quickCraftType = option.dataset.type;
+                });
+            });
+        }
+
+        function showStep(step) {
+            currentStep = step;
+
+            // Hide all steps
+            [stepType, stepItem, stepTraits, stepSummary].forEach(s => s.classList.remove('active'));
+
+            // Show current step
+            const steps = [stepType, stepItem, stepTraits, stepSummary];
+            steps[step].classList.add('active');
+
+            // Update navigation buttons
+            prevBtn.style.display = step === 0 ? 'none' : 'inline-block';
+            nextBtn.style.display = step < 3 ? 'inline-block' : 'none';
+            craftBtn.style.display = step === 3 ? 'inline-block' : 'none';
+
+            // Load step content
+            switch (step) {
+                case 1: // Item selection
+                    loadItemOptions();
+                    break;
+                case 2: // Traits selection
+                    loadTraitOptions();
+                    break;
+                case 3: // Summary
+                    loadSummary();
+                    break;
+            }
+        }
+
+        function validateStep(step) {
+            switch (step) {
+                case 0:
+                    if (!quickCraftType) {
+                        return false;
+                    }
+                    return true;
+                case 1:
+                    if (!quickCraftItem) {
+                        return false;
+                    }
+                    return true;
+                case 2:
+                    if (selectedTraits.length === 0) {
+
+                        return false;
+
+                    }
+                    return true;
+                default:
+                    return true;
+            }
+        }
+
+        function loadItemOptions() {
+            itemOptions.innerHTML = '';
+            const items = quickCraftType === 'weapon' ? optimalCounts.weapon : optimalCounts.armor;
+
+            Object.entries(items).forEach(([itemName, optimalCount]) => {
+                const option = document.createElement('div');
+                option.className = 'modal-option';
+                option.dataset.item = itemName;
+                option.innerHTML = `
+                    <div style="font-weight: bold; font-size: 0.9rem;">${itemName}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">Optimal: ${optimalCount} ores</div>
+                `;
+
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.modal-option[data-item]').forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+                    quickCraftItem = {
+                        name: itemName,
+                        optimal: optimalCount
+                    };
+                });
+
+                itemOptions.appendChild(option);
+            });
+        }
+
+        function loadTraitOptions() {
+            traitOptions.innerHTML = '';
+            selectedTraits = [];
+
+            // Get ores with traits that apply to the selected type
+            const availableTraits = oreData.filter(ore =>
+                ore.traits.length > 0 &&
+                ore.traits.some(trait => trait.type === 'all' || trait.type === quickCraftType)
+            );
+
+            availableTraits.forEach(ore => {
+                ore.traits.forEach(trait => {
+                    if (trait.type === 'all' || trait.type === quickCraftType) {
+                        const option = document.createElement('div');
+                        option.className = 'trait-option';
+                        option.dataset.oreId = ore.id;
+
+                        let desc = trait.description;
+                        // Replace placeholders with min-max values to show range
+                        Object.keys(trait.scaling).forEach(key => {
+                            const scale = trait.scaling[key];
+                            desc = desc.replace(`{${key}}`, `${scale.min}-${scale.max}`);
+                        });
+
+                        option.innerHTML = `
+                    <div class="trait-info">
+                        <div class="trait-name">${ore.name} (${ore.multiplier}x)</div>
+                        <div class="trait-desc">${desc}</div>
+                    </div>
+                `;
+
+                        // Add click event to toggle selection
+                        option.addEventListener('click', () => {
+                            // Check if already selected
+                            const isSelected = option.classList.contains('selected');
+
+                            if (!isSelected) {
+                                // Check if we can add more traits
+                                if (selectedTraits.length >= 4) {
+                                    return; // Silent fail - max traits reached
+                                }
+
+                                // Add to selected traits
+                                selectedTraits.push({
+                                    oreId: ore.id,
+                                    oreName: ore.name,
+                                    description: trait.description,
+                                    scaling: trait.scaling
+                                });
+                                option.classList.add('selected');
+                            } else {
+                                // Remove from selected traits
+                                selectedTraits = selectedTraits.filter(t => t.oreId !== ore.id);
+                                option.classList.remove('selected');
+                            }
+
+                            updateSelectedTraitsCount();
+                        });
+
+                        traitOptions.appendChild(option);
+                    }
+                });
+            });
+
+            updateSelectedTraitsCount();
+        }
+
+        function updateSelectedTraitsCount() {
+            selectedTraitsCount.textContent = `Selected: ${selectedTraits.length}/4 traits`;
+        }
+
+        function loadSummary() {
+            const optimalCount = quickCraftItem.optimal;
+            let mixPlan = [];
+
+            if (selectedTraits.length === 0) {
+                // Just use optimal count with filler ore
+                mixPlan = [{ id: 1, count: optimalCount }]; // Stone as filler
+            } else {
+                // Calculate distribution WITHOUT adding stone ore
+                const traitCount = selectedTraits.length;
+
+                // Start with 1 ore per trait (minimum)
+                selectedTraits.forEach(trait => {
+                    mixPlan.push({
+                        id: trait.oreId,
+                        count: 1
+                    });
+                });
+
+                let totalOres = traitCount;
+                const remainingOres = optimalCount - traitCount;
+
+                // Distribute remaining ores among the existing traits
+                if (remainingOres > 0) {
+                    // Calculate how many ores to add to each trait
+                    const baseAddition = Math.floor(remainingOres / traitCount);
+                    const extraOres = remainingOres % traitCount;
+
+                    // Add base amount to each trait
+                    mixPlan.forEach((item, index) => {
+                        item.count += baseAddition;
+                    });
+
+                    // Distribute any extra ores
+                    for (let i = 0; i < extraOres; i++) {
+                        mixPlan[i].count++;
+                    }
+                }
+
+                // Now check if we're below the optimal count and add more to existing traits
+                totalOres = mixPlan.reduce((sum, item) => sum + item.count, 0);
+
+                if (totalOres < optimalCount) {
+                    const shortfall = optimalCount - totalOres;
+
+                    // Add the shortfall to the traits in a round-robin fashion
+                    for (let i = 0; i < shortfall; i++) {
+                        const traitIndex = i % traitCount;
+                        mixPlan[traitIndex].count++;
+                    }
+                }
+
+                // Ensure we don't exceed the optimal count
+                totalOres = mixPlan.reduce((sum, item) => sum + item.count, 0);
+                if (totalOres > optimalCount) {
+                    // Remove excess from the last trait
+                    const excess = totalOres - optimalCount;
+                    mixPlan[mixPlan.length - 1].count -= excess;
+                }
+            }
+
+            // Format summary
+            let summaryHTML = `
+                <div style="margin-bottom: 10px;">
+                    <strong>Item:</strong> ${quickCraftItem.name}<br>
+                    <strong>Type:</strong> ${quickCraftType}<br>
+                    <strong>Optimal Ores:</strong> ${optimalCount}
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <strong>Traits (${selectedTraits.length}):</strong>
+            `;
+
+            if (selectedTraits.length > 0) {
+                summaryHTML += '<div style="margin-left: 10px; margin-top: 5px;">';
+                selectedTraits.forEach(trait => {
+                    summaryHTML += `
+            <div style="padding: 5px; margin-bottom: 3px; background-color: rgba(255,102,0,0.1); border-radius: 5px; font-size: 0.85rem;">
+                <i class="fas fa-check" style="color: var(--success); margin-right: 5px;"></i>
+                ${trait.oreName}
+            </div>
+        `;
+                });
+                summaryHTML += '</div>';
+            } else {
+                summaryHTML += '<div style="color: var(--text-secondary); padding-left: 10px;">None selected</div>';
+            }
+
+            summaryHTML += `
+                </div>
+                <div>
+                    <strong>Proposed Mix:</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+            `;
+
+            const totalOresInMix = mixPlan.reduce((sum, item) => sum + item.count, 0);
+            const multiplierSum = mixPlan.reduce((sum, item) => {
+                const ore = oreData.find(o => o.id === item.id);
+                return sum + (ore.multiplier * item.count);
+            }, 0);
+            const avgMultiplier = (multiplierSum / totalOresInMix).toFixed(2);
+
+            mixPlan.forEach(item => {
+                const ore = oreData.find(o => o.id === item.id);
+                const percentage = ((item.count / totalOresInMix) * 100).toFixed(1);
+                summaryHTML += `<li>${item.count}x ${ore.name} (${ore.multiplier}x) - ${percentage}%</li>`;
+            });
+
+            summaryHTML += `
+                    </ul>
+                    <div style="margin-top: 10px; padding: 8px; background-color: rgba(255,102,0,0.1); border-radius: 5px;">
+                        <i class="fas fa-info-circle"></i> 
+                        Total: ${totalOresInMix} ores | Average Multiplier: ${avgMultiplier}x
+                    </div>
+                </div>
+            `;
+
+            summaryContent.innerHTML = summaryHTML;
+
+            // Store mix plan for crafting
+            summaryContent.dataset.mixPlan = JSON.stringify(mixPlan);
+        }
+
+        function applyQuickCraft() {
+            const mixPlan = JSON.parse(summaryContent.dataset.mixPlan);
+
+            // Clear current mix
+            oreMix = [];
+
+            // Apply new mix
+            mixPlan.forEach(item => {
+                // Check if ore already in mix
+                const existingIndex = oreMix.findIndex(ore => ore.id === item.id);
+                if (existingIndex !== -1) {
+                    oreMix[existingIndex].count += item.count;
+                } else {
+                    oreMix.push({ id: item.id, count: item.count });
+                }
+            });
+
+            // Update display
+            updateOreSlots();
+            updateProbabilities();
+
+            // Close modal
+            quickCraftModal.style.display = 'none';
+
+            // Switch mode if needed
+            if (quickCraftType !== currentMode) {
+                currentMode = quickCraftType;
+                if (currentMode === 'weapon') {
+                    weaponToggle.classList.add('active');
+                    armorToggle.classList.remove('active');
+                } else {
+                    armorToggle.classList.add('active');
+                    weaponToggle.classList.remove('active');
+                }
+                updateProbabilities();
+            }
+        }
+
+        function resetQuickCraft() {
+            quickCraftType = null;
+            quickCraftItem = null;
+            selectedTraits = [];
+            currentStep = 0;
+
+            document.querySelectorAll('.modal-option').forEach(o => o.classList.remove('selected'));
+            document.querySelectorAll('.trait-checkbox').forEach(cb => cb.checked = false);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Mode toggles
+            weaponToggle.addEventListener('click', () => {
+                currentMode = 'weapon';
+                weaponToggle.classList.add('active');
+                armorToggle.classList.remove('active');
+                updateProbabilities();
+                updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
+            });
+
+            armorToggle.addEventListener('click', () => {
+                currentMode = 'armor';
+                armorToggle.classList.add('active');
+                weaponToggle.classList.remove('active');
+                updateProbabilities();
+                updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
+            });
+
+            // Filter buttons
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activeFilter = btn.dataset.filter;
+                    renderOreInventory();
+                });
+            });
+
+            // Reset button
+            resetBtn.addEventListener('click', () => {
+                oreMix = [];
+                updateOreSlots();
+                updateProbabilities();
+            });
+
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>
