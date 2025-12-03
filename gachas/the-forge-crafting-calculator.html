@@ -162,7 +162,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 1px solid var(--border);
         }
@@ -269,7 +269,8 @@
         .modal-nav {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            margin-top: 15px;
+            gap: 10px;
         }
 
         .modal-btn {
@@ -870,6 +871,32 @@
             -ms-user-select: none;
         }
 
+        .forge-result-image {
+            width: 120px;
+            height: 90px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+        }
+
+        @media (max-width: 480px) {
+            .forge-result-image {
+                width: 100px;
+                height: 75px;
+            }
+
+            #forge-result-content {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .forge-btn i,
+            .reset-btn i {
+                display: none;
+            }
+        }
+
         @media (min-width: 769px) {
             .ores-grid {
                 grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -1056,9 +1083,6 @@
         <section class="inventory-section">
             <div class="section-title">
                 <span><i class="fas fa-gem"></i> Ore List / Select Ores</span>
-                <button class="quick-craft-btn" id="quick-craft-btn">
-                    <i class="fas fa-bolt"></i> Quick Craft
-                </button>
             </div>
 
             <div class="filter-controls">
@@ -1079,8 +1103,8 @@
         <section class="mix-section">
             <div class="section-title">
                 <span><i class="fas fa-fire"></i> Forge</span>
-                <button class="control-btn reset-btn" id="reset-btn">
-                    <i class="fas fa-redo"></i> Reset Forge
+                <button class="quick-craft-btn" id="quick-craft-btn">
+                    <i class="fas fa-bolt"></i> Quick Craft
                 </button>
             </div>
 
@@ -1105,6 +1129,15 @@
                     <div class="stat-title" id="expected-item" style="color: var(--success)">Expected: None (0%)</div>
                 </div>
             </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px; justify-content: center;" class="controls">
+                <button class="control-btn forge-btn" id="forge-btn">
+                    <i class="fas fa-fire"></i> Forge Item
+                </button>
+                <button class="control-btn reset-btn" id="reset-btn">
+                    <i class="fas fa-redo"></i> Reset Forge
+                </button>
+
+            </div>
             <div class="traits-container">
                 <div class="section-title">
                     <span><i class="fas fa-magic"></i> Ore Traits</span>
@@ -1127,7 +1160,8 @@
 
             </div>
             <div class="probability-grid" id="probability-list"></div>
-            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px; text-align: center;">(Click on an item type for specific item forge odds)</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px; text-align: center;">(Click
+                on an item type for specific item forge odds)</div>
     </div>
 
     <div class="tooltip" id="variant-tooltip">
@@ -1139,7 +1173,20 @@
         </div>
     </div>
     </section>
-
+    <div class="modal-overlay" id="forge-result-modal">
+        <div class="modal-content" id="forge-result-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-fire"></i> Forged Item</h3>
+                <button class="modal-close" id="forge-result-close">&times;</button>
+            </div>
+            <div id="forge-result-body">
+            </div>
+            <div class="modal-nav" style="justify-content: center; margin-top: 15px;">
+                <button class="modal-btn" id="forge-again-btn">Forge Again</button>
+                <button class="modal-btn secondary" id="close-result-btn">Close</button>
+            </div>
+        </div>
+    </div>
     </div>
 
     <script>
@@ -1188,22 +1235,135 @@
             "Arcane Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/arcane-crystal-the-forge-calculator.png"
         };
 
+        const itemImages = {
+            // Daggers
+            "Dagger": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dagger-the-forge-calculator.png",
+            "Falchion Knife": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/falchion-knife-the-forge-calculator.png",
+            "Gladius Dagger": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/gladius-dagger-the-forge-calculator.png",
+            "Hook": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/hook-the-forge-calculator.png",
+
+            // Straight Swords
+            "Falchion": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/falchion-the-forge-calculator.png",
+            "Gladius": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/gladius-the-forge-calculator.png",
+            "Cutlass": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/cutlass-the-forge-calculator.png",
+            "Rapier": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/rapier-the-forge-calculator.png",
+            "Chaos": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/chaos-the-forge-calculator.png",
+
+            // Gauntlets
+            "Ironhand": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/ironhand-the-forge-calculator.png",
+            "Boxing Gloves": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/boxing-gloves-the-forge-calculator.png",
+            "Relevator": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/relevator-the-forge-calculator.png",
+
+            // Katanas
+            "Uchigatana": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/uchigatana-the-forge-calculator.png",
+            "Tachi": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/tachi-the-forge-calculator.png",
+
+            // Great Swords
+            "Crusader Sword": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/crusader-sword-the-forge-calculator.png",
+            "Long Sword": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/long-sword-the-forge-calculator.png",
+
+            // Great Axes
+            "Scythe": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/scythe-the-forge-calculator.png",
+            "Double Battle Axe": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/double-battle-axe-the-forge-calculator.png",
+
+            // Colossal Swords
+            "Great Sword": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/great-sword-the-forge-calculator.png",
+            "Dragon Slayer": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dragon-slayer-the-forge-calculator.png",
+            "Hammer": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/hammer-the-forge-calculator.png",
+            "Skull Crusher": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/skull-crusher-the-forge-calculator.png",
+            "Comically Large Spoon": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/comically-large-spoon-the-forge-calculator.png",
+
+            // Light Armor
+            "Light Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/light-helmet-the-forge-calculator.png",
+            "Light Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/light-leggings-the-forge-calculator.png",
+            "Light Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/light-chestplate-the-forge-calculator.png",
+
+            // Medium Armor
+            "Medium Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/medium-helmet-the-forge-calculator.png",
+            "Samurai Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/samurai-helmet-the-forge-calculator.png",
+            "Medium Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/medium-leggings-the-forge-calculator.png",
+            "Samurai Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/samurai-leggings-the-forge-calculator.png",
+            "Medium Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/medium-chestplate-the-forge-calculator.png",
+            "Samurai Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/samurai-chestplate-the-forge-calculator.png",
+
+            // Heavy Armor
+            "Knight Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/knight-helmet-the-forge-calculator.png",
+            "Dark Knight Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-helmet-the-forge-calculator.png",
+            "Knight Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/knight-leggings-the-forge-calculator.png",
+            "Dark Knight Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-leggings-the-forge-calculator.png",
+            "Knight Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/knight-chestplate-the-forge-calculator.png",
+            "Dark Knight Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-chestplate-the-forge-calculator.png"
+        };
+
+        const baseItemStats = {
+            weapon: {
+                "Dagger": { damage: 8.6, atkSpeed: 0.35, range: 6, price: 68, type: "Dagger" },
+                "Falchion Knife": { damage: 8.6, atkSpeed: 0.35, range: 6, price: 68, type: "Dagger" },
+                "Gladius Dagger": { damage: 8.6, atkSpeed: 0.35, range: 6, price: 68, type: "Dagger" },
+                "Hook": { damage: 9.46, atkSpeed: 0.39, range: 6, price: 68, type: "Dagger" },
+
+                "Falchion": { damage: 15, atkSpeed: 0.59, range: 8, price: 120, type: "Straight Sword" },
+                "Gladius": { damage: 15.75, atkSpeed: 0.62, range: 8, price: 120, type: "Straight Sword" },
+                "Cutlass": { damage: 18.75, atkSpeed: 0.66, range: 8, price: 120, type: "Straight Sword" },
+                "Rapier": { damage: 15, atkSpeed: 0.49, range: 8, price: 120, type: "Straight Sword" },
+                "Chaos": { damage: 18.75, atkSpeed: 0.59, range: 8, price: 120, type: "Straight Sword" },
+
+                "Ironhand": { damage: 15.2, atkSpeed: 0.51, range: 6, price: 205, type: "Gauntlet" },
+                "Boxing Gloves": { damage: 16, atkSpeed: 0.59, range: 6, price: 205, type: "Gauntlet" },
+                "Relevator": { damage: 9.6, atkSpeed: 0.69, range: 6, price: 205, type: "Gauntlet" },
+
+                "Uchigatana": { damage: 17, atkSpeed: 0.6, range: 9, price: 324, type: "Katana" },
+                "Tachi": { damage: 17.85, atkSpeed: 0.63, range: 9, price: 324, type: "Katana" },
+
+                "Crusader Sword": { damage: 24, atkSpeed: 1.0, range: 9, price: 485, type: "Great Sword" },
+                "Long Sword": { damage: 24, atkSpeed: 1.11, range: 9, price: 485, type: "Great Sword" },
+
+                "Scythe": { damage: 28.5, atkSpeed: 0.95, range: 9, price: 850, type: "Great Axe" },
+                "Double Battle Axe": { damage: 31.5, atkSpeed: 1.05, range: 9, price: 850, type: "Great Axe" },
+
+                "Great Sword": { damage: 40, atkSpeed: 1.12, range: 10, price: 1355, type: "Colossal Sword" },
+                "Dragon Slayer": { damage: 44, atkSpeed: 1.12, range: 10, price: 1355, type: "Colossal Sword" },
+                "Hammer": { damage: 44, atkSpeed: 1.24, range: 10, price: 1355, type: "Colossal Sword" },
+                "Skull Crusher": { damage: 48, atkSpeed: 1.4, range: 10, price: 1355, type: "Colossal Sword" },
+                "Comically Large Spoon": { damage: 36, atkSpeed: 1.12, range: 10, price: 1355, type: "Colossal Sword" }
+            },
+            armor: {
+                "Light Helmet": { health: 3.75, price: 65, def: 8, type: "Light Helmet" },
+                "Light Leggings": { health: 4.375, price: 112.5, def: 9, type: "Light Leggings" },
+                "Light Chestplate": { health: 5, price: 225, def: 10, type: "Light Chestplate" },
+
+                "Medium Helmet": { health: 6.25, price: 335, def: 12, type: "Medium Helmet" },
+                "Samurai Helmet": { health: 8, price: 335, def: 16, type: "Medium Helmet" },
+                "Medium Leggings": { health: 7.5, price: 485, def: 15, type: "Medium Leggings" },
+                "Samurai Leggings": { health: 9, price: 485, def: 20, type: "Medium Leggings" },
+                "Medium Chestplate": { health: 8.75, price: 850, def: 18, type: "Medium Chestplate" },
+                "Samurai Chestplate": { health: 12.75, price: 850, def: 24, type: "Medium Chestplate" },
+
+                "Knight Helmet": { health: 12.5, price: 1020, def: 24, type: "Heavy Helmet" },
+                "Dark Knight Helmet": { health: 18.75, price: 1020, def: 38, type: "Heavy Helmet" },
+                "Knight Leggings": { health: 13.75, price: 1200, def: 28, type: "Heavy Leggings" },
+                "Dark Knight Leggings": { health: 21.875, price: 1200, def: 44, type: "Heavy Leggings" },
+                "Knight Chestplate": { health: 16.25, price: 1355, def: 32, type: "Heavy Chestplate" },
+                "Dark Knight Chestplate": { health: 25, price: 1355, def: 50, type: "Heavy Chestplate" }
+            }
+        };
+
         const oreData = [
             // Stonewake's Cross
-            { id: 1, name: "Stone", multiplier: 0.2, rarity: "common", area: "stonewake", color: "#8c8c8c", traitType: null, traits: [] },
-            { id: 2, name: "Sand Stone", multiplier: 0.25, rarity: "common", area: "stonewake", color: "#d2b48c", traitType: null, traits: [] },
-            { id: 3, name: "Copper", multiplier: 0.3, rarity: "common", area: "stonewake", color: "#b87333", traitType: null, traits: [] },
-            { id: 4, name: "Iron", multiplier: 0.35, rarity: "common", area: "stonewake", color: "#a19d94", traitType: null, traits: [] },
-            { id: 5, name: "Tin", multiplier: 0.425, rarity: "uncommon", area: "stonewake", color: "#c0c0c0", traitType: null, traits: [] },
-            { id: 6, name: "Silver", multiplier: 0.5, rarity: "uncommon", area: "stonewake", color: "#d3d3d3", traitType: null, traits: [] },
-            { id: 7, name: "Gold", multiplier: 0.65, rarity: "uncommon", area: "stonewake", color: "#ffd700", traitType: null, traits: [] },
-            { id: 8, name: "Mushroomite", multiplier: 0.8, rarity: "rare", area: "stonewake", color: "#ff6bc9", traitType: null, traits: [] },
-            { id: 9, name: "Platinum", multiplier: 0.8, rarity: "rare", area: "stonewake", color: "#e5e4e2", traitType: null, traits: [] },
-            { id: 10, name: "Bananite", multiplier: 0.85, rarity: "uncommon", area: "stonewake", color: "#ffeb3b", traitType: null, traits: [] },
-            { id: 11, name: "Cardboardite", multiplier: 0.7, rarity: "common", area: "stonewake", color: "#8b4513", traitType: null, traits: [] },
-            { id: 12, name: "Aite", multiplier: 1.0, rarity: "epic", area: "stonewake", color: "#4CAF50", traitType: null, traits: [] },
+            { id: 1, name: "Stone", multiplier: 0.2, rarity: "common", area: "stonewake", color: "#7b7773", traitType: null, traits: [] },
+            { id: 2, name: "Sand Stone", multiplier: 0.25, rarity: "common", area: "stonewake", color: "#c3a777", traitType: null, traits: [] },
+            { id: 3, name: "Copper", multiplier: 0.3, rarity: "common", area: "stonewake", color: "#925d3e", traitType: null, traits: [] },
+            { id: 4, name: "Iron", multiplier: 0.35, rarity: "common", area: "stonewake", color: "#827356", traitType: null, traits: [] },
+            { id: 5, name: "Tin", multiplier: 0.425, rarity: "uncommon", area: "stonewake", color: "#69707b", traitType: null, traits: [] },
+            { id: 6, name: "Silver", multiplier: 0.5, rarity: "uncommon", area: "stonewake", color: "#bad0e0", traitType: null, traits: [] },
+            { id: 7, name: "Gold", multiplier: 0.65, rarity: "uncommon", area: "stonewake", color: "#c89d40", traitType: null, traits: [] },
+            { id: 8, name: "Mushroomite", multiplier: 0.8, rarity: "rare", area: "stonewake", color: "#9b8768", traitType: null, traits: [] },
+            { id: 9, name: "Platinum", multiplier: 0.8, rarity: "rare", area: "stonewake", color: "#d6dee6", traitType: null, traits: [] },
+            { id: 10, name: "Bananite", multiplier: 0.85, rarity: "uncommon", area: "stonewake", color: "#edbe70", traitType: null, traits: [] },
+            { id: 11, name: "Cardboardite", multiplier: 0.7, rarity: "common", area: "stonewake", color: "#a28161", traitType: null, traits: [] },
+            { id: 12, name: "Aite", multiplier: 1.0, rarity: "epic", area: "stonewake", color: "#f0d2a7", traitType: null, traits: [] },
             {
-                id: 13, name: "Poopite", multiplier: 1.2, rarity: "epic", area: "stonewake", color: "#795548", traitType: "all", traits: [
+                id: 13, name: "Poopite", multiplier: 1.2, rarity: "epic", area: "stonewake", color: "#5f4937", traitType: "all", traits: [
                     {
                         description: "Deal {damage}% Poison DMG in AoE for {duration}s, fearing enemies (15s CD). Activates when HP drops below 35%.",
                         scaling: { damage: { min: 1.5, max: 15 }, duration: { min: 0.5, max: 5 } }, type: "all"
@@ -1212,48 +1372,48 @@
             },
 
             // Forgotten Kingdom
-            { id: 14, name: "Cobalt", multiplier: 1.0, rarity: "uncommon", area: "kingdom", color: "#0047ab", traitType: null, traits: [] },
-            { id: 15, name: "Titanium", multiplier: 1.15, rarity: "uncommon", area: "kingdom", color: "#878681", traitType: null, traits: [] },
-            { id: 16, name: "Volcanic Rock", multiplier: 1.55, rarity: "rare", area: "kingdom", color: "#8b0000", traitType: null, traits: [] },
-            { id: 17, name: "Lapis Lazuli", multiplier: 1.3, rarity: "uncommon", area: "kingdom", color: "#26619c", traitType: null, traits: [] },
-            { id: 18, name: "Quartz", multiplier: 1.5, rarity: "rare", area: "kingdom", color: "#f5f5f5", traitType: null, traits: [] },
-            { id: 19, name: "Amethyst", multiplier: 1.65, rarity: "rare", area: "kingdom", color: "#9966cc", traitType: null, traits: [] },
+            { id: 14, name: "Cobalt", multiplier: 1.0, rarity: "uncommon", area: "kingdom", color: "#579de7", traitType: null, traits: [] },
+            { id: 15, name: "Titanium", multiplier: 1.15, rarity: "uncommon", area: "kingdom", color: "#aca895", traitType: null, traits: [] },
+            { id: 16, name: "Volcanic Rock", multiplier: 1.55, rarity: "rare", area: "kingdom", color: "#504b44", traitType: null, traits: [] },
+            { id: 17, name: "Lapis Lazuli", multiplier: 1.3, rarity: "uncommon", area: "kingdom", color: "#5c89dc", traitType: null, traits: [] },
+            { id: 18, name: "Quartz", multiplier: 1.5, rarity: "rare", area: "kingdom", color: "#a6babc", traitType: null, traits: [] },
+            { id: 19, name: "Amethyst", multiplier: 1.65, rarity: "rare", area: "kingdom", color: "#a56bca", traitType: null, traits: [] },
             { id: 20, name: "Topaz", multiplier: 1.75, rarity: "rare", area: "kingdom", color: "#ffcc00", traitType: null, traits: [] },
-            { id: 21, name: "Diamond", multiplier: 2.0, rarity: "rare", area: "kingdom", color: "#b9f2ff", traitType: null, traits: [] },
-            { id: 22, name: "Sapphire", multiplier: 2.25, rarity: "rare", area: "kingdom", color: "#0f52ba", traitType: null, traits: [] },
-            { id: 23, name: "Cuprite", multiplier: 2.43, rarity: "epic", area: "kingdom", color: "#b87333", traitType: null, traits: [] },
+            { id: 21, name: "Diamond", multiplier: 2.0, rarity: "rare", area: "kingdom", color: "#91cff0", traitType: null, traits: [] },
+            { id: 22, name: "Sapphire", multiplier: 2.25, rarity: "rare", area: "kingdom", color: "#5194ec", traitType: null, traits: [] },
+            { id: 23, name: "Cuprite", multiplier: 2.43, rarity: "epic", area: "kingdom", color: "#90af4a", traitType: null, traits: [] },
             {
-                id: 24, name: "Obsidian", multiplier: 2.35, rarity: "epic", area: "kingdom", color: "#0b0b0b", traitType: "armor", traits: [
+                id: 24, name: "Obsidian", multiplier: 2.35, rarity: "epic", area: "kingdom", color: "#5b1fd5", traitType: "armor", traits: [
                     { description: "+{health}% extra health.", scaling: { health: { min: 3, max: 30 } }, type: "armor" }
                 ]
             },
-            { id: 25, name: "Emerald", multiplier: 2.55, rarity: "epic", area: "kingdom", color: "#50c878", traitType: null, traits: [] },
-            { id: 26, name: "Ruby", multiplier: 2.95, rarity: "epic", area: "kingdom", color: "#e0115f", traitType: null, traits: [] },
+            { id: 25, name: "Emerald", multiplier: 2.55, rarity: "epic", area: "kingdom", color: "#8df356", traitType: null, traits: [] },
+            { id: 26, name: "Ruby", multiplier: 2.95, rarity: "epic", area: "kingdom", color: "#ed4b4b", traitType: null, traits: [] },
             {
-                id: 27, name: "Rivalite", multiplier: 3.33, rarity: "epic", area: "kingdom", color: "#ff6b6b", traitType: "weapon", traits: [
+                id: 27, name: "Rivalite", multiplier: 3.33, rarity: "epic", area: "kingdom", color: "#f01919", traitType: "weapon", traits: [
                     { description: "+{crit}% critical chance.", scaling: { crit: { min: 2, max: 20 } }, type: "weapon" }
                 ]
             },
             {
-                id: 28, name: "Uranium", multiplier: 3.0, rarity: "legendary", area: "kingdom", color: "#008000", traitType: "armor", traits: [
+                id: 28, name: "Uranium", multiplier: 3.0, rarity: "legendary", area: "kingdom", color: "#8df060", traitType: "armor", traits: [
                     { description: "Deal {damage}% of max health as AoE DMG while in-combat.", scaling: { damage: { min: 0.5, max: 5 } }, type: "armor" }
                 ]
             },
             {
-                id: 29, name: "Mythril", multiplier: 3.5, rarity: "legendary", area: "kingdom", color: "#76d7ea", traitType: "armor", traits: [
+                id: 29, name: "Mythril", multiplier: 3.5, rarity: "legendary", area: "kingdom", color: "#ad51ee", traitType: "armor", traits: [
                     { description: "+{health}% extra health.", scaling: { health: { min: 1.5, max: 15 } }, type: "armor" }
                 ]
             },
             {
-                id: 30, name: "Eye Ore", multiplier: 4.0, rarity: "legendary", area: "kingdom", color: "#800080", traitType: "all", traits: [
+                id: 30, name: "Eye Ore", multiplier: 4.0, rarity: "legendary", area: "kingdom", color: "#d9681e", traitType: "all", traits: [
                     {
-                        description: "Increase physical damage by {damage}% and decrease health by {health}%.",
+                        description: "Increase physical damage by +{damage}% and decrease health by -{health}%.",
                         scaling: { damage: { min: 1.5, max: 15 }, health: { min: 1, max: 10 } }, type: "all"
                     }
                 ]
             },
             {
-                id: 31, name: "Fireite", multiplier: 4.5, rarity: "legendary", area: "kingdom", color: "#ff4500", traitType: "weapon", traits: [
+                id: 31, name: "Fireite", multiplier: 4.5, rarity: "legendary", area: "kingdom", color: "#d9670a", traitType: "weapon", traits: [
                     {
                         description: "Deals {damage}% of weapon damage as fire per second for 2 seconds. 30% chance on hit.",
                         scaling: { damage: { min: 2, max: 20 } }, type: "weapon"
@@ -1261,20 +1421,20 @@
                 ]
             },
             {
-                id: 32, name: "Magmaite", multiplier: 5.0, rarity: "legendary", area: "kingdom", color: "#ff0000", traitType: "weapon", traits: [
+                id: 32, name: "Magmaite", multiplier: 5.0, rarity: "legendary", area: "kingdom", color: "#db3d3d", traitType: "weapon", traits: [
                     {
-                        description: "Cause an explosion at location of victim, dealing {damage}% of weapon damage as AoE damage. 35% chance on hit.",
+                        description: "Cause an explosion on hit, dealing {damage}% of weapon damage as AoE damage. 35% chance on hit.",
                         scaling: { damage: { min: 5, max: 50 } }, type: "weapon"
                     }
                 ]
             },
             {
-                id: 33, name: "Lightite", multiplier: 4.6, rarity: "legendary", area: "kingdom", color: "#ffff00", traitType: "armor", traits: [
+                id: 33, name: "Lightite", multiplier: 4.6, rarity: "legendary", area: "kingdom", color: "#dfdfdf", traitType: "armor", traits: [
                     { description: "+{speed}% extra movement speed.", scaling: { speed: { min: 1.5, max: 15 } }, type: "armor" }
                 ]
             },
             {
-                id: 34, name: "Demonite", multiplier: 5.5, rarity: "mythical", area: "kingdom", color: "#8b0000", traitType: "armor", traits: [
+                id: 34, name: "Demonite", multiplier: 5.5, rarity: "mythical", area: "kingdom", color: "#901c1c", traitType: "armor", traits: [
                     {
                         description: "Deals {damage}% of weapon damage as fire per second for 2 seconds. 15% chance on hit and 25% chance when hit by an enemy.",
                         scaling: { damage: { min: 2, max: 20 } }, type: "armor"
@@ -1282,7 +1442,7 @@
                 ]
             },
             {
-                id: 35, name: "Darkryte", multiplier: 6.3, rarity: "mythical", area: "kingdom", color: "#4b0082", traitType: "armor", traits: [
+                id: 35, name: "Darkryte", multiplier: 6.3, rarity: "mythical", area: "kingdom", color: "#dcdcdc", traitType: "armor", traits: [
                     {
                         description: "Upon taking damage, there is a {chance}% chance to turn into a shadow and dodge the attack.",
                         scaling: { chance: { min: 1.5, max: 15 } }, type: "armor"
@@ -1291,13 +1451,13 @@
             },
 
             // Goblin Cave
-            { id: 36, name: "Magenta Crystal", multiplier: 3.1, rarity: "epic", area: "goblin", color: "#ff00ff", traitType: null, traits: [] },
+            { id: 36, name: "Magenta Crystal", multiplier: 3.1, rarity: "epic", area: "goblin", color: "#7d47a9", traitType: null, traits: [] },
             { id: 37, name: "Crimson Crystal", multiplier: 3.3, rarity: "epic", area: "goblin", color: "#dc143c", traitType: null, traits: [] },
-            { id: 38, name: "Green Crystal", multiplier: 3.2, rarity: "epic", area: "goblin", color: "#00ff00", traitType: null, traits: [] },
-            { id: 39, name: "Orange Crystal", multiplier: 3.0, rarity: "epic", area: "goblin", color: "#ffa500", traitType: null, traits: [] },
-            { id: 40, name: "Blue Crystal", multiplier: 3.4, rarity: "epic", area: "goblin", color: "#0000ff", traitType: null, traits: [] },
-            { id: 41, name: "Rainbow Crystal", multiplier: 5.25, rarity: "legendary", area: "goblin", color: "#ff0000", traitType: null, traits: [] },
-            { id: 42, name: "Arcane Crystal", multiplier: 7.5, rarity: "mythical", area: "goblin", color: "#9400d3", traitType: null, traits: [] },
+            { id: 38, name: "Green Crystal", multiplier: 3.2, rarity: "epic", area: "goblin", color: "#8ba846", traitType: null, traits: [] },
+            { id: 39, name: "Orange Crystal", multiplier: 3.0, rarity: "epic", area: "goblin", color: "#a66e41", traitType: null, traits: [] },
+            { id: 40, name: "Blue Crystal", multiplier: 3.4, rarity: "epic", area: "goblin", color: "#A7C7E7", traitType: null, traits: [] },
+            { id: 41, name: "Rainbow Crystal", multiplier: 5.25, rarity: "legendary", area: "goblin", color: "#50C878", traitType: null, traits: [] },
+            { id: 42, name: "Arcane Crystal", multiplier: 7.5, rarity: "mythical", area: "goblin", color: "#d1e2f9", traitType: null, traits: [] },
 
             // Enemy Drops
             { id: 43, name: "Boneite", multiplier: 1.2, rarity: "rare", area: "enemy", color: "#f5f5dc", traitType: null, traits: [] },
@@ -1613,6 +1773,7 @@
             setupQuickCraft();
             updateExpectedItem();
             updateAreaToggle();
+            setupForgeResultModal();
         }
 
         document.getElementById('tooltip-close').addEventListener('click', () => {
@@ -2034,11 +2195,11 @@
         function setupQuickCraft() {
             quickCraftBtn.addEventListener('click', () => {
                 quickCraftModal.style.display = 'flex';
-                
+
                 if (window.innerWidth <= 480) {
                     document.body.classList.add('modal-open');
                 }
-                
+
                 resetQuickCraft();
                 showStep(0);
                 setTimeout(() => quickCraftModal.focus(), 10);
@@ -2068,7 +2229,7 @@
                     const modalContent = document.querySelector('.modal-content');
                     const atTop = modalContent.scrollTop === 0;
                     const atBottom = modalContent.scrollHeight - modalContent.scrollTop === modalContent.clientHeight;
-                    
+
                     if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -2362,7 +2523,7 @@
 
         function applyQuickCraft() {
             const mixPlan = JSON.parse(summaryContent.dataset.mixPlan);
-            
+
             if (quickCraftType !== currentMode) {
                 currentMode = quickCraftType;
                 if (currentMode === 'weapon') {
@@ -2374,7 +2535,7 @@
                 }
                 updateProbabilities();
             }
-            
+
             oreMix = [];
             mixPlan.forEach(item => {
                 const existingIndex = oreMix.findIndex(ore => ore.id === item.id);
@@ -2384,12 +2545,12 @@
                     oreMix.push({ id: item.id, count: item.count });
                 }
             });
-            
+
             updateOreSlots();
             if (quickCraftType === currentMode) {
                 updateProbabilities();
             }
-            
+
             quickCraftModal.style.display = 'none';
             document.body.classList.remove('modal-open');
         }
@@ -2402,6 +2563,366 @@
 
             document.querySelectorAll('.modal-option').forEach(o => o.classList.remove('selected'));
             document.querySelectorAll('.trait-checkbox').forEach(cb => cb.checked = false);
+        }
+
+        function getVariantProbabilities(variants) {
+            if (!variants || variants.length === 0) {
+                return null;
+            }
+
+            const weights = variants.map(v => {
+                const [num, den] = v.chance.split('/').map(Number);
+                return num / den;
+            });
+
+            const total = weights.reduce((a, b) => a + b, 0);
+            return variants.map((v, i) => ({
+                ...v,
+                normalizedProb: weights[i] / total
+            }));
+        }
+
+        function getRandomVariant(itemType) {
+            const variants = specificItemVariants[currentMode]?.[itemType]?.[currentArea];
+            if (!variants || variants.length === 0) {
+                return { name: itemType, chance: "1/1", probability: 1.0 };
+            }
+
+            const weightedVariants = getVariantProbabilities(variants);
+            if (!weightedVariants) return { name: itemType, chance: "1/1", probability: 1.0 };
+
+            let random = Math.random();
+            let cumulative = 0;
+
+            for (const variant of weightedVariants) {
+                cumulative += variant.normalizedProb;
+                if (random <= cumulative) {
+                    return variant;
+                }
+            }
+
+            return weightedVariants[0];
+        }
+
+        function getMainOre() {
+            if (oreMix.length === 0) return null;
+
+            let maxCount = 0;
+            let mainOre = null;
+
+            oreMix.forEach(item => {
+                if (item.count > maxCount) {
+                    maxCount = item.count;
+                    const ore = oreData.find(o => o.id === item.id);
+                    mainOre = ore;
+                }
+            });
+
+            const ties = oreMix.filter(item => item.count === maxCount);
+            if (ties.length > 1) {
+                ties.sort((a, b) => {
+                    const oreA = oreData.find(o => o.id === a.id);
+                    const oreB = oreData.find(o => o.id === b.id);
+                    return oreB.multiplier - oreA.multiplier;
+                });
+                mainOre = oreData.find(o => o.id === ties[0].id);
+            }
+
+            return mainOre;
+        }
+
+        function calculateScaledStats(itemName, multiplier) {
+            const stats = baseItemStats[currentMode][itemName];
+            if (!stats) return null;
+
+            const scaled = { ...stats };
+
+            if (currentMode === 'weapon') {
+                scaled.damage = stats.damage * multiplier;
+                scaled.price = stats.price * multiplier;
+            } else {
+                scaled.def = stats.def * multiplier;
+                scaled.price = stats.price * multiplier;
+            }
+
+            return scaled;
+        }
+
+        function getActiveTraits() {
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+            const traitsList = [];
+
+            oreMix.forEach(item => {
+                const ore = oreData.find(o => o.id === item.id);
+                const percentage = (item.count / totalOres) * 100;
+
+                if (ore.traits && ore.traits.length > 0 && percentage >= 10) {
+                    ore.traits.forEach(trait => {
+                        const isApplicable = trait.type === 'all' || trait.type === currentMode;
+
+                        if (isApplicable) {
+                            let scaledValues = {};
+                            Object.keys(trait.scaling).forEach(key => {
+                                const scale = trait.scaling[key];
+                                let value = 0;
+
+                                if (percentage >= 30) {
+                                    value = scale.max;
+                                } else if (percentage >= 10) {
+                                    const scaleFactor = (percentage - 10) / 20;
+                                    value = scale.min + (scale.max - scale.min) * scaleFactor;
+                                }
+
+                                scaledValues[key] = Math.round(value * 10) / 10;
+                            });
+
+                            let formattedDesc = trait.description;
+                            Object.keys(scaledValues).forEach(key => {
+                                formattedDesc = formattedDesc.replace(`{${key}}`, scaledValues[key]);
+                            });
+
+                            traitsList.push({
+                                oreName: ore.name,
+                                description: formattedDesc,
+                                percentage: percentage,
+                                oreColor: ore.color
+                            });
+                        }
+                    });
+                }
+            });
+
+            return traitsList;
+        }
+
+        function simulateForge() {
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+
+            if (totalOres < 3) {
+                return;
+            }
+
+            const forgeBtn = document.getElementById('forge-btn');
+            const originalText = forgeBtn.innerHTML;
+            forgeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Forging...';
+            forgeBtn.disabled = true;
+
+            let multiplierSum = 0;
+            oreMix.forEach(item => {
+                const ore = oreData.find(o => o.id === item.id);
+                multiplierSum += ore.multiplier * item.count;
+            });
+            const multiplier = multiplierSum / totalOres;
+
+            const probabilities = currentMode === 'weapon' ? weaponProbabilities : armorProbabilities;
+            const counts = Object.keys(probabilities).map(Number);
+            const closestCount = counts.reduce((prev, curr) => {
+                return (Math.abs(curr - totalOres) < Math.abs(prev - totalOres) ? curr : prev);
+            });
+
+            const currentProbs = probabilities[closestCount] || {};
+
+            let random = Math.random();
+            let selectedItemType = null;
+            let cumulativeProb = 0;
+
+            for (const [itemType, prob] of Object.entries(currentProbs)) {
+                cumulativeProb += prob;
+                if (random <= cumulativeProb) {
+                    selectedItemType = itemType;
+                    break;
+                }
+            }
+
+            if (!selectedItemType) {
+                selectedItemType = Object.keys(currentProbs)[0];
+            }
+
+            const variant = getRandomVariant(selectedItemType);
+            const itemName = variant.name.replace(/\s*\[.*?\]\s*/g, ''); // Clean name
+
+            const mainOre = getMainOre();
+
+            const scaledStats = calculateScaledStats(itemName, multiplier);
+
+            const activeTraits = getActiveTraits();
+
+            setTimeout(() => {
+                showForgeResult({
+                    itemName: itemName,
+                    itemType: selectedItemType,
+                    variant: variant,
+                    multiplier: multiplier,
+                    mainOre: mainOre,
+                    stats: scaledStats,
+                    traits: activeTraits,
+                    area: currentArea,
+                    totalOres: totalOres
+                });
+
+                forgeBtn.innerHTML = originalText;
+                forgeBtn.disabled = false;
+            }, 300);
+        }
+
+        function showForgeResult(result) {
+            const modal = document.getElementById('forge-result-modal');
+            const content = document.getElementById('forge-result-body');
+
+            const bgColor = result.mainOre ? result.mainOre.color : '#FF6600';
+            const bgPattern = `
+        background: linear-gradient(135deg, 
+            ${bgColor}15 0%, 
+            ${bgColor}08 25%, 
+            rgba(0,0,0,0.1) 50%, 
+            ${bgColor}08 75%, 
+            ${bgColor}15 100%);
+        background-size: 8px 8px;
+        border: 2px solid ${bgColor}40;
+    `;
+
+            let statsHTML = '';
+            if (currentMode === 'weapon') {
+                statsHTML = `
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px;">
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                    <div style="color: var(--primary); font-size: 0.9rem;">Damage</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;">${result.stats.damage.toFixed(2)}</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                    <div style="color: var(--primary); font-size: 0.9rem;">ATK Speed</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;">${result.stats.atkSpeed}s</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                    <div style="color: var(--primary); font-size: 0.9rem;">Range</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;">${result.stats.range} studs</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                    <div style="color: var(--primary); font-size: 0.9rem;">Value</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;">$${Math.round(result.stats.price)}</div>
+                </div>
+            </div>
+        `;
+            } else {
+                statsHTML = `
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px;">
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                    <div style="color: var(--primary); font-size: 0.9rem;">Health Bonus</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;">+${result.stats.health}%</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                    <div style="color: var(--primary); font-size: 0.9rem;">DEF</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;">${Math.round(result.stats.def)}</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; grid-column: 1 / -1;">
+                    <div style="color: var(--primary); font-size: 0.9rem;">Value</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;">$${Math.round(result.stats.price)}</div>
+                </div>
+            </div>
+        `;
+            }
+
+            let traitsHTML = '';
+            if (result.traits.length > 0) {
+                traitsHTML = `
+            <div style="margin-top: 20px;">
+                <div style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-magic"></i> Item Traits
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    ${result.traits.map(trait => `
+                        <div style="background: rgba(255,102,0,0.1); border: 1px solid var(--primary); border-radius: 8px; padding: 10px;">
+                            <div style="font-weight: bold; color: ${trait.oreColor || 'var(--primary)'}; font-size: 0.9rem;">
+                                ${trait.oreName} (${trait.percentage.toFixed(1)}%)
+                            </div>
+                            <div style="font-size: 0.85rem; margin-top: 5px; color: var(--text-secondary);">
+                                ${trait.description}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+            }
+
+            const itemImage = itemImages[result.itemName] || '';
+
+            content.innerHTML = `
+        <div style="${bgPattern} padding: 20px; border-radius: 10px; position: relative;">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                ${itemImage ? `
+                    <div style="box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);width: 120px; height: 90px; background-image: url('${itemImage}'); background-size: cover; background-position: center; border-radius: 8px; border: 2px solid ${result.mainOre?.color || 'var(--primary)'};">
+                    </div>
+                ` : ''}
+                <div style="flex: 1; min-width: 200px;">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: ${result.mainOre?.color || 'var(--primary)'}; margin-bottom: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                        ${result.itemName}
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">
+                        ${result.itemType} • ${result.mainOre?.rarity ? result.mainOre.rarity.charAt(0).toUpperCase() + result.mainOre.rarity.slice(1) : 'Common'}
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                        <div style="background: rgba(255,102,0,0.2); color: var(--primary); padding: 4px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">
+                            <i class="fas fa-percent"></i> ${result.multiplier.toFixed(2)}x Multi
+                        </div>
+                        <div style="background: rgba(255,102,0,0.2); color: var(--primary); padding: 4px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">
+                            <i class="fas fa-star"></i> [100]% Masterwork
+                        </div>
+                        <div style="background: ${result.mainOre?.color || '#FF6600'}30; color: ${result.mainOre?.color || '#FF6600'}; padding: 4px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">
+                            <i class="fas fa-gem"></i> ${result.mainOre?.name || 'Stone'}
+                        </div>
+                        <div style="background: ${currentArea === 'kingdom' ? 'rgba(255,102,0,0.2)' : 'rgba(8,78,78,0.2)'}; 
+                            color: ${currentArea === 'kingdom' ? 'var(--primary)' : 'var(--stonewake-teal)'}; 
+                            padding: 4px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">
+                            <i class="fas fa-map-marker-alt"></i> ${currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            ${statsHTML}
+            ${traitsHTML}
+            
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
+                Forged with ${result.totalOres} ores • Masterwork Quality [100%]
+            </div>
+        </div>
+    `;
+
+            modal.style.display = 'flex';
+            if (window.innerWidth <= 480) {
+                document.body.classList.add('modal-open');
+            }
+        }
+
+        function setupForgeResultModal() {
+            const modal = document.getElementById('forge-result-modal');
+            const closeBtn = document.getElementById('forge-result-close');
+            const closeResultBtn = document.getElementById('close-result-btn');
+            const forgeAgainBtn = document.getElementById('forge-again-btn');
+
+            closeBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+            });
+
+            closeResultBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+            });
+
+            forgeAgainBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                simulateForge();
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                }
+            });
         }
 
         function setupEventListeners() {
@@ -2437,6 +2958,11 @@
                 updateOreSlots();
                 updateProbabilities();
             });
+
+            const forgeBtn = document.getElementById('forge-btn');
+            if (forgeBtn) {
+                forgeBtn.addEventListener('click', simulateForge);
+            }
 
         }
 
