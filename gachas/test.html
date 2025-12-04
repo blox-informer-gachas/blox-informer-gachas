@@ -4,22 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forging Calculator - Roblox Experience</title>
+    <title>The Forge Crafting Calculator & Simulator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #FF6600;
             --primary-dark: #cc5200;
             --primary-light: rgba(255, 102, 0, 0.1);
-            --background: #1d1d1d;
-            --card-bg: #2a2a2a;
+            --primary-glow: rgba(255, 102, 0, 0.3);
+            --background: #0f0f0f;
+            --card-bg: linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             --text: #f0f0f0;
-            --text-secondary: #ff812d;
+            --text-secondary: #ffa366;
             --border: #444;
             --success: #4CAF50;
             --warning: #ff9800;
             --error: #f44336;
-            --glow: 0 0 15px rgba(255, 102, 0, 0.5);
+            --glow: 0 0 20px rgba(255, 102, 0, 0.4);
             --common: #8c8c8c;
             --uncommon: #4CAF50;
             --rare: #2196F3;
@@ -27,113 +29,165 @@
             --legendary: #f0b209;
             --mythical: #d13429;
             --relic: #ffeb3b;
-            --stonewake-teal: #084e4e;
+            --stonewake-teal: #0a6e6e;
+            --animation-speed: 0.3s;
+            --border-radius: 12px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background);
+            background: var(--background);
             color: var(--text);
             max-width: 800px;
             margin: 0 auto;
             padding: 10px;
-            line-height: 1.5;
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(255, 102, 0, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 102, 0, 0.05) 0%, transparent 50%);
         }
 
         .container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
+        /* Header & Mode Toggle */
         header {
             text-align: center;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-            border-radius: 10px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--border-radius);
             box-shadow: var(--glow);
             position: relative;
+            overflow: hidden;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: shimmer 3s infinite;
         }
 
         h1 {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
         }
 
         .subtitle {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            margin-bottom: 15px;
         }
 
         .mode-toggle {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-top: 10px;
+            gap: 15px;
+            margin-top: 15px;
         }
 
+        /* Buttons */
         button {
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            outline: none;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        button:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
         }
 
         .toggle-btn {
-            padding: 8px 20px;
-            border: 2px solid var(--border);
-            background-color: var(--card-bg);
+            padding: 10px 25px;
+            background: rgba(0, 0, 0, 0.8);
             color: var(--text);
             border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 2px solid var(--border);
+            backdrop-filter: blur(10px);
         }
 
         .toggle-btn.active {
-            background-color: white;
-            color: var(--primary);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, var(--text-secondary), var(--primary-dark));
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .toggle-btn:hover:not(.active) {
+            box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.4);
             border: 2px solid var(--primary);
+            transform: translateY(-3px);
         }
 
-        .toggle-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-            background-color: white;
-            color: var(--primary)
-        }
-
-        .toggle-btn.active:hover {
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-        }
-
+        /* Quick Craft Button */
         .quick-craft-btn {
-            padding: 8px 15px;
-            background-color: white;
-            color: var(--primary-dark);
-            border: 2px solid white;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: 25px;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 5px;
-            transition: all 0.3s ease;
+            font-size: 0.95rem;
         }
 
         .quick-craft-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 12px var(--primary-glow);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
         }
 
+        /* Modal Styles */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -141,21 +195,30 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(5px);
+            animation: fadeIn var(--animation-speed) ease-out;
+        }
+
+        .modal-overlay.show {
+            display: flex;
         }
 
         .modal-content {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 20px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
             width: 90%;
             max-width: 500px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            box-shadow: var(--card-shadow);
+            border: 2px solid var(--primary-dark);
+            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center center;
         }
 
         .modal-header {
@@ -163,17 +226,29 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-dark);
         }
 
         .modal-close {
             background: none;
             border: none;
             color: var(--text);
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
-            padding: 5px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all var(--animation-speed);
+            position: relative;
+        }
+
+        .modal-close:hover {
+            background: var(--primary-dark);
+            transform: rotate(90deg);
         }
 
         .modal-step {
@@ -193,7 +268,7 @@
 
         .modal-options {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-bottom: 15px;
         }
@@ -210,7 +285,7 @@
 
         .modal-option.selected {
             border-color: var(--primary);
-            background-color: rgba(255, 102, 0, 0.1);
+            background-color: var(--primary-light);
         }
 
         .modal-option:hover {
@@ -234,17 +309,17 @@
         .trait-option:hover {
             transform: translateY(-3px);
             border-color: var(--primary-light);
-            background-color: rgba(255, 102, 0, 0.05);
+            background-color: var(--primary-light);
         }
 
         .trait-option.selected {
             border-color: var(--primary);
-            background-color: rgba(255, 102, 0, 0.15);
-            box-shadow: 0 0 10px rgba(255, 102, 0, 0.2);
+            background-color: var(--primary-light);
+            box-shadow: 0 0 10px var(--primary-light);
         }
 
         .trait-option.selected:hover {
-            background-color: rgba(255, 102, 0, 0.2);
+            background-color: var(--primary-light);
             border-color: var(--primary);
         }
 
@@ -269,76 +344,90 @@
         .modal-nav {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            margin-top: 15px;
+            gap: 10px;
         }
 
-        .modal-btn {
-            padding: 10px 20px;
-            background-color: var(--primary);
-            color: var(--background);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
+        /* Sections */
+        .inventory-section,
+        .mix-section,
+        .probability-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            animation: fadeInUp 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
         }
 
-        .modal-btn:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .modal-btn.secondary {
-            background-color: var(--border);
-            color: var(--text);
-        }
-
-        .inventory-section {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        .inventory-section::before,
+        .mix-section::before,
+        .probability-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), transparent);
         }
 
         .section-title {
             font-size: 1.3rem;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: var(--text-secondary);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        .section-title i {
+            margin-right: 6px;
+        }
+
+        /* Filter Controls */
         .filter-controls {
             display: flex;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
         .filter-btn {
-            padding: 5px 12px;
-            border: 1px solid var(--border);
-            background-color: rgba(255, 255, 255, 0.05);
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text);
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.2s;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
+            transition: all var(--animation-speed);
         }
 
         .filter-btn.active {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
         }
 
+        .filter-btn:hover:not(.active) {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Ores Grid */
         .ores-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 15px;
-            max-height: 270px;
+            min-height: 300px;
+            max-height: 300px;
             overflow-y: auto;
-            padding: 5px;
+            padding: 10px;
         }
 
         .ore-item {
@@ -367,7 +456,7 @@
             right: 5px;
             color: var(--primary);
             font-size: 1rem;
-            text-shadow: 0 0 5px rgba(255, 102, 0, 0.7);
+            text-shadow: 0 0 5px var(--primary-glow);
             width: 20px;
             height: 20px;
             display: flex;
@@ -489,13 +578,7 @@
             z-index: 2;
         }
 
-        .mix-section {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
+        /* Slots */
         .slots-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -516,7 +599,7 @@
 
         .slot.filled {
             border: 2px solid var(--primary);
-            background-color: rgba(255, 102, 0, 0.05);
+            background-color: var(--primary-light);
             transition: all 0.3s ease;
         }
 
@@ -591,148 +674,457 @@
                 1px 1px 0 rgba(0, 0, 0, 0.5);
         }
 
-        .remove-ore {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 24px;
-            height: 24px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: bold;
-            z-index: 2;
-        }
-
-        .remove-ore:hover {
-            background-color: var(--error);
-        }
-
-        .mix-stats {
-            margin-bottom: 20px;
-        }
-
+        /* Stats & Traits */
         .stat-box {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            padding: 15px;
+            background: linear-gradient(135deg, var(--primary-light), rgba(0, 0, 0, 0.2));
+            border-radius: var(--border-radius);
+            padding: 20px;
             text-align: center;
+            border: 1px solid var(--primary-light);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border: 1px solid var(--primary);
+            transition: all 0.3s ease;
         }
 
         .stat-title {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
 
         .stat-value {
-            font-size: 1.2rem;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* Traits Section */
+        .traits-container {
+            margin-top: 15px;
+        }
+
+        .traits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .trait-card {
+            background: var(--primary-light);
+            border: 1px solid var(--primary);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all var(--animation-speed) ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trait-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-light), transparent);
+            opacity: 0;
+            transition: opacity var(--animation-speed) ease;
+        }
+
+        .trait-card:hover::before {
+            opacity: 1;
+        }
+
+        .trait-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--glow);
+        }
+
+        .trait-content {
+            flex: 1;
+        }
+
+        .trait-name {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .trait-percentage {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: var(--border-radius);
+        }
+
+        .trait-description {
+            font-size: 0.85rem;
+            color: var(--text);
+            line-height: 1.4;
+        }
+
+        /* Probability Section */
+        .probability-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .probability-item {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), var(--primary-light));
+            border-radius: 10px;
+            padding: 10px 15px;
+            border-left: 4px solid var(--primary);
+            transition: all var(--animation-speed);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .probability-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-light), transparent);
+            opacity: 0;
+            transition: opacity var(--animation-speed) ease;
+        }
+
+        .probability-item:hover::before {
+            opacity: 1;
+        }
+
+        .probability-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .optimal-count {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 3px 10px;
+            border-radius: var(--border-radius);
+        }
+
+        .probability-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .probability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--text-secondary));
+            border-radius: var(--border-radius);
+            position: relative;
+            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .probability-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        .probability-value {
+            text-align: right;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: bold;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .control-btn {
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s;
+        }
+
+        .control-btn:hover::before {
+            left: 100%;
+        }
+
+        .forge-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 6px 25px var(--primary-light);
+        }
+
+        .forge-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px var(--primary-glow);
+        }
+
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--primary);
+        }
+
+        /* Forge Result Modal */
+        .forge-result-container {
+            padding: 20px;
+            border-radius: var(--border-radius);
+        }
+
+        #forge-result-content {
+            max-width: 700px;
+            animation: modalSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .forge-result-header {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .forge-result-image {
+            width: 140px;
+            height: 105px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            border: 3px solid;
+            box-shadow: 0 0 25px;
+            flex-shrink: 0;
+        }
+
+        .forge-result-details {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .forge-result-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .forge-result-type {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .forge-result-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .forge-tag {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+        }
+
+        .forge-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .forge-stat-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid var(--primary-light);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            transition: all var(--animation-speed) ease;
+        }
+
+        .forge-stat-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: var(--primary);
+            box-shadow: var(--glow);
+            transform: translateY(-3px);
+            transition: all var(--animation-speed) ease;
+        }
+
+        .forge-stat-label {
+            color: var(--text);
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .forge-stat-value {
+            font-size: 1.5rem;
             font-weight: bold;
             color: var(--primary);
         }
 
-        .traits-container {
-            margin-top: 5px;
+        .traits-section {
+            margin-top: 25px;
         }
 
-        .traits-list {
+        .traits-list-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
         }
 
-        .trait {
-            background-color: rgba(255, 102, 0, 0.1);
-            border: 1px solid var(--primary);
-            border-radius: 15px;
-            padding: 8px 15px;
-            font-size: 0.85rem;
+        .trait-placeholder {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .forge-trait-item {
+            background: linear-gradient(135deg, var(--primary-glow), var(--primary-light));
+            border: 1px solid var(--primary-light);
+            border-radius: 10px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            transition: all var(--animation-speed);
+        }
+
+        .forge-trait-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px var(--primary-glow);
+        }
+
+        .forge-trait-ore {
+            font-weight: bold;
+            margin-bottom: 5px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .trait-icon {
-            color: var(--primary);
-        }
-
-        .probability-section {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .probability-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .probability-item {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            padding: 12px;
-            border-left: 4px solid var(--primary);
-            transition: all 0.3s ease;
-        }
-
-        .probability-item:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--glow);
-            transition: all 0.3s ease;
-        }
-
-        .item-name {
+        .forge-trait-desc {
             font-size: 0.9rem;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .optimal-count-display {
-            font-size: 0.8rem;
             color: var(--text-secondary);
-            background-color: rgba(255, 102, 0, 0.1);
-            padding: 2px 8px;
-            border-radius: 10px;
+            line-height: 1.5;
         }
 
-        .probability-bar {
-            height: 8px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 5px;
+        .forge-result-footer {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
         }
 
-        .probability-fill {
-            height: 100%;
-            background-color: var(--primary);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-
-        .probability-value {
+        /* Area Toggle */
+        .area-toggle-btn {
             font-size: 0.85rem;
-            text-align: right;
-            color: var(--text-secondary);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--animation-speed);
+            font-weight: 600;
         }
 
+        .area-toggle-btn.kingdom {
+            background: linear-gradient(135deg, #FF6600, #cc5200);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .area-toggle-btn.stonewake {
+            background: linear-gradient(135deg, #1da5a5, #084e4e);
+            border-color: var(--stonewake-teal);
+            color: white;
+        }
+
+        .area-toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Tooltip */
         .tooltip {
             display: none;
             position: fixed;
-            background-color: var(--card-bg);
+            background-color: #1d1d1d;
             border: 2px solid var(--primary);
             border-radius: 8px;
             padding: 15px;
@@ -756,15 +1148,6 @@
             font-size: 1rem;
             color: var(--primary);
             margin: 0;
-        }
-
-        .tooltip-close {
-            background: none;
-            border: none;
-            color: var(--text);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0 5px;
         }
 
         .tooltip-content {
@@ -795,88 +1178,183 @@
         .variant-chance {
             color: var(--primary);
             font-weight: bold;
-            background-color: rgba(255, 102, 0, 0.1);
+            background-color: var(--primary-light);
             padding: 2px 8px;
             border-radius: 10px;
             font-size: 0.85rem;
         }
 
-        .area-exclusive {
-            color: var(--warning);
-            font-size: 0.8rem;
-            margin-top: 3px;
+        .step-panel {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .3s ease;
         }
 
-        .area-toggle-btn.kingdom {
-            background-color: var(--primary);
-            border: 1px solid var(--primary);
-            color: var(--background);
-            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.18);
+        .step-panel.active {
+            opacity: 1;
+            pointer-events: auto;
         }
 
-        .area-toggle-btn.stonewake {
-            background-color: var(--stonewake-teal);
-            border: 1px solid var(--stonewake-teal);
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(8, 78, 78, 0.18);
+        .step-anim-in {
+            animation: fadeIn .3s ease forwards;
         }
 
-        .area-toggle-btn {
-            transition: all 0.3s ease;
+        .step-anim-out {
+            animation: fadeOut .3s ease forwards;
         }
 
-        .area-toggle-btn:hover {
-            background-color: var(--primary-light) !important;
-            border-color: var(--primary) !important;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .control-btn {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 25px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .reset-btn {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-
-        .forge-btn {
-            background-color: var(--primary);
-            color: var(--background);
-            box-shadow: 0 4px 10px rgba(255, 102, 0, 0.3);
-        }
-
-        .control-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        * {
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-
-        @media (min-width: 769px) {
-            .ores-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+        }
+
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+
+            20% {
+                transform: scale(25, 25);
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+
+        @keyframes tooltipFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+
+            .forge-result-tags {
+                justify-content: center;
+            }
+
+            .forge-tag {
+                font-size: 0.75rem;
+                padding: 5px 12px;
+            }
+
+            .forge-result-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 5px;
+            }
+
+            .forge-stat-value {
+                font-size: 1.2rem;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            .stat-value {
+                font-size: 1.6rem;
+            }
+
+
         }
 
         @media (max-width: 480px) {
@@ -899,21 +1377,15 @@
                 grid-template-columns: 1fr;
             }
 
-            .stat-box {
-                padding: 10px;
-            }
-
             .filter-controls {
                 justify-content: center;
             }
 
-            h1 {
-                font-size: 1.5rem;
-            }
         }
 
+        /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
         }
 
         ::-webkit-scrollbar-track {
@@ -922,64 +1394,68 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-dark);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
         }
 
+        /* Rarity Colors */
         .common {
             border-color: var(--common);
-        }
-
-        .common .ore-name {
-            color: var(--common);
         }
 
         .uncommon {
             border-color: var(--uncommon);
         }
 
-        .uncommon .ore-name {
-            color: var(--uncommon);
-        }
-
         .rare {
             border-color: var(--rare);
-        }
-
-        .rare .ore-name {
-            color: var(--rare);
         }
 
         .epic {
             border-color: var(--epic);
         }
 
-        .epic .ore-name {
-            color: var(--epic);
-        }
-
         .legendary {
             border-color: var(--legendary);
+            border-image: var(--legendary) 1;
+        }
+
+        .mythical {
+            border-color: var(--mythical);
+            border-image: var(--mythical) 1;
+        }
+
+        .relic {
+            border-color: var(--relic);
+            border-image: var(--relic) 1;
+        }
+
+        .common .ore-name {
+            color: var(--common);
+        }
+
+        .uncommon .ore-name {
+            color: var(--uncommon);
+        }
+
+        .rare .ore-name {
+            color: var(--rare);
+        }
+
+        .epic .ore-name {
+            color: var(--epic);
         }
 
         .legendary .ore-name {
             color: var(--legendary);
         }
 
-        .mythical {
-            border-color: var(--mythical);
-        }
-
         .mythical .ore-name {
             color: var(--mythical);
-        }
-
-        .relic {
-            border-color: var(--relic);
         }
 
         .relic .ore-name {
@@ -998,7 +1474,7 @@
                     &#9876; Weapons
                 </button>
                 <button class="toggle-btn" id="armor-toggle">
-                    <i class="fas fa-shield-alt"></i> Armor
+                    <i class="fas fa-shield-alt" style="font-size: 0.8rem;"></i> Armor
                 </button>
             </div>
 
@@ -1012,7 +1488,7 @@
                     <button class="modal-close" id="modal-close">&times;</button>
                 </div>
 
-                <div class="modal-step active" id="step-type">
+                <div class="modal-step active step-panel" id="step-type">
                     <div class="modal-step-title">1. Select Item Type</div>
                     <div class="modal-options">
                         <div class="modal-option" data-type="weapon" style="display: flex; flex-direction: column;">
@@ -1026,13 +1502,13 @@
                     </div>
                 </div>
 
-                <div class="modal-step" id="step-item">
+                <div class="modal-step step-panel" id="step-item">
                     <div class="modal-step-title">2. Select Item</div>
                     <div class="modal-options" id="item-options">
                     </div>
                 </div>
 
-                <div class="modal-step" id="step-traits">
+                <div class="modal-step step-panel" id="step-traits">
                     <div class="modal-step-title">3. Select Traits (Max 4)</div>
                     <div id="trait-options">
                     </div>
@@ -1041,17 +1517,16 @@
                     </div>
                 </div>
 
-                <div class="modal-step" id="step-summary">
+                <div class="modal-step step-panel" id="step-summary">
                     <div class="modal-step-title">4. Summary</div>
-                    <div id="summary-content"
-                        style="padding: 10px; background-color: rgba(0,0,0,0.2); border-radius: 8px;">
+                    <div id="summary-content" style="background-color: rgba(0,0,0,0.2); border-radius: 8px;">
                     </div>
                 </div>
 
                 <div class="modal-nav">
-                    <button class="modal-btn secondary" id="prev-btn">Previous</button>
-                    <button class="modal-btn" id="next-btn">Next</button>
-                    <button class="modal-btn" id="craft-btn" style="display: none;">Craft Item</button>
+                    <button class="control-btn reset-btn" id="prev-btn">Previous</button>
+                    <button class="control-btn forge-btn" id="next-btn">Next</button>
+                    <button class="control-btn forge-btn" id="craft-btn" style="display: none;">Craft Item</button>
                 </div>
             </div>
         </div>
@@ -1059,9 +1534,6 @@
         <section class="inventory-section">
             <div class="section-title">
                 <span><i class="fas fa-gem"></i> Ore List / Select Ores</span>
-                <button class="quick-craft-btn" id="quick-craft-btn">
-                    <i class="fas fa-bolt"></i> Quick Craft
-                </button>
             </div>
 
             <div class="filter-controls">
@@ -1082,8 +1554,8 @@
         <section class="mix-section">
             <div class="section-title">
                 <span><i class="fas fa-fire"></i> Forge</span>
-                <button class="control-btn reset-btn" id="reset-btn">
-                    <i class="fas fa-redo"></i> Reset Forge
+                <button class="quick-craft-btn" id="quick-craft-btn">
+                    <i class="fas fa-bolt"></i> Quick Craft
                 </button>
             </div>
 
@@ -1108,11 +1580,20 @@
                     <div class="stat-title" id="expected-item" style="color: var(--success)">Expected: None (0%)</div>
                 </div>
             </div>
+            <div style="display: flex; gap: 10px; justify-content: center;" class="controls">
+                <button class="control-btn forge-btn" id="forge-btn">
+                    <i class="fas fa-fire"></i> Forge Item
+                </button>
+                <button class="control-btn reset-btn" id="reset-btn">
+                    <i class="fas fa-redo"></i> Reset Forge
+                </button>
+
+            </div>
             <div class="traits-container">
                 <div class="section-title">
                     <span><i class="fas fa-magic"></i> Ore Traits</span>
                 </div>
-                <div class="traits-list" id="active-traits">
+                <div class="traits-grid" id="active-traits">
                     <div class="trait-placeholder">Add ores with traits to see effects...</div>
                 </div>
             </div>
@@ -1131,19 +1612,32 @@
             </div>
             <div class="probability-grid" id="probability-list"></div>
             <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px; text-align: center;">(Click
-                on an item type for variants)</div>
+                on an item type for specific item forge odds)</div>
     </div>
 
     <div class="tooltip" id="variant-tooltip">
         <div class="tooltip-header">
             <h3 class="tooltip-title" id="tooltip-item-name">Item Variants</h3>
-            <button class="tooltip-close" id="tooltip-close">&times;</button>
+            <button class="modal-close" id="tooltip-close">&times;</button>
         </div>
         <div class="tooltip-content" id="tooltip-content">
         </div>
     </div>
     </section>
-
+    <div class="modal-overlay" id="forge-result-modal">
+        <div class="modal-content" id="forge-result-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-fire"></i> Forged Item</h3>
+                <button class="modal-close" id="forge-result-close">&times;</button>
+            </div>
+            <div id="forge-result-body">
+            </div>
+            <div class="modal-nav" style="justify-content: center; margin-top: 15px;">
+                <button class="control-btn forge-btn" id="forge-again-btn">Forge Again</button>
+                <button class="control-btn reset-btn" id="close-result-btn">Close</button>
+            </div>
+        </div>
+    </div>
     </div>
 
     <script>
@@ -1192,22 +1686,135 @@
             "Arcane Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/arcane-crystal-the-forge-calculator.png"
         };
 
+        const itemImages = {
+            // Daggers
+            "Dagger": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dagger-the-forge-calculator.png",
+            "Falchion Knife": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/falchion-knife-the-forge-calculator.png",
+            "Gladius Dagger": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/gladius-dagger-the-forge-calculator.png",
+            "Hook": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/hook-the-forge-calculator.png",
+
+            // Straight Swords
+            "Falchion": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/falchion-the-forge-calculator.png",
+            "Gladius": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/gladius-the-forge-calculator.png",
+            "Cutlass": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/cutlass-the-forge-calculator.png",
+            "Rapier": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/rapier-the-forge-calculator.png",
+            "Chaos": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/chaos-the-forge-calculator.png",
+
+            // Gauntlets
+            "Ironhand": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/ironhand-the-forge-calculator.png",
+            "Boxing Gloves": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/boxing-gloves-the-forge-calculator.png",
+            "Relevator": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/relevator-the-forge-calculator.png",
+
+            // Katanas
+            "Uchigatana": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/uchigatana-the-forge-calculator.png",
+            "Tachi": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/tachi-the-forge-calculator.png",
+
+            // Great Swords
+            "Crusader Sword": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/crusader-sword-the-forge-calculator.png",
+            "Long Sword": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/long-sword-the-forge-calculator.png",
+
+            // Great Axes
+            "Scythe": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/scythe-the-forge-calculator.png",
+            "Double Battle Axe": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/double-battle-axe-the-forge-calculator.png",
+
+            // Colossal Swords
+            "Great Sword": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/great-sword-the-forge-calculator.png",
+            "Dragon Slayer": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dragon-slayer-the-forge-calculator.png",
+            "Hammer": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/hammer-the-forge-calculator.png",
+            "Skull Crusher": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/skull-crusher-the-forge-calculator.png",
+            "Comically Large Spoon": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/comically-large-spoon-the-forge-calculator.png",
+
+            // Light Armor
+            "Light Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/light-helmet-the-forge-calculator.png",
+            "Light Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/light-leggings-the-forge-calculator.png",
+            "Light Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/light-chestplate-the-forge-calculator.png",
+
+            // Medium Armor
+            "Medium Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/medium-helmet-the-forge-calculator.png",
+            "Samurai Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/samurai-helmet-the-forge-calculator.png",
+            "Medium Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/medium-leggings-the-forge-calculator.png",
+            "Samurai Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/samurai-leggings-the-forge-calculator.png",
+            "Medium Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/medium-chestplate-the-forge-calculator.png",
+            "Samurai Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/samurai-chestplate-the-forge-calculator.png",
+
+            // Heavy Armor
+            "Knight Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/knight-helmet-the-forge-calculator.png",
+            "Dark Knight Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-helmet-the-forge-calculator.png",
+            "Knight Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/knight-leggings-the-forge-calculator.png",
+            "Dark Knight Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-leggings-the-forge-calculator.png",
+            "Knight Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/knight-chestplate-the-forge-calculator.png",
+            "Dark Knight Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-chestplate-the-forge-calculator.png"
+        };
+
+        const baseItemStats = {
+            weapon: {
+                "Dagger": { damage: 8.6, atkSpeed: 0.35, range: 6, price: 68, type: "Dagger" },
+                "Falchion Knife": { damage: 8.6, atkSpeed: 0.35, range: 6, price: 68, type: "Dagger" },
+                "Gladius Dagger": { damage: 8.6, atkSpeed: 0.35, range: 6, price: 68, type: "Dagger" },
+                "Hook": { damage: 9.46, atkSpeed: 0.39, range: 6, price: 68, type: "Dagger" },
+
+                "Falchion": { damage: 15, atkSpeed: 0.59, range: 8, price: 120, type: "Straight Sword" },
+                "Gladius": { damage: 15.75, atkSpeed: 0.62, range: 8, price: 120, type: "Straight Sword" },
+                "Cutlass": { damage: 18.75, atkSpeed: 0.66, range: 8, price: 120, type: "Straight Sword" },
+                "Rapier": { damage: 15, atkSpeed: 0.49, range: 8, price: 120, type: "Straight Sword" },
+                "Chaos": { damage: 18.75, atkSpeed: 0.59, range: 8, price: 120, type: "Straight Sword" },
+
+                "Ironhand": { damage: 15.2, atkSpeed: 0.51, range: 6, price: 205, type: "Gauntlet" },
+                "Boxing Gloves": { damage: 16, atkSpeed: 0.59, range: 6, price: 205, type: "Gauntlet" },
+                "Relevator": { damage: 9.6, atkSpeed: 0.69, range: 6, price: 205, type: "Gauntlet" },
+
+                "Uchigatana": { damage: 17, atkSpeed: 0.6, range: 9, price: 324, type: "Katana" },
+                "Tachi": { damage: 17.85, atkSpeed: 0.63, range: 9, price: 324, type: "Katana" },
+
+                "Crusader Sword": { damage: 24, atkSpeed: 1.0, range: 9, price: 485, type: "Great Sword" },
+                "Long Sword": { damage: 24, atkSpeed: 1.11, range: 9, price: 485, type: "Great Sword" },
+
+                "Scythe": { damage: 28.5, atkSpeed: 0.95, range: 9, price: 850, type: "Great Axe" },
+                "Double Battle Axe": { damage: 31.5, atkSpeed: 1.05, range: 9, price: 850, type: "Great Axe" },
+
+                "Great Sword": { damage: 40, atkSpeed: 1.12, range: 10, price: 1355, type: "Colossal Sword" },
+                "Dragon Slayer": { damage: 44, atkSpeed: 1.12, range: 10, price: 1355, type: "Colossal Sword" },
+                "Hammer": { damage: 44, atkSpeed: 1.24, range: 10, price: 1355, type: "Colossal Sword" },
+                "Skull Crusher": { damage: 48, atkSpeed: 1.4, range: 10, price: 1355, type: "Colossal Sword" },
+                "Comically Large Spoon": { damage: 36, atkSpeed: 1.12, range: 10, price: 1355, type: "Colossal Sword" }
+            },
+            armor: {
+                "Light Helmet": { health: 3.75, price: 65, def: 8, type: "Light Helmet" },
+                "Light Leggings": { health: 4.375, price: 112.5, def: 9, type: "Light Leggings" },
+                "Light Chestplate": { health: 5, price: 225, def: 10, type: "Light Chestplate" },
+
+                "Medium Helmet": { health: 6.25, price: 335, def: 12, type: "Medium Helmet" },
+                "Samurai Helmet": { health: 8, price: 335, def: 16, type: "Medium Helmet" },
+                "Medium Leggings": { health: 7.5, price: 485, def: 15, type: "Medium Leggings" },
+                "Samurai Leggings": { health: 9, price: 485, def: 20, type: "Medium Leggings" },
+                "Medium Chestplate": { health: 8.75, price: 850, def: 18, type: "Medium Chestplate" },
+                "Samurai Chestplate": { health: 12.75, price: 850, def: 24, type: "Medium Chestplate" },
+
+                "Knight Helmet": { health: 12.5, price: 1020, def: 24, type: "Heavy Helmet" },
+                "Dark Knight Helmet": { health: 18.75, price: 1020, def: 38, type: "Heavy Helmet" },
+                "Knight Leggings": { health: 13.75, price: 1200, def: 28, type: "Heavy Leggings" },
+                "Dark Knight Leggings": { health: 21.875, price: 1200, def: 44, type: "Heavy Leggings" },
+                "Knight Chestplate": { health: 16.25, price: 1355, def: 32, type: "Heavy Chestplate" },
+                "Dark Knight Chestplate": { health: 25, price: 1355, def: 50, type: "Heavy Chestplate" }
+            }
+        };
+
         const oreData = [
             // Stonewake's Cross
-            { id: 1, name: "Stone", multiplier: 0.2, rarity: "common", area: "stonewake", color: "#8c8c8c", traitType: null, traits: [] },
-            { id: 2, name: "Sand Stone", multiplier: 0.25, rarity: "common", area: "stonewake", color: "#d2b48c", traitType: null, traits: [] },
-            { id: 3, name: "Copper", multiplier: 0.3, rarity: "common", area: "stonewake", color: "#b87333", traitType: null, traits: [] },
-            { id: 4, name: "Iron", multiplier: 0.35, rarity: "common", area: "stonewake", color: "#a19d94", traitType: null, traits: [] },
-            { id: 5, name: "Tin", multiplier: 0.425, rarity: "uncommon", area: "stonewake", color: "#c0c0c0", traitType: null, traits: [] },
-            { id: 6, name: "Silver", multiplier: 0.5, rarity: "uncommon", area: "stonewake", color: "#d3d3d3", traitType: null, traits: [] },
-            { id: 7, name: "Gold", multiplier: 0.65, rarity: "uncommon", area: "stonewake", color: "#ffd700", traitType: null, traits: [] },
-            { id: 8, name: "Mushroomite", multiplier: 0.8, rarity: "rare", area: "stonewake", color: "#ff6bc9", traitType: null, traits: [] },
-            { id: 9, name: "Platinum", multiplier: 0.8, rarity: "rare", area: "stonewake", color: "#e5e4e2", traitType: null, traits: [] },
-            { id: 10, name: "Bananite", multiplier: 0.85, rarity: "uncommon", area: "stonewake", color: "#ffeb3b", traitType: null, traits: [] },
-            { id: 11, name: "Cardboardite", multiplier: 0.7, rarity: "common", area: "stonewake", color: "#8b4513", traitType: null, traits: [] },
-            { id: 12, name: "Aite", multiplier: 1.0, rarity: "epic", area: "stonewake", color: "#4CAF50", traitType: null, traits: [] },
+            { id: 1, name: "Stone", multiplier: 0.2, rarity: "common", area: "stonewake", color: "#7b7773", traitType: null, traits: [] },
+            { id: 2, name: "Sand Stone", multiplier: 0.25, rarity: "common", area: "stonewake", color: "#c3a777", traitType: null, traits: [] },
+            { id: 3, name: "Copper", multiplier: 0.3, rarity: "common", area: "stonewake", color: "#925d3e", traitType: null, traits: [] },
+            { id: 4, name: "Iron", multiplier: 0.35, rarity: "common", area: "stonewake", color: "#827356", traitType: null, traits: [] },
+            { id: 5, name: "Tin", multiplier: 0.425, rarity: "uncommon", area: "stonewake", color: "#69707b", traitType: null, traits: [] },
+            { id: 6, name: "Silver", multiplier: 0.5, rarity: "uncommon", area: "stonewake", color: "#bad0e0", traitType: null, traits: [] },
+            { id: 7, name: "Gold", multiplier: 0.65, rarity: "uncommon", area: "stonewake", color: "#c89d40", traitType: null, traits: [] },
+            { id: 8, name: "Mushroomite", multiplier: 0.8, rarity: "rare", area: "stonewake", color: "#9b8768", traitType: null, traits: [] },
+            { id: 9, name: "Platinum", multiplier: 0.8, rarity: "rare", area: "stonewake", color: "#d6dee6", traitType: null, traits: [] },
+            { id: 10, name: "Bananite", multiplier: 0.85, rarity: "uncommon", area: "stonewake", color: "#edbe70", traitType: null, traits: [] },
+            { id: 11, name: "Cardboardite", multiplier: 0.7, rarity: "common", area: "stonewake", color: "#a28161", traitType: null, traits: [] },
+            { id: 12, name: "Aite", multiplier: 1.0, rarity: "epic", area: "stonewake", color: "#f0d2a7", traitType: null, traits: [] },
             {
-                id: 13, name: "Poopite", multiplier: 1.2, rarity: "epic", area: "stonewake", color: "#795548", traitType: "all", traits: [
+                id: 13, name: "Poopite", multiplier: 1.2, rarity: "epic", area: "stonewake", color: "#5f4937", traitType: "all", traits: [
                     {
                         description: "Deal {damage}% Poison DMG in AoE for {duration}s, fearing enemies (15s CD). Activates when HP drops below 35%.",
                         scaling: { damage: { min: 1.5, max: 15 }, duration: { min: 0.5, max: 5 } }, type: "all"
@@ -1216,48 +1823,48 @@
             },
 
             // Forgotten Kingdom
-            { id: 14, name: "Cobalt", multiplier: 1.0, rarity: "uncommon", area: "kingdom", color: "#0047ab", traitType: null, traits: [] },
-            { id: 15, name: "Titanium", multiplier: 1.15, rarity: "uncommon", area: "kingdom", color: "#878681", traitType: null, traits: [] },
-            { id: 16, name: "Volcanic Rock", multiplier: 1.55, rarity: "rare", area: "kingdom", color: "#8b0000", traitType: null, traits: [] },
-            { id: 17, name: "Lapis Lazuli", multiplier: 1.3, rarity: "uncommon", area: "kingdom", color: "#26619c", traitType: null, traits: [] },
-            { id: 18, name: "Quartz", multiplier: 1.5, rarity: "rare", area: "kingdom", color: "#f5f5f5", traitType: null, traits: [] },
-            { id: 19, name: "Amethyst", multiplier: 1.65, rarity: "rare", area: "kingdom", color: "#9966cc", traitType: null, traits: [] },
+            { id: 14, name: "Cobalt", multiplier: 1.0, rarity: "uncommon", area: "kingdom", color: "#579de7", traitType: null, traits: [] },
+            { id: 15, name: "Titanium", multiplier: 1.15, rarity: "uncommon", area: "kingdom", color: "#aca895", traitType: null, traits: [] },
+            { id: 16, name: "Volcanic Rock", multiplier: 1.55, rarity: "rare", area: "kingdom", color: "#504b44", traitType: null, traits: [] },
+            { id: 17, name: "Lapis Lazuli", multiplier: 1.3, rarity: "uncommon", area: "kingdom", color: "#5c89dc", traitType: null, traits: [] },
+            { id: 18, name: "Quartz", multiplier: 1.5, rarity: "rare", area: "kingdom", color: "#a6babc", traitType: null, traits: [] },
+            { id: 19, name: "Amethyst", multiplier: 1.65, rarity: "rare", area: "kingdom", color: "#a56bca", traitType: null, traits: [] },
             { id: 20, name: "Topaz", multiplier: 1.75, rarity: "rare", area: "kingdom", color: "#ffcc00", traitType: null, traits: [] },
-            { id: 21, name: "Diamond", multiplier: 2.0, rarity: "rare", area: "kingdom", color: "#b9f2ff", traitType: null, traits: [] },
-            { id: 22, name: "Sapphire", multiplier: 2.25, rarity: "rare", area: "kingdom", color: "#0f52ba", traitType: null, traits: [] },
-            { id: 23, name: "Cuprite", multiplier: 2.43, rarity: "epic", area: "kingdom", color: "#b87333", traitType: null, traits: [] },
+            { id: 21, name: "Diamond", multiplier: 2.0, rarity: "rare", area: "kingdom", color: "#91cff0", traitType: null, traits: [] },
+            { id: 22, name: "Sapphire", multiplier: 2.25, rarity: "rare", area: "kingdom", color: "#5194ec", traitType: null, traits: [] },
+            { id: 23, name: "Cuprite", multiplier: 2.43, rarity: "epic", area: "kingdom", color: "#90af4a", traitType: null, traits: [] },
             {
-                id: 24, name: "Obsidian", multiplier: 2.35, rarity: "epic", area: "kingdom", color: "#0b0b0b", traitType: "armor", traits: [
+                id: 24, name: "Obsidian", multiplier: 2.35, rarity: "epic", area: "kingdom", color: "#5b1fd5", traitType: "armor", traits: [
                     { description: "+{health}% extra health.", scaling: { health: { min: 3, max: 30 } }, type: "armor" }
                 ]
             },
-            { id: 25, name: "Emerald", multiplier: 2.55, rarity: "epic", area: "kingdom", color: "#50c878", traitType: null, traits: [] },
-            { id: 26, name: "Ruby", multiplier: 2.95, rarity: "epic", area: "kingdom", color: "#e0115f", traitType: null, traits: [] },
+            { id: 25, name: "Emerald", multiplier: 2.55, rarity: "epic", area: "kingdom", color: "#8df356", traitType: null, traits: [] },
+            { id: 26, name: "Ruby", multiplier: 2.95, rarity: "epic", area: "kingdom", color: "#ed4b4b", traitType: null, traits: [] },
             {
-                id: 27, name: "Rivalite", multiplier: 3.33, rarity: "epic", area: "kingdom", color: "#ff6b6b", traitType: "weapon", traits: [
+                id: 27, name: "Rivalite", multiplier: 3.33, rarity: "epic", area: "kingdom", color: "#f01919", traitType: "weapon", traits: [
                     { description: "+{crit}% critical chance.", scaling: { crit: { min: 2, max: 20 } }, type: "weapon" }
                 ]
             },
             {
-                id: 28, name: "Uranium", multiplier: 3.0, rarity: "legendary", area: "kingdom", color: "#008000", traitType: "armor", traits: [
+                id: 28, name: "Uranium", multiplier: 3.0, rarity: "legendary", area: "kingdom", color: "#8df060", traitType: "armor", traits: [
                     { description: "Deal {damage}% of max health as AoE DMG while in-combat.", scaling: { damage: { min: 0.5, max: 5 } }, type: "armor" }
                 ]
             },
             {
-                id: 29, name: "Mythril", multiplier: 3.5, rarity: "legendary", area: "kingdom", color: "#76d7ea", traitType: "armor", traits: [
+                id: 29, name: "Mythril", multiplier: 3.5, rarity: "legendary", area: "kingdom", color: "#ad51ee", traitType: "armor", traits: [
                     { description: "+{health}% extra health.", scaling: { health: { min: 1.5, max: 15 } }, type: "armor" }
                 ]
             },
             {
-                id: 30, name: "Eye Ore", multiplier: 4.0, rarity: "legendary", area: "kingdom", color: "#800080", traitType: "all", traits: [
+                id: 30, name: "Eye Ore", multiplier: 4.0, rarity: "legendary", area: "kingdom", color: "#d9681e", traitType: "all", traits: [
                     {
-                        description: "Increase physical damage by {damage}% and decrease health by {health}%.",
+                        description: "Increase physical damage by +{damage}% and decrease health by -{health}%.",
                         scaling: { damage: { min: 1.5, max: 15 }, health: { min: 1, max: 10 } }, type: "all"
                     }
                 ]
             },
             {
-                id: 31, name: "Fireite", multiplier: 4.5, rarity: "legendary", area: "kingdom", color: "#ff4500", traitType: "weapon", traits: [
+                id: 31, name: "Fireite", multiplier: 4.5, rarity: "legendary", area: "kingdom", color: "#d9670a", traitType: "weapon", traits: [
                     {
                         description: "Deals {damage}% of weapon damage as fire per second for 2 seconds. 30% chance on hit.",
                         scaling: { damage: { min: 2, max: 20 } }, type: "weapon"
@@ -1265,20 +1872,20 @@
                 ]
             },
             {
-                id: 32, name: "Magmaite", multiplier: 5.0, rarity: "legendary", area: "kingdom", color: "#ff0000", traitType: "weapon", traits: [
+                id: 32, name: "Magmaite", multiplier: 5.0, rarity: "legendary", area: "kingdom", color: "#db3d3d", traitType: "weapon", traits: [
                     {
-                        description: "Cause an explosion at location of victim, dealing {damage}% of weapon damage as AoE damage. 35% chance on hit.",
+                        description: "Cause an explosion on hit, dealing {damage}% of weapon damage as AoE damage. 35% chance on hit.",
                         scaling: { damage: { min: 5, max: 50 } }, type: "weapon"
                     }
                 ]
             },
             {
-                id: 33, name: "Lightite", multiplier: 4.6, rarity: "legendary", area: "kingdom", color: "#ffff00", traitType: "armor", traits: [
+                id: 33, name: "Lightite", multiplier: 4.6, rarity: "legendary", area: "kingdom", color: "#dfdfdf", traitType: "armor", traits: [
                     { description: "+{speed}% extra movement speed.", scaling: { speed: { min: 1.5, max: 15 } }, type: "armor" }
                 ]
             },
             {
-                id: 34, name: "Demonite", multiplier: 5.5, rarity: "mythical", area: "kingdom", color: "#8b0000", traitType: "armor", traits: [
+                id: 34, name: "Demonite", multiplier: 5.5, rarity: "mythical", area: "kingdom", color: "#901c1c", traitType: "armor", traits: [
                     {
                         description: "Deals {damage}% of weapon damage as fire per second for 2 seconds. 15% chance on hit and 25% chance when hit by an enemy.",
                         scaling: { damage: { min: 2, max: 20 } }, type: "armor"
@@ -1286,7 +1893,7 @@
                 ]
             },
             {
-                id: 35, name: "Darkryte", multiplier: 6.3, rarity: "mythical", area: "kingdom", color: "#4b0082", traitType: "armor", traits: [
+                id: 35, name: "Darkryte", multiplier: 6.3, rarity: "mythical", area: "kingdom", color: "#dcdcdc", traitType: "armor", traits: [
                     {
                         description: "Upon taking damage, there is a {chance}% chance to turn into a shadow and dodge the attack.",
                         scaling: { chance: { min: 1.5, max: 15 } }, type: "armor"
@@ -1295,13 +1902,13 @@
             },
 
             // Goblin Cave
-            { id: 36, name: "Magenta Crystal", multiplier: 3.1, rarity: "epic", area: "goblin", color: "#ff00ff", traitType: null, traits: [] },
+            { id: 36, name: "Magenta Crystal", multiplier: 3.1, rarity: "epic", area: "goblin", color: "#7d47a9", traitType: null, traits: [] },
             { id: 37, name: "Crimson Crystal", multiplier: 3.3, rarity: "epic", area: "goblin", color: "#dc143c", traitType: null, traits: [] },
-            { id: 38, name: "Green Crystal", multiplier: 3.2, rarity: "epic", area: "goblin", color: "#00ff00", traitType: null, traits: [] },
-            { id: 39, name: "Orange Crystal", multiplier: 3.0, rarity: "epic", area: "goblin", color: "#ffa500", traitType: null, traits: [] },
-            { id: 40, name: "Blue Crystal", multiplier: 3.4, rarity: "epic", area: "goblin", color: "#0000ff", traitType: null, traits: [] },
-            { id: 41, name: "Rainbow Crystal", multiplier: 5.25, rarity: "legendary", area: "goblin", color: "#ff0000", traitType: null, traits: [] },
-            { id: 42, name: "Arcane Crystal", multiplier: 7.5, rarity: "mythical", area: "goblin", color: "#9400d3", traitType: null, traits: [] },
+            { id: 38, name: "Green Crystal", multiplier: 3.2, rarity: "epic", area: "goblin", color: "#8ba846", traitType: null, traits: [] },
+            { id: 39, name: "Orange Crystal", multiplier: 3.0, rarity: "epic", area: "goblin", color: "#a66e41", traitType: null, traits: [] },
+            { id: 40, name: "Blue Crystal", multiplier: 3.4, rarity: "epic", area: "goblin", color: "#A7C7E7", traitType: null, traits: [] },
+            { id: 41, name: "Rainbow Crystal", multiplier: 5.25, rarity: "legendary", area: "goblin", color: "#50C878", traitType: null, traits: [] },
+            { id: 42, name: "Arcane Crystal", multiplier: 7.5, rarity: "mythical", area: "goblin", color: "#d1e2f9", traitType: null, traits: [] },
 
             // Enemy Drops
             { id: 43, name: "Boneite", multiplier: 1.2, rarity: "rare", area: "enemy", color: "#f5f5dc", traitType: null, traits: [] },
@@ -1617,6 +2224,7 @@
             setupQuickCraft();
             updateExpectedItem();
             updateAreaToggle();
+            setupForgeResultModal();
         }
 
         document.getElementById('tooltip-close').addEventListener('click', () => {
@@ -1959,15 +2567,18 @@
 
             traitsList.forEach(traitInfo => {
                 const traitElement = document.createElement('div');
-                traitElement.className = 'trait';
+                traitElement.className = 'trait-card';
                 traitElement.dataset.oreId = traitInfo.oreId;
                 traitElement.dataset.percentage = traitInfo.percentage.toFixed(1);
 
                 traitElement.innerHTML = `
-            <div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: bold;">${traitInfo.oreName}</div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span>${traitInfo.description}</span>
-            </div>
+                    <div class="trait-content">
+                        <div class="trait-name">
+                            ${traitInfo.oreName}
+                            <span class="trait-percentage">${traitInfo.percentage.toFixed(1)}%</span>
+                        </div>
+                        <div class="trait-description">${traitInfo.description}</div>
+                    </div>
         `;
 
                 activeTraitsContainer.appendChild(traitElement);
@@ -2001,17 +2612,17 @@
                 itemElement.dataset.itemName = itemName;
 
                 itemElement.innerHTML = `
-        <div class="item-name">
-            <span>${itemName}</span>
-            <span class="optimal-count-display">Optimal: ${optimal[itemName] || 'N/A'}</span>
-        </div>
-        <div class="probability-bar">
-            <div class="probability-fill" style="width: ${probabilityPercent}%"></div>
-        </div>
-        <div class="probability-value">
-            ${probabilityPercent}%
-        </div>
-    `;
+                    <div class="item-header">
+                        <div class="item-name">${itemName}</div>
+                    </div>
+                    <div class="probability-bar">
+                        <div class="probability-fill" style="width: ${probabilityPercent}%"></div>
+                    </div>
+                    <div class="item-header" style="margin-bottom: 0px;">
+                    <div class="optimal-count">Optimal: ${optimal[itemName] || 'N/A'}</div>
+                    <div class="probability-value">${probabilityPercent}%</div>
+                    </div>
+                `;
 
                 itemElement.addEventListener('click', (e) => {
                     showVariantTooltip(itemName, e);
@@ -2038,30 +2649,45 @@
         function setupQuickCraft() {
             quickCraftBtn.addEventListener('click', () => {
                 quickCraftModal.style.display = 'flex';
-                
+                setTimeout(() => quickCraftModal.classList.add('show'), 10);
+
                 if (window.innerWidth <= 480) {
                     document.body.classList.add('modal-open');
                 }
-                
+
                 resetQuickCraft();
                 showStep(0);
                 setTimeout(() => quickCraftModal.focus(), 10);
             });
 
             modalClose.addEventListener('click', () => {
-                quickCraftModal.style.display = 'none';
-                document.body.classList.remove('modal-open');
+                resetQuickCraft();
+                quickCraftModal.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => {
+                    quickCraftModal.style.display = 'none';
+                    quickCraftModal.classList.remove('show');
+                    quickCraftModal.style.animation = '';
+                    document.body.classList.remove('modal-open');
+                }, 300);
+                resetQuickCraft();
             });
 
             quickCraftModal.addEventListener('click', (e) => {
                 if (e.target === quickCraftModal) {
-                    quickCraftModal.style.display = 'none';
-                    document.body.classList.remove('modal-open');
+                    resetQuickCraft();
+                    quickCraftModal.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => {
+                        quickCraftModal.style.display = 'none';
+                        quickCraftModal.classList.remove('show');
+                        quickCraftModal.style.animation = '';
+                        document.body.classList.remove('modal-open');
+                    }, 300);
                 }
             });
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && quickCraftModal.style.display === 'flex') {
+                    resetQuickCraft();
                     quickCraftModal.style.display = 'none';
                     document.body.classList.remove('modal-open');
                 }
@@ -2072,7 +2698,7 @@
                     const modalContent = document.querySelector('.modal-content');
                     const atTop = modalContent.scrollTop === 0;
                     const atBottom = modalContent.scrollHeight - modalContent.scrollTop === modalContent.clientHeight;
-                    
+
                     if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -2104,8 +2730,15 @@
 
             craftBtn.addEventListener('click', () => {
                 applyQuickCraft();
-                quickCraftModal.style.display = 'none';
-                document.body.classList.remove('modal-open');
+
+                quickCraftModal.style.animation = 'fadeOut .3s ease';
+                setTimeout(() => {
+                    quickCraftModal.style.display = 'none';
+                    quickCraftModal.classList.remove('show');
+                    quickCraftModal.style.animation = '';
+                    document.body.classList.remove('modal-open');
+                }, 300);
+                resetSteps();
             });
 
             document.querySelectorAll('.modal-option[data-type]').forEach(option => {
@@ -2117,27 +2750,40 @@
             });
         }
 
+        function resetSteps() {
+            [stepType, stepItem, stepTraits, stepSummary].forEach(s => {
+                s.classList.remove('active', 'step-anim-in', 'step-anim-out');
+            });
+        }
+
         function showStep(step) {
+            const steps = [stepType, stepItem, stepTraits, stepSummary];
+
+            const previous = steps[currentStep];
+            const next = steps[step];
+
+            if (previous && previous !== next) {
+                previous.classList.remove('active');
+                previous.classList.add('step-anim-out');
+
+                setTimeout(() => {
+                    previous.classList.remove('step-anim-out');
+                }, 300);
+            }
+
+            next.classList.add('active', 'step-anim-in');
+            setTimeout(() => next.classList.remove('step-anim-in'), 300);
+
             currentStep = step;
 
-            [stepType, stepItem, stepTraits, stepSummary].forEach(s => s.classList.remove('active'));
-
-            const steps = [stepType, stepItem, stepTraits, stepSummary];
-            steps[step].classList.add('active');
             prevBtn.style.display = step === 0 ? 'none' : 'inline-block';
             nextBtn.style.display = step < 3 ? 'inline-block' : 'none';
             craftBtn.style.display = step === 3 ? 'inline-block' : 'none';
 
             switch (step) {
-                case 1:
-                    loadItemOptions();
-                    break;
-                case 2:
-                    loadTraitOptions();
-                    break;
-                case 3:
-                    loadSummary();
-                    break;
+                case 1: loadItemOptions(); break;
+                case 2: loadTraitOptions(); break;
+                case 3: loadSummary(); break;
             }
         }
 
@@ -2168,6 +2814,19 @@
         function loadItemOptions() {
             itemOptions.innerHTML = '';
             const items = quickCraftType === 'weapon' ? optimalCounts.weapon : optimalCounts.armor;
+            if (quickCraftType !== currentMode) {
+                currentMode = quickCraftType;
+                if (currentMode === 'weapon') {
+                    weaponToggle.classList.add('active');
+                    armorToggle.classList.remove('active');
+                    applyColorScheme(weaponColors);
+                } else {
+                    armorToggle.classList.add('active');
+                    weaponToggle.classList.remove('active');
+                    applyColorScheme(armorColors);
+                }
+                updateProbabilities();
+            }
 
             Object.entries(items).forEach(([itemName, optimalCount]) => {
                 const option = document.createElement('div');
@@ -2306,35 +2965,39 @@
             }
 
             let summaryHTML = `
-                <div style="margin-bottom: 10px;">
-                    <strong>Item:</strong> ${quickCraftItem.name}<br>
-                    <strong>Type:</strong> ${quickCraftType}<br>
-                    <strong>Optimal Ores:</strong> ${optimalCount}
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <strong>Traits (${selectedTraits.length}):</strong>
+                <div class="forge-result-container" style="margin-bottom: 20px; background: var(--primary-light);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <i class="fas fa-hammer" style="font-size: 1.5rem; color: var(--primary);"></i>
+                        <div>
+                            <div style="font-weight: bold; font-size: 1.2rem;">${quickCraftItem.name}</div>
+                            <div style="color: var(--text-secondary);">${quickCraftType === 'weapon' ? 'Weapon' : 'Armor'} • Optimal: ${optimalCount} ores</div>
+                        </div>
+                    </div>
             `;
 
             if (selectedTraits.length > 0) {
-                summaryHTML += '<div style="margin-left: 10px; margin-top: 5px;">';
+                summaryHTML += `
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-weight: bold; margin-bottom: 10px;">Selected Traits:</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                `;
+
                 selectedTraits.forEach(trait => {
                     summaryHTML += `
-            <div style="padding: 5px; margin-bottom: 3px; background-color: rgba(255,102,0,0.1); border-radius: 5px; font-size: 0.85rem;">
-                <i class="fas fa-check" style="color: var(--success); margin-right: 5px;"></i>
-                ${trait.oreName}
-            </div>
-        `;
+                        <div style="background: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--border-radius); padding: 5px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px;">
+                            <i class="fas fa-magic" style="color: var(--primary);"></i>
+                            ${trait.oreName}
+                        </div>
+                    `;
                 });
-                summaryHTML += '</div>';
-            } else {
-                summaryHTML += '<div style="color: var(--text-secondary); padding-left: 10px;">None selected</div>';
+
+                summaryHTML += `</div></div>`;
             }
 
             summaryHTML += `
-                </div>
-                <div>
-                    <strong>Proposed Mix:</strong>
-                    <ul style="margin-left: 20px; margin-top: 5px;">
+                    <div>
+                        <div style="font-weight: bold; margin-bottom: 10px;">Ore Mix:</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
             `;
 
             const totalOresInMix = mixPlan.reduce((sum, item) => sum + item.count, 0);
@@ -2347,14 +3010,24 @@
             mixPlan.forEach(item => {
                 const ore = oreData.find(o => o.id === item.id);
                 const percentage = ((item.count / totalOresInMix) * 100).toFixed(1);
-                summaryHTML += `<li>${item.count}x ${ore.name} (${ore.multiplier}x) - ${percentage}%</li>`;
+                summaryHTML += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 10px; border-radius: var(--border-radius);">
+                        <div>
+                            <div style="font-weight: bold;">${ore.name}</div>
+                            <div style="font-size: 0.85rem; color: var(--text);">${ore.multiplier}x multiplier</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: bold;">${item.count}x (${percentage}%)</div>
+                        </div>
+                    </div>
+                `;
             });
 
             summaryHTML += `
-                    </ul>
-                    <div style="margin-top: 10px; padding: 8px; background-color: rgba(255,102,0,0.1); border-radius: 5px;">
-                        <i class="fas fa-info-circle"></i> 
-                        Total: ${totalOresInMix} ores | Average Multiplier: ${avgMultiplier}x
+                        </div>
+                        <div style="margin-top: 15px; padding: 12px; background: var(--primary-light); border-radius: var(--border-radius); text-align: center;">
+                            <i class="fas fa-calculator"></i> Total: ${totalOresInMix} ores • Avg Multiplier: ${avgMultiplier}x
+                        </div>
                     </div>
                 </div>
             `;
@@ -2366,19 +3039,21 @@
 
         function applyQuickCraft() {
             const mixPlan = JSON.parse(summaryContent.dataset.mixPlan);
-            
+
             if (quickCraftType !== currentMode) {
                 currentMode = quickCraftType;
                 if (currentMode === 'weapon') {
                     weaponToggle.classList.add('active');
                     armorToggle.classList.remove('active');
+                    applyColorScheme(weaponColors);
                 } else {
                     armorToggle.classList.add('active');
                     weaponToggle.classList.remove('active');
+                    applyColorScheme(armorColors);
                 }
                 updateProbabilities();
             }
-            
+
             oreMix = [];
             mixPlan.forEach(item => {
                 const existingIndex = oreMix.findIndex(ore => ore.id === item.id);
@@ -2388,12 +3063,12 @@
                     oreMix.push({ id: item.id, count: item.count });
                 }
             });
-            
+
             updateOreSlots();
             if (quickCraftType === currentMode) {
                 updateProbabilities();
             }
-            
+
             quickCraftModal.style.display = 'none';
             document.body.classList.remove('modal-open');
         }
@@ -2406,6 +3081,377 @@
 
             document.querySelectorAll('.modal-option').forEach(o => o.classList.remove('selected'));
             document.querySelectorAll('.trait-checkbox').forEach(cb => cb.checked = false);
+
+            [stepType, stepItem, stepTraits, stepSummary].forEach(step => {
+                step.classList.remove('active', 'step-anim-in', 'step-anim-out');
+            });
+
+            stepType.classList.add('active');
+        }
+
+        function getVariantProbabilities(variants) {
+            if (!variants || variants.length === 0) {
+                return null;
+            }
+
+            const weights = variants.map(v => {
+                const [num, den] = v.chance.split('/').map(Number);
+                return num / den;
+            });
+
+            const total = weights.reduce((a, b) => a + b, 0);
+            return variants.map((v, i) => ({
+                ...v,
+                normalizedProb: weights[i] / total
+            }));
+        }
+
+        function getRandomVariant(itemType) {
+            const variants = specificItemVariants[currentMode]?.[itemType]?.[currentArea];
+            if (!variants || variants.length === 0) {
+                return { name: itemType, chance: "1/1", probability: 1.0 };
+            }
+
+            const weightedVariants = getVariantProbabilities(variants);
+            if (!weightedVariants) return { name: itemType, chance: "1/1", probability: 1.0 };
+
+            let random = Math.random();
+            let cumulative = 0;
+
+            for (const variant of weightedVariants) {
+                cumulative += variant.normalizedProb;
+                if (random <= cumulative) {
+                    return variant;
+                }
+            }
+
+            return weightedVariants[0];
+        }
+
+        function getMainOre() {
+            if (oreMix.length === 0) return null;
+
+            let maxCount = 0;
+            let mainOre = null;
+
+            oreMix.forEach(item => {
+                if (item.count > maxCount) {
+                    maxCount = item.count;
+                    const ore = oreData.find(o => o.id === item.id);
+                    mainOre = ore;
+                }
+            });
+
+            const ties = oreMix.filter(item => item.count === maxCount);
+            if (ties.length > 1) {
+                ties.sort((a, b) => {
+                    const oreA = oreData.find(o => o.id === a.id);
+                    const oreB = oreData.find(o => o.id === b.id);
+                    return oreB.multiplier - oreA.multiplier;
+                });
+                mainOre = oreData.find(o => o.id === ties[0].id);
+            }
+
+            return mainOre;
+        }
+
+        function calculateScaledStats(itemName, multiplier) {
+            const stats = baseItemStats[currentMode][itemName];
+            if (!stats) return null;
+
+            const scaled = { ...stats };
+
+            if (currentMode === 'weapon') {
+                scaled.damage = stats.damage * multiplier;
+                scaled.price = stats.price * multiplier;
+            } else {
+                scaled.def = stats.def * multiplier;
+                scaled.price = stats.price * multiplier;
+            }
+
+            return scaled;
+        }
+
+        function getActiveTraits() {
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+            const traitsList = [];
+
+            oreMix.forEach(item => {
+                const ore = oreData.find(o => o.id === item.id);
+                const percentage = (item.count / totalOres) * 100;
+
+                if (ore.traits && ore.traits.length > 0 && percentage >= 10) {
+                    ore.traits.forEach(trait => {
+                        const isApplicable = trait.type === 'all' || trait.type === currentMode;
+
+                        if (isApplicable) {
+                            let scaledValues = {};
+                            Object.keys(trait.scaling).forEach(key => {
+                                const scale = trait.scaling[key];
+                                let value = 0;
+
+                                if (percentage >= 30) {
+                                    value = scale.max;
+                                } else if (percentage >= 10) {
+                                    const scaleFactor = (percentage - 10) / 20;
+                                    value = scale.min + (scale.max - scale.min) * scaleFactor;
+                                }
+
+                                scaledValues[key] = Math.round(value * 10) / 10;
+                            });
+
+                            let formattedDesc = trait.description;
+                            Object.keys(scaledValues).forEach(key => {
+                                formattedDesc = formattedDesc.replace(`{${key}}`, scaledValues[key]);
+                            });
+
+                            traitsList.push({
+                                oreName: ore.name,
+                                description: formattedDesc,
+                                percentage: percentage,
+                                oreColor: ore.color
+                            });
+                        }
+                    });
+                }
+            });
+
+            return traitsList;
+        }
+
+        function simulateForge() {
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+
+            if (totalOres < 3) {
+                return;
+            }
+
+            const forgeBtn = document.getElementById('forge-btn');
+            const originalText = forgeBtn.innerHTML;
+            forgeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Forging...';
+            forgeBtn.disabled = true;
+
+            let multiplierSum = 0;
+            oreMix.forEach(item => {
+                const ore = oreData.find(o => o.id === item.id);
+                multiplierSum += ore.multiplier * item.count;
+            });
+            const multiplier = multiplierSum / totalOres;
+
+            const probabilities = currentMode === 'weapon' ? weaponProbabilities : armorProbabilities;
+            const counts = Object.keys(probabilities).map(Number);
+            const closestCount = counts.reduce((prev, curr) => {
+                return (Math.abs(curr - totalOres) < Math.abs(prev - totalOres) ? curr : prev);
+            });
+
+            const currentProbs = probabilities[closestCount] || {};
+
+            let random = Math.random();
+            let selectedItemType = null;
+            let cumulativeProb = 0;
+
+            for (const [itemType, prob] of Object.entries(currentProbs)) {
+                cumulativeProb += prob;
+                if (random <= cumulativeProb) {
+                    selectedItemType = itemType;
+                    break;
+                }
+            }
+
+            if (!selectedItemType) {
+                selectedItemType = Object.keys(currentProbs)[0];
+            }
+
+            const variant = getRandomVariant(selectedItemType);
+            const itemName = variant.name.replace(/\s*\[.*?\]\s*/g, '');
+
+            const mainOre = getMainOre();
+
+            const scaledStats = calculateScaledStats(itemName, multiplier);
+
+            const activeTraits = getActiveTraits();
+
+            setTimeout(() => {
+                showForgeResult({
+                    itemName: itemName,
+                    itemType: selectedItemType,
+                    variant: variant,
+                    multiplier: multiplier,
+                    mainOre: mainOre,
+                    stats: scaledStats,
+                    traits: activeTraits,
+                    area: currentArea,
+                    totalOres: totalOres
+                });
+
+                forgeBtn.innerHTML = originalText;
+                forgeBtn.disabled = false;
+            }, 300);
+        }
+
+
+        function showForgeResult(result) {
+            const modal = document.getElementById('forge-result-modal');
+            const content = document.getElementById('forge-result-body');
+
+            const bgColor = result.mainOre ? result.mainOre.color : '#FF6600';
+            const areaBgColor = currentArea === 'kingdom' ? 'var(--primary-light)' : 'rgba(8,78,78,0.2)';
+            const areaColor = currentArea === 'kingdom' ? 'var(--primary)' : 'var(--stonewake-teal)';
+
+            const itemImage = itemImages[result.itemName] || '';
+
+            content.innerHTML = `
+        <div class="forge-result-container" style="background: linear-gradient(135deg, ${bgColor}15 0%, ${bgColor}08 25%, rgba(0,0,0,0.1) 50%, ${bgColor}08 75%, ${bgColor}15 100%); border: 2px solid ${bgColor}40;">
+            <div class="forge-result-header">
+                ${itemImage ? `
+                    <div class="forge-result-image" style="background-image: url('${itemImage}'); border-color: ${bgColor}; box-shadow: 0 0 25px ${bgColor}80;">
+                    </div>
+                ` : ''}
+                <div class="forge-result-details">
+                    <div class="forge-result-name" style="color: ${bgColor};">
+                        ${result.itemName}
+                    </div>
+                    <div class="forge-result-type">
+                        ${result.itemType} • ${result.mainOre?.rarity ? result.mainOre.rarity.charAt(0).toUpperCase() + result.mainOre.rarity.slice(1) : 'Common'}
+                    </div>
+                    <div class="forge-result-tags">
+                        <div class="forge-tag" style="background: var(--primary-light); color: var(--primary);">
+                            <i class="fas fa-percent"></i> ${result.multiplier.toFixed(2)}x Multi
+                        </div>
+                        <div class="forge-tag" style="background: var(--primary-light); color: var(--primary);">
+                            <i class="fas fa-star"></i> [100]% Masterwork
+                        </div>
+                        <div class="forge-tag" style="background: ${bgColor}30; color: ${bgColor};">
+                            <i class="fas fa-gem"></i> ${result.mainOre?.name || 'Stone'}
+                        </div>
+                        <div class="forge-tag" style="background: ${areaBgColor}; color: ${areaColor};">
+                            <i class="fas fa-map-marker-alt"></i> ${currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="forge-stats-grid">
+                ${currentMode === 'weapon' ? `
+                    <div class="forge-stat-item">
+                        <div class="forge-stat-value">${result.stats.damage.toFixed(2)}</div>
+                        <div class="forge-stat-label">DAMAGE</div>
+                    </div>
+                    <div class="forge-stat-item">
+                        <div class="forge-stat-value">${result.stats.atkSpeed}s</div>
+                        <div class="forge-stat-label">ATK SPEED</div>
+                    </div>
+                    <div class="forge-stat-item">
+                        <div class="forge-stat-value">${result.stats.range} studs</div>
+                        <div class="forge-stat-label">RANGE</div>
+                    </div>
+                    <div class="forge-stat-item">
+                        <div class="forge-stat-value">$${Math.round(result.stats.price)}</div>
+                        <div class="forge-stat-label">VALUE</div>
+                    </div>
+                ` : `
+                    <div class="forge-stat-item">
+                        <div class="forge-stat-value">+${result.stats.health}%</div>
+                        <div class="forge-stat-label">HEALTH BONUS</div>
+                    </div>
+                    <div class="forge-stat-item">
+                        <div class="forge-stat-value">${Math.round(result.stats.def)}</div>
+                        <div class="forge-stat-label">DEF</div>
+                    </div>
+                    <div class="forge-stat-item" style="grid-column: 1 / -1;">
+                        <div class="forge-stat-value">$${Math.round(result.stats.price)}</div>
+                        <div class="forge-stat-label">VALUE</div>
+                    </div>
+                `}
+            </div>
+            
+            ${result.traits.length > 0 ? `
+                <div class="traits-section">
+                    <div class="section-title">
+                        <span><i class="fas fa-magic"></i> Item Traits</span>
+                    </div>
+                    <div class="traits-list-container">
+                        ${result.traits.map(trait => `
+                            <div class="forge-trait-item" style="border-color: ${trait.oreColor || 'var(--primary)'}40;">
+                                <div class="forge-trait-ore" style="color: ${trait.oreColor || 'var(--primary)'};">
+                                    <i class="fas fa-gem"></i> ${trait.oreName} (${trait.percentage.toFixed(1)}%)
+                                </div>
+                                <div class="forge-trait-desc">
+                                    ${trait.description}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            <div class="forge-result-footer">
+                Forged with ${result.totalOres} ores • Masterwork Quality [100%]
+            </div>
+        </div>
+    `;
+
+            modal.style.display = 'flex';
+            modal.classList.add('show');
+            if (window.innerWidth <= 480) {
+                document.body.classList.add('modal-open');
+            }
+        }
+
+        function setupForgeResultModal() {
+            const modal = document.getElementById('forge-result-modal');
+            const closeBtn = document.getElementById('forge-result-close');
+            const closeResultBtn = document.getElementById('close-result-btn');
+            const forgeAgainBtn = document.getElementById('forge-again-btn');
+
+            function closeModal() {
+                modal.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    modal.classList.remove('show');
+                    modal.style.animation = '';
+                    document.body.classList.remove('modal-open');
+                }, 300);
+            }
+
+            closeBtn.addEventListener('click', closeModal);
+            closeResultBtn.addEventListener('click', closeModal);
+
+            forgeAgainBtn.addEventListener('click', () => {
+                closeModal();
+                setTimeout(() => simulateForge(), 350);
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        const weaponColors = {
+            '--primary': '#FF6600',
+            '--primary-dark': '#cc5200',
+            '--primary-light': 'rgba(255, 102, 0, 0.1)',
+            '--primary-glow': 'rgba(255, 102, 0, 0.3)',
+            '--text-secondary': '#ffa366',
+            '--glow': '0 0 20px rgba(255, 102, 0, 0.4)'
+        };
+
+        const armorColors = {
+            '--primary': '#1da5a5',
+            '--primary-dark': '#0a6e6e',
+            '--primary-light': 'rgba(13, 165, 165, 0.1)',
+            '--primary-glow': 'rgba(13, 165, 165, 0.3)',
+            '--text-secondary': '#6fdcdc',
+            '--glow': '0 0 20px rgba(13, 165, 165, 0.4)'
+        };
+
+        function applyColorScheme(colors) {
+            const root = document.documentElement;
+            Object.keys(colors).forEach(key => {
+                root.style.setProperty(key, colors[key]);
+            });
         }
 
         function setupEventListeners() {
@@ -2413,6 +3459,7 @@
                 currentMode = 'weapon';
                 weaponToggle.classList.add('active');
                 armorToggle.classList.remove('active');
+                applyColorScheme(weaponColors);
                 updateProbabilities();
                 updateExpectedItem();
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
@@ -2422,6 +3469,7 @@
                 currentMode = 'armor';
                 armorToggle.classList.add('active');
                 weaponToggle.classList.remove('active');
+                applyColorScheme(armorColors);
                 updateProbabilities();
                 updateExpectedItem();
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
@@ -2441,6 +3489,11 @@
                 updateOreSlots();
                 updateProbabilities();
             });
+
+            const forgeBtn = document.getElementById('forge-btn');
+            if (forgeBtn) {
+                forgeBtn.addEventListener('click', simulateForge);
+            }
 
         }
 
