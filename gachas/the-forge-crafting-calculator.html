@@ -418,8 +418,8 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 10px;
-            min-height: 235px;
-            max-height: 235px;
+            min-height: 240px;
+            max-height: 240px;
             overflow-y: auto;
             padding: 10px;
         }
@@ -759,7 +759,6 @@
         .trait-percentage {
             font-size: 0.8rem;
             color: var(--text-secondary);
-            background: rgba(0, 0, 0, 0.3);
             padding: 2px 8px;
             border-radius: var(--border-radius);
         }
@@ -799,7 +798,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, var(--primary-light), transparent);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
             opacity: 0;
             transition: opacity var(--animation-speed) ease;
         }
@@ -1168,7 +1167,7 @@
         .variant-chance {
             color: var(--primary);
             font-weight: bold;
-            background-color: var(--primary-light);
+            background-color: var(--background);
             padding: 2px 8px;
             border-radius: 10px;
             font-size: 0.85rem;
@@ -1191,6 +1190,81 @@
 
         .step-anim-out {
             animation: fadeOut .3s ease forwards;
+        }
+
+        /* Misc */
+        .weapon-dagger {
+            border-color: #8c8c8c;
+            background: linear-gradient(135deg, rgba(140, 140, 140, 0.1), rgba(140, 140, 140, 0.05));
+        }
+
+        .weapon-straight-sword {
+            border-color: #4CAF50;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.05));
+        }
+
+        .weapon-gauntlet {
+            border-color: #2196F3;
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(33, 150, 243, 0.05));
+        }
+
+        .weapon-katana {
+            border-color: #9c27b0;
+            background: linear-gradient(135deg, rgba(156, 39, 176, 0.1), rgba(156, 39, 176, 0.05));
+        }
+
+        .weapon-great-sword {
+            border-color: #f0b209;
+            background: linear-gradient(135deg, rgba(240, 178, 9, 0.1), rgba(240, 178, 9, 0.05));
+        }
+
+        .weapon-great-axe {
+            border-color: #d13429;
+            background: linear-gradient(135deg, rgba(209, 52, 41, 0.1), rgba(209, 52, 41, 0.05));
+        }
+
+        .weapon-colossal-sword {
+            border-color: #ffeb3b;
+            background: linear-gradient(135deg, rgba(255, 235, 59, 0.1), rgba(255, 235, 59, 0.05));
+        }
+
+        .armor-light {
+            border-color: #8c8c8c;
+            background: linear-gradient(135deg, rgba(140, 140, 140, 0.1), rgba(140, 140, 140, 0.05));
+        }
+
+        .armor-medium {
+            border-color: #4CAF50;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.05));
+        }
+
+        .armor-heavy {
+            border-color: #2196F3;
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(33, 150, 243, 0.05));
+        }
+
+        .scalable-value {
+            color: var(--primary);
+            font-weight: bold;
+            text-shadow: 0 0 5px var(--primary-glow);
+        }
+
+        .scalable-symbol {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .ore-inventory-max .ore-item:not(.in-forge) {
+            opacity: 0.4;
+            filter: grayscale(0.7);
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .ore-item.in-forge {
+            border: 3px solid var(--primary) !important;
+            box-shadow: 0 0 15px var(--primary-glow) !important;
+            transform: scale(1.05);
         }
 
         /* Animations */
@@ -1571,7 +1645,10 @@
             <div class="mix-stats">
                 <div class="stat-box">
                     <div class="stat-value" id="multiplier-value">0.0x</div>
-                    <div class="stat-title" id="expected-item" style="color: var(--success)">Expected: None (0%)</div>
+                    <div class="stat-title" id="expected-item" style="color: var(--success)">Expected: None (0%)<br>
+                        <span style="font-size: 0.85rem; color: var(--text-secondary);">Add 3+ ores for
+                            predictions</span>
+                    </div>
                 </div>
             </div>
             <div style="display: flex; gap: 10px; justify-content: center;" class="controls">
@@ -2273,17 +2350,24 @@
             }
         }
 
-        function showVariantTooltip(itemName, event) {
+        function showVariantTooltip(itemName, event, typeClass = '') {
             const tooltip = document.getElementById('variant-tooltip');
             const tooltipTitle = document.getElementById('tooltip-item-name');
             const tooltipContent = document.getElementById('tooltip-content');
+
+            const probabilityItem = event.currentTarget;
+            const borderColor = window.getComputedStyle(probabilityItem).borderColor;
+
+
+            tooltip.style.borderColor = borderColor;
+            tooltipTitle.style.color = borderColor;
 
             const variants = specificItemVariants[currentMode]?.[itemName]?.[currentArea];
 
             if (!variants || variants.length === 0) {
                 tooltipContent.innerHTML = `<p>No specific variants available for ${itemName} in ${currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross'}.</p>`;
             } else {
-                let html = `<p style="margin-bottom: 10px; color: var(--text-secondary);">Available in ${currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross'}:</p>`;
+                let html = `<p style="margin-bottom: 10px; color: ${borderColor};">Available in ${currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross'}:</p>`;
                 html += '<ul class="variant-list">';
 
                 variants.forEach(variant => {
@@ -2291,12 +2375,12 @@
                     const cleanName = variant.name.replace(/\s*\[.*?\]\s*/, '');
 
                     html += `
-                <li class="variant-item">
+                <li class="variant-item" style="border-left: 4px solid ${borderColor};">
                     <div>
                         <div class="variant-name">${cleanName}</div>
                         ${areaExclusive ? `<div class="area-exclusive">Exclusive to ${areaExclusive}</div>` : ''}
                     </div>
-                    <div class="variant-chance">${variant.chance}</div>
+                    <div class="variant-chance" style="color: ${borderColor};">${variant.chance}</div>
                 </li>
             `;
                 });
@@ -2454,6 +2538,25 @@
             const slots = document.querySelectorAll('.slot');
             let totalOres = 0;
             let uniqueOres = oreMix.length;
+            const oreInventoryContainer = document.getElementById('ore-inventory');
+            const oreItems = oreInventoryContainer.querySelectorAll('.ore-item');
+
+            oreItems.forEach(item => {
+                item.classList.remove('in-forge');
+            });
+
+            oreMix.forEach(item => {
+                const oreElement = document.querySelector(`.ore-item[data-id="${item.id}"]`);
+                if (oreElement) {
+                    oreElement.classList.add('in-forge');
+                }
+            });
+
+            if (oreMix.length >= 4) {
+                oreInventoryContainer.parentElement.classList.add('ore-inventory-max');
+            } else {
+                oreInventoryContainer.parentElement.classList.remove('ore-inventory-max');
+            }
 
             let multiplierSum = 0;
             oreMix.forEach(item => {
@@ -2539,7 +2642,10 @@
 
                             let formattedDesc = trait.description;
                             Object.keys(scaledValues).forEach(key => {
-                                formattedDesc = formattedDesc.replace(`{${key}}`, scaledValues[key]);
+                                formattedDesc = formattedDesc.replace(
+                                    new RegExp(`([-+]?){${key}}(\\s*[+%s]*)`, 'g'),
+                                    `<span class="scalable-value">$1${scaledValues[key]}<span class="scalable-symbol">$2</span></span>`
+                                );
                             });
 
                             traitsList.push({
@@ -2601,8 +2707,23 @@
             Object.entries(currentProbs).forEach(([itemName, probability]) => {
                 const probabilityPercent = (probability * 100).toFixed(1);
 
+                let typeClass = '';
+                if (currentMode === 'weapon') {
+                    if (itemName === 'Dagger') typeClass = 'weapon-dagger';
+                    else if (itemName === 'Straight Sword') typeClass = 'weapon-straight-sword';
+                    else if (itemName === 'Gauntlet') typeClass = 'weapon-gauntlet';
+                    else if (itemName === 'Katana') typeClass = 'weapon-katana';
+                    else if (itemName === 'Great Sword') typeClass = 'weapon-great-sword';
+                    else if (itemName === 'Great Axe') typeClass = 'weapon-great-axe';
+                    else if (itemName === 'Colossal Sword') typeClass = 'weapon-colossal-sword';
+                } else {
+                    if (itemName.includes('Light')) typeClass = 'armor-light';
+                    else if (itemName.includes('Medium')) typeClass = 'armor-medium';
+                    else if (itemName.includes('Heavy')) typeClass = 'armor-heavy';
+                }
+
                 const itemElement = document.createElement('div');
-                itemElement.className = 'probability-item';
+                itemElement.className = `probability-item ${typeClass}`;
                 itemElement.dataset.itemName = itemName;
 
                 itemElement.innerHTML = `
@@ -2616,7 +2737,7 @@
 `;
 
                 itemElement.addEventListener('click', (e) => {
-                    showVariantTooltip(itemName, e);
+                    showVariantTooltip(itemName, e, typeClass);
                     e.stopPropagation();
                 });
 
@@ -2634,6 +2755,69 @@
                         <p>Add at least 3 ores to see forge chances</p>
                     </div>
                 `;
+            }
+
+            updatePredictedStats();
+        }
+
+        function updatePredictedStats() {
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+
+            if (totalOres < 3) {
+                return;
+            }
+
+            let multiplierSum = 0;
+            oreMix.forEach(item => {
+                const ore = oreData.find(o => o.id === item.id);
+                multiplierSum += ore.multiplier * item.count;
+            });
+            const multiplier = multiplierSum / totalOres;
+
+            const probabilities = currentMode === 'weapon' ? weaponProbabilities : armorProbabilities;
+            const counts = Object.keys(probabilities).map(Number);
+            const closestCount = counts.reduce((prev, curr) => {
+                return (Math.abs(curr - totalOres) < Math.abs(prev - totalOres) ? curr : prev);
+            });
+
+            const currentProbs = probabilities[closestCount] || {};
+            let highestProb = 0;
+            let highestItem = null;
+
+            Object.entries(currentProbs).forEach(([itemName, probability]) => {
+                if (probability > highestProb) {
+                    highestProb = probability;
+                    highestItem = itemName;
+                }
+            });
+
+            if (!highestItem) return;
+            let baseItemName = Object.keys(baseItemStats[currentMode]).find(name => {
+                const itemData = baseItemStats[currentMode][name];
+                return itemData.type === highestItem;
+            });
+
+            if (!baseItemName && currentMode === 'armor') {
+                baseItemName = Object.keys(baseItemStats.armor).find(name => {
+                    const itemData = baseItemStats.armor[name];
+                    return itemData.type === highestItem;
+                });
+            }
+
+            if (!baseItemName) return;
+
+            const baseStats = baseItemStats[currentMode][baseItemName];
+            const predictedStats = calculateScaledStats(baseItemName, multiplier);
+
+            const expectedItemEl = document.getElementById('expected-item');
+            const percent = (highestProb * 100).toFixed(1);
+
+            if (currentMode === 'weapon') {
+                expectedItemEl.innerHTML = `Expected: ${highestItem} (${percent}%)<br>
+                                    <span style="color: var(--primary); font-size: 0.9em;">Predicted Damage: ${predictedStats.damage.toFixed(2)} • Value: $${Math.round(predictedStats.price)}</span>`;
+            } else {
+                expectedItemEl.innerHTML = `Expected: ${highestItem} (${percent}%)<br>
+                                    <span style="color: var(--primary); font-size: 0.9em;">Predicted DEF: ${Math.round(predictedStats.def)} • Value: $${Math.round(predictedStats.price)}</span>`;
             }
         }
 
@@ -2860,7 +3044,10 @@
                         let desc = trait.description;
                         Object.keys(trait.scaling).forEach(key => {
                             const scale = trait.scaling[key];
-                            desc = desc.replace(`{${key}}`, `${scale.min}-${scale.max}`);
+                            desc = desc.replace(
+                                new RegExp(`([-+]?){${key}}(\\s*[+%s]*)`, 'g'),
+                                `<span class="scalable-value">$1${scale.min}-${scale.max}<span class="scalable-symbol">$2</span></span>`
+                            );
                         });
 
                         option.innerHTML = `
@@ -3368,7 +3555,10 @@
                                     <i class="fas fa-gem"></i> ${trait.oreName} (${trait.percentage.toFixed(1)}%)
                                 </div>
                                 <div class="forge-trait-desc">
-                                    ${trait.description}
+                                    ${trait.description.replace(
+                /([-+]?\d+(\.\d+)?)([+%s]*)/g,
+                '<span class="scalable-value">$1<span class="scalable-symbol">$3</span></span>'
+            )}
                                 </div>
                             </div>
                         `).join('')}
@@ -3427,9 +3617,9 @@
         };
 
         const armorColors = {
-            '--primary': '#1da5a5',
+            '--primary': '#19b9b9',
             '--primary-dark': '#0a6e6e',
-            '--primary-light': 'rgba(13, 165, 165, 0.1)',
+            '--primary-light': 'rgba(9, 119, 119, 0.1)',
             '--primary-glow': 'rgba(13, 165, 165, 0.3)',
             '--text-secondary': '#6fdcdc',
             '--glow': '0 0 20px rgba(13, 165, 165, 0.4)'
@@ -3469,6 +3659,7 @@
                     btn.classList.add('active');
                     activeFilter = btn.dataset.filter;
                     renderOreInventory();
+                    updateOreSlots();
                 });
             });
 
