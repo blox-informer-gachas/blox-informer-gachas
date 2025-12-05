@@ -775,7 +775,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .probability-item {
@@ -821,7 +821,7 @@
 
         .item-name {
             font-weight: bold;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--text);
             flex: 1;
         }
@@ -840,7 +840,7 @@
 
         .probability-bar {
             background: rgba(255, 255, 255, 0.1);
-            height: 24px;
+            height: 8px;
             border-radius: 12px;
             overflow: hidden;
             margin-top: 5px;
@@ -867,15 +867,10 @@
         }
 
         .probability-value {
-            position: absolute;
-            top: 0;
-            right: 10px;
             font-size: 0.80rem;
             font-weight: bold;
             color: white;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
-            line-height: 24px;
-            z-index: 2;
         }
 
         /* Controls */
@@ -2612,11 +2607,10 @@
                 itemElement.innerHTML = `
     <div class="item-header">
         <div class="item-name">${itemName}</div>
-        <div class="optimal-count">${optimal[itemName] || 'N/A'}</div>
+        <div class="probability-value">${probabilityPercent}%</div>
     </div>
     <div class="probability-bar">
         <div class="probability-fill" style="width: ${probabilityPercent}%"></div>
-        <div class="probability-value">${probabilityPercent}%</div>
     </div>
 `;
 
