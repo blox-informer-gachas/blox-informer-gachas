@@ -472,7 +472,7 @@
             font-size: 0.95rem;
             font-weight: bold;
             padding: 3px 5px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8),
                 -1px -1px 0 rgba(0, 0, 0, 0.5),
                 1px -1px 0 rgba(0, 0, 0, 0.5),
                 -1px 1px 0 rgba(0, 0, 0, 0.5),
@@ -631,7 +631,7 @@
             font-size: 0.9rem;
             font-weight: bold;
             padding: 3px 5px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8),
                 -1px -1px 0 rgba(0, 0, 0, 0.5),
                 1px -1px 0 rgba(0, 0, 0, 0.5),
                 -1px 1px 0 rgba(0, 0, 0, 0.5),
@@ -996,6 +996,8 @@
             align-items: center;
             gap: 6px;
             backdrop-filter: blur(10px);
+            border: 1px solid var(--primary-dark);
+            text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
         }
 
         .forge-stats-grid {
@@ -1071,7 +1073,7 @@
             align-items: center;
             font-size: 0.9rem;
             gap: 6px;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
         }
 
         .forge-trait-desc {
@@ -1912,36 +1914,36 @@
             { id: 15, name: "Titanium", multiplier: 1.15, rarity: "uncommon", area: "kingdom", color: "#aca895", traitType: null, traits: [] },
             { id: 16, name: "Volcanic Rock", multiplier: 1.55, rarity: "rare", area: "kingdom", color: "#504b44", traitType: null, traits: [] },
             { id: 17, name: "Lapis Lazuli", multiplier: 1.3, rarity: "uncommon", area: "kingdom", color: "#5c89dc", traitType: null, traits: [] },
-            { id: 18, name: "Quartz", multiplier: 1.5, rarity: "rare", area: "kingdom", color: "#a6babc", traitType: null, traits: [] },
-            { id: 19, name: "Amethyst", multiplier: 1.65, rarity: "rare", area: "kingdom", color: "#a56bca", traitType: null, traits: [] },
-            { id: 20, name: "Topaz", multiplier: 1.75, rarity: "rare", area: "kingdom", color: "#ffcc00", traitType: null, traits: [] },
-            { id: 21, name: "Diamond", multiplier: 2.0, rarity: "rare", area: "kingdom", color: "#91cff0", traitType: null, traits: [] },
-            { id: 22, name: "Sapphire", multiplier: 2.25, rarity: "rare", area: "kingdom", color: "#5194ec", traitType: null, traits: [] },
-            { id: 23, name: "Cuprite", multiplier: 2.43, rarity: "epic", area: "kingdom", color: "#90af4a", traitType: null, traits: [] },
+            { id: 18, name: "Quartz", multiplier: 1.5, rarity: "rare", area: "kingdom", color: "#b6dffd", traitType: null, traits: [] },
+            { id: 19, name: "Amethyst", multiplier: 1.65, rarity: "rare", area: "kingdom", color: "#957aed", traitType: null, traits: [] },
+            { id: 20, name: "Topaz", multiplier: 1.75, rarity: "rare", area: "kingdom", color: "#deb7a4", traitType: null, traits: [] },
+            { id: 21, name: "Diamond", multiplier: 2.0, rarity: "rare", area: "kingdom", color: "#aef8fa", traitType: null, traits: [] },
+            { id: 22, name: "Sapphire", multiplier: 2.25, rarity: "rare", area: "kingdom", color: "#7bbdfa", traitType: null, traits: [] },
+            { id: 23, name: "Cuprite", multiplier: 2.43, rarity: "epic", area: "kingdom", color: "#7a3034", traitType: null, traits: [] },
             {
                 id: 24, name: "Obsidian", multiplier: 2.35, rarity: "epic", area: "kingdom", color: "#5b1fd5", traitType: "armor", traits: [
                     { description: "+{health}% extra health.", scaling: { health: { min: 3, max: 30 } }, type: "armor" }
                 ]
             },
-            { id: 25, name: "Emerald", multiplier: 2.55, rarity: "epic", area: "kingdom", color: "#8df356", traitType: null, traits: [] },
-            { id: 26, name: "Ruby", multiplier: 2.95, rarity: "epic", area: "kingdom", color: "#ed4b4b", traitType: null, traits: [] },
+            { id: 25, name: "Emerald", multiplier: 2.55, rarity: "epic", area: "kingdom", color: "#5fb172", traitType: null, traits: [] },
+            { id: 26, name: "Ruby", multiplier: 2.95, rarity: "epic", area: "kingdom", color: "#cc4a53", traitType: null, traits: [] },
             {
-                id: 27, name: "Rivalite", multiplier: 3.33, rarity: "epic", area: "kingdom", color: "#f01919", traitType: "weapon", traits: [
+                id: 27, name: "Rivalite", multiplier: 3.33, rarity: "epic", area: "kingdom", color: "#8e4a4c", traitType: "weapon", traits: [
                     { description: "+{crit}% critical chance.", scaling: { crit: { min: 2, max: 20 } }, type: "weapon" }
                 ]
             },
             {
-                id: 28, name: "Uranium", multiplier: 3.0, rarity: "legendary", area: "kingdom", color: "#8df060", traitType: "armor", traits: [
+                id: 28, name: "Uranium", multiplier: 3.0, rarity: "legendary", area: "kingdom", color: "#97c889", traitType: "armor", traits: [
                     { description: "Deal {damage}% of max health as AoE DMG while in-combat.", scaling: { damage: { min: 0.5, max: 5 } }, type: "armor" }
                 ]
             },
             {
-                id: 29, name: "Mythril", multiplier: 3.5, rarity: "legendary", area: "kingdom", color: "#ad51ee", traitType: "armor", traits: [
+                id: 29, name: "Mythril", multiplier: 3.5, rarity: "legendary", area: "kingdom", color: "#9f61fa", traitType: "armor", traits: [
                     { description: "+{health}% extra health.", scaling: { health: { min: 1.5, max: 15 } }, type: "armor" }
                 ]
             },
             {
-                id: 30, name: "Eye Ore", multiplier: 4.0, rarity: "legendary", area: "kingdom", color: "#d9681e", traitType: "all", traits: [
+                id: 30, name: "Eye Ore", multiplier: 4.0, rarity: "legendary", area: "kingdom", color: "#fab67f", traitType: "all", traits: [
                     {
                         description: "Increase physical damage by +{damage}% and decrease health by -{health}%.",
                         scaling: { damage: { min: 1.5, max: 15 }, health: { min: 1, max: 10 } }, type: "all"
@@ -1949,7 +1951,7 @@
                 ]
             },
             {
-                id: 31, name: "Fireite", multiplier: 4.5, rarity: "legendary", area: "kingdom", color: "#d9670a", traitType: "weapon", traits: [
+                id: 31, name: "Fireite", multiplier: 4.5, rarity: "legendary", area: "kingdom", color: "#a4532e", traitType: "weapon", traits: [
                     {
                         description: "Deals {damage}% of weapon damage as fire per second for 2 seconds. 30% chance on hit.",
                         scaling: { damage: { min: 2, max: 20 } }, type: "weapon"
@@ -1957,7 +1959,7 @@
                 ]
             },
             {
-                id: 32, name: "Magmaite", multiplier: 5.0, rarity: "legendary", area: "kingdom", color: "#db3d3d", traitType: "weapon", traits: [
+                id: 32, name: "Magmaite", multiplier: 5.0, rarity: "legendary", area: "kingdom", color: "#f77b61", traitType: "weapon", traits: [
                     {
                         description: "Cause an explosion on hit, dealing {damage}% of weapon damage as AoE damage. 35% chance on hit.",
                         scaling: { damage: { min: 5, max: 50 } }, type: "weapon"
@@ -1965,12 +1967,12 @@
                 ]
             },
             {
-                id: 33, name: "Lightite", multiplier: 4.6, rarity: "legendary", area: "kingdom", color: "#dfdfdf", traitType: "armor", traits: [
+                id: 33, name: "Lightite", multiplier: 4.6, rarity: "legendary", area: "kingdom", color: "#9ac9fa", traitType: "armor", traits: [
                     { description: "+{speed}% extra movement speed.", scaling: { speed: { min: 1.5, max: 15 } }, type: "armor" }
                 ]
             },
             {
-                id: 34, name: "Demonite", multiplier: 5.5, rarity: "mythical", area: "kingdom", color: "#901c1c", traitType: "armor", traits: [
+                id: 34, name: "Demonite", multiplier: 5.5, rarity: "mythical", area: "kingdom", color: "#7d1b1d", traitType: "armor", traits: [
                     {
                         description: "Deals {damage}% of weapon damage as fire per second for 2 seconds. 15% chance on hit and 25% chance when hit by an enemy.",
                         scaling: { damage: { min: 2, max: 20 } }, type: "armor"
@@ -1978,7 +1980,7 @@
                 ]
             },
             {
-                id: 35, name: "Darkryte", multiplier: 6.3, rarity: "mythical", area: "kingdom", color: "#dcdcdc", traitType: "armor", traits: [
+                id: 35, name: "Darkryte", multiplier: 6.3, rarity: "mythical", area: "kingdom", color: "#f0f0f0", traitType: "armor", traits: [
                     {
                         description: "Upon taking damage, there is a {chance}% chance to turn into a shadow and dodge the attack.",
                         scaling: { chance: { min: 1.5, max: 15 } }, type: "armor"
@@ -1987,13 +1989,13 @@
             },
 
             // Goblin Cave
-            { id: 36, name: "Magenta Crystal", multiplier: 3.1, rarity: "epic", area: "goblin", color: "#7d47a9", traitType: null, traits: [] },
-            { id: 37, name: "Crimson Crystal", multiplier: 3.3, rarity: "epic", area: "goblin", color: "#dc143c", traitType: null, traits: [] },
-            { id: 38, name: "Green Crystal", multiplier: 3.2, rarity: "epic", area: "goblin", color: "#8ba846", traitType: null, traits: [] },
-            { id: 39, name: "Orange Crystal", multiplier: 3.0, rarity: "epic", area: "goblin", color: "#a66e41", traitType: null, traits: [] },
-            { id: 40, name: "Blue Crystal", multiplier: 3.4, rarity: "epic", area: "goblin", color: "#A7C7E7", traitType: null, traits: [] },
-            { id: 41, name: "Rainbow Crystal", multiplier: 5.25, rarity: "legendary", area: "goblin", color: "#50C878", traitType: null, traits: [] },
-            { id: 42, name: "Arcane Crystal", multiplier: 7.5, rarity: "mythical", area: "goblin", color: "#d1e2f9", traitType: null, traits: [] },
+            { id: 36, name: "Magenta Crystal", multiplier: 3.1, rarity: "epic", area: "goblin", color: "#795ef8", traitType: null, traits: [] },
+            { id: 37, name: "Crimson Crystal", multiplier: 3.3, rarity: "epic", area: "goblin", color: "#9a5065", traitType: null, traits: [] },
+            { id: 38, name: "Green Crystal", multiplier: 3.2, rarity: "epic", area: "goblin", color: "#68c87b", traitType: null, traits: [] },
+            { id: 39, name: "Orange Crystal", multiplier: 3.0, rarity: "epic", area: "goblin", color: "#d8792a", traitType: null, traits: [] },
+            { id: 40, name: "Blue Crystal", multiplier: 3.4, rarity: "epic", area: "goblin", color: "#699cf1", traitType: null, traits: [] },
+            { id: 41, name: "Rainbow Crystal", multiplier: 5.25, rarity: "legendary", area: "goblin", color: "#1b7c3a", traitType: null, traits: [] },
+            { id: 42, name: "Arcane Crystal", multiplier: 7.5, rarity: "mythical", area: "goblin", color: "#c8dbf5", traitType: null, traits: [] },
 
             // Enemy Drops
             { id: 43, name: "Boneite", multiplier: 1.2, rarity: "rare", area: "enemy", color: "#f5f5dc", traitType: null, traits: [] },
@@ -2506,7 +2508,7 @@
                 oreElement.innerHTML = `
     ${ore.traits.length > 0 ? '<div class="trait-indicator"><i class="fas fa-magic"></i></div>' : ''}
     ${!oreImages[ore.name] ? `<div class="ore-icon"><i class="fas fa-gem" style="color: ${ore.color};"></i></div>` : ''}
-    <div class="ore-name">${ore.name}</div>
+    <div class="ore-name"><span style="color: ${ore.color};">${ore.name}</span></div>
     <div class="ore-multiplier">${ore.multiplier}x</div>
 `;
 
@@ -2601,13 +2603,15 @@
                 }
 
                 slot.innerHTML = `
-                    <div class="slot-ore" ${backgroundStyle} data-id="${ore.id}">
-                        ${!oreImages[ore.name] ? `<i class="fas fa-gem" style="color: ${ore.color}; font-size: 30px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>` : ''}
-                        <div class="slot-ore-name">${ore.name}</div>
-                        <div class="slot-ore-count">${item.count}</div>
-                        <div class="slot-ore-percentage">${percentage}%</div>
-                    </div>
-                `;
+    <div class="slot-ore" ${backgroundStyle} data-id="${ore.id}">
+        ${!oreImages[ore.name] ? `<i class="fas fa-gem" style="color: ${ore.color}; font-size: 30px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>` : ''}
+        <div class="slot-ore-name">
+            <span style="color: ${ore.color}; font-weight: bold;">${ore.name}</span>
+        </div>
+        <div class="slot-ore-count">${item.count}</div>
+        <div class="slot-ore-percentage">${percentage}%</div>
+    </div>
+`;
                 slot.classList.add('filled');
 
                 slot.querySelector('.slot-ore').addEventListener('click', (e) => {
@@ -2685,15 +2689,21 @@
                 traitElement.dataset.oreId = traitInfo.oreId;
                 traitElement.dataset.percentage = traitInfo.percentage.toFixed(1);
 
+                const ore = oreData.find(o => o.id === traitInfo.oreId);
+                const oreColor = ore ? ore.color : 'var(--primary)';
+
                 traitElement.innerHTML = `
-                    <div class="trait-content">
-                        <div class="trait-name">
-                            ${traitInfo.oreName}
-                            <span class="trait-percentage">${traitInfo.percentage.toFixed(1)}%</span>
-                        </div>
-                        <div class="trait-description">${traitInfo.description}</div>
-                    </div>
-        `;
+        <div class="trait-content">
+            <div class="trait-name">
+                
+                    
+                    <span style="color: ${oreColor}; font-weight: bold; text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);"><i class="fas fa-gem" style="color: ${oreColor}; font-size: 0.9rem;"></i> ${traitInfo.oreName}</span>
+                    <span class="trait-percentage">${traitInfo.percentage.toFixed(1)}%</span>
+               
+            </div>
+            <div class="trait-description">${traitInfo.description}</div>
+        </div>
+    `;
 
                 activeTraitsContainer.appendChild(traitElement);
             });
@@ -3065,11 +3075,17 @@
                         });
 
                         option.innerHTML = `
-                    <div class="trait-info">
-                        <div class="trait-name">${ore.name} (${ore.multiplier}x)</div>
-                        <div class="trait-desc">${desc}</div>
-                    </div>
-                `;
+    <div class="trait-info">
+        <div class="trait-name">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-gem" style="color: ${ore.color}; font-size: 1rem;"></i>
+                <span style="color: ${ore.color}; font-weight: bold; font-size: 0.95rem;">${ore.name}</span>
+                <span style="font-size: 0.85rem; color: var(--text-secondary);">(${ore.multiplier}x)</span>
+            </div>
+        </div>
+        <div class="trait-desc">${desc}</div>
+    </div>
+`;
 
                         option.addEventListener('click', () => {
                             const isSelected = option.classList.contains('selected');
@@ -3175,12 +3191,15 @@
                 `;
 
                 selectedTraits.forEach(trait => {
+                    const ore = oreData.find(o => o.id === trait.oreId);
+                    const oreColor = ore ? ore.color : 'var(--primary)';
+
                     summaryHTML += `
-                        <div style="background: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--border-radius); padding: 5px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px;">
-                            <i class="fas fa-magic" style="color: var(--primary);"></i>
-                            ${trait.oreName}
-                        </div>
-                    `;
+    <div style="background: ${oreColor}15; border: 1px solid ${oreColor}; border-radius: var(--border-radius); padding: 5px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+        <i class="fas fa-gem" style="color: ${oreColor}; font-size: 0.85rem;"></i>
+        <span style="color: ${oreColor}; font-weight: bold;">${trait.oreName}</span>
+    </div>
+`;
                 });
 
                 summaryHTML += `</div></div>`;
@@ -3203,16 +3222,22 @@
                 const ore = oreData.find(o => o.id === item.id);
                 const percentage = ((item.count / totalOresInMix) * 100).toFixed(1);
                 summaryHTML += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 10px; border-radius: var(--border-radius);">
-                        <div>
-                            <div style="font-weight: bold;">${ore.name}</div>
-                            <div style="font-size: 0.85rem; color: var(--text);">${ore.multiplier}x multiplier</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-weight: bold;">${item.count}x (${percentage}%)</div>
-                        </div>
-                    </div>
-                `;
+    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 10px; border-radius: var(--border-radius); border-left: 4px solid ${ore.color};">
+        <div>
+            <div style="font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-gem" style="color: ${ore.color}; font-size: 0.9rem;"></i>
+                <span style="color: ${ore.color};">${ore.name}</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px;">
+                ${ore.multiplier}x multiplier • ${ore.rarity.charAt(0).toUpperCase() + ore.rarity.slice(1)}
+            </div>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-weight: bold; color: var(--text);">${item.count}x</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary);">${percentage}%</div>
+        </div>
+    </div>
+`;
             });
 
             summaryHTML += `
