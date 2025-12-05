@@ -48,7 +48,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--background);
             color: var(--text);
-            max-width: 800px;
+            max-width: 840px;
             margin: 0 auto;
             padding: 10px;
             line-height: 1.6;
@@ -88,7 +88,7 @@
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin-bottom: 5px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
             position: relative;
@@ -204,7 +204,7 @@
         .modal-content {
             background: var(--card-bg);
             border-radius: var(--border-radius);
-            padding: 20px;
+            padding: 15px;
             width: 90%;
             max-width: 500px;
             max-height: 90vh;
@@ -219,8 +219,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
             border-bottom: 2px solid var(--primary-dark);
         }
 
@@ -692,7 +692,7 @@
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: var(--primary);
             text-shadow: 0 0 10px var(--primary-glow);
@@ -705,7 +705,7 @@
 
         .traits-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-top: 20px;
         }
@@ -941,7 +941,7 @@
 
         /* Forge Result Modal */
         .forge-result-container {
-            padding: 20px;
+            padding: 15px 10px;
             border-radius: var(--border-radius);
         }
 
@@ -953,8 +953,8 @@
         .forge-result-header {
             display: flex;
             align-items: center;
-            gap: 25px;
-            margin-bottom: 15px;
+            gap: 20px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
         }
 
@@ -977,27 +977,25 @@
         .forge-result-name {
             font-size: 1.8rem;
             font-weight: bold;
-            margin-bottom: 5px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .forge-result-type {
             font-size: 1rem;
+            margin-bottom: 5px;
             color: var(--text-secondary);
-            margin-bottom: 10px;
         }
 
         .forge-result-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-top: 15px;
         }
 
         .forge-tag {
             padding: 6px 15px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.80rem;
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -1009,7 +1007,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
-            margin: 20px 0;
+            margin-top: 15px;
         }
 
         .forge-stat-item {
@@ -1032,18 +1030,18 @@
 
         .forge-stat-label {
             color: var(--text);
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             opacity: 0.7;
         }
 
         .forge-stat-value {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
             color: var(--primary);
         }
 
         .traits-section {
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .traits-list-container {
@@ -1062,7 +1060,7 @@
             background: linear-gradient(135deg, var(--primary-glow), var(--primary-light));
             border: 1px solid var(--primary-light);
             border-radius: 10px;
-            padding: 15px;
+            padding: 10px 15px;
             backdrop-filter: blur(10px);
             transition: all var(--animation-speed);
         }
@@ -1074,25 +1072,16 @@
 
         .forge-trait-ore {
             font-weight: bold;
-            margin-bottom: 5px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
         }
 
         .forge-trait-desc {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
             line-height: 1.5;
-        }
-
-        .forge-result-footer {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            text-align: center;
         }
 
         /* Area Toggle */
@@ -1368,6 +1357,10 @@
                 overflow: hidden;
                 width: 100%;
                 height: 100%;
+            }
+
+            .traits-grid {
+                grid-template-columns: 1fr;
             }
 
             .slots-container {
