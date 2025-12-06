@@ -11,7 +11,7 @@
             --primary: #FF6600;
             --primary-dark: #cc5200;
             --primary-light: rgba(255, 102, 0, 0.1);
-            --primary-glow: rgba(255, 102, 0, 0.3);
+            --primary-glow: rgba(255, 102, 0, 0.2);
             --background: #0f0f0f;
             --card-bg: linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);
             --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -287,6 +287,20 @@
             transform: translateY(-3px);
         }
 
+        .trait-option.disabled {
+            opacity: 0.4;
+            filter: grayscale(0.7);
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .modal-option.disabled {
+            opacity: 0.4;
+            filter: grayscale(0.7);
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
         .trait-option {
             display: flex;
             align-items: center;
@@ -384,34 +398,122 @@
             margin-right: 6px;
         }
 
-        /* Filter Controls */
-        .filter-controls {
+        /* Compact Filter & Search Container */
+        .filter-search-container {
             display: flex;
             gap: 10px;
             margin-bottom: 15px;
+            align-items: center;
             flex-wrap: wrap;
         }
 
-        .filter-btn {
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.80rem;
-            transition: all var(--animation-speed);
+        /* Filters Dropdown */
+        .filters-dropdown {
+            position: relative;
         }
 
-        .filter-btn.active {
+        .dropdown-toggle {
+            padding: 10px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all var(--animation-speed);
+            white-space: nowrap;
+        }
+
+        .dropdown-toggle:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .dropdown-toggle.active {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-color: var(--primary);
             box-shadow: 0 0 15px var(--primary-glow);
         }
 
-        .filter-btn:hover:not(.active) {
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 5px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            min-width: 170px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            z-index: 100;
+            max-height: 250px;
+            overflow-y: auto;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .filter-option {
+            padding: 10px 15px;
+            color: var(--text);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .filter-option:last-child {
+            border-bottom: none;
+        }
+
+        .filter-option:hover {
             background: var(--primary-light);
-            border-color: var(--primary);
-            transform: translateY(-2px);
+            color: var(--primary);
+        }
+
+        .filter-option.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            position: relative;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--primary-dark);
+        }
+
+        /* Search Container */
+        .search-container {
+            flex: 1;
+        }
+
+        #ore-search {
+            width: 100%;
+            padding: 10px 10px 10px 35px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text);
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #ore-search:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        #ore-search::placeholder {
+            color: var(--text-secondary);
         }
 
         /* Ores Grid */
@@ -960,7 +1062,7 @@
             background-position: center;
             border-radius: 10px;
             border: 3px solid;
-            box-shadow: 0 0 25px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
             flex-shrink: 0;
         }
 
@@ -1447,11 +1549,6 @@
             .probability-grid {
                 grid-template-columns: 1fr;
             }
-
-            .filter-controls {
-                justify-content: center;
-            }
-
         }
 
         /* Scrollbar */
@@ -1545,6 +1642,207 @@
             background-size: 300px;
             z-index: -1;
         }
+
+        /* Inventory Modal Styles */
+        .inventory-modal .modal-content {
+            max-width: 700px;
+            width: 95%;
+            padding: 20px;
+        }
+
+        .inventory-stats {
+            margin-top: 15px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .inventory-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .inventory-card {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(30, 30, 30, 0.6));
+            border-radius: var(--border-radius);
+            padding: 15px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+
+        }
+
+        .inventory-card:hover {
+            box-shadow: var(--glow);
+            border-color: var(--primary);
+        }
+
+        .inventory-card-header {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .inventory-card-ore {
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .inventory-card-item {
+            color: var(--text);
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .inventory-card-stats {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .inventory-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        .inventory-stat-label {
+            color: var(--text-secondary);
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .inventory-stat-value {
+            color: var(--text);
+            font-weight: bold;
+            text-align: right;
+            min-width: 60px;
+        }
+
+        .inventory-card-traits {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row-reverse;
+            gap: 6px;
+            margin-top: auto;
+        }
+
+        .trait-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .trait-icon:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .trait-icon i {
+            font-size: 0.8rem;
+            color: white;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .trait-tooltip {
+            position: absolute;
+            bottom: 120%;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 0.8rem;
+            min-width: 180px;
+            max-width: 220px;
+            display: none;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .trait-icon:nth-child(2) .trait-tooltip {
+            left: 50%;
+            right: auto;
+            transform: translateX(-80%);
+        }
+
+        /* For the third icon (if there are 4), center it */
+        .trait-icon:nth-child(3) .trait-tooltip {
+            right: 50%;
+            left: auto;
+            transform: translateX(35%);
+        }
+
+        /* For the fourth icon (if there are 4), center it */
+        .trait-icon:nth-child(4) .trait-tooltip {
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%);
+        }
+
+        .trait-icon:hover .trait-tooltip {
+            display: block;
+        }
+
+        .trait-tooltip strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .trait-tooltip p {
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .inventory-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .inventory-empty i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
     </style>
 </head>
 
@@ -1555,13 +1853,15 @@
             <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
                 <h1><i class="fas fa-hammer"></i> The Forge Crafting Calculator</h1>
             </div>
-            <div class="mode-toggle">
-                <button class="toggle-btn active" id="weapon-toggle">
-                    &#9876; Weapons
-                </button>
-                <button class="toggle-btn" id="armor-toggle">
-                    <i class="fas fa-shield-alt" style="font-size: 0.8rem;"></i> Armor
-                </button>
+            <div class="header-controls">
+                <div class="mode-toggle">
+                    <button class="toggle-btn active" id="weapon-toggle">
+                        &#9876; Weapons
+                    </button>
+                    <button class="toggle-btn" id="armor-toggle">
+                        <i class="fas fa-shield-alt" style="font-size: 0.8rem;"></i> Armor
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -1596,9 +1896,6 @@
                     <div class="modal-step-title">3. Select Traits (Max 4)</div>
                     <div id="trait-options">
                     </div>
-                    <div id="selected-traits-count" style="margin-top: 10px; color: var(--text-secondary);">
-                        Selected: 0/4 traits
-                    </div>
                 </div>
 
                 <div class="modal-step step-panel" id="step-summary">
@@ -1618,17 +1915,36 @@
         <section class="inventory-section">
             <div class="section-title">
                 <span><i class="fas fa-gem"></i> Ore List / Select Ores</span>
+                <button class="quick-craft-btn" id="inventory-btn">
+                    <i class="fas fa-bag-shopping"></i> Inventory
+                </button>
             </div>
 
-            <div class="filter-controls">
-                <button class="filter-btn active" data-filter="all">All Ores</button>
-                <button class="filter-btn" data-filter="stonewake">Stonewake's Cross</button>
-                <button class="filter-btn" data-filter="kingdom">Forgotten Kingdom</button>
-                <button class="filter-btn" data-filter="goblin">Goblin Cave</button>
-                <button class="filter-btn" data-filter="enemy">Enemy Drops</button>
-                <button class="filter-btn" data-filter="has-trait">With Traits</button>
-                <button class="filter-btn" data-filter="has-weapon-trait">With Weapon Traits</button>
-                <button class="filter-btn" data-filter="has-armor-trait">With Armor Traits</button>
+            <div class="filter-search-container"
+                style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+                <div class="filters-dropdown">
+                    <button class="filter-btn dropdown-toggle" id="filters-toggle">
+                        <i class="fas fa-filter"></i> Filters
+                        <i class="fas fa-chevron-down" style="font-size: 0.8rem; margin-left: 5px;"></i>
+                    </button>
+                    <div class="dropdown-menu" id="filters-dropdown">
+                        <div class="filter-option active" data-filter="all">All Ores</div>
+                        <div class="filter-option" data-filter="stonewake">Stonewake's Cross</div>
+                        <div class="filter-option" data-filter="kingdom">Forgotten Kingdom</div>
+                        <div class="filter-option" data-filter="goblin">Goblin Cave</div>
+                        <div class="filter-option" data-filter="enemy">Enemy Drops</div>
+                        <div class="dropdown-divider"></div>
+                        <div class="filter-option" data-filter="has-trait">With Traits</div>
+                        <div class="filter-option" data-filter="has-weapon-trait">With Weapon Traits</div>
+                        <div class="filter-option" data-filter="has-armor-trait">With Armor Traits</div>
+                    </div>
+                </div>
+                <div class="search-container" style="position: relative; flex: 1;">
+                    <i class="fas fa-search"
+                        style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 0.9rem; z-index: 2;"></i>
+                    <input type="text" id="ore-search" placeholder="Search ores by name, area, rarity..."
+                        style="width: 100%; padding: 10px 10px 10px 35px;">
+                </div>
             </div>
 
             <div class="ores-grid" id="ore-inventory">
@@ -1722,6 +2038,32 @@
             <div class="modal-nav" style="justify-content: center; margin-top: 15px;">
                 <button class="control-btn forge-btn" id="forge-again-btn">Forge Again</button>
                 <button class="control-btn reset-btn" id="close-result-btn">Close</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay inventory-modal" id="inventory-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-bag-shopping"></i> Forge History (Last 20 Items)</h3>
+                <button class="modal-close" id="inventory-close">&times;</button>
+            </div>
+
+            <div class="inventory-stats">
+                <span id="total-forged">Total Items Forged: 0</span> •
+                <span id="total-value">Total Value: $0</span>
+            </div>
+
+            <div class="inventory-cards-container" id="inventory-cards">
+                <div class="inventory-empty">
+                    <i class="fas fa-box-open"></i>
+                    <p>No items forged yet. Start forging to see your history!</p>
+                </div>
+            </div>
+
+            <div class="modal-nav" style="justify-content: center; margin-top: 15px;">
+                <button class="control-btn reset-btn" id="close-inventory-btn">Close</button>
+                <button class="control-btn reset-btn" id="clear-inventory-btn"
+                    style="background-color: var(--error);"><i class="fas fa-trash"></i> Clear All</button>
             </div>
         </div>
     </div>
@@ -2276,6 +2618,15 @@
         let currentStep = 0;
         let currentArea = 'kingdom';
         let highestProbabilityItem = null;
+        let forgedItems = JSON.parse(localStorage.getItem('forgedItems') || '[]');
+        const MAX_INVENTORY_SIZE = 20;
+        let currentSearchTerm = '';
+        let isQuickCraft = false;
+        let quickCraftTargetItem = null;
+        const oreSearchInput = document.getElementById('ore-search');
+        const filtersToggle = document.getElementById('filters-toggle');
+        const filtersDropdown = document.getElementById('filters-dropdown');
+        const filterOptions = document.querySelectorAll('.filter-option');
 
         const oreInventory = document.getElementById('ore-inventory');
         const oreSlotsContainer = document.getElementById('ore-slots');
@@ -2300,8 +2651,15 @@
         const stepSummary = document.getElementById('step-summary');
         const itemOptions = document.getElementById('item-options');
         const traitOptions = document.getElementById('trait-options');
-        const selectedTraitsCount = document.getElementById('selected-traits-count');
         const summaryContent = document.getElementById('summary-content');
+        const inventoryBtn = document.getElementById('inventory-btn');
+        const inventoryModal = document.getElementById('inventory-modal');
+        const inventoryClose = document.getElementById('inventory-close');
+        const closeInventoryBtn = document.getElementById('close-inventory-btn');
+        const clearInventoryBtn = document.getElementById('clear-inventory-btn');
+        const inventoryCards = document.getElementById('inventory-cards');
+        const totalForged = document.getElementById('total-forged');
+        const totalValue = document.getElementById('total-value');
 
         function init() {
             renderOreInventory();
@@ -2312,6 +2670,8 @@
             updateExpectedItem();
             updateAreaToggle();
             setupForgeResultModal();
+            setupInventorySystem();
+            setupFiltersDropdown();
         }
 
         document.getElementById('tooltip-close').addEventListener('click', () => {
@@ -2324,6 +2684,219 @@
                 tooltip.style.display = 'none';
             }
         });
+
+        function saveForgedItem(result) {
+            const inventoryItem = {
+                id: Date.now(),
+                itemName: result.itemName,
+                itemType: result.itemType,
+                variant: result.variant,
+                multiplier: result.multiplier,
+                mainOre: result.mainOre,
+                stats: result.stats,
+                traits: result.traits,
+                area: result.area,
+                totalOres: result.totalOres,
+                timestamp: new Date().toLocaleString(),
+                mode: currentMode,
+                image: itemImages[result.itemName] || ''
+            };
+
+            forgedItems.unshift(inventoryItem);
+
+            if (forgedItems.length > MAX_INVENTORY_SIZE) {
+                forgedItems = forgedItems.slice(0, MAX_INVENTORY_SIZE);
+            }
+
+            localStorage.setItem('forgedItems', JSON.stringify(forgedItems));
+
+            updateInventoryUI();
+        }
+
+        function updateInventoryUI() {
+
+            const totalItems = forgedItems.length;
+            const totalValueSum = forgedItems.reduce((sum, item) => sum + (item.stats?.price || 0), 0);
+
+            totalForged.textContent = `Total Items Forged: ${totalItems}`;
+            totalValue.textContent = `Total Value: $${Math.round(totalValueSum)}`;
+
+            renderInventoryCards();
+        }
+
+        function renderInventoryCards() {
+            inventoryCards.innerHTML = '';
+
+            if (forgedItems.length === 0) {
+                inventoryCards.innerHTML = `
+            <div class="inventory-empty">
+                <i class="fas fa-box-open"></i>
+                <p>No items forged yet. Start forging to see your history!</p>
+            </div>
+        `;
+                return;
+            }
+
+            forgedItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'inventory-card';
+
+                const oreColor = item.mainOre?.color || (currentMode === 'weapon' ? '#FF6600' : '#19b9b9');
+
+                let statsHTML = '';
+                if (item.mode === 'weapon') {
+                    statsHTML = `
+                <div class="inventory-stat-row">
+                    <span class="inventory-stat-label">Damage:</span>
+                    <span class="inventory-stat-value" style="color: var(--primary);">${item.stats.damage?.toFixed(2) || '0.00'}</span>
+                </div>
+                <div class="inventory-stat-row">
+                    <span class="inventory-stat-label">Atk Speed:</span>
+                    <span class="inventory-stat-value" style="color: var(--rare);">${item.stats.atkSpeed?.toFixed(2) || '0.00'}s</span>
+                </div>
+                <div class="inventory-stat-row">
+                    <span class="inventory-stat-label">Range:</span>
+                    <span class="inventory-stat-value" style="color: var(--relic)">${item.stats.range || '0'} studs</span>
+                </div>
+                <div class="inventory-stat-row">
+                    <span class="inventory-stat-label">Value:</span>
+                    <span class="inventory-stat-value" style="color: var(--legendary);">$${Math.round(item.stats.price) || '0'}</span>
+                </div>
+            `;
+                } else {
+                    statsHTML = `
+                <div class="inventory-stat-row">
+                    <span class="inventory-stat-label">Health:</span>
+                    <span class="inventory-stat-value" style="color: var(--success);">+${item.stats.health?.toFixed(2) || '0'}%</span>
+                </div>
+                <div class="inventory-stat-row">
+                    <span class="inventory-stat-label">DEF:</span>
+                    <span class="inventory-stat-value" style="color: var(--primary);">${Math.round(item.stats.def) || '0'}</span>
+                </div>
+                <div class="inventory-stat-row">
+                    <span class="inventory-stat-label">Value:</span>
+                    <span class="inventory-stat-value" style="color: var(--legendary);">$${Math.round(item.stats.price) || '0'}</span>
+                </div>
+            `;
+                }
+
+                let traitsHTML = '';
+                if (item.traits && item.traits.length > 0) {
+                    item.traits.forEach((trait, index) => {
+                        const iconClass = getTraitIconClass(trait.description);
+                        traitsHTML += `
+    <div class="trait-icon" style="border-color: ${trait.oreColor || oreColor}; background: ${trait.oreColor || oreColor}30;">
+        <i class="${iconClass}"></i>
+        <div class="trait-tooltip">
+            <strong style="color: ${trait.oreColor || oreColor};">
+                <i class="fas ${iconClass}" style="color: ${trait.oreColor || oreColor};"></i>
+                ${trait.oreName}
+            </strong>
+            <p>${formatTraitDescription(trait.description)}</p>
+        </div>
+    </div>
+`;
+                    });
+                }
+
+                card.innerHTML = `
+            <div class="inventory-card-header">
+                <div class="forge-result-image" style="border-color: ${oreColor}; background-image: url('${item.image}'); width: 120px; height: 90px;"></div>
+                <div style="flex-grow: 1; margin-left: 10px;">
+                <div class="inventory-card-ore">
+                    <i class="fas fa-gem" style="color: ${oreColor};"></i>
+                    <span style="color: ${oreColor};">${item.mainOre?.name || 'Unknown Ore'}</span>
+                </div>
+                <div class="inventory-card-item" style="color: ${oreColor};">${item.itemName}</div>
+                </div>
+            </div>
+            
+            <div class="inventory-card-stats">
+                ${statsHTML}
+            </div>
+            
+            ${traitsHTML ? `
+                <div class="inventory-card-traits">
+                    ${traitsHTML}
+                </div>
+            ` : ''}
+        `;
+
+                inventoryCards.appendChild(card);
+            });
+        }
+
+        function formatTraitDescription(description) {
+            return description.replace(
+                /([-+]?\d+(?:\.\d+)?)(\s*[+%a-zA-Z]*)/g,
+                '<span class="scalable-value">$1<span class="scalable-symbol">$2</span></span>'
+            );
+        }
+
+        function getTraitIconClass(description) {
+            const lowerDesc = description.toLowerCase();
+
+            if (lowerDesc.includes('fire')) return 'fas fa-fire';
+            if (lowerDesc.includes('explosion')) return 'fas fa-bomb';
+            if (lowerDesc.includes('shadow') || lowerDesc.includes('dodge')) return 'fas fa-ghost';
+            if (lowerDesc.includes('damage')) return 'fas fa-fan';
+            if (lowerDesc.includes('poison')) return 'fas fa-skull-crossbones';
+            if (lowerDesc.includes('max health')) return 'fas fa-skull';
+            if (lowerDesc.includes('critical') || lowerDesc.includes('crit')) return 'fas fa-crosshairs';
+            if (lowerDesc.includes('health')) return 'fas fa-heart';
+            if (lowerDesc.includes('speed')) return 'fas fa-running';
+
+            if (lowerDesc.includes('fear')) return 'fas fa-scared';
+            if (lowerDesc.includes('light')) return 'fas fa-sun';
+            if (lowerDesc.includes('dark')) return 'fas fa-moon';
+            if (lowerDesc.includes('magic')) return 'fas fa-wand-magic-sparkles';
+
+            return 'fas fa-gem';
+        }
+
+        function clearInventory() {
+            if (forgedItems.length > 0) {
+                forgedItems = [];
+                localStorage.removeItem('forgedItems');
+                updateInventoryUI();
+            }
+        }
+
+        function setupInventorySystem() {
+            inventoryBtn.addEventListener('click', () => {
+                inventoryModal.style.display = 'flex';
+                setTimeout(() => inventoryModal.classList.add('show'), 10);
+
+                if (window.innerWidth <= 480) {
+                    document.body.classList.add('modal-open');
+                }
+
+                updateInventoryUI();
+            });
+
+            function closeInventoryModal() {
+                inventoryModal.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => {
+                    inventoryModal.style.display = 'none';
+                    inventoryModal.classList.remove('show');
+                    inventoryModal.style.animation = '';
+                    document.body.classList.remove('modal-open');
+                }, 300);
+            }
+
+            inventoryClose.addEventListener('click', closeInventoryModal);
+            closeInventoryBtn.addEventListener('click', closeInventoryModal);
+
+            inventoryModal.addEventListener('click', (e) => {
+                if (e.target === inventoryModal) {
+                    closeInventoryModal();
+                }
+            });
+
+            clearInventoryBtn.addEventListener('click', clearInventory);
+
+            updateInventoryUI();
+        }
 
         function updateExpectedItem() {
             const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
@@ -2480,17 +3053,49 @@
                 if (activeFilter === 'has-trait') {
                     filteredOres = oreData.filter(ore => ore.traits.some(trait => trait.type === 'weapon' || trait.type === 'all' || trait.type === 'armor'));
                 }
-
                 else if (activeFilter === 'has-weapon-trait') {
                     filteredOres = oreData.filter(ore => ore.traits.some(trait => trait.type === 'weapon' || trait.type === 'all'));
                 }
-
                 else if (activeFilter === 'has-armor-trait') {
                     filteredOres = oreData.filter(ore => ore.traits.some(trait => trait.type === 'armor' || trait.type === 'all'));
                 }
                 else {
                     filteredOres = oreData.filter(ore => ore.area === activeFilter);
                 }
+            }
+
+            if (currentSearchTerm.trim() !== '') {
+                const searchTerm = currentSearchTerm.toLowerCase().trim();
+                filteredOres = filteredOres.filter(ore =>
+                    ore.name.toLowerCase().includes(searchTerm) ||
+                    ore.area.toLowerCase().includes(searchTerm) ||
+                    ore.rarity.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (filteredOres.length === 0) {
+                oreInventory.innerHTML = `
+            <div class="search-empty-state">
+                <i class="fas fa-search"></i>
+                <p>No ores found matching "${currentSearchTerm}"</p>
+                <button id="clear-search-from-empty" 
+                        style="
+                            margin-top: 10px;
+                            padding: 8px 20px;
+                            background: var(--primary-light);
+                            border: 1px solid var(--primary);
+                            border-radius: 20px;
+                            color: var(--text);
+                            font-size: 0.85rem;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                        ">
+                    Clear Search
+                </button>
+            </div>
+        `;
+
+                return;
             }
 
             filteredOres.forEach(ore => {
@@ -2515,6 +3120,8 @@
                 oreElement.addEventListener('click', () => addOreToMix(ore.id));
                 oreInventory.appendChild(oreElement);
             });
+
+
         }
 
         function addOreToMix(oreId) {
@@ -2691,13 +3298,14 @@
 
                 const ore = oreData.find(o => o.id === traitInfo.oreId);
                 const oreColor = ore ? ore.color : 'var(--primary)';
+                const iconClass = getTraitIconClass(traitInfo.description);
 
                 traitElement.innerHTML = `
         <div class="trait-content">
             <div class="trait-name">
                 
                     
-                    <span style="color: ${oreColor}; font-weight: bold; text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);"><i class="fas fa-gem" style="color: ${oreColor}; font-size: 0.9rem;"></i> ${traitInfo.oreName}</span>
+                    <span style="color: ${oreColor}; font-weight: bold; text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);"><i class="fas ${iconClass}" style="color: ${oreColor}; font-size: 0.9rem;"></i> ${traitInfo.oreName}</span>
                     <span class="trait-percentage">${traitInfo.percentage.toFixed(1)}%</span>
                
             </div>
@@ -3058,6 +3666,22 @@
                 ore.traits.some(trait => trait.type === 'all' || trait.type === quickCraftType)
             );
 
+            const updateDisabledState = () => {
+                const allOptions = document.querySelectorAll('.trait-option');
+                const isMaxSelected = selectedTraits.length >= 4;
+
+                allOptions.forEach(option => {
+                    const oreId = parseInt(option.dataset.oreId);
+                    const isSelected = selectedTraits.some(trait => trait.oreId === oreId);
+
+                    if (isMaxSelected && !isSelected) {
+                        option.classList.add('disabled');
+                    } else {
+                        option.classList.remove('disabled');
+                    }
+                });
+            };
+
             availableTraits.forEach(ore => {
                 ore.traits.forEach(trait => {
                     if (trait.type === 'all' || trait.type === quickCraftType) {
@@ -3089,12 +3713,13 @@
 
                         option.addEventListener('click', () => {
                             const isSelected = option.classList.contains('selected');
+                            const isMaxSelected = selectedTraits.length >= 4;
+
+                            if (isMaxSelected && !isSelected) {
+                                return;
+                            }
 
                             if (!isSelected) {
-                                if (selectedTraits.length >= 4) {
-                                    return;
-                                }
-
                                 selectedTraits.push({
                                     oreId: ore.id,
                                     oreName: ore.name,
@@ -3106,20 +3731,14 @@
                                 selectedTraits = selectedTraits.filter(t => t.oreId !== ore.id);
                                 option.classList.remove('selected');
                             }
-
-                            updateSelectedTraitsCount();
+                            updateDisabledState();
                         });
 
                         traitOptions.appendChild(option);
                     }
                 });
             });
-
-            updateSelectedTraitsCount();
-        }
-
-        function updateSelectedTraitsCount() {
-            selectedTraitsCount.textContent = `Selected: ${selectedTraits.length}/4 traits`;
+            updateDisabledState();
         }
 
         function loadSummary() {
@@ -3193,10 +3812,11 @@
                 selectedTraits.forEach(trait => {
                     const ore = oreData.find(o => o.id === trait.oreId);
                     const oreColor = ore ? ore.color : 'var(--primary)';
+                    const traitIconClass = getTraitIconClass(trait.description);
 
                     summaryHTML += `
     <div style="background: ${oreColor}15; border: 1px solid ${oreColor}; border-radius: var(--border-radius); padding: 5px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
-        <i class="fas fa-gem" style="color: ${oreColor}; font-size: 0.85rem;"></i>
+        <i class="fas ${traitIconClass}" style="color: ${oreColor}; font-size: 0.85rem;"></i>
         <span style="color: ${oreColor}; font-weight: bold;">${trait.oreName}</span>
     </div>
 `;
@@ -3257,6 +3877,9 @@
         function applyQuickCraft() {
             const mixPlan = JSON.parse(summaryContent.dataset.mixPlan);
 
+            isQuickCraft = true;
+            quickCraftTargetItem = quickCraftItem.name;
+
             if (quickCraftType !== currentMode) {
                 currentMode = quickCraftType;
                 if (currentMode === 'weapon') {
@@ -3288,6 +3911,13 @@
 
             quickCraftModal.style.display = 'none';
             document.body.classList.remove('modal-open');
+
+            setTimeout(() => {
+                simulateForge();
+
+                isQuickCraft = false;
+                quickCraftTargetItem = null;
+            }, 100);
         }
 
         function resetQuickCraft() {
@@ -3296,7 +3926,12 @@
             selectedTraits = [];
             currentStep = 0;
 
-            document.querySelectorAll('.modal-option').forEach(o => o.classList.remove('selected'));
+            document.querySelectorAll('.modal-option').forEach(o => {
+                o.classList.remove('selected', 'disabled');
+            });
+            document.querySelectorAll('.trait-option').forEach(o => {
+                o.classList.remove('selected', 'disabled');
+            });
             document.querySelectorAll('.trait-checkbox').forEach(cb => cb.checked = false);
 
             [stepType, stepItem, stepTraits, stepSummary].forEach(step => {
@@ -3455,37 +4090,40 @@
             });
             const multiplier = multiplierSum / totalOres;
 
-            const probabilities = currentMode === 'weapon' ? weaponProbabilities : armorProbabilities;
-            const counts = Object.keys(probabilities).map(Number);
-            const closestCount = counts.reduce((prev, curr) => {
-                return (Math.abs(curr - totalOres) < Math.abs(prev - totalOres) ? curr : prev);
-            });
+            let selectedItemType;
 
-            const currentProbs = probabilities[closestCount] || {};
+            if (isQuickCraft && quickCraftTargetItem) {
+                selectedItemType = quickCraftTargetItem;
+            } else {
+                const probabilities = currentMode === 'weapon' ? weaponProbabilities : armorProbabilities;
+                const counts = Object.keys(probabilities).map(Number);
+                const closestCount = counts.reduce((prev, curr) => {
+                    return (Math.abs(curr - totalOres) < Math.abs(prev - totalOres) ? curr : prev);
+                });
 
-            let random = Math.random();
-            let selectedItemType = null;
-            let cumulativeProb = 0;
+                const currentProbs = probabilities[closestCount] || {};
 
-            for (const [itemType, prob] of Object.entries(currentProbs)) {
-                cumulativeProb += prob;
-                if (random <= cumulativeProb) {
-                    selectedItemType = itemType;
-                    break;
+                let random = Math.random();
+                selectedItemType = null;
+                let cumulativeProb = 0;
+
+                for (const [itemType, prob] of Object.entries(currentProbs)) {
+                    cumulativeProb += prob;
+                    if (random <= cumulativeProb) {
+                        selectedItemType = itemType;
+                        break;
+                    }
                 }
-            }
 
-            if (!selectedItemType) {
-                selectedItemType = Object.keys(currentProbs)[0];
+                if (!selectedItemType) {
+                    selectedItemType = Object.keys(currentProbs)[0];
+                }
             }
 
             const variant = getRandomVariant(selectedItemType);
             const itemName = variant.name.replace(/\s*\[.*?\]\s*/g, '');
-
             const mainOre = getMainOre();
-
             const scaledStats = calculateScaledStats(itemName, multiplier);
-
             const activeTraits = getActiveTraits();
 
             setTimeout(() => {
@@ -3499,6 +4137,19 @@
                     traits: activeTraits,
                     area: currentArea,
                     totalOres: totalOres
+                });
+
+                saveForgedItem({
+                    itemName: itemName,
+                    itemType: selectedItemType,
+                    variant: variant,
+                    multiplier: multiplier,
+                    mainOre: mainOre,
+                    stats: scaledStats,
+                    traits: activeTraits,
+                    area: currentArea,
+                    totalOres: totalOres,
+                    mode: currentMode
                 });
 
                 forgeBtn.innerHTML = originalText;
@@ -3521,7 +4172,7 @@
         <div class="forge-result-container" style="background: linear-gradient(135deg, ${bgColor}15 0%, ${bgColor}08 25%, rgba(0,0,0,0.1) 50%, ${bgColor}08 75%, ${bgColor}15 100%); border: 2px solid ${bgColor}40;">
             <div class="forge-result-header">
                 ${itemImage ? `
-                    <div class="forge-result-image" style="background-image: url('${itemImage}'); border-color: ${bgColor}; box-shadow: 0 0 25px ${bgColor}80;">
+                    <div class="forge-result-image" style="background-image: url('${itemImage}'); border-color: ${bgColor};">
                     </div>
                 ` : ''}
                 <div class="forge-result-details">
@@ -3591,7 +4242,7 @@
                         ${result.traits.map(trait => `
                             <div class="forge-trait-item" style="border-color: ${trait.oreColor || 'var(--primary)'}40;">
                                 <div class="forge-trait-ore" style="color: ${trait.oreColor || 'var(--primary)'};">
-                                    <i class="fas fa-gem"></i> ${trait.oreName} (${trait.percentage.toFixed(1)}%)
+                                    <i class="fas ${getTraitIconClass(trait.description)}"></i> ${trait.oreName} (${trait.percentage.toFixed(1)}%)
                                 </div>
                                 <div class="forge-trait-desc">
                                     ${trait.description.replace(
@@ -3650,7 +4301,7 @@
             '--primary': '#FF6600',
             '--primary-dark': '#cc5200',
             '--primary-light': 'rgba(255, 102, 0, 0.1)',
-            '--primary-glow': 'rgba(255, 102, 0, 0.3)',
+            '--primary-glow': 'rgba(255, 102, 0, 0.2)',
             '--text-secondary': '#ffa366',
             '--glow': '0 0 20px rgba(255, 102, 0, 0.4)'
         };
@@ -3659,7 +4310,7 @@
             '--primary': '#19b9b9',
             '--primary-dark': '#0a6e6e',
             '--primary-light': 'rgba(9, 119, 119, 0.1)',
-            '--primary-glow': 'rgba(13, 165, 165, 0.3)',
+            '--primary-glow': 'rgba(13, 165, 165, 0.2)',
             '--text-secondary': '#6fdcdc',
             '--glow': '0 0 20px rgba(13, 165, 165, 0.4)'
         };
@@ -3678,6 +4329,39 @@
             }
         }
 
+        function setupFiltersDropdown() {
+            filtersToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                filtersDropdown.classList.toggle('show');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!filtersDropdown.contains(e.target) && !filtersToggle.contains(e.target)) {
+                    filtersDropdown.classList.remove('show');
+                }
+            });
+
+            filterOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    filterOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    activeFilter = option.dataset.filter;
+                    filtersDropdown.classList.remove('show');
+                    filtersToggle.innerHTML = `<i class="fas fa-filter"></i> ${option.textContent}`;
+                    oreSearchInput.value = '';
+                    currentSearchTerm = '';
+
+                    renderOreInventory();
+                    updateOreSlots();
+                });
+            });
+
+            const initialActive = document.querySelector('.filter-option.active');
+            if (initialActive) {
+                filtersToggle.innerHTML = `<i class="fas fa-filter"></i> ${initialActive.textContent}`;
+            }
+        }
+
         function setupEventListeners() {
             weaponToggle.addEventListener('click', () => {
                 currentMode = 'weapon';
@@ -3686,6 +4370,7 @@
                 applyColorScheme(weaponColors);
                 updateProbabilities();
                 updateExpectedItem();
+                updatePredictedStats();
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
             });
 
@@ -3696,30 +4381,33 @@
                 applyColorScheme(armorColors);
                 updateProbabilities();
                 updateExpectedItem();
+                updatePredictedStats();
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
-            });
-
-            filterButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    filterButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    activeFilter = btn.dataset.filter;
-                    renderOreInventory();
-                    updateOreSlots();
-                });
             });
 
             resetBtn.addEventListener('click', () => {
                 oreMix = [];
+                oreSearchInput.value = '';
+                currentSearchTerm = '';
+                renderOreInventory();
                 updateOreSlots();
                 updateProbabilities();
             });
 
+            oreSearchInput.addEventListener('input', (e) => {
+                currentSearchTerm = e.target.value;
+                renderOreInventory();
+                updateOreSlots();
+            });
+
             const forgeBtn = document.getElementById('forge-btn');
             if (forgeBtn) {
-                forgeBtn.addEventListener('click', simulateForge);
+                forgeBtn.addEventListener('click', () => {
+                    isQuickCraft = false;
+                    quickCraftTargetItem = null;
+                    simulateForge();
+                });
             }
-
         }
 
         document.addEventListener('DOMContentLoaded', init);
