@@ -869,7 +869,7 @@
 
         .trait-description {
             font-size: 0.75rem;
-            color: var(--text);
+            color: var(--text-secondary);
             line-height: 1.4;
         }
 
@@ -1092,7 +1092,7 @@
         .forge-tag {
             padding: 6px 15px;
             border-radius: 20px;
-            font-size: 0.80rem;
+            font-size: 0.75rem;
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -1156,7 +1156,7 @@
         }
 
         .forge-trait-item {
-            background: linear-gradient(135deg, var(--primary-glow), var(--primary-light));
+            background: var(--primary-light);
             border: 1px solid var(--primary-light);
             border-radius: 10px;
             padding: 5px 10px;
@@ -1166,7 +1166,7 @@
 
         .forge-trait-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px var(--primary-glow);
+            box-shadow: var(--glow);
         }
 
         .forge-trait-ore {
@@ -1684,6 +1684,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            transition: all 0.3s ease;
         }
 
         .inventory-card::after {
@@ -1734,7 +1735,6 @@
         .inventory-card-stats {
             position: relative;
             z-index: 1;
-            margin-bottom: 15px;
             background: rgba(0, 0, 0, 0.4);
             border-radius: 8px;
             padding: 8px 12px 0px 12px;
@@ -1785,7 +1785,7 @@
             flex-wrap: wrap;
             flex-direction: row-reverse;
             gap: 6px;
-            margin-top: auto;
+            margin-top: 10px;
         }
 
         .trait-icon {
@@ -1926,6 +1926,7 @@
             text-align: center;
             font-style: italic;
             opacity: 0.8;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -2347,7 +2348,7 @@
             { id: 22, name: "Sapphire", multiplier: 2.25, rarity: "rare", area: "kingdom", color: "#7bbdfa", traitType: null, traits: [] },
             { id: 23, name: "Cuprite", multiplier: 2.43, rarity: "epic", area: "kingdom", color: "#7a3034", traitType: null, traits: [] },
             {
-                id: 24, name: "Obsidian", multiplier: 2.35, rarity: "epic", area: "kingdom", color: "#5b1fd5", traitType: "armor", traits: [
+                id: 24, name: "Obsidian", multiplier: 2.35, rarity: "epic", area: "kingdom", color: "#4b2e87", traitType: "armor", traits: [
                     { description: "+{health}% extra health.", scaling: { health: { min: 3, max: 30 } }, type: "armor" }
                 ]
             },
@@ -2428,6 +2429,20 @@
             { id: 44, name: "Dark Boneite", multiplier: 2.25, rarity: "rare", area: "enemy", color: "#696969", traitType: null, traits: [] },
             { id: 45, name: "Slimite", multiplier: 2.25, rarity: "epic", area: "enemy", color: "#32cd32", traitType: null, traits: [] }
         ];
+
+        const traitIconMapping = {
+            13: { icon: 'fas fa-skull-crossbones', color: '#5f4937' },
+            24: { icon: 'fas fa-heart', color: '#4b2e87' },
+            27: { icon: 'fas fa-crosshairs', color: '#8e4a4c' },
+            28: { icon: 'fas fa-skull', color: '#97c889' },
+            29: { icon: 'fas fa-heart', color: '#9f61fa' },
+            30: { icon: 'fas fa-fan', color: '#fab67f' },
+            31: { icon: 'fas fa-fire', color: '#a4532e' },
+            32: { icon: 'fas fa-bomb', color: '#f77b61' },
+            33: { icon: 'fas fa-running', color: '#9ac9fa' },
+            34: { icon: 'fas fa-fire', color: '#7d1b1d' },
+            35: { icon: 'fas fa-ghost', color: '#f0f0f0' }
+        };
 
         // Weapon probability data
         const weaponProbabilities = {
@@ -2895,7 +2910,7 @@
                 let traitsHTML = '';
                 if (item.traits && item.traits.length > 0) {
                     item.traits.forEach((trait, index) => {
-                        const iconClass = getTraitIconClass(trait.description);
+                        const iconClass = getTraitIconClass(trait.oreId);
                         traitsHTML += `
                     <div class="trait-icon" style="border-color: ${trait.oreColor || oreColor}; background: ${trait.oreColor || oreColor}30;">
                         <i class="${iconClass}"></i>
@@ -2912,7 +2927,7 @@
                 }
 
                 card.innerHTML = `
-            <div class="inventory-card-header" style="border-color: ${oreColor};">
+            <div class="inventory-card-header" style="border-color: ${oreColor}40;">
                 <div class="forge-result-image" style="border-color: ${oreColor}; background-image: url('${item.image}'); width: 120px; height: 90px;"></div>
                 <div style="flex-grow: 1; margin-left: 10px;">
                     <div class="inventory-card-ore">
@@ -2923,7 +2938,7 @@
                 </div>
             </div>
             
-            <div class="inventory-card-stats" style="border-color: ${oreColor};">
+            <div class="inventory-card-stats" style="border-color: ${oreColor}40;">
                 ${statsHTML}
             </div>
             
@@ -2934,9 +2949,9 @@
             ` : ''}
         `;
 
-                card.style.border = `2px solid ${oreColor}`;
+                card.style.border = `2px solid ${oreColor}40`;
                 card.style.setProperty('--ore-color', oreColor);
-                card.style.setProperty('--ore-color-light', `${oreColor}15`);
+                card.style.setProperty('--ore-color-light', `${oreColor}10`);
 
                 inventoryCards.appendChild(card);
             });
@@ -2949,23 +2964,25 @@
             );
         }
 
-        function getTraitIconClass(description) {
-            const lowerDesc = description.toLowerCase();
+        function getTraitIconClass(oreId) {
+            if (!oreId) return 'fas fa-gem';
 
-            if (lowerDesc.includes('fire')) return 'fas fa-fire';
-            if (lowerDesc.includes('explosion')) return 'fas fa-bomb';
-            if (lowerDesc.includes('shadow') || lowerDesc.includes('dodge')) return 'fas fa-ghost';
-            if (lowerDesc.includes('damage')) return 'fas fa-fan';
-            if (lowerDesc.includes('poison')) return 'fas fa-skull-crossbones';
-            if (lowerDesc.includes('max health')) return 'fas fa-skull';
-            if (lowerDesc.includes('critical') || lowerDesc.includes('crit')) return 'fas fa-crosshairs';
-            if (lowerDesc.includes('health')) return 'fas fa-heart';
-            if (lowerDesc.includes('speed')) return 'fas fa-running';
+            if (traitIconMapping[oreId]) {
+                return traitIconMapping[oreId].icon;
+            }
 
-            if (lowerDesc.includes('fear')) return 'fas fa-scared';
-            if (lowerDesc.includes('light')) return 'fas fa-sun';
-            if (lowerDesc.includes('dark')) return 'fas fa-moon';
-            if (lowerDesc.includes('magic')) return 'fas fa-wand-magic-sparkles';
+            const ore = oreData.find(o => o.id === oreId);
+            if (!ore) return 'fas fa-gem';
+
+            const lowerName = ore.name.toLowerCase();
+
+            if (lowerName.includes('fire') || lowerName.includes('magma')) return 'fas fa-fire';
+            if (lowerName.includes('demon') || lowerName.includes('dark')) return 'fas fa-ghost';
+            if (lowerName.includes('light')) return 'fas fa-running';
+            if (lowerName.includes('myth') || lowerName.includes('obsidian')) return 'fas fa-heart';
+            if (lowerName.includes('rival')) return 'fas fa-crosshairs';
+            if (lowerName.includes('uranium') || lowerName.includes('poop')) return 'fas fa-skull-crossbones';
+            if (lowerName.includes('eye')) return 'fas fa-fan';
 
             return 'fas fa-gem';
         }
@@ -3098,9 +3115,9 @@
             let traitsHTML = '';
             if (activeTraits.length > 0) {
                 traitsHTML = `
-            <div class="inventory-card-traits" style="margin-bottom: 5px;">
+            <div class="inventory-card-traits">
                 ${activeTraits.map((trait, index) => {
-                    const iconClass = getTraitIconClass(trait.description);
+                    const iconClass = getTraitIconClass(trait.oreId);
                     return `
                         <div class="trait-icon" style="border-color: ${trait.oreColor || oreColor}; background: ${trait.oreColor || oreColor}30;">
                             <i class="${iconClass}"></i>
@@ -3184,12 +3201,11 @@
             }
 
             previewCard.innerHTML = `
-        <div class="inventory-card-header" style="justify-content: space-between; border-color: ${oreColor}; margin-bottom: 10px;">
+        <div class="inventory-card-header" style="justify-content: space-between; border-color: ${oreColor}40;">
             ${itemImage ? `
                 <div class="forge-result-image" style="border-color: ${oreColor}; background-image: url('${itemImage}'); width: 120px; height: 90px;"></div>
             ` : ''}
             <div style="flex-grow: 1; margin-left: 10px;">
-                
                     <div class="inventory-card-item" style="color: ${oreColor}; margin-bottom: 5px;">${mainOre.name || 'Unknown Ore'} ${baseItemName}</div>
                 <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px; display: flex; gap: 5px; align-items: center;">
                     <span style="font-size: 0.7rem; font-weight: bold; background: ${oreColor}20; padding: 2px 8px; border-radius: 10px; border: 1px solid ${oreColor}40;">
@@ -3201,11 +3217,8 @@
                 </div>
             </div>
         </div>
-        
-        <div style="display: flex; gap: 15px; align-items: flex-start; margin-bottom: 10px;">            
+        <div style="display: flex; gap: 15px; align-items: flex-start;">
             <div style="flex: 1;">
-                
-                
                 <div class="inventory-card-stats" style="border-color: ${oreColor}40; margin-bottom: 0px;">
                     ${statsHTML}
                 </div>
@@ -3218,8 +3231,8 @@
             <i class="fas fa-info-circle"></i> Expected item • ${(highestProb * 100).toFixed(1)}% probability
         </div>
     `;
-
-            previewCard.style.borderColor = oreColor;
+            previewCard.style.background = `linear-gradient(135deg, ${oreColor}15 0%, ${oreColor}08 25%, rgba(0,0,0,0.1) 50%, ${oreColor}08 75%, ${oreColor}15 100%)`;
+            previewCard.style.borderColor = oreColor + '40';
             previewCard.style.setProperty('--ore-color', oreColor);
         }
 
@@ -3580,7 +3593,7 @@
 
                 const ore = oreData.find(o => o.id === traitInfo.oreId);
                 const oreColor = ore ? ore.color : 'var(--primary)';
-                const iconClass = getTraitIconClass(traitInfo.description);
+                const iconClass = getTraitIconClass(traitInfo.oreId);
 
                 traitElement.innerHTML = `
         <div class="trait-content">
@@ -3921,7 +3934,7 @@
     <div class="trait-info">
         <div class="trait-name">
             <div style="display: flex; align-items: center; gap: 6px;">
-                <i class="fas ${getTraitIconClass(trait.description)}" style="color: ${ore.color}; font-size: 1rem;"></i>
+                <i class="fas ${getTraitIconClass(option.dataset.oreId)}" style="color: ${ore.color}; font-size: 1rem;"></i>
                 <span style="color: ${ore.color}; font-weight: bold; font-size: 0.95rem;">${ore.name}</span>
                 <span style="font-size: 0.85rem; color: var(--text-secondary);">(${ore.multiplier}x)</span>
             </div>
@@ -4031,7 +4044,7 @@
                 selectedTraits.forEach(trait => {
                     const ore = oreData.find(o => o.id === trait.oreId);
                     const oreColor = ore ? ore.color : 'var(--primary)';
-                    const traitIconClass = getTraitIconClass(trait.description);
+                    const traitIconClass = getTraitIconClass(trait.oreId);
 
                     summaryHTML += `
     <div style="background: ${oreColor}15; border: 1px solid ${oreColor}; border-radius: var(--border-radius); padding: 5px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
@@ -4130,13 +4143,6 @@
 
             quickCraftModal.style.display = 'none';
             document.body.classList.remove('modal-open');
-
-            setTimeout(() => {
-                simulateForge();
-
-                isQuickCraft = false;
-                quickCraftTargetItem = null;
-            }, 100);
         }
 
         function resetQuickCraft() {
@@ -4280,7 +4286,8 @@
                                 oreName: ore.name,
                                 description: formattedDesc,
                                 percentage: percentage,
-                                oreColor: ore.color
+                                oreColor: ore.color,
+                                oreId: ore.id,
                             });
                         }
                     });
@@ -4402,16 +4409,16 @@
                         ${result.itemType} • ${result.mainOre?.rarity ? result.mainOre.rarity.charAt(0).toUpperCase() + result.mainOre.rarity.slice(1) : 'Common'}
                     </div>
                     <div class="forge-result-tags">
-                        <div class="forge-tag" style="background: var(--primary-light); color: var(--primary);">
+                        <div class="forge-tag" style="background: var(--primary-light); color: var(--text-secondary);">
                             <i class="fas fa-percent"></i> ${result.multiplier.toFixed(2)}x Multi
                         </div>
-                        <div class="forge-tag" style="background: var(--primary-light); color: var(--primary);">
+                        <div class="forge-tag" style="background: var(--primary-light); color: var(--text-secondary);">
                             <i class="fas fa-star"></i> [100]% Masterwork
                         </div>
-                        <div class="forge-tag" style="background: ${bgColor}30; color: ${bgColor};">
+                        <div class="forge-tag" style="background: ${bgColor}30; color: ${bgColor}; border-color: ${bgColor};">
                             <i class="fas fa-gem"></i> ${result.mainOre?.name || 'Stone'}
                         </div>
-                        <div class="forge-tag" style="background: ${areaBgColor}; color: ${areaColor};">
+                        <div class="forge-tag" style="background: ${areaBgColor}; color: ${areaColor}; border-color: ${areaColor};">
                             <i class="fas fa-map-marker-alt"></i> ${currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross'}
                         </div>
                     </div>
@@ -4461,7 +4468,7 @@
                         ${result.traits.map(trait => `
                             <div class="forge-trait-item" style="border-color: ${trait.oreColor || 'var(--primary)'}40;">
                                 <div class="forge-trait-ore" style="color: ${trait.oreColor || 'var(--primary)'};">
-                                    <i class="fas ${getTraitIconClass(trait.description)}"></i> ${trait.oreName} (${trait.percentage.toFixed(1)}%)
+                                    <i class="fas ${getTraitIconClass(trait.oreId)}"></i> ${trait.oreName} (${trait.percentage.toFixed(1)}%)
                                 </div>
                                 <div class="forge-trait-desc">
                                     ${trait.description.replace(
