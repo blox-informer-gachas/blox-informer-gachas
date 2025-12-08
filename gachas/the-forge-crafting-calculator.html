@@ -924,7 +924,7 @@
 
         .item-name {
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: var(--text);
             flex: 1;
         }
@@ -970,7 +970,7 @@
         }
 
         .probability-value {
-            font-size: 0.80rem;
+            font-size: 0.7rem;
             font-weight: bold;
             color: white;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
@@ -1547,7 +1547,7 @@
             }
 
             .probability-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -1680,7 +1680,7 @@
             min-height: 200px;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0px 12px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -1702,7 +1702,7 @@
 
         .inventory-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5),
+            box-shadow: 0 0px 12px rgba(0, 0, 0, 0.5),
                 0 0 20px var(--primary-glow);
             border-color: var(--primary);
         }
@@ -1734,7 +1734,6 @@
 
         .inventory-card-stats {
             position: relative;
-            z-index: 1;
             background: rgba(0, 0, 0, 0.4);
             border-radius: 8px;
             padding: 8px 12px 0px 12px;
@@ -1928,6 +1927,20 @@
             opacity: 0.8;
             margin-top: 10px;
         }
+
+        .preview-tooltip-trigger {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .preview-tooltip-trigger:hover {
+            transform: translateY(-3px);
+            transition: all 0.2s ease;
+        }
+
+        .preview-variant-tooltip {
+            pointer-events: auto !important;
+        }
     </style>
 </head>
 
@@ -2061,8 +2074,8 @@
 
             <div class="forge-preview-container" id="item-preview-container">
                 <div class="forge-preview-placeholder" id="forge-preview-placeholder">
-                    <i class="fas fa-question-circle"></i>
-                    <p>Add 3+ ores to see item preview</p>
+                    <i class="fas fa-info-circle"></i>
+                    <p>Minimum 3 ores are required to forge an item</p>
                 </div>
 
                 <div class="inventory-card forge-preview-card" id="forge-preview-card" style="display: none;">
@@ -2082,7 +2095,7 @@
                     <span><i class="fas fa-magic"></i> Ore Traits</span>
                 </div>
                 <div class="traits-grid" id="active-traits">
-                    <div class="trait-placeholder">Add ores with traits to see effects...</div>
+                    <div class="trait-placeholder">Add ores with traits to see effects (10% at least)...</div>
                 </div>
             </div>
         </section>
@@ -3205,16 +3218,27 @@
             ${itemImage ? `
                 <div class="forge-result-image" style="border-color: ${oreColor}; background-image: url('${itemImage}'); width: 120px; height: 90px;"></div>
             ` : ''}
-            <div style="flex-grow: 1; margin-left: 10px;">
+            <div style="flex-grow: 1; margin-left: 10px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
                     <div class="inventory-card-item" style="color: ${oreColor}; margin-bottom: 5px;">${mainOre.name || 'Unknown Ore'} ${baseItemName}</div>
-                <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px; display: flex; gap: 5px; align-items: center;">
-                    <span style="font-size: 0.7rem; font-weight: bold; background: ${oreColor}20; padding: 2px 8px; border-radius: 10px; border: 1px solid ${oreColor}40;">
-                        ${highestItem}
-                    </span>
+
+                    <div style="display: flex; align-items: center; gap: 5px; position: relative;">
+    <span style="color: var(--text-secondary); margin-bottom: 5px; font-size: 0.7rem; font-weight: bold; background: ${oreColor}20; padding: 2px 8px 2px 8px; border-radius: 10px; border: 1px solid ${oreColor}40;">
+        ${highestItem}
+    </span>
+    <div class="preview-tooltip-trigger" data-item-type="${highestItem}" style="cursor: pointer; color: ${oreColor}; margin-bottom: 5px;">
+        <i class="fas fa-info-circle" style="font-size: 1.1rem;"></i>
+        <div class="preview-variant-tooltip" style="display: none; position: absolute; left: 0; background: var(--card-bg); border: 1px solid ${oreColor}; border-radius: 8px; padding: 10px; min-width: 180px; max-width: 220px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); right: -75px;">
+            <div style="font-weight: bold; color: ${oreColor}; margin-bottom: 5px; font-size: 0.8rem;">Available Variants</div>
+            <div style="color: var(--text-secondary); font-size: 0.75rem; line-height: 1.3;">
+                ${getPreviewTooltipContent(highestItem, oreColor)}
+            </div>
+        </div>
+    </div>
+</div>
                     <span class="preview-multiplier" style="font-weight: bold; background: ${oreColor}20; color: ${oreColor}; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; border: 1px solid ${oreColor}40;">
                 ${multiplier.toFixed(2)}x
             </span>
-                </div>
+
             </div>
         </div>
         <div style="display: flex; gap: 15px; align-items: flex-start;">
@@ -3234,6 +3258,79 @@
             previewCard.style.background = `linear-gradient(135deg, ${oreColor}15 0%, ${oreColor}08 25%, rgba(0,0,0,0.1) 50%, ${oreColor}08 75%, ${oreColor}15 100%)`;
             previewCard.style.borderColor = oreColor + '40';
             previewCard.style.setProperty('--ore-color', oreColor);
+
+            document.addEventListener('mouseover', (e) => {
+                const trigger = e.target.closest('.preview-tooltip-trigger');
+                if (trigger) {
+                    const tooltip = trigger.querySelector('.preview-variant-tooltip');
+                    if (tooltip) {
+                        tooltip.style.display = 'block';
+
+                        // Position tooltip
+                        const rect = trigger.getBoundingClientRect();
+                        tooltip.style.left = '0';
+
+                        // Check if tooltip goes off screen
+                        const tooltipRect = tooltip.getBoundingClientRect();
+                        if (tooltipRect.right > window.innerWidth) {
+                            tooltip.style.left = 'auto';
+                        }
+                    }
+                }
+            });
+
+            document.addEventListener('mouseout', (e) => {
+                const trigger = e.target.closest('.preview-tooltip-trigger');
+                if (trigger) {
+                    const tooltip = trigger.querySelector('.preview-variant-tooltip');
+                    if (tooltip && !tooltip.matches(':hover') && !trigger.matches(':hover')) {
+                        tooltip.style.display = 'none';
+                    }
+                }
+            });
+
+            // Also handle tooltip hover to keep it visible
+            document.addEventListener('mouseover', (e) => {
+                if (e.target.closest('.preview-variant-tooltip')) {
+                    e.target.closest('.preview-variant-tooltip').style.display = 'block';
+                }
+            });
+
+            document.addEventListener('mouseout', (e) => {
+                const tooltip = e.target.closest('.preview-variant-tooltip');
+                if (tooltip) {
+                    const related = e.relatedTarget;
+                    if (!tooltip.contains(related) && !tooltip.previousElementSibling?.contains(related)) {
+                        tooltip.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        function getPreviewTooltipContent(itemType, color) {
+            const variants = specificItemVariants[currentMode]?.[itemType]?.[currentArea];
+
+            if (!variants || variants.length === 0) {
+                return `<div style="color: var(--text-secondary);">No specific variants available</div>`;
+            }
+
+            let html = `<div style="display: flex; flex-direction: column; gap: 3px;">`;
+
+            variants.forEach(variant => {
+                const areaExclusive = variant.name.includes('[') ? variant.name.match(/\[(.*?)\]/)?.[1] : null;
+                const cleanName = variant.name.replace(/\s*\[.*?\]\s*/, '');
+                const probability = (variant.probability * 100).toFixed(1);
+
+                html += `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <div style="color: var(--text); font-weight: 600; font-size: 0.75rem;">${cleanName}</div>
+                <div style="color: ${color}; font-weight: bold; font-size: 0.7rem; background: ${color}20; padding: 1px 6px; border-radius: 4px;">${variant.chance}</div>
+            </div>
+        `;
+            });
+
+            html += `</div>`;
+            return html;
         }
 
         function showVariantTooltip(itemName, event, typeClass = '') {
@@ -3530,7 +3627,7 @@
             activeTraitsContainer.innerHTML = '';
 
             if (oreMix.length === 0) {
-                activeTraitsContainer.innerHTML = '<div class="trait-placeholder">Add ores with traits to see effects...</div>';
+                activeTraitsContainer.innerHTML = '<div class="trait-placeholder">Add ores with traits to see effects (10% at least)...</div>';
                 return;
             }
 
