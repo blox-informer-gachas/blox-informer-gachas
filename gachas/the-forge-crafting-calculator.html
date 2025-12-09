@@ -4912,7 +4912,7 @@
                 weaponToggle.classList.add('active');
                 armorToggle.classList.remove('active');
                 applyColorScheme(weaponColors);
-                resetPreviewSelection(); // Reset variant selection
+                resetPreviewSelection();
                 updateProbabilities();
                 updateItemPreview();
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
@@ -4923,7 +4923,7 @@
                 armorToggle.classList.add('active');
                 weaponToggle.classList.remove('active');
                 applyColorScheme(armorColors);
-                resetPreviewSelection(); // Reset variant selection
+                resetPreviewSelection();
                 updateProbabilities();
                 updateItemPreview();
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
@@ -4933,7 +4933,7 @@
                 oreMix = [];
                 oreSearchInput.value = '';
                 currentSearchTerm = '';
-                resetPreviewSelection(); // Reset variant selection
+                resetPreviewSelection();
                 renderOreInventory();
                 updateOreSlots();
                 updateProbabilities();
