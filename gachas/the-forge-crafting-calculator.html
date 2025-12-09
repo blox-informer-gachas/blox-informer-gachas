@@ -1915,7 +1915,7 @@
         }
 
         .prediction-note {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
             text-align: center;
             font-style: italic;
@@ -1929,7 +1929,6 @@
         }
 
         .preview-tooltip-trigger:hover {
-            transform: translateY(-3px);
             transition: all 0.2s ease;
         }
 
@@ -2020,6 +2019,24 @@
             z-index: 1;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .variant-option {
+            transition: all 0.2s ease !important;
+        }
+
+        .variant-option:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .variant-selected {
+            font-weight: bold !important;
+            position: relative !important;
+        }
+
+        .preview-variant-tooltip {
+            animation: tooltipFadeIn 0.2s ease !important;
         }
     </style>
 </head>
@@ -2831,6 +2848,7 @@
         let currentSearchTerm = '';
         let isQuickCraft = false;
         let quickCraftTargetItem = null;
+        let selectedPreviewVariant = { baseItemType: null, variantName: null };
         const oreSearchInput = document.getElementById('ore-search');
         const filtersToggle = document.getElementById('filters-toggle');
         const filtersDropdown = document.getElementById('filters-dropdown');
@@ -3184,16 +3202,26 @@
                 return;
             }
 
-            let baseItemName = Object.keys(baseItemStats[currentMode]).find(name => {
-                const itemData = baseItemStats[currentMode][name];
-                return itemData.type === highestItem;
-            });
+            if (selectedPreviewVariant.baseItemType && selectedPreviewVariant.baseItemType !== highestItem) {
+                selectedPreviewVariant = { baseItemType: null, variantName: null };
+            }
 
-            if (!baseItemName && currentMode === 'armor') {
-                baseItemName = Object.keys(baseItemStats.armor).find(name => {
-                    const itemData = baseItemStats.armor[name];
+            let baseItemName;
+
+            if (selectedPreviewVariant.baseItemType === highestItem && selectedPreviewVariant.variantName) {
+                baseItemName = selectedPreviewVariant.variantName;
+            } else {
+                baseItemName = Object.keys(baseItemStats[currentMode]).find(name => {
+                    const itemData = baseItemStats[currentMode][name];
                     return itemData.type === highestItem;
                 });
+
+                if (!baseItemName && currentMode === 'armor') {
+                    baseItemName = Object.keys(baseItemStats.armor).find(name => {
+                        const itemData = baseItemStats.armor[name];
+                        return itemData.type === highestItem;
+                    });
+                }
             }
 
             if (!baseItemName) return;
@@ -3247,94 +3275,91 @@
             let statsHTML = '';
             if (currentMode === 'weapon') {
                 statsHTML = `
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-fan"></i> Damage
-                    </span>
-                    <span class="inventory-stat-value" style="color: var(--primary);">
-                        ${scaledStats.damage.toFixed(2) || '0.00'}
-                    </span>
-                </div>
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-bolt"></i> Attack Speed
-                    </span>
-                    <span class="inventory-stat-value" style="color: var(--rare);">
-                        ${scaledStats.atkSpeed.toFixed(2) || '0.00'}s
-                    </span>
-                </div>
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-ruler"></i> Range
-                    </span>
-                    <span class="inventory-stat-value" style="color: var(--relic)">
-                        ${scaledStats.range || '0'} studs
-                    </span>
-                </div>
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-coins"></i> Value
-                    </span>
-                    <span class="inventory-stat-value" style="color: gold;">
-                        $${Math.round(scaledStats.price) || '0'}
-                    </span>
-                </div>
-            `;
+            <div class="inventory-stat-row">
+                <span class="inventory-stat-label">
+                    <i class="fas fa-fan"></i> Damage
+                </span>
+                <span class="inventory-stat-value" style="color: var(--primary);">
+                    ${scaledStats.damage.toFixed(2) || '0.00'}
+                </span>
+            </div>
+            <div class="inventory-stat-row">
+                <span class="inventory-stat-label">
+                    <i class="fas fa-bolt"></i> Attack Speed
+                </span>
+                <span class="inventory-stat-value" style="color: var(--rare);">
+                    ${scaledStats.atkSpeed.toFixed(2) || '0.00'}s
+                </span>
+            </div>
+            <div class="inventory-stat-row">
+                <span class="inventory-stat-label">
+                    <i class="fas fa-ruler"></i> Range
+                </span>
+                <span class="inventory-stat-value" style="color: var(--relic)">
+                    ${scaledStats.range || '0'} studs
+                </span>
+            </div>
+            <div class="inventory-stat-row">
+                <span class="inventory-stat-label">
+                    <i class="fas fa-coins"></i> Value
+                </span>
+                <span class="inventory-stat-value" style="color: gold;">
+                    $${Math.round(scaledStats.price) || '0'}
+                </span>
+            </div>
+        `;
             } else {
                 statsHTML = `
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-heart"></i> Health Bonus
-                    </span>
-                    <span class="inventory-stat-value" style="color: var(--success);">
-                        +${scaledStats.health.toFixed(2) || '0'}%
-                    </span>
-                </div>
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-shield-alt"></i> DEF
-                    </span>
-                    <span class="inventory-stat-value" style="color: var(--primary);">
-                        ${Math.round(scaledStats.def) || '0'}
-                    </span>
-                </div>
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-coins"></i> Value
-                    </span>
-                    <span class="inventory-stat-value" style="color: gold;">
-                        $${Math.round(scaledStats.price) || '0'}
-                    </span>
-                </div>
-            `;
+            <div class="inventory-stat-row">
+                <span class="inventory-stat-label">
+                    <i class="fas fa-heart"></i> Health Bonus
+                </span>
+                <span class="inventory-stat-value" style="color: var(--success);">
+                    +${scaledStats.health.toFixed(2) || '0'}%
+                </span>
+            </div>
+            <div class="inventory-stat-row">
+                <span class="inventory-stat-label">
+                    <i class="fas fa-shield-alt"></i> DEF
+                </span>
+                <span class="inventory-stat-value" style="color: var(--primary);">
+                    ${Math.round(scaledStats.def) || '0'}
+                </span>
+            </div>
+            <div class="inventory-stat-row">
+                <span class="inventory-stat-label">
+                    <i class="fas fa-coins"></i> Value
+                </span>
+                <span class="inventory-stat-value" style="color: gold;">
+                    $${Math.round(scaledStats.price) || '0'}
+                </span>
+            </div>
+        `;
             }
 
             previewCard.innerHTML = `
-        <div class="inventory-card-header" style="justify-content: space-between; border-color: ${oreColor}40;">
+        <div class="inventory-card-header" style="justify-content: space-between; border-color: ${oreColor}40; position: relative;">
             ${itemImage ? `
                 <div class="forge-result-image" style="border-color: ${oreColor}; background-image: url('${itemImage}'); width: 120px; height: 90px;"></div>
             ` : ''}
             <div style="flex-grow: 1; margin-left: 10px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
-                    <div class="inventory-card-item" style="color: ${oreColor}; margin-bottom: 5px;">${mainOre.name || 'Unknown Ore'} ${baseItemName}</div>
-
-                    <div style="display: flex; align-items: center; gap: 5px; position: relative;">
-    <span style="color: var(--text-secondary); margin-bottom: 5px; font-size: 0.7rem; font-weight: bold; background: ${oreColor}20; padding: 2px 8px 2px 8px; border-radius: 10px; border: 1px solid ${oreColor}40;">
-        ${highestItem}
-    </span>
-    <div class="preview-tooltip-trigger" data-item-type="${highestItem}" style="cursor: pointer; color: ${oreColor}; margin-bottom: 5px;">
-        <i class="fas fa-info-circle" style="font-size: 1.1rem;"></i>
-        <div class="preview-variant-tooltip" style="display: none; position: absolute; left: 0; background: var(--card-bg); border: 1px solid ${oreColor}; border-radius: 8px; padding: 10px; min-width: 180px; max-width: 220px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); right: -75px;">
-            <div style="font-weight: bold; color: ${oreColor}; margin-bottom: 5px; font-size: 0.8rem;">Available Variants</div>
-            <div style="color: var(--text-secondary); font-size: 0.75rem; line-height: 1.3;">
-                ${getPreviewTooltipContent(highestItem, oreColor)}
-            </div>
-        </div>
-    </div>
-</div>
-                    <span class="preview-multiplier" style="font-weight: bold; background: ${oreColor}20; color: ${oreColor}; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; border: 1px solid ${oreColor}40;">
-                ${multiplier.toFixed(2)}x
-            </span>
-
+                <div class="inventory-card-item" style="color: ${oreColor}; margin-bottom: 5px;">${mainOre?.name || 'Unknown Ore'} ${baseItemName}</div>
+                <div style="display: flex; align-items: center; gap: 5px; position: relative; flex-wrap: wrap;">
+                    <span style="color: var(--text-secondary);font-weight: bold; background: ${oreColor}20; padding: 2px 8px 2px 8px; border-radius: 10px; border: 1px solid ${oreColor}40;">
+                        <div class="preview-tooltip-trigger" data-item-type="${highestItem}" style="cursor: pointer; color: ${oreColor}; font-size: 0.8rem;">
+                        <i class="fas fa-info-circle"></i> ${highestItem}
+<div class="preview-variant-tooltip" style="display: none; position: absolute; background: var(--card-bg); border: 1px solid ${oreColor}; border-radius: 8px; padding: 10px; min-width: 180px; max-width: 220px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); left: -60px;">
+                            <div style="font-weight: bold; color: ${oreColor}; margin-bottom: 5px; font-size: 0.8rem;">Available Variants</div>
+                            <div style="color: var(--text-secondary); font-size: 0.75rem; line-height: 1.3;">
+                                ${getPreviewTooltipContent(highestItem, oreColor)}
+                            </div>
+                        </div>
+                    </div>
+                    </span>
+                    <span class="preview-multiplier" style="font-weight: bold; background: ${oreColor}20; color: ${oreColor}; font-size: 0.8rem; padding: 2px 8px; border-radius: 10px; border: 1px solid ${oreColor}40;">
+                    ${multiplier.toFixed(2)}x
+                </span>
+                </div> 
             </div>
         </div>
         <div style="display: flex; gap: 15px; align-items: flex-start;">
@@ -3348,59 +3373,73 @@
         ${traitsHTML}
         
         <div class="prediction-note">
-            <i class="fas fa-info-circle"></i> Expected item • ${(highestProb * 100).toFixed(1)}% probability
-        </div>
+            <i class="fas fa-info-circle"></i> <span style="font-weight: bold;">${(calculateFinalProbability(highestItem, highestProb) * 100).toFixed(1)}%</span> forge chance for the ${selectedPreviewVariant.variantName || highestItem} variant.
+        </div
     `;
+
             previewCard.style.background = `linear-gradient(135deg, ${oreColor}15 0%, ${oreColor}08 25%, rgba(0,0,0,0.1) 50%, ${oreColor}08 75%, ${oreColor}15 100%)`;
             previewCard.style.borderColor = oreColor + '40';
             previewCard.style.setProperty('--ore-color', oreColor);
 
-            document.addEventListener('mouseover', (e) => {
-                const trigger = e.target.closest('.preview-tooltip-trigger');
-                if (trigger) {
-                    const tooltip = trigger.querySelector('.preview-variant-tooltip');
-                    if (tooltip) {
-                        tooltip.style.display = 'block';
+            const tooltipTrigger = previewCard.querySelector('.preview-tooltip-trigger');
+            const tooltip = tooltipTrigger?.querySelector('.preview-variant-tooltip');
 
-                        // Position tooltip
-                        const rect = trigger.getBoundingClientRect();
-                        tooltip.style.left = '0';
+            tooltipTrigger.addEventListener('mouseenter', () => {
+                tooltip.style.display = 'block';
+            });
+            tooltipTrigger.addEventListener('mouseleave', () => {
+                tooltip.style.display = 'none';
+            });
 
-                        // Check if tooltip goes off screen
-                        const tooltipRect = tooltip.getBoundingClientRect();
-                        if (tooltipRect.right > window.innerWidth) {
-                            tooltip.style.left = 'auto';
-                        }
+            if (tooltipTrigger && tooltip) {
+                tooltip.addEventListener('click', function (e) {
+                    const variantOption = e.target.closest('.variant-option');
+                    if (variantOption) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const variantName = variantOption.dataset.variantName;
+                        const baseType = variantOption.dataset.baseType;
+
+                        selectPreviewVariant(baseType, variantName);
                     }
-                }
-            });
+                });
+            }
+        }
 
-            document.addEventListener('mouseout', (e) => {
-                const trigger = e.target.closest('.preview-tooltip-trigger');
-                if (trigger) {
-                    const tooltip = trigger.querySelector('.preview-variant-tooltip');
-                    if (tooltip && !tooltip.matches(':hover') && !trigger.matches(':hover')) {
-                        tooltip.style.display = 'none';
-                    }
-                }
-            });
+        function resetPreviewSelection() {
+            selectedPreviewVariant = { baseItemType: null, variantName: null };
+            updateItemPreview();
+        }
 
-            // Also handle tooltip hover to keep it visible
-            document.addEventListener('mouseover', (e) => {
-                if (e.target.closest('.preview-variant-tooltip')) {
-                    e.target.closest('.preview-variant-tooltip').style.display = 'block';
-                }
-            });
 
-            document.addEventListener('mouseout', (e) => {
-                const tooltip = e.target.closest('.preview-variant-tooltip');
-                if (tooltip) {
-                    const related = e.relatedTarget;
-                    if (!tooltip.contains(related) && !tooltip.previousElementSibling?.contains(related)) {
-                        tooltip.style.display = 'none';
-                    }
-                }
-            });
+
+        function calculateFinalProbability(itemType, itemTypeProb) {
+            const variants = specificItemVariants[currentMode]?.[itemType]?.[currentArea];
+
+            if (!variants || variants.length === 0) {
+                return itemTypeProb;
+            }
+
+            const totalWeight = variants.reduce((sum, variant) => sum + variant.probability, 0);
+
+            if (totalWeight === 0) {
+                return itemTypeProb;
+            }
+
+            let selectedVariant = null;
+            if (selectedPreviewVariant.baseItemType === itemType && selectedPreviewVariant.variantName) {
+                selectedVariant = variants.find(v => {
+                    const cleanName = v.name.replace(/\s*\[.*?\]\s*/, '');
+                    return cleanName === selectedPreviewVariant.variantName;
+                });
+            }
+
+            if (!selectedVariant) {
+                selectedVariant = variants[0];
+            }
+
+            return itemTypeProb * (selectedVariant.probability / totalWeight);
         }
 
         function getPreviewTooltipContent(itemType, color) {
@@ -3410,23 +3449,79 @@
                 return `<div style="color: var(--text-secondary);">No specific variants available</div>`;
             }
 
+            if (!selectedPreviewVariant.baseItemType || selectedPreviewVariant.baseItemType !== itemType) {
+                const firstVariant = variants[0];
+                const cleanFirstName = firstVariant.name.replace(/\s*\[.*?\]\s*/, '');
+                selectedPreviewVariant = { baseItemType: itemType, variantName: cleanFirstName };
+            }
+
             let html = `<div style="display: flex; flex-direction: column; gap: 3px;">`;
 
             variants.forEach(variant => {
                 const areaExclusive = variant.name.includes('[') ? variant.name.match(/\[(.*?)\]/)?.[1] : null;
                 const cleanName = variant.name.replace(/\s*\[.*?\]\s*/, '');
                 const probability = (variant.probability * 100).toFixed(1);
+                const isSelected = (selectedPreviewVariant.baseItemType === itemType &&
+                    selectedPreviewVariant.variantName === cleanName);
 
                 html += `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <div style="color: var(--text); font-weight: 600; font-size: 0.75rem;">${cleanName}</div>
-                <div style="color: ${color}; font-weight: bold; font-size: 0.7rem; background: ${color}20; padding: 1px 6px; border-radius: 4px;">${variant.chance}</div>
+            <div class="variant-option ${isSelected ? 'variant-selected' : ''}" 
+                 data-variant-name="${cleanName}" 
+                 data-base-type="${itemType}"
+                 style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 6px 8px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    background: ${isSelected ? color + '30' : 'transparent'};
+                    border: 1px solid ${isSelected ? color : 'transparent'};
+                    border-bottom: 1px solid ${color};
+                 "
+                 onmouseover="this.style.background='${color}20'; this.style.transform='translateY(-1px)'"
+                 onmouseout="this.style.background='${isSelected ? color + '30' : 'transparent'}'; this.style.transform='translateY(0px)'">
+                <div style="
+                    color: var(--text); 
+                    font-weight: ${isSelected ? 'bold' : '600'}; 
+                    font-size: 0.75rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;">
+                    ${cleanName}
+                </div>
+                <div style="
+                    color: ${color}; 
+                    font-weight: bold; 
+                    font-size: 0.7rem; 
+                    background: ${color}20; 
+                    padding: 2px 6px; 
+                    border-radius: 4px;">
+                    ${variant.chance}
+                </div>
             </div>
         `;
             });
 
             html += `</div>`;
             return html;
+        }
+
+        function selectPreviewVariant(baseItemType, variantName) {
+            if (selectedPreviewVariant.baseItemType === baseItemType &&
+                selectedPreviewVariant.variantName === variantName) {
+                selectedPreviewVariant = { baseItemType: null, variantName: null };
+            } else {
+                selectedPreviewVariant = { baseItemType: baseItemType, variantName: variantName };
+            }
+
+            updateItemPreview();
+
+            const tooltip = document.querySelector('.preview-variant-tooltip');
+            if (tooltip) {
+                tooltip.style.display = 'none';
+            }
         }
 
         function showVariantTooltip(itemName, event, typeClass = '') {
@@ -4344,6 +4439,7 @@
                     weaponToggle.classList.remove('active');
                     applyColorScheme(armorColors);
                 }
+                resetPreviewSelection();
                 updateProbabilities();
             }
 
@@ -4816,6 +4912,7 @@
                 weaponToggle.classList.add('active');
                 armorToggle.classList.remove('active');
                 applyColorScheme(weaponColors);
+                resetPreviewSelection(); // Reset variant selection
                 updateProbabilities();
                 updateItemPreview();
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
@@ -4826,6 +4923,7 @@
                 armorToggle.classList.add('active');
                 weaponToggle.classList.remove('active');
                 applyColorScheme(armorColors);
+                resetPreviewSelection(); // Reset variant selection
                 updateProbabilities();
                 updateItemPreview();
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
@@ -4835,11 +4933,11 @@
                 oreMix = [];
                 oreSearchInput.value = '';
                 currentSearchTerm = '';
+                resetPreviewSelection(); // Reset variant selection
                 renderOreInventory();
                 updateOreSlots();
                 updateProbabilities();
             });
-
             oreSearchInput.addEventListener('input', (e) => {
                 currentSearchTerm = e.target.value;
                 renderOreInventory();
