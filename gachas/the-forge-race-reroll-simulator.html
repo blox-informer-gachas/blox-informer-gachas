@@ -64,7 +64,6 @@
             opacity: 0.98;
         }
 
-        /* Header */
         header {
             text-align: center;
             padding: 15px;
@@ -105,7 +104,6 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
         }
 
-        /* Main Compact Layout */
         .main-compact-section {
             background: linear-gradient(145deg, #1e1e1e80 0%, #2a2a2a80 100%);
             border-radius: var(--border-radius);
@@ -115,7 +113,6 @@
             animation: fadeInUp 0.5s ease-out;
             position: relative;
             overflow: hidden;
-            margin-bottom: 15px;
         }
 
         .main-compact-section::before {
@@ -151,14 +148,13 @@
         }
 
         .slot-indicator {
-            font-size: 0.85rem;
+            font-size: 0.80rem;
             color: var(--text-secondary);
             background: var(--primary-light);
-            padding: 4px 10px;
+            padding: 2px 8px;
             border-radius: 15px;
         }
 
-        /* Left: Race Slots */
         .compact-left {
             display: flex;
             flex-direction: column;
@@ -187,6 +183,7 @@
             border: 3px solid var(--primary);
             background-color: var(--primary-light);
             box-shadow: var(--glow);
+            transition: all 0.3s ease;
         }
 
         .compact-slot:hover:not(.active) {
@@ -238,7 +235,6 @@
             font-weight: bold;
         }
 
-        /* Middle: Race Display with Stats Overlay */
         .compact-middle {
             display: flex;
             flex-direction: column;
@@ -268,7 +264,7 @@
             top: 0;
             left: 0;
             opacity: 0.9;
-            transition: all 0.5s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .race-name-text {
@@ -288,7 +284,7 @@
             font-weight: bold;
             color: white;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .stats-overlay {
@@ -396,7 +392,6 @@
             border-color: var(--primary);
         }
 
-        /* Right: Race Chances & Probability Calculator */
         .compact-right {
             display: flex;
             flex-direction: column;
@@ -516,18 +511,16 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
         }
 
-        /* Race Perks */
 
         .perks-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-top: 10px;
-            max-height: 200px;
             overflow-y: auto;
             padding-right: 5px;
             padding-top: 5px;
             padding-bottom: 5px;
+            max-height: 610px;
         }
 
         .perk-item {
@@ -538,8 +531,48 @@
             display: flex;
             align-items: flex-start;
             gap: 10px;
-            transition: all var(--animation-speed) ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+        }
+
+        @keyframes gentlePulse {
+
+            0%,
+            100% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes raceImageReveal {
+            0% {
+                opacity: 0;
+                transform: scale(0.95);
+                filter: blur(2px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes smoothFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .perk-item::before {
@@ -587,7 +620,6 @@
             line-height: 1.4;
         }
 
-        /* Modals */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -698,7 +730,6 @@
             color: var(--text);
         }
 
-        /* Tooltip */
         .tooltip {
             display: none;
             position: fixed;
@@ -827,21 +858,15 @@
             line-height: 1.5;
         }
 
-        /* Highlight important text in perks */
         .perk-highlight {
             color: var(--primary);
             font-weight: 700;
-            border-radius: 4px;
-            display: inline-block;
-            margin: 0 2px;
         }
 
-        /* Hide the old input */
         #target-race-compact {
             display: none;
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -860,7 +885,6 @@
             background: linear-gradient(135deg, var(--primary-dark), var(--primary));
         }
 
-        /* Animations */
         @keyframes tooltipFadeIn {
             from {
                 opacity: 0;
@@ -936,12 +960,8 @@
                 opacity: 0.5;
             }
 
-            50% {
-                opacity: 1;
-            }
-
             100% {
-                opacity: 0.5;
+                opacity: 1;
             }
         }
 
@@ -957,7 +977,6 @@
             }
         }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
             .compact-container {
                 grid-template-columns: 1fr;
@@ -1016,7 +1035,6 @@
             }
         }
 
-        /* Reroll animation styles */
         .rolling-overlay {
             position: absolute;
             top: 0;
@@ -1029,7 +1047,7 @@
             align-items: center;
             justify-content: center;
             border-radius: inherit;
-            animation: overlayFadeIn 0.3s ease-out;
+            animation: overlayFadeIn 0.2s ease-out;
         }
 
         @keyframes overlayFadeIn {
@@ -1058,7 +1076,6 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) !important;
-            /* Force centering */
             font-size: 2.5rem;
             font-weight: 800;
             text-transform: uppercase;
@@ -1069,7 +1086,6 @@
             text-align: center;
             width: 100%;
             will-change: transform, opacity;
-            /* Better performance */
         }
 
         .final-rolling-name {
@@ -1077,7 +1093,6 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) !important;
-            /* Force centering */
             font-size: 3rem;
             font-weight: 900;
             text-transform: uppercase;
@@ -1192,20 +1207,16 @@
             </div>
         </header>
 
-        <!-- Main Compact Section -->
         <section class="main-compact-section">
             <div class="compact-container">
-                <!-- Left: Race Slots -->
                 <div class="compact-left">
                     <div class="section-header">
                         <span><i class="fas fa-user-circle"></i> Race Slots</span>
                     </div>
                     <div class="compact-slots-container" id="race-slots">
-                        <!-- Race slots will be generated here -->
                     </div>
                 </div>
 
-                <!-- Middle: Current Race Display with Stats Overlay -->
                 <div class="compact-middle">
                     <div class="section-header">
                         <span><i class="fas fa-eye"></i> Current Race</span>
@@ -1214,7 +1225,6 @@
                         </div>
                     </div>
 
-                    <!-- Race name banner ABOVE the image -->
                     <div class="race-name-text" id="current-race-name">Human
                     </div>
 
@@ -1244,28 +1254,24 @@
                     </div>
                 </div>
 
-                <!-- Right: Race Chances & Probability Calculator -->
                 <div class="compact-right">
-                    <div class="section-header" id="right-panel-header">
-                        <span><i class="fas fa-percentage"></i> Race Chances</span>
+                    <div class="section-header">
+                        <span><i class="fas fa-star"></i> Race Perks</span>
                     </div>
-                    <div class="right-panel-content">
-                        <!-- Race chances (default view) -->
-                        <div class="chances-grid-compact" id="chances-grid-compact">
-                            <!-- Race chances will be generated here -->
-                        </div>
+                    <div class="perks-list" id="perks-list">
                     </div>
+
                 </div>
             </div>
-            <div class="section-header">
-                <span style="margin-top: 10px;"><i class="fas fa-star"></i> Race Perks</span>
+            <div class="section-header" id="right-panel-header">
+                <span style="margin-top: 10px;"><i class="fas fa-percentage"></i> Race Chances</span>
             </div>
-            <div class="perks-list" id="perks-list">
-                <!-- Perks will be generated here -->
+            <div class="right-panel-content">
+                <div class="chances-grid-compact" id="chances-grid-compact">
+                </div>
             </div>
         </section>
 
-        <!-- Auto Roll Modal -->
         <div class="modal-overlay" id="auto-roll-modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1276,7 +1282,6 @@
                     <p>Select a target race to auto roll until you get it:</p>
                 </div>
                 <div class="modal-options" id="auto-roll-options">
-                    <!-- Options will be generated here -->
                 </div>
                 <div class="modal-nav" style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
                     <button class="control-btn reroll-btn" id="start-auto-roll">Start Auto Roll</button>
@@ -1285,7 +1290,6 @@
             </div>
         </div>
 
-        <!-- Auto Roll Complete Modal -->
         <div class="modal-overlay" id="auto-roll-complete-modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1319,20 +1323,17 @@
             </div>
         </div>
 
-        <!-- Tooltip -->
         <div class="tooltip" id="race-tooltip">
             <div class="tooltip-header">
                 <h3 class="tooltip-title" id="tooltip-race-name">Race</h3>
                 <span class="tooltip-close" id="tooltip-close">&times;</span>
             </div>
             <div class="tooltip-content" id="tooltip-content">
-                <!-- Tooltip content will be generated here -->
             </div>
         </div>
     </div>
 
     <script>
-        // Race data from the WordPress table
         const raceData = [
             {
                 name: "Demon",
@@ -1475,7 +1476,6 @@
             }
         ];
 
-        // State variables
         let currentSlot = 0;
         let slots = [
             { race: "Human", rerolls: 0 },
@@ -1492,7 +1492,6 @@
         let currentTooltipRace = null;
         let animationEnabled = true;
 
-        // DOM Elements
         const raceSlotsContainer = document.getElementById('race-slots');
         const selectedSlotIndicator = document.getElementById('selected-slot-indicator');
         const currentRaceImage = document.getElementById('current-race-image');
@@ -1536,7 +1535,6 @@
         const animationToggle = document.getElementById('animation-toggle');
         const compactMiddle = document.querySelector('.compact-middle');
 
-        // Initialize the app
         function init() {
             renderRaceSlots();
             updateDisplay();
@@ -1551,21 +1549,18 @@
         }
 
         function setupAnimationToggle() {
-            // Load from localStorage
             const savedAnimation = localStorage.getItem('forgeRaceAnimation');
             if (savedAnimation !== null) {
                 animationEnabled = savedAnimation === 'true';
                 animationToggle.checked = animationEnabled;
             }
 
-            // Add event listener
             animationToggle.addEventListener('change', function () {
                 animationEnabled = this.checked;
                 localStorage.setItem('forgeRaceAnimation', animationEnabled);
             });
         }
 
-        // Render race slots
         function renderRaceSlots() {
             raceSlotsContainer.innerHTML = '';
 
@@ -1593,38 +1588,45 @@
             });
         }
 
-        // Update the main display with current slot's race
         function updateDisplay() {
             const currentRace = slots[currentSlot].race;
             const race = raceData.find(r => r.name === currentRace);
 
             if (race) {
-                currentRaceImage.style.backgroundImage = `url('${race.image}')`;
-                currentRaceName.textContent = race.name;
-                raceRarityColor = getRarityColor(race.rarity);
+                currentRaceImage.style.opacity = '0';
+
+                setTimeout(() => {
+                    currentRaceImage.style.backgroundImage = `url('${race.image}')`;
+                    currentRaceImage.style.opacity = '1';
+                    currentRaceImage.style.animation = 'raceImageReveal 0.5s ease-out';
+                }, 50);
+
+                const raceRarityColor = getRarityColor(race.rarity);
                 currentRaceName.style.backgroundColor = raceRarityColor;
                 currentRaceName.style.borderColor = raceRarityColor;
                 currentRaceName.style.color = raceRarityColor;
+                currentRaceName.textContent = race.name;
+
+                currentRaceName.style.animation = 'gentlePulse 0.8s ease-out';
+
                 selectedSlotIndicator.textContent = `Slot ${currentSlot + 1} Selected`;
 
-                // Update perks
                 perksList.innerHTML = '';
-                race.perks.forEach(perk => {
+                race.perks.forEach((perk, index) => {
                     const perkElement = document.createElement('div');
                     perkElement.className = 'perk-item';
+                    perkElement.style.animationDelay = `${index * 0.1}s`;
                     perkElement.innerHTML = `
-                        <div class="perk-icon"><i class="fas fa-star"></i></div>
-                        <div class="perk-content">
-                            <div class="perk-name">${perk.split(':')[0]}</div>
-                            <div class="perk-description">${perk.split(':').slice(1).join(':')}</div>
-                        </div>
-                    `;
+                <div class="perk-content">
+                    <div class="perk-name"><i class="fas fa-star"></i> ${perk.split(':')[0]}</div>
+                    <div class="perk-description">${perk.split(':').slice(1).join(':')}</div>
+                </div>
+            `;
                     perksList.appendChild(perkElement);
                 });
             }
         }
 
-        // Render the compact chances grid
         function renderChancesGridCompact() {
             chancesGridCompact.innerHTML = '';
 
@@ -1643,7 +1645,6 @@
                     </div>
                 `;
 
-                // Show tooltip on hover
                 chanceElement.addEventListener('mouseenter', (e) => {
                     showRaceTooltip(race, e);
                 });
@@ -1660,23 +1661,19 @@
             });
         }
 
-        // Show race tooltip
         function showRaceTooltip(race, event) {
-            // Clear any existing timeout
             if (tooltipTimeout) {
                 clearTimeout(tooltipTimeout);
             }
 
             currentTooltipRace = race;
 
-            // Set a small delay before showing tooltip
             tooltipTimeout = setTimeout(() => {
                 if (currentTooltipRace !== race) return;
 
                 tooltipRaceName.textContent = race.name;
                 tooltipRaceName.style.color = getRarityColor(race.rarity);
 
-                // Build perks HTML with highlighting
                 let perksHTML = `<div class="tooltip-perks">`;
                 race.perks.forEach(perk => {
                     const [perkName, ...perkDescParts] = perk.split(':');
@@ -1696,26 +1693,22 @@
 
                 tooltipContent.innerHTML = perksHTML;
 
-                // Position tooltip with better logic
                 raceTooltip.style.display = 'block';
 
-                // Force a reflow to get actual dimensions
                 raceTooltip.style.opacity = '0';
                 const tooltipRect = raceTooltip.getBoundingClientRect();
 
                 let left = event.clientX - 15;
                 let top = event.clientY - 15;
 
-                // Adjust if tooltip would go off screen
-                if (left + tooltipRect.width > window.innerWidth - 15) {
-                    left = event.clientX - tooltipRect.width - 15;
+                if (left + tooltipRect.width > window.innerWidth - 5) {
+                    left = event.clientX - tooltipRect.width - 5;
                 }
 
                 if (top + tooltipRect.height > window.innerHeight - 15) {
-                    top = event.clientY - tooltipRect.height - 15;
+                    top = event.clientY - tooltipRect.height - 20;
                 }
 
-                // Ensure tooltip stays on screen
                 left = Math.max(15, Math.min(left, window.innerWidth - tooltipRect.width - 15));
                 top = Math.max(15, Math.min(top, window.innerHeight - tooltipRect.height - 15));
 
@@ -1725,17 +1718,15 @@
                 raceTooltip.style.opacity = '1';
                 raceTooltip.style.pointerEvents = 'auto';
 
-            }, 100); // 100ms delay
+            }, 100); 
         }
 
-        // Update tooltip setup
         function setupTooltip() {
             tooltipClose.addEventListener('click', () => {
                 raceTooltip.style.display = 'none';
                 raceTooltip.style.pointerEvents = 'none';
             });
 
-            // Hide tooltip when not hovering over race items or tooltip
             document.addEventListener('mouseover', (e) => {
                 const isRaceItem = e.target.closest('.chance-item-compact');
                 const isInTooltip = e.target.closest('.tooltip');
@@ -1750,7 +1741,6 @@
                 }
             });
 
-            // Keep tooltip visible when hovering over it
             raceTooltip.addEventListener('mouseenter', () => {
                 raceTooltip.style.display = 'block';
                 raceTooltip.style.pointerEvents = 'auto';
@@ -1766,62 +1756,61 @@
             if (autoRollInterval) return;
 
             if (animationEnabled) {
-                // Run with animation (existing code)
                 performRerollWithAnimation();
             } else {
-                // Run without animation
                 performInstantReroll();
             }
         }
 
         function performInstantReroll() {
+            if (autoRollInterval) return;
+
             const rollCost = 55;
 
-            // Disable button during transition
             rerollBtn.disabled = true;
+            rerollBtn.style.opacity = '0.7';
+            rerollBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Rolling...';
 
-            // Determine result instantly
-            const random = Math.random() * 100;
-            let cumulative = 0;
-            let selectedRace = raceData[0];
-
-            for (const race of raceData) {
-                cumulative += race.percentage;
-                if (random <= cumulative) {
-                    selectedRace = race;
-                    break;
-                }
-            }
-
-            // Add fade-out transition
-            currentRaceImage.style.opacity = '0';
-            currentRaceName.style.opacity = '0';
+            currentRaceImage.style.transition = 'opacity 0.2s ease';
+            currentRaceName.style.transition = 'opacity 0.2s ease';
+            currentRaceImage.style.opacity = '0.3';
+            currentRaceName.style.opacity = '0.5';
 
             setTimeout(() => {
-                // Update slot with new race
+                const random = Math.random() * 100;
+                let cumulative = 0;
+                let selectedRace = raceData[0];
+
+                for (const race of raceData) {
+                    cumulative += race.percentage;
+                    if (random <= cumulative) {
+                        selectedRace = race;
+                        break;
+                    }
+                }
+
                 slots[currentSlot].race = selectedRace.name;
                 slots[currentSlot].rerolls++;
 
-                // Update statistics
                 totalRerolls++;
                 robuxSpent += rollCost;
 
-                // Update display
                 updateDisplay();
                 renderRaceSlots();
                 updateStatistics();
                 saveToLocalStorage();
 
-                // Fade back in
-                currentRaceImage.style.opacity = '1';
                 currentRaceName.style.opacity = '1';
 
-                // Re-enable button
-                rerollBtn.disabled = false;
-            }, 300);
+                setTimeout(() => {
+                    rerollBtn.disabled = false;
+                    rerollBtn.style.opacity = '1';
+                    rerollBtn.innerHTML = '<i class="fas fa-redo"></i> Reroll Slot (55 Robux)';
+                }, 300);
+
+            }, 200);
         }
 
-        // Perform a reroll
         function performRerollWithAnimation() {
             if (autoRollInterval) return;
 
@@ -1829,15 +1818,12 @@
             const currentRaceNameElement = document.querySelector('.race-name-text');
             const rollCost = 55;
 
-            // Disable button during animation
             rerollBtn.disabled = true;
             rerollBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Rolling...';
 
-            // Save current race for comparison
             const currentRace = slots[currentSlot].race;
             const currentRaceData = raceData.find(r => r.name === currentRace);
 
-            // Create rolling overlay
             const rollingOverlay = document.createElement('div');
             rollingOverlay.className = 'rolling-overlay';
             rollingOverlay.innerHTML = `
@@ -1845,13 +1831,11 @@
     `;
             raceDisplay.appendChild(rollingOverlay);
 
-            // Generate random race names for the slot machine effect
             let rollCount = 0;
             const maxRolls = 10;
-            const rollSpeed = 150; // Start speed
+            const rollSpeed = 150; 
             let currentSpeed = rollSpeed;
 
-            // Function to show a random name
             function showRandomName() {
                 const randomRace = raceData[Math.floor(Math.random() * raceData.length)];
                 const namesContainer = document.getElementById('rolling-names');
@@ -1862,34 +1846,28 @@
 
                 namesContainer.appendChild(nameElement);
 
-                // Keep only last 3 names visible
                 const allNames = namesContainer.querySelectorAll('.rolling-name');
                 if (allNames.length > 1) {
                     allNames[0].remove();
                 }
 
-                // Animate the names
                 allNames.forEach((name, index) => {
                     name.style.opacity = (1 - (index * 0.3)).toString();
                     name.style.transform = `translate(-50%, calc(-50% + ${index * 30}px))`;
                 });
             }
 
-            // Start rolling animation
             const rollInterval = setInterval(() => {
                 showRandomName();
                 rollCount++;
 
-                // Gradually slow down
                 if (rollCount > maxRolls * 0.6) {
                     currentSpeed += 20;
                 }
 
-                // Stop after max rolls
                 if (rollCount >= maxRolls) {
                     clearInterval(rollInterval);
 
-                    // Determine actual result
                     const random = Math.random() * 100;
                     let cumulative = 0;
                     let selectedRace = raceData[0];
@@ -1902,46 +1880,40 @@
                         }
                     }
 
-                    // Show final result with a pause
                     setTimeout(() => {
 
                         const namesContainer = document.getElementById('rolling-names');
                         namesContainer.innerHTML = '';
 
-                        // Show final name
                         const finalName = document.createElement('div');
                         finalName.className = 'final-rolling-name';
                         finalName.textContent = selectedRace.name;
                         finalName.style.color = getRarityColor(selectedRace.rarity);
                         namesContainer.appendChild(finalName);
 
-                        // Animate final reveal
                         finalName.style.animation = 'finalReveal 0.8s ease-out forwards';
 
-                        // After reveal animation, update everything
                         setTimeout(() => {
-                            // Update slot with new race
                             slots[currentSlot].race = selectedRace.name;
                             slots[currentSlot].rerolls++;
 
-                            // Update statistics
                             totalRerolls++;
                             robuxSpent += rollCost;
 
-                            // Update display
                             updateDisplay();
                             renderRaceSlots();
                             updateStatistics();
                             saveToLocalStorage();
 
-                            // Remove rolling overlay
-                            rollingOverlay.remove();
+                            rollingOverlay.style.opacity = '0';
+                            rollingOverlay.style.transition = 'opacity 0.3s ease';
+                            setTimeout(() => {
+                                rollingOverlay.remove();
+                            }, 300);
 
-                            // Re-enable button
                             rerollBtn.disabled = false;
                             rerollBtn.innerHTML = '<i class="fas fa-redo"></i> Reroll Slot (55 Robux)';
 
-                            // Show image transition
                             currentRaceImage.style.opacity = '0';
                             setTimeout(() => {
                                 currentRaceImage.style.backgroundImage = `url('${selectedRace.image}')`;
@@ -1956,7 +1928,6 @@
             }, currentSpeed);
         }
 
-        // Start auto roll
         function startAutoRoll() {
             if (!autoRollTarget) return;
 
@@ -1964,95 +1935,91 @@
             autoRollModal.classList.remove('show');
 
             const raceDisplay = document.getElementById('race-display');
-            raceDisplay.classList.add('rolling');
-
             autoRollCount = 0;
             let found = false;
 
-            autoRollInterval = setInterval(() => {
-                autoRollCount++;
+            function performSingleAutoRoll() {
+                if (!autoRollInterval) return; 
 
-                // Update the button to show stop (only on first iteration)
                 if (autoRollCount === 1) {
                     updateAutoRollButton();
                 }
+                autoRollCount++;
 
-                // Simulate a roll
-                const random = Math.random() * 100;
-                let cumulative = 0;
-                let selectedRace = raceData[0];
+                currentRaceImage.style.transition = 'opacity 0.15s ease';
+                currentRaceName.style.transition = 'opacity 0.15s ease';
+                currentRaceImage.style.opacity = '0.4';
+                currentRaceName.style.opacity = '0.6';
+                
 
-                for (const race of raceData) {
-                    cumulative += race.percentage;
-                    if (random <= cumulative) {
-                        selectedRace = race;
-                        break;
+                setTimeout(() => {
+                    if (!autoRollInterval) return; 
+
+                    const random = Math.random() * 100;
+                    let cumulative = 0;
+                    let selectedRace = raceData[0];
+
+                    for (const race of raceData) {
+                        cumulative += race.percentage;
+                        if (random <= cumulative) {
+                            selectedRace = race;
+                            break;
+                        }
                     }
-                }
 
-                // Update display during animation
-                currentRaceName.textContent = selectedRace.name;
-                currentRaceImage.style.backgroundImage = `url('${selectedRace.image}')`;
+                    const raceRarityColor = getRarityColor(selectedRace.rarity);
+                    currentRaceName.textContent = selectedRace.name;
+                    currentRaceName.style.backgroundColor = raceRarityColor;
+                    currentRaceName.style.borderColor = raceRarityColor;
+                    currentRaceName.style.color = raceRarityColor;
+                    currentRaceImage.style.backgroundImage = `url('${selectedRace.image}')`;
+                    currentRaceImage.style.opacity = '1';
+                    currentRaceName.style.opacity = '1';
 
-                // Check if we got the target
-                if (selectedRace.name === autoRollTarget) {
-                    found = true;
-                    clearInterval(autoRollInterval);
-                    autoRollInterval = null;
-                    updateAutoRollButton();
+                    if (selectedRace.name === autoRollTarget) {
+                        found = true;
+                        clearInterval(autoRollInterval);
+                        autoRollInterval = null;
+                        updateAutoRollButton();
 
-                    // Update slot with new race
-                    slots[currentSlot].race = selectedRace.name;
-                    slots[currentSlot].rerolls += autoRollCount;
+                        slots[currentSlot].race = selectedRace.name;
+                        slots[currentSlot].rerolls += autoRollCount;
 
-                    // Update statistics
-                    totalRerolls += autoRollCount;
-                    robuxSpent += autoRollCount * 55;
+                        totalRerolls += autoRollCount;
+                        robuxSpent += autoRollCount * 55;
 
-                    // Show completion
-                    setTimeout(() => {
-                        raceDisplay.classList.remove('rolling');
-                        currentRaceName.textContent = selectedRace.name;
-                        currentRaceImage.style.backgroundImage = `url('${selectedRace.image}')`;
-                        currentRaceImage.style.animation = 'raceReveal 0.5s ease-out';
-
-                        updateDisplay();
-                        renderRaceSlots();
-                        updateStatistics();
-                        saveToLocalStorage();
-
-                        // Show completion modal
-                        showAutoRollComplete(selectedRace);
-
-                        // Remove animation after it completes
                         setTimeout(() => {
-                            currentRaceImage.style.animation = '';
-                        }, 500);
-                    }, 300);
-                }
+                            updateDisplay();
+                            renderRaceSlots();
+                            updateStatistics();
+                            saveToLocalStorage();
 
-                // Stop after too many rolls (safety)
-                if (autoRollCount > 1000 && !found) {
-                    clearInterval(autoRollInterval);
-                    autoRollInterval = null;
-                    updateAutoRollButton();
-                    raceDisplay.classList.remove('rolling');
-                }
-            }, 100);
+                            showAutoRollComplete(selectedRace);
+                        }, 200);
+                    }
+
+                    if (autoRollCount > 1000 && !found) {
+                        clearInterval(autoRollInterval);
+                        autoRollInterval = null;
+                        updateAutoRollButton();
+                    }
+                }, 150);
+            }
+
+            autoRollInterval = setInterval(performSingleAutoRoll, 400);
         }
 
-        // Show auto roll complete modal
+        
+
         function showAutoRollComplete(race) {
             autoRollRace.textContent = race.name;
             autoRollCountDisplay.textContent = autoRollCount;
             autoRollRobux.textContent = autoRollCount * 55;
 
-            // Calculate expected rolls
             const p = race.percentage / 100;
             const expected = Math.ceil(1 / p);
             autoRollExpected.textContent = expected;
 
-            // Calculate luck factor
             const luck = ((expected - autoRollCount) / expected * 100).toFixed(1);
             autoRollLuck.textContent = `${luck}%`;
 
@@ -2060,13 +2027,11 @@
             autoRollCompleteModal.classList.add('show');
         }
 
-        // Update statistics display
         function updateStatistics() {
             totalRerollsDisplay.textContent = totalRerolls;
             robuxSpentDisplay.textContent = robuxSpent;
         }
 
-        // Render auto roll options
         function renderAutoRollOptions() {
             autoRollOptions.innerHTML = '';
 
@@ -2094,14 +2059,12 @@
                 autoRollOptions.appendChild(option);
             });
 
-            // Select first option by default
             if (autoRollOptions.firstChild) {
                 autoRollOptions.firstChild.classList.add('selected');
                 autoRollTarget = raceData[0].name;
             }
         }
 
-        // Get color for rarity
         function getRarityColor(rarity) {
             switch (rarity) {
                 case 'common': return 'var(--common)';
@@ -2114,7 +2077,6 @@
             }
         }
 
-        // Save to local storage
         function saveToLocalStorage() {
             const data = {
                 slots: slots,
@@ -2125,7 +2087,6 @@
             localStorage.setItem('forgeRaceSimulator', JSON.stringify(data));
         }
 
-        // Load from local storage
         function loadFromLocalStorage() {
             const saved = localStorage.getItem('forgeRaceSimulator');
             if (saved) {
@@ -2145,7 +2106,6 @@
             }
         }
 
-        // Reset all statistics
         function resetStatistics() {
             totalRerolls = 0;
             robuxSpent = 0;
@@ -2162,12 +2122,11 @@
                 clearInterval(autoRollInterval);
                 autoRollInterval = null;
 
-                // Restore button to original state
                 updateAutoRollButton();
 
-                // Remove rolling class
                 const raceDisplay = document.getElementById('race-display');
                 raceDisplay.classList.remove('rolling');
+                currentRaceName.style.opacity = '1';
             }
         }
 
@@ -2191,16 +2150,13 @@
             }
         }
 
-        // Setup event listeners
         function setupEventListeners() {
             rerollBtn.addEventListener('click', performReroll);
 
             autoRollBtn.addEventListener('click', () => {
                 if (autoRollInterval) {
-                    // Stop auto roll if it's running
                     stopAutoRoll();
                 } else {
-                    // Start auto roll
                     autoRollModal.style.display = 'flex';
                     autoRollModal.classList.add('show');
                 }
@@ -2230,7 +2186,6 @@
                 autoRollCompleteModal.classList.remove('show');
             });
 
-            // Close modals when clicking outside
             [autoRollModal, autoRollCompleteModal].forEach(modal => {
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
@@ -2240,7 +2195,6 @@
                 });
             });
 
-            // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'r' || e.key === 'R') {
                     if (!autoRollInterval) {
@@ -2266,7 +2220,6 @@
             });
         }
 
-        // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
