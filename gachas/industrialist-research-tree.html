@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Industrialist Research Tree</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            background-color: #0a0a12;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e0e0e0;
+            padding: 20px;
+            overflow-x: auto;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 100%;
+            height: 100vh;
+            /* Full viewport height */
+            overflow: hidden;
+            /* Hide scrollbars, we'll handle panning manually */
+            padding: 20px 0;
+            position: relative;
+            cursor: grab;
+            -webkit-overflow-scrolling: touch;
+            touch-action: none;
+            /* Disable all browser touch actions */
+            overscroll-behavior: none;
+        }
+
+        .container.dragging {
+            cursor: grabbing;
+        }
+
+        .tree-container {
+            position: relative;
+            min-height: 1200px;
+            padding: 50px;
+            min-width: 2500px;
+            user-select: none;
+            /* Prevent text selection */
+            pointer-events: all;
+            /* Ensure it can receive events */
+        }
+
+        .tree-container.dragging {
+            cursor: grabbing;
+        }
+
+        .research-node {
+            position: absolute;
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 2px solid #4cc9f0;
+            border-radius: 8px;
+            padding: 15px;
+            width: 200px;
+            min-height: 100px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            z-index: 10;
+            /* Increased z-index */
+        }
+
+        .research-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(76, 201, 240, 0.3);
+            border-color: #72efdd;
+            z-index: 100;
+        }
+
+        .node-header {
+            font-size: 14px;
+            font-weight: bold;
+            color: #4cc9f0;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #4cc9f0;
+            padding-bottom: 4px;
+        }
+
+        .node-requirements {
+            font-size: 12px;
+            color: #72efdd;
+            margin-top: 5px;
+        }
+
+        .node-sell-requirement {
+            font-size: 11px;
+            color: #f72585;
+            margin-top: 3px;
+            font-style: italic;
+        }
+
+        /* Updated connection styles */
+        .connection {
+            position: absolute;
+            z-index: 1;
+            /* Lower than nodes */
+            pointer-events: none;
+        }
+
+        .horizontal-line {
+            height: 2px;
+            background-color: #4cc9f0;
+        }
+
+        .vertical-line {
+            width: 2px;
+            background-color: #4cc9f0;
+        }
+
+        /* Tooltip styles remain the same */
+        .tooltip {
+            position: absolute;
+            background: rgba(26, 26, 46, 0.95);
+            border: 2px solid #7209b7;
+            border-radius: 8px;
+            padding: 15px;
+            width: 300px;
+            max-width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: block;
+            backdrop-filter: blur(5px);
+        }
+
+        .tooltip-header {
+            color: #7209b7;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border-bottom: 1px solid #7209b7;
+            padding-bottom: 5px;
+        }
+
+        .building-item {
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #333;
+            padding-bottom: 10px;
+        }
+
+        .building-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .building-image {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            margin-bottom: 8px;
+            border: 1px solid #444;
+        }
+
+        .building-name {
+            font-size: 13px;
+            color: #b5b5b5;
+            text-align: center;
+        }
+
+        .building-count {
+            font-size: 11px;
+            color: #f72585;
+            text-align: center;
+            margin-top: 2px;
+        }
+
+        .tier-indicator {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: #7209b7;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(26, 26, 46, 0.9);
+            border: 1px solid #4cc9f0;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .legend h3 {
+            color: #4cc9f0;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .legend-item {
+            margin-bottom: 5px;
+        }
+
+        .legend-color {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+
+        .rp-0-100 {
+            background-color: #4cc9f0;
+        }
+
+        .rp-101-1000 {
+            background-color: #4361ee;
+        }
+
+        .rp-1001-10000 {
+            background-color: #3a0ca3;
+        }
+
+        .rp-10001-100000 {
+            background-color: #7209b7;
+        }
+
+        .rp-100001-plus {
+            background-color: #f72585;
+        }
+
+        .search-filter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(26, 26, 46, 0.9);
+            border: 1px solid #4cc9f0;
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 1000;
+            width: 250px;
+        }
+
+        .search-filter input {
+            width: 100%;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #4cc9f0;
+            border-radius: 4px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .node-highlight {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 201, 240, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 201, 240, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 201, 240, 0);
+            }
+        }
+
+        .node-theory {
+            background: linear-gradient(145deg, #0a0a12, #16213e);
+            border-color: #7209b7;
+        }
+
+        .node-theory .node-header {
+            color: #7209b7;
+        }
+
+        .search-filter,
+        .legend {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="search-filter">
+        <input type="text" id="searchInput" placeholder="Search research nodes..." onkeyup="filterNodes()">
+        <div id="searchResults"></div>
+    </div>
+
+    <div class="container">
+        <div class="tree-container" id="treeContainer">
+            <!-- Research nodes and connections will be generated here -->
+        </div>
+    </div>
+
+    <script>
+        // Research data extracted from the table
+        const researchData = [
+            {
+                id: "production",
+                name: "Production (Theory Research)",
+                requirements: "0 RP",
+                unlocks: ["coal_extracting", "water_pump", "research_station_1"],
+                buildings: [],
+                tier: 0,
+                x: 50,
+                y: 700
+            },
+
+            // Tier 1
+            {
+                id: "coal_extracting",
+                name: "Coal Extracting",
+                requirements: "10 RP",
+                unlocks: ["copper_extracting", "oil_extraction"],
+                buildings: ["coal-drill1-industrialist.jpg"],
+                tier: 1,
+                x: 300,
+                y: 550
+            },
+            {
+                id: "water_pump",
+                name: "Water Pump",
+                requirements: "25 RP",
+                unlocks: ["oil_extraction", "modular_tree_farm", "water_pump_2"],
+                buildings: ["water-pump-industrialist.jpg"],
+                tier: 1,
+                x: 300,
+                y: 700
+            },
+            {
+                id: "research_station_1",
+                name: "Research Station 1",
+                requirements: "10 RP",
+                unlocks: [],
+                buildings: ["research-tracking-panel1-industrialist.jpg", "research-station1-industrialist.jpg"],
+                tier: 1,
+                x: 300,
+                y: 850
+            },
+
+            // Tier 2
+            {
+                id: "copper_extracting",
+                name: "Copper Extracting",
+                requirements: "50 RP",
+                unlocks: ["electric_furnace_molding"],
+                buildings: ["copper-drill1-industrialist.jpg"],
+                tier: 2,
+                x: 550,
+                y: 550
+            },
+            {
+                id: "oil_extraction",
+                name: "Oil Extraction",
+                requirements: "1500 RP",
+                unlocks: ["oil_refining"],
+                buildings: ["oil-rig2-industrialist.jpg"],
+                tier: 2,
+                x: 550,
+                y: 700
+            },
+            {
+                id: "modular_tree_farm",
+                name: "Modular Tree Farm",
+                requirements: "1000 RP",
+                unlocks: ["sawmill"],
+                buildings: [
+                    "tree-farm-output1-industrialist.jpg",
+                    "tree-farm-sprinkler1-industrialist.jpg",
+                    "tree-farm-water-tank1-industrialist.jpg",
+                    "farm-harvester1-industrialist.jpg",
+                    "tree1-industrialist.jpg",
+                    "tree-farm-controller1-industrialist.jpg"
+                ],
+                tier: 2,
+                x: 550,
+                y: 850
+            },
+            {
+                id: "water_pump_2",
+                name: "Water Pump 2",
+                requirements: "5000 RP",
+                unlocks: ["water_filtering"],
+                buildings: ["water-pump2-industrialist.jpg"],
+                tier: 2,
+                x: 550,
+                y: 1000
+            },
+
+            // Tier 3
+            {
+                id: "electric_furnace_molding",
+                name: "Electric Furnace & Molding",
+                requirements: "50 RP",
+                unlocks: ["iron_extracting", "press"],
+                buildings: ["ingot-molder1-industrialist.jpg", "electric-furnace1-industrialist.jpg"],
+                tier: 3,
+                x: 800,
+                y: 550
+            },
+            {
+                id: "oil_refining",
+                name: "Oil Refining",
+                requirements: "1000 RP",
+                unlocks: ["diesel_refining"],
+                buildings: ["crude-oil-separator2-industrialist.jpg", "liquid-boiler2-industrialist.jpg"],
+                tier: 3,
+                x: 800,
+                y: 700
+            },
+            {
+                id: "sawmill",
+                name: "Sawmill",
+                requirements: "1000 RP",
+                unlocks: ["craft_assembler", "paper_mill", "industrial_sawmill", "grinder"],
+                buildings: ["sawmill1-industrialist.jpg"],
+                tier: 3,
+                x: 800,
+                y: 850
+            },
+            {
+                id: "water_filtering",
+                name: "Water Filtering",
+                requirements: "2500 RP",
+                unlocks: [],
+                buildings: ["filtration-plant-2-industrialist.jpg"],
+                tier: 3,
+                x: 800,
+                y: 1000
+            },
+
+            // TIER 4 - Adjusted for better spacing
+            {
+                id: "iron_extracting",
+                name: "Iron Extracting",
+                requirements: "250 RP",
+                unlocks: ["research_station_2"],
+                buildings: ["iron-drill2-industrialist.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 250
+            },
+            {
+                id: "press",
+                name: "Press",
+                requirements: "150 RP",
+                unlocks: ["roller"],
+                buildings: ["press1-industrialist.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 550
+            },
+            {
+                id: "diesel_refining",
+                name: "Diesel Refining",
+                requirements: "750 RP",
+                unlocks: ["quarry", "industrial_diesel_refining", "advanced_oil_refining", "natural_gas_well", "research_station_3"],
+                buildings: ["diesel-refinery2-industrialist.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 700
+            },
+            {
+                id: "craft_assembler",
+                name: "Craft Assembler",
+                requirements: "3000 RP",
+                unlocks: [],
+                buildings: ["craft-assembler1-industrialist.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 850
+            },
+            {
+                id: "paper_mill",
+                name: "Paper Mill",
+                requirements: "2000 RP",
+                unlocks: [],
+                buildings: ["paper-mill2-industrialist.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 1000
+            },
+            {
+                id: "industrial_sawmill",
+                name: "Industrial Sawmill",
+                requirements: "12000 RP",
+                unlocks: [],
+                buildings: ["industrial-sawmill3-industrialist.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 1150
+            },
+            {
+                id: "grinder",
+                name: "Grinder",
+                requirements: "1000 RP",
+                unlocks: [],
+                buildings: ["grinder2-industrialist.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 1300
+            },
+
+            // TIER 5
+            {
+                id: "research_station_2",
+                name: "Research Station 2",
+                requirements: "750 RP",
+                unlocks: ["advanced_copper_extraction", "advanced_coal_extraction", "steel"],
+                buildings: ["research-station2-industrialist.jpg"],
+                tier: 5,
+                x: 1300,
+                y: 250
+            },
+            {
+                id: "roller",
+                name: "Roller",
+                requirements: "150 RP",
+                unlocks: [],
+                buildings: ["roller1-industrialist.jpg"],
+                tier: 5,
+                x: 1300,
+                y: 550
+            },
+            {
+                id: "quarry",
+                name: "Quarry",
+                requirements: "350 RP",
+                unlocks: ["brick_production", "industrial_firebox", "oil_fracking"],
+                buildings: ["quarry2-industrialist.jpg"],
+                tier: 5,
+                x: 1300,
+                y: 700
+            },
+            {
+                id: "industrial_diesel_refining",
+                name: "Industrial Diesel Refining",
+                requirements: "40000 RP",
+                unlocks: ["chemical_reactor", "oil_fracking"],
+                buildings: ["industrial-diesel-refinery3-industrialist.jpg"],
+                tier: 5,
+                x: 1300,
+                y: 1000
+            },
+            {
+                id: "advanced_oil_refining",
+                name: "Advanced Oil Refining",
+                requirements: "25000 RP",
+                unlocks: ["chemical_reactor"],
+                buildings: [
+                    "industrial-oil-separator3-industrialist.jpg",
+                    "advanced-oil-separator3-industrialist.jpg",
+                    "coal-liquefaction-plant3-industrialist.jpg"
+                ],
+                tier: 5,
+                x: 1300,
+                y: 1150
+            },
+            {
+                id: "natural_gas_well",
+                name: "Natural Gas Well",
+                requirements: "15000 RP",
+                unlocks: ["gas_refining"],
+                buildings: ["natural-gas-well3-industrialist.jpg"],
+                tier: 5,
+                x: 1300,
+                y: 1300
+            },
+            {
+                id: "research_station_3",
+                name: "Research Station 3",
+                requirements: "15000 RP",
+                unlocks: ["plastics", "satellite_dishes"],
+                buildings: ["research-station3-industrialist.jpg"],
+                tier: 5,
+                x: 1300,
+                y: 1450
+            },
+
+            // TIER 6
+            {
+                id: "advanced_copper_extraction",
+                name: "Advanced Copper Extraction",
+                requirements: "350 RP",
+                unlocks: ["mineshaft_drill"],
+                buildings: ["advanced-copper-drill2-industrialist.jpg"],
+                tier: 6,
+                x: 1550,
+                y: 100
+            },
+            {
+                id: "advanced_coal_extraction",
+                name: "Advanced Coal Extraction",
+                requirements: "1000 RP",
+                unlocks: ["mineshaft_drill"],
+                buildings: ["advanced-coal-drill2-industrialist.jpg"],
+                tier: 6,
+                x: 1550,
+                y: 250
+            },
+            {
+                id: "steel",
+                name: "Steel",
+                requirements: "3500 RP",
+                unlocks: ["mineshaft_drill"],
+                buildings: ["blast-furnace3-industrialist.jpg"],
+                tier: 6,
+                x: 1550,
+                y: 400
+            },
+            {
+                id: "brick_production",
+                name: "Brick Production",
+                requirements: "1500 RP",
+                unlocks: ["concrete_production"],
+                buildings: ["kiln2-industrialist.jpg", "concrete-plant2-industrialist.jpg"],
+                tier: 6,
+                x: 1550,
+                y: 700
+            },
+            {
+                id: "chemical_reactor",
+                name: "Chemical Reactor",
+                requirements: "80000 RP",
+                unlocks: [],
+                buildings: ["chemical-reactor3-industrialist.jpg"],
+                tier: 6,
+                x: 1550,
+                y: 850
+            },
+            {
+                id: "industrial_firebox",
+                name: "Industrial Firebox",
+                requirements: "10000 RP",
+                unlocks: ["advanced_processing"],
+                buildings: ["industrial-firebox3-industrialist.jpg"],
+                tier: 6,
+                x: 1550,
+                y: 1000
+            },
+            {
+                id: "oil_fracking",
+                name: "Oil Fracking",
+                requirements: "6000 RP",
+                unlocks: ["large_oil_rig"],
+                buildings: ["oil-fracking-tower3-industrialist.jpg", "atmospheric-distillation-plant3-industrialist.jpg"],
+                tier: 6,
+                x: 1550,
+                y: 1150
+            },
+            {
+                id: "gas_refining",
+                name: "Gas Refining",
+                requirements: "8000 RP",
+                unlocks: ["large_oil_rig", "lng_plant"],
+                buildings: ["condenser3-industrialist.jpg", "gas-refinery3-industrialist.jpg"],
+                tier: 6,
+                x: 1550,
+                y: 1300
+            },
+            {
+                id: "plastics",
+                name: "Plastics",
+                requirements: "25000 RP",
+                unlocks: ["plastic_molding"],
+                buildings: [
+                    "plastic-production-facility3-industrialist.jpg",
+                    "plastic-refinery3-industrialist.jpg",
+                    "oxidation-plant3-industrialist.jpg",
+                    "steam-cracking-plant3-industrialist.jpg"
+                ],
+                tier: 6,
+                x: 1550,
+                y: 1450
+            },
+            {
+                id: "satellite_dishes",
+                name: "Satellite Dishes",
+                requirements: "40000 RP",
+                unlocks: [],
+                buildings: ["satellite-dish-controller3-industrialist.jpg", "satellite-dish3-industrialist.jpg"],
+                tier: 6,
+                x: 1550,
+                y: 1600
+            },
+
+            // TIER 7
+            {
+                id: "mineshaft_drill",
+                name: "Mineshaft Drill",
+                requirements: "175000 RP",
+                unlocks: ["electrolysis_plant", "foundry", "press_mk2", "roller_mk2", "radioactive_waste_storage"],
+                buildings: ["mineshaft-drill4-industrialist.jpg", "lathe4-industrialist.jpg"],
+                tier: 7,
+                x: 1800,
+                y: 250
+            },
+            {
+                id: "concrete_production",
+                name: "Concrete Production",
+                requirements: "15000 RP",
+                unlocks: ["radioactive_waste_storage"],
+                buildings: ["raw-mill2-industrialist.jpg", "industrial-kiln2-industrialist.jpg"],
+                tier: 7,
+                x: 1800,
+                y: 700
+            },
+            {
+                id: "advanced_processing",
+                name: "Advanced Processing (Theory Research)",
+                requirements: "5000 RP",
+                unlocks: ["industrial_electric_furnace", "industrial_roller", "alloyer", "pressurized_water_filter"],
+                buildings: [],
+                tier: 7,
+                x: 1800,
+                y: 1000
+            },
+            {
+                id: "large_oil_rig",
+                name: "Large Oil Rig",
+                requirements: "20000 RP",
+                unlocks: [],
+                buildings: ["large-pumpjack3-industrialist.jpg"],
+                tier: 7,
+                x: 1800,
+                y: 1150
+            },
+            {
+                id: "lng_plant",
+                name: "LNG Plant",
+                requirements: "15000 RP",
+                unlocks: ["air_separation_unit"],
+                buildings: ["lng-plant3-industrialist.jpg"],
+                tier: 7,
+                x: 1800,
+                y: 1300
+            },
+            {
+                id: "plastic_molding",
+                name: "Plastic Molding",
+                requirements: "7500 RP",
+                unlocks: ["air_separation_unit", "industrial_plastic_molding", "water_bottling"],
+                buildings: ["plastic-molding-machine3-industrialist.jpg"],
+                tier: 7,
+                x: 1800,
+                y: 1450
+            },
+
+            // TIER 8
+            {
+                id: "electrolysis_plant",
+                name: "Electrolysis Plant",
+                requirements: "290000 RP",
+                unlocks: ["ore_enrichment_facility"],
+                buildings: ["electrolysis-plant4-industrialist.jpg"],
+                tier: 8,
+                x: 2050,
+                y: 100
+            },
+            {
+                id: "foundry",
+                name: "Foundry",
+                requirements: "100000 RP",
+                unlocks: ["ore_enrichment_facility"],
+                buildings: ["foundry4-industrialist.jpg"],
+                tier: 8,
+                x: 2050,
+                y: 250
+            },
+            {
+                id: "press_mk2",
+                name: "Press MK2",
+                requirements: "40000 RP",
+                unlocks: ["grinder_mk2", "blast_furnace_mk2"],
+                buildings: ["press-mk2-industrialist.jpg"],
+                tier: 8,
+                x: 2050,
+                y: 400
+            },
+            {
+                id: "roller_mk2",
+                name: "Roller MK2",
+                requirements: "40000 RP",
+                unlocks: ["grinder_mk2", "blast_furnace_mk2"],
+                buildings: ["roller-mk2-industrialist.jpg"],
+                tier: 8,
+                x: 2050,
+                y: 550
+            },
+            {
+                id: "radioactive_waste_storage",
+                name: "Radioactive Waste Storage",
+                requirements: "250000 RP",
+                unlocks: [],
+                buildings: ["underground-waste-facility4-industrialist.jpg"],
+                tier: 8,
+                x: 2050,
+                y: 700
+            },
+            {
+                id: "industrial_electric_furnace",
+                name: "Industrial Electric Furnace",
+                requirements: "20000 RP",
+                unlocks: ["gold_refining"],
+                buildings: ["industrial-electric-furnace3-industrialist.jpg"],
+                tier: 8,
+                x: 2050,
+                y: 850
+            },
+            {
+                id: "industrial_roller",
+                name: "Industrial Roller",
+                requirements: "10000 RP",
+                unlocks: ["gold_refining"],
+                buildings: ["industrial-roller3-industrialist.jpg"],
+                tier: 8,
+                x: 2050,
+                y: 1000
+            },
+            {
+                id: "alloyer",
+                name: "Alloyer",
+                requirements: "32000 RP",
+                unlocks: ["gold_acid_refinery"],
+                buildings: ["alloyer3-industrialist.jpg"],
+                tier: 8,
+                x: 2050,
+                y: 1150
+            },
+            {
+                id: "pressurized_water_filter",
+                name: "Pressurized Water Filter",
+                requirements: "20000 RP",
+                unlocks: ["gold_acid_refinery"],
+                buildings: ["pressurized-water-filter3-industrialist.jpg"],
+                tier: 8,
+                x: 2050,
+                y: 1300
+            },
+            {
+                id: "air_separation_unit",
+                name: "Air Separation Unit",
+                requirements: "125000 RP",
+                unlocks: ["advanced_oxidation_plant"],
+                buildings: ["air-separation-unit3-industrialist.jpg", "vaporizer3-industrialist.jpg"],
+                tier: 8,
+                x: 2050,
+                y: 1450
+            },
+            {
+                id: "industrial_plastic_molding",
+                name: "Industrial Plastic Molding",
+                requirements: "50000 RP",
+                unlocks: ["advanced_assembler"],
+                buildings: ["industrial-plastic-molder3-industrialist.jpg"],
+                tier: 8,
+                x: 2050,
+                y: 1600
+            },
+            {
+                id: "water_bottling",
+                name: "Water Bottling",
+                requirements: "5000 RP",
+                unlocks: [],
+                buildings: ["bottling-plant3-industrialist.jpg"],
+                tier: 8,
+                x: 2050,
+                y: 1750
+            },
+
+            // TIER 9
+            {
+                id: "ore_enrichment_facility",
+                name: "Ore Enrichment Facility",
+                requirements: "750000 RP",
+                unlocks: ["centrifuge"],
+                buildings: ["ore-enrichment-facility-industrialist.jpg"],
+                tier: 9,
+                x: 2300,
+                y: 175
+            },
+            {
+                id: "grinder_mk2",
+                name: "Grinder MK2",
+                requirements: "40000 RP",
+                unlocks: [],
+                buildings: ["grinder-mk2-industrialist.jpg"],
+                tier: 9,
+                x: 2300,
+                y: 400
+            },
+            {
+                id: "blast_furnace_mk2",
+                name: "Blast Furnace MK2",
+                requirements: "50000 RP",
+                unlocks: [],
+                buildings: ["blast-furnace-mk2-industrialist.jpg"],
+                tier: 9,
+                x: 2300,
+                y: 550
+            },
+            {
+                id: "gold_refining",
+                name: "Gold Refining",
+                requirements: "20000 RP",
+                unlocks: ["lithium", "research_station_4"],
+                buildings: ["trommel-industrialist.jpg"],
+                tier: 9,
+                x: 2300,
+                y: 925
+            },
+            {
+                id: "gold_acid_refinery",
+                name: "Gold Acid Refinery",
+                requirements: "15000 RP",
+                unlocks: ["lithium", "research_station_4"],
+                buildings: ["gold-acid-refinery-industrialist.jpg"],
+                tier: 9,
+                x: 2300,
+                y: 1225
+            },
+            {
+                id: "advanced_oxidation_plant",
+                name: "Advanced Oxidation Plant",
+                requirements: "1500000 RP",
+                unlocks: [],
+                buildings: ["advanced-oxidation-plant-industrialist.jpg"],
+                tier: 9,
+                x: 2300,
+                y: 1450
+            },
+
+            // TIER 10
+            {
+                id: "centrifuge",
+                name: "Centrifuge",
+                requirements: "4000000 RP",
+                unlocks: [],
+                buildings: ["gas-centrifuge-industrialist.jpg"],
+                tier: 10,
+                x: 2550,
+                y: 175
+            },
+            {
+                id: "lithium",
+                name: "Lithium",
+                requirements: "100000 RP",
+                unlocks: ["charger"],
+                buildings: ["lithium-brine-extractor-industrialist.jpg", "lithium-ore-drill-industrialist.jpg"],
+                tier: 10,
+                x: 2550,
+                y: 1000
+            },
+            {
+                id: "research_station_4",
+                name: "Research Station 4",
+                requirements: "250000 RP",
+                unlocks: ["advanced_chemical_plant", "precision_assembler"],
+                buildings: ["research-station4-industrialist.jpg"],
+                tier: 10,
+                x: 2550,
+                y: 1150
+            },
+
+            // TIER 11
+            {
+                id: "charger",
+                name: "Charger",
+                requirements: "100000 RP",
+                unlocks: ["logic_assembler"],
+                buildings: ["battery-charger-industrialist.jpg"],
+                tier: 11,
+                x: 2800,
+                y: 1000
+            },
+            {
+                id: "advanced_chemical_plant",
+                name: "Advanced Chemical Plant",
+                requirements: "2000000 RP",
+                unlocks: [],
+                buildings: ["chemical-plant-industrialist.jpg"],
+                tier: 11,
+                x: 2800,
+                y: 1150
+            },
+            {
+                id: "precision_assembler",
+                name: "Precision Assembler",
+                requirements: "500000 RP and Sell 40x Purple Gold Ingot",
+                unlocks: ["logic_assembler"],
+                buildings: ["precision-assembler-industrialist.jpg"],
+                tier: 11,
+                x: 2800,
+                y: 1300
+            },
+            {
+                id: "advanced_assembler",
+                name: "Advanced Assembler",
+                requirements: "100000 RP and Sell 20x Crankshaft",
+                unlocks: ["logic_assembler"],
+                buildings: ["advanced-assembler-industrialist.jpg"],
+                tier: 11,
+                x: 2800,
+                y: 1600
+            },
+
+            // TIER 12
+            {
+                id: "logic_assembler",
+                name: "Logic Assembler",
+                requirements: "3000000 RP and Sell 10x Lithium Battery Pack",
+                unlocks: [],
+                buildings: ["logic-assembler-industrialist.jpg"],
+                tier: 12,
+                x: 3050,
+                y: 1150
+            }
+        ];
+
+        // ADJUST ALL NODE POSITIONS FOR BETTER SPACING
+        // We need to increase x spacing for tiers and y spacing between nodes
+        researchData.forEach(node => {
+            // Increase horizontal spacing between tiers
+            node.x = 50 + node.tier * 300; // 300px between tiers instead of 200
+
+            // Keep vertical positions but add more spacing
+            // You may need to adjust individual y values for better tree structure
+        });
+
+        // Map for quick lookup
+        const researchMap = {};
+        researchData.forEach(research => {
+            researchMap[research.id] = research;
+        });
+
+        // Build connections
+        const connections = [];
+        researchData.forEach(research => {
+            research.unlocks.forEach(unlockId => {
+                if (researchMap[unlockId]) {
+                    connections.push({
+                        from: research.id,
+                        to: unlockId,
+                        fromX: research.x,
+                        fromY: research.y,
+                        toX: researchMap[unlockId].x,
+                        toY: researchMap[unlockId].y
+                    });
+                }
+            });
+        });
+
+        // Generate tree with improved connection logic
+        function generateTree() {
+            const container = document.getElementById('treeContainer');
+
+            // Clear container
+            container.innerHTML = '';
+
+            // Create connections first (so they appear behind nodes)
+            connections.forEach(conn => {
+                const fromNode = researchMap[conn.from];
+                const toNode = researchMap[conn.to];
+
+                // Calculate connection points
+                // Start from right middle of source node
+                const startX = fromNode.x + 200; // Node width
+                const startY = fromNode.y + 50;  // Middle of node (assuming 100px height)
+
+                // End at left middle of target node
+                const endX = toNode.x;
+                const endY = toNode.y + 50;      // Middle of node
+
+                // Connection type: direct line or L-shaped
+                const horizontalGap = 50; // Space between node and vertical line
+
+                // For nodes in same tier group (coming from same parent)
+                // We need to create proper tree structure
+
+                // Check if multiple nodes share the same parent
+                const siblings = connections.filter(c => c.from === conn.from);
+
+                if (siblings.length > 1) {
+                    // Multiple children - create tree structure
+                    // Sort siblings by y position
+                    siblings.sort((a, b) => a.toY - b.toY);
+
+                    // Find min and max y for vertical line
+                    let minY = Math.min(...siblings.map(s => s.toY + 50));
+                    let maxY = Math.max(...siblings.map(s => s.toY + 50));
+
+                    if (fromNode.id === "gold_refining") {
+                        // Move the trunk up by 50px
+                        minY -= 75;
+                    } else if (fromNode.id === "gold_acid_refinery") {
+                        // Move the trunk down by 50px  
+                        maxY += 75;
+                    }
+
+                    // Create vertical trunk line
+                    const verticalTrunk = document.createElement('div');
+                    verticalTrunk.className = 'connection vertical-line';
+                    verticalTrunk.style.left = `${startX + horizontalGap}px`;
+                    verticalTrunk.style.top = `${minY}px`;
+                    verticalTrunk.style.height = `${maxY - minY}px`;
+                    container.appendChild(verticalTrunk);
+
+                    // Create horizontal connection for this specific node
+                    // Horizontal line from parent to vertical trunk
+                    const horizontal1 = document.createElement('div');
+                    horizontal1.className = 'connection horizontal-line';
+                    horizontal1.style.left = `${startX}px`;
+                    horizontal1.style.top = `${startY}px`;
+                    horizontal1.style.width = `${horizontalGap}px`;
+                    container.appendChild(horizontal1);
+
+                    // Horizontal line from vertical trunk to child
+                    const horizontal2 = document.createElement('div');
+                    horizontal2.className = 'connection horizontal-line';
+                    horizontal2.style.left = `${startX + horizontalGap}px`;
+                    horizontal2.style.top = `${endY}px`;
+                    horizontal2.style.width = `${endX - (startX + horizontalGap)}px`;
+                    container.appendChild(horizontal2);
+
+                } else {
+                    // Single child - simple L-shaped connection
+                    // Horizontal line from parent
+                    const horizontal1 = document.createElement('div');
+                    horizontal1.className = 'connection horizontal-line';
+                    horizontal1.style.left = `${startX}px`;
+                    horizontal1.style.top = `${startY}px`;
+                    horizontal1.style.width = `${horizontalGap}px`;
+                    container.appendChild(horizontal1);
+
+                    // Vertical line (if needed)
+                    if (Math.abs(startY - endY) > 10) {
+                        const verticalLine = document.createElement('div');
+                        verticalLine.className = 'connection vertical-line';
+                        const vertX = startX + horizontalGap;
+                        verticalLine.style.left = `${vertX}px`;
+                        verticalLine.style.top = `${Math.min(startY, endY)}px`;
+                        verticalLine.style.height = `${Math.abs(endY - startY)}px`;
+                        container.appendChild(verticalLine);
+                    }
+
+                    // Horizontal line to child
+                    const horizontal2 = document.createElement('div');
+                    horizontal2.className = 'connection horizontal-line';
+                    horizontal2.style.left = `${startX + horizontalGap}px`;
+                    horizontal2.style.top = `${endY}px`;
+                    horizontal2.style.width = `${endX - (startX + horizontalGap)}px`;
+                    container.appendChild(horizontal2);
+                }
+            });
+
+            // Create nodes (after connections so they appear on top)
+            researchData.forEach(research => {
+                const node = document.createElement('div');
+                node.className = 'research-node';
+                node.style.left = `${research.x}px`;
+                node.style.top = `${research.y}px`;
+                node.id = `node-${research.id}`;
+
+                // Add tier indicator
+                const tierIndicator = document.createElement('div');
+                tierIndicator.className = 'tier-indicator';
+                tierIndicator.textContent = `Tier ${research.tier}`;
+                node.appendChild(tierIndicator);
+
+                // Add theory research class
+                if (research.name.includes("Theory Research")) {
+                    node.classList.add('node-theory');
+                }
+
+                // Add cost-based color coding
+                const rpMatch = research.requirements.match(/([\d,]+)\s*RP/);
+                if (rpMatch) {
+                    const rpValue = parseInt(rpMatch[1].replace(/,/g, ''));
+                    if (rpValue <= 100) node.style.borderColor = '#4cc9f0';
+                    else if (rpValue <= 1000) node.style.borderColor = '#4361ee';
+                    else if (rpValue <= 10000) node.style.borderColor = '#3a0ca3';
+                    else if (rpValue <= 100000) node.style.borderColor = '#7209b7';
+                    else node.style.borderColor = '#f72585';
+                }
+
+                // Create node content
+                const header = document.createElement('div');
+                header.className = 'node-header';
+                header.textContent = research.name;
+                node.appendChild(header);
+
+                const requirements = document.createElement('div');
+                requirements.className = 'node-requirements';
+                requirements.textContent = research.requirements;
+                node.appendChild(requirements);
+
+                // Add sell requirements if present
+                if (research.requirements.includes("Sell")) {
+                    const sellReq = document.createElement('div');
+                    sellReq.className = 'node-sell-requirement';
+                    const sellMatch = research.requirements.match(/Sell (.+)/);
+                    if (sellMatch) {
+                        sellReq.textContent = sellMatch[0];
+                    }
+                    node.appendChild(sellReq);
+                }
+
+                // Add hover event for tooltip
+                node.addEventListener('mouseenter', (e) => showTooltip(e, research));
+                node.addEventListener('mouseleave', hideTooltip);
+
+                container.appendChild(node);
+            });
+
+            // Set container size based on nodes
+            const maxX = Math.max(...researchData.map(r => r.x)) + 300;
+            const maxY = Math.max(...researchData.map(r => r.y)) + 200;
+            container.style.minWidth = `${maxX}px`;
+            container.style.minHeight = `${maxY}px`;
+        }
+
+        // Tooltip functions (remain the same)
+        let currentTooltip = null;
+        let isPanning = false;
+        let startX, startY;
+        let scrollLeft, scrollTop;
+        let isZooming = false;
+        const container = document.querySelector('.container');
+        const minScale = 0.1;
+        const maxScale = 5;
+
+        container.addEventListener('wheel', handleWheel, { passive: false });
+
+        function handleWheel(e) {
+            // Prevent default scrolling
+            e.preventDefault();
+
+            // Use Ctrl key + wheel or just wheel for zoom
+            const delta = e.deltaY || e.detail || e.wheelDelta;
+            const zoomSpeed = 0.1;
+
+            // Get mouse position relative to container
+            const rect = container.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            // Calculate zoom
+            const zoomFactor = delta > 0 ? 1 - zoomSpeed : 1 + zoomSpeed;
+            zoomToPoint(zoomFactor, mouseX, mouseY);
+        }
+
+        function zoomToPoint(zoomFactor, centerX, centerY) {
+            // Clamp the new scale
+            const newScale = scale * zoomFactor;
+            const clampedScale = Math.max(minScale, Math.min(maxScale, newScale));
+
+            if (clampedScale === scale) return; // No change needed
+
+            // Calculate scroll position to keep the center point fixed
+            const scrollX = container.scrollLeft;
+            const scrollY = container.scrollTop;
+
+            // Calculate new scroll position
+            const newScrollX = (scrollX + centerX) * (clampedScale / scale) - centerX;
+            const newScrollY = (scrollY + centerY) * (clampedScale / scale) - centerY;
+
+            // Apply zoom
+            scale = clampedScale;
+            treeContainer.style.transform = `scale(${scale})`;
+            treeContainer.style.transformOrigin = 'top left';
+
+            // Update scroll position to maintain center
+            container.scrollLeft = newScrollX;
+            container.scrollTop = newScrollY;
+        }
+
+        function initPanning() {
+            const container = document.querySelector('.container');
+            const treeContainer = document.getElementById('treeContainer');
+
+            // Mouse events
+            container.addEventListener('mousedown', startPan);
+            container.addEventListener('mousemove', doPan);
+            container.addEventListener('mouseup', endPan);
+            container.addEventListener('mouseleave', endPan);
+
+            // Touch events for mobile
+            container.addEventListener('touchstart', handleTouchStart, { passive: false });
+            container.addEventListener('touchmove', handleTouchMove, { passive: false });
+            container.addEventListener('touchend', handleTouchEnd);
+            container.addEventListener('touchcancel', handleTouchEnd);
+
+            // Prevent default drag behavior for images
+            treeContainer.addEventListener('dragstart', (e) => e.preventDefault());
+
+            function startPan(e) {
+                isPanning = true;
+                container.classList.add('dragging');
+
+                // Get initial position
+                if (e.type === 'mousedown') {
+                    startX = e.pageX;
+                    startY = e.pageY;
+                } else if (e.touches && e.touches.length === 1) {
+                    startX = e.touches[0].pageX;
+                    startY = e.touches[0].pageY;
+                }
+
+                // Store current scroll position
+                scrollLeft = container.scrollLeft;
+                scrollTop = container.scrollTop;
+
+                e.preventDefault();
+                return false;
+            }
+
+            function doPan(e) {
+                if (!isPanning) return;
+
+                let currentX, currentY;
+
+                if (e.type === 'mousemove') {
+                    currentX = e.pageX;
+                    currentY = e.pageY;
+                } else if (e.touches && e.touches.length === 1) {
+                    currentX = e.touches[0].pageX;
+                    currentY = e.touches[0].pageY;
+                } else {
+                    return;
+                }
+
+                // Calculate how far we've moved
+                const walkX = startX - currentX;
+                const walkY = startY - currentY;
+
+                // Apply the movement to scroll position
+                container.scrollLeft = scrollLeft + walkX;
+                container.scrollTop = scrollTop + walkY;
+
+                e.preventDefault();
+                return false;
+            }
+
+            function endPan() {
+                isPanning = false;
+                container.classList.remove('dragging');
+            }
+
+            function handleTouchStart(e) {
+                if (e.touches.length === 1) {
+                    startPan(e);
+                }
+            }
+
+            function handleTouchMove(e) {
+                if (e.touches.length === 1) {
+                    doPan(e);
+                }
+            }
+
+            function handleTouchEnd() {
+                endPan();
+            }
+        }
+
+        function showTooltip(event, research) {
+
+            if (research.buildings.length === 0) {
+                // Create tooltip even if no buildings
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.style.left = `${event.pageX + 15}px`;
+                tooltip.style.top = `${event.pageY + 15}px`;
+
+                const header = document.createElement('div');
+                header.className = 'tooltip-header';
+                header.textContent = research.name;
+                tooltip.appendChild(header);
+
+                const info = document.createElement('div');
+                info.className = 'building-name';
+                info.textContent = 'No buildings unlocked';
+                info.style.textAlign = 'center';
+                info.style.padding = '10px';
+                tooltip.appendChild(info);
+
+                document.body.appendChild(tooltip);
+                currentTooltip = tooltip;
+                return;
+            }
+
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.style.left = `${event.pageX + 15}px`;
+            tooltip.style.top = `${event.pageY + 15}px`;
+
+            const header = document.createElement('div');
+            header.className = 'tooltip-header';
+            header.textContent = `Buildings Unlocked (${research.buildings.length})`;
+            tooltip.appendChild(header);
+
+            research.buildings.forEach((building, index) => {
+                const buildingDiv = document.createElement('div');
+                buildingDiv.className = 'building-item';
+
+                const img = document.createElement('img');
+                img.className = 'building-image';
+                img.src = `https://cms.bloxinformer.com/wp-content/uploads/2025/12/${building}`;
+                img.alt = building.replace('-industrialist.jpg', '').replace(/-/g, ' ');
+                img.onerror = function () {
+                    this.onerror = null; // Prevent infinite loop
+                    this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><rect width="100%" height="100%" fill="%231a1a2e"/><text x="50%" y="50%" font-family="Arial" font-size="14" fill="%2372efdd" text-anchor="middle" dy=".3em">Image not found</text></svg>';
+                };
+
+                const name = document.createElement('div');
+                name.className = 'building-name';
+                name.textContent = building.replace('-industrialist.jpg', '').replace(/-/g, ' ');
+
+                buildingDiv.appendChild(img);
+                buildingDiv.appendChild(name);
+                tooltip.appendChild(buildingDiv);
+            });
+
+            document.body.appendChild(tooltip);
+            currentTooltip = tooltip;
+        }
+
+        function hideTooltip() {
+            if (currentTooltip) {
+                currentTooltip.remove();
+                currentTooltip = null;
+            }
+        }
+
+        // Move tooltip with mouse
+        document.addEventListener('mousemove', (e) => {
+            if (currentTooltip) {
+                currentTooltip.style.left = `${e.pageX + 15}px`;
+                currentTooltip.style.top = `${e.pageY + 15}px`;
+            }
+        });
+
+        // Search and filter functionality (remain the same)
+        function filterNodes() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const resultsDiv = document.getElementById('searchResults');
+
+            if (!searchTerm) {
+                resultsDiv.innerHTML = '';
+                researchData.forEach(research => {
+                    const node = document.getElementById(`node-${research.id}`);
+                    if (node) {
+                        node.style.opacity = '1';
+                        node.classList.remove('node-highlight');
+                    }
+                });
+                return;
+            }
+
+            const matches = [];
+            researchData.forEach(research => {
+                const node = document.getElementById(`node-${research.id}`);
+                const isMatch = research.name.toLowerCase().includes(searchTerm) ||
+                    research.requirements.toLowerCase().includes(searchTerm);
+
+                if (node) {
+                    node.style.opacity = isMatch ? '1' : '0.2';
+                    if (isMatch) {
+                        node.classList.add('node-highlight');
+                        matches.push(research.name);
+                    } else {
+                        node.classList.remove('node-highlight');
+                    }
+                }
+            });
+
+            // Show search results count
+            resultsDiv.innerHTML = `<div style="color: #72efdd; font-size: 12px; margin-top: 5px;">Found ${matches.length} matching research nodes</div>`;
+        }
+
+        // Zoom and view controls (remain the same)
+        let scale = 1;
+        const treeContainer = document.getElementById('treeContainer');
+
+        function zoomIn() {
+            const container = document.querySelector('.container');
+            const scrollLeftRatio = container.scrollLeft / container.scrollWidth;
+            const scrollTopRatio = container.scrollTop / container.scrollHeight;
+
+            scale *= 1.2;
+            treeContainer.style.transform = `scale(${scale})`;
+            treeContainer.style.transformOrigin = 'top left';
+
+            // Maintain scroll position
+            requestAnimationFrame(() => {
+                container.scrollLeft = scrollLeftRatio * container.scrollWidth;
+                container.scrollTop = scrollTopRatio * container.scrollHeight;
+            });
+        }
+
+        function zoomOut() {
+            const container = document.querySelector('.container');
+            const scrollLeftRatio = container.scrollLeft / container.scrollWidth;
+            const scrollTopRatio = container.scrollTop / container.scrollHeight;
+
+            scale *= 0.8;
+            if (scale < 0.1) scale = 0.1;
+            treeContainer.style.transform = `scale(${scale})`;
+            treeContainer.style.transformOrigin = 'top left';
+
+            // Maintain scroll position
+            requestAnimationFrame(() => {
+                container.scrollLeft = scrollLeftRatio * container.scrollWidth;
+                container.scrollTop = scrollTopRatio * container.scrollHeight;
+            });
+        }
+
+        function resetView() {
+            scale = 1;
+            treeContainer.style.transform = `scale(${scale})`;
+            treeContainer.style.transformOrigin = 'top left';
+        }
+
+        // Initialize tree on load
+        window.onload = function () {
+            generateTree();
+            initPanning();
+
+            // Center the view on initial load
+            const container = document.querySelector('.container');
+            const treeContainer = document.getElementById('treeContainer');
+
+            // Center the viewport on the tree
+            const centerX = treeContainer.scrollWidth / 2 - container.clientWidth / 2;
+            const centerY = treeContainer.scrollHeight / 2 - container.clientHeight / 2;
+
+            container.scrollLeft = centerX;
+            container.scrollTop = centerY;
+        };
+    </script>
+</body>
+
+</html>
