@@ -269,106 +269,114 @@
         }
 
         #clearSearch {
-    position: absolute;
-    right: 20px;
-    top: 22px;
-    background: #7209b7;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
-    cursor: pointer;
-    display: none; /* Initially hidden */
-}
+            position: absolute;
+            right: 20px;
+            top: 22px;
+            background: #7209b7;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+        }
 
-#clearSearch:hover {
-    background: #4cc9f0;
-}
+        #clearSearch:hover {
+            background: #4cc9f0;
+        }
 
-.zoom-controls {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    z-index: 1000;
-    background: rgba(26, 26, 46, 0.9);
-    border: 1px solid #4cc9f0;
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-}
+        .zoom-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            z-index: 1000;
+            background: rgba(26, 26, 46, 0.9);
+            border: 1px solid #4cc9f0;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
 
-.zoom-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(145deg, #1a1a2e, #16213e);
-    border: 2px solid #4cc9f0;
-    color: #4cc9f0;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 2px solid #4cc9f0;
+            color: #4cc9f0;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
 
-.zoom-btn:hover {
-    background: linear-gradient(145deg, #4cc9f0, #4361ee);
-    color: #0a0a12;
-    transform: scale(1.1);
-}
+        .zoom-btn:hover {
+            background: linear-gradient(145deg, #4cc9f0, #4361ee);
+            color: #0a0a12;
+            transform: scale(1.1);
+        }
 
-.zoom-reset {
-    font-size: 16px;
-}
+        .zoom-reset {
+            font-size: 16px;
+        }
 
-/* For mobile devices */
-@media (max-width: 768px) {
-    .zoom-controls {
-        bottom: 70px; /* Higher up to avoid mobile browser UI */
-        right: 10px;
-        padding: 8px;
-    }
-    
-    .zoom-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 24px;
-    }
-    .zoom-btn {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-}
-}
+        @media (max-width: 768px) {
+            .zoom-controls {
+                right: 10px;
+                padding: 8px;
+            }
+
+            .zoom-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 24px;
+            }
+
+            .zoom-btn {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tooltip {
+                overflow-y: auto;
+                max-height: 300px;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
     </style>
 </head>
 
 <body>
 
     <div class="search-filter">
-    <input type="text" id="searchInput" placeholder="Search buildings and nodes..." onkeyup="filterNodes()" autocomplete="off">
-    <button id="clearSearch" onclick="clearSearch()">X</button>
-    <div id="searchResults"></div>
-</div>
+        <input type="text" id="searchInput" placeholder="Search buildings and nodes..." onkeyup="filterNodes()"
+            autocomplete="off">
+        <button id="clearSearch" onclick="clearSearch()">X</button>
+        <div id="searchResults"></div>
+    </div>
 
     <div class="container">
         <div class="tree-container" id="treeContainer">
         </div>
     </div>
     <div class="zoom-controls">
-    <button class="zoom-btn zoom-in" title="Zoom In">+</button>
-    <button class="zoom-btn zoom-out" title="Zoom Out">-</button>
-    <button class="zoom-btn zoom-reset" title="Reset Zoom">⟳</button>
-</div>
+        <button class="zoom-btn zoom-in" title="Zoom In">+</button>
+        <button class="zoom-btn zoom-out" title="Zoom Out">-</button>
+        <button class="zoom-btn zoom-reset" title="Reset Zoom">⟳</button>
+    </div>
 
     <script>
         /* Row Y-coordinates
@@ -973,11 +981,11 @@
                 }
 
                 node.addEventListener('mouseenter', (e) => showTooltip(e, research));
-node.addEventListener('mouseleave', hideTooltip);
-node.addEventListener('touchstart', (e) => {
-    e.stopPropagation(); // Prevent triggering panning
-    showTooltip(e, research);
-});
+                node.addEventListener('mouseleave', hideTooltip);
+                node.addEventListener('touchstart', (e) => {
+                    e.stopPropagation();
+                    showTooltip(e, research);
+                });
 
                 container.appendChild(node);
             });
@@ -1044,44 +1052,42 @@ node.addEventListener('touchstart', (e) => {
             applyScrollBoundaries();
         }
         function resetZoom() {
-    const container = document.querySelector('.container');
-    const treeContainer = document.getElementById('treeContainer');
-    
-    scale = 0.5;
-    treeContainer.style.transform = `scale(${scale})`;
-    treeContainer.style.transformOrigin = 'top left';
-    
-    const centerX = (treeContainer.scrollWidth * scale - container.clientWidth) / 2;
-    const centerY = (treeContainer.scrollHeight * scale - container.clientHeight) / 2;
+            const container = document.querySelector('.container');
+            const treeContainer = document.getElementById('treeContainer');
 
-    container.scrollLeft = centerX;
-    container.scrollTop = centerY;
+            scale = 0.5;
+            treeContainer.style.transform = `scale(${scale})`;
+            treeContainer.style.transformOrigin = 'top left';
 
-    setTimeout(() => {
-        applyScrollBoundaries();
-    }, 100);
-}
+            const centerX = (treeContainer.scrollWidth * scale - container.clientWidth) / 2;
+            const centerY = (treeContainer.scrollHeight * scale - container.clientHeight) / 2;
 
-// Add event listeners for zoom buttons (put this in window.onload)
-document.querySelector('.zoom-in').addEventListener('click', zoomIn);
-document.querySelector('.zoom-out').addEventListener('click', zoomOut);
-document.querySelector('.zoom-reset').addEventListener('click', resetZoom);
+            container.scrollLeft = centerX;
+            container.scrollTop = centerY;
 
-// Also add touch event listeners for mobile
-document.querySelector('.zoom-in').addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    zoomIn();
-});
+            setTimeout(() => {
+                applyScrollBoundaries();
+            }, 100);
+        }
 
-document.querySelector('.zoom-out').addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    zoomOut();
-});
+        document.querySelector('.zoom-in').addEventListener('click', zoomIn);
+        document.querySelector('.zoom-out').addEventListener('click', zoomOut);
+        document.querySelector('.zoom-reset').addEventListener('click', resetZoom);
 
-document.querySelector('.zoom-reset').addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    resetZoom();
-});
+        document.querySelector('.zoom-in').addEventListener('touchstart', function (e) {
+            e.preventDefault();
+            zoomIn();
+        });
+
+        document.querySelector('.zoom-out').addEventListener('touchstart', function (e) {
+            e.preventDefault();
+            zoomOut();
+        });
+
+        document.querySelector('.zoom-reset').addEventListener('touchstart', function (e) {
+            e.preventDefault();
+            resetZoom();
+        });
 
         function applyScrollBoundaries() {
             const containerRect = container.getBoundingClientRect();
@@ -1199,25 +1205,20 @@ document.querySelector('.zoom-reset').addEventListener('touchstart', function(e)
         }
 
         function showTooltip(event, research) {
-    // Hide any existing tooltip first
-    hideTooltip();
-    
-    // Create new tooltip
-    const tooltip = document.createElement('div');
-    tooltip.className = 'tooltip';
-    
-    // Get coordinates for both mouse and touch events
-    let clientX, clientY;
-    
-    if (event.touches && event.touches[0]) {
-        // Touch event
-        clientX = event.touches[0].clientX;
-        clientY = event.touches[0].clientY;
-    } else {
-        // Mouse event
-        clientX = event.clientX;
-        clientY = event.clientY;
-    }
+            hideTooltip();
+
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+
+            let clientX, clientY;
+
+            if (event.touches && event.touches[0]) {
+                clientX = event.touches[0].clientX;
+                clientY = event.touches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
 
             const header = document.createElement('div');
             header.className = 'tooltip-header';
@@ -1245,14 +1246,19 @@ document.querySelector('.zoom-reset').addEventListener('touchstart', function(e)
                     gridContainer.style.gridTemplateColumns = '1fr';
                 } else if (research.buildings.length <= 4) {
                     gridContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                    tooltip.style.minWidth = '100px';
                 } else if (research.buildings.length <= 6) {
                     gridContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
+                    tooltip.style.minWidth = '140px';
                 } else if (research.buildings.length <= 8) {
                     gridContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                    tooltip.style.minWidth = '210px';
                 } else if (research.buildings.length <= 10) {
                     gridContainer.style.gridTemplateColumns = 'repeat(5, 1fr)';
+                    tooltip.style.minWidth = '260px';
                 } else {
                     gridContainer.style.gridTemplateColumns = 'repeat(6, 1fr)';
+                    tooltip.style.minWidth = '300px';
                 }
 
                 research.buildings.forEach((building, index) => {
@@ -1293,8 +1299,8 @@ document.querySelector('.zoom-reset').addEventListener('touchstart', function(e)
             }
 
             const closeBtn = document.createElement('button');
-    closeBtn.innerHTML = '✕';
-    closeBtn.style.cssText = `
+            closeBtn.innerHTML = '✕';
+            closeBtn.style.cssText = `
         position: absolute;
         top: 5px;
         right: 5px;
@@ -1308,62 +1314,63 @@ document.querySelector('.zoom-reset').addEventListener('touchstart', function(e)
         cursor: pointer;
         display: none;
     `;
-    
-    // Show close button only on mobile/touch devices
-    if ('ontouchstart' in window) {
-        closeBtn.style.display = 'block';
-        closeBtn.addEventListener('click', hideTooltip);
-    }
-    
-    tooltip.appendChild(closeBtn);
 
-            // Position tooltip
-    positionTooltip(tooltip, clientX, clientY);
-    
-    document.body.appendChild(tooltip);
-    currentTooltip = tooltip;
-    
-    // On mobile, hide tooltip when tapping outside
-    if ('ontouchstart' in window) {
-        setTimeout(() => {
-            document.addEventListener('touchstart', hideTooltipOnOutsideClick, { once: true });
-        }, 100);
-    }
-}
+            if ('ontouchstart' in window) {
+                closeBtn.style.display = 'block';
+                closeBtn.addEventListener('click', hideTooltip);
+            }
 
-function hideTooltipOnOutsideClick(event) {
-    if (currentTooltip && !currentTooltip.contains(event.target)) {
-        hideTooltip();
-    }
-}
+            tooltip.appendChild(closeBtn);
+
+            positionTooltip(tooltip, clientX, clientY);
+
+            document.body.appendChild(tooltip);
+            currentTooltip = tooltip;
+
+            if ('ontouchstart' in window) {
+                setTimeout(() => {
+                    document.addEventListener('touchstart', hideTooltipOnOutsideClick, { once: true });
+                }, 100);
+            }
+
+            if (!('ontouchstart' in window)) {
+                tooltip.addEventListener('wheel', (e) => e.preventDefault(), { passive: false });
+            }
+        }
+
+        function hideTooltipOnOutsideClick(event) {
+            if (currentTooltip && !currentTooltip.contains(event.target)) {
+                hideTooltip();
+            }
+        }
 
         function positionTooltip(tooltip, clientX, clientY) {
-    const tooltipRect = tooltip.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
 
-    let left = clientX + 15;
-    let top = clientY + 15;
+            let left = clientX + 15;
+            let top = clientY + 15;
 
-    if (left + tooltipRect.width > viewportWidth) {
-        left = clientX - tooltipRect.width - 15;
-    }
+            if (left + tooltipRect.width > viewportWidth) {
+                left = clientX - tooltipRect.width - 15;
+            }
 
-    if (left < 0) {
-        left = 15;
-    }
+            if (left < 0) {
+                left = 15;
+            }
 
-    if (top + tooltipRect.height > viewportHeight) {
-        top = clientY - tooltipRect.height - 15;
-    }
+            if (top + tooltipRect.height > viewportHeight) {
+                top = clientY - tooltipRect.height - 15;
+            }
 
-    if (top < 0) {
-        top = 15;
-    }
+            if (top < 0) {
+                top = 15;
+            }
 
-    tooltip.style.left = `${left}px`;
-    tooltip.style.top = `${top}px`;
-}
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
+        }
 
         function hideTooltip() {
             if (currentTooltip) {
@@ -1388,63 +1395,59 @@ function hideTooltipOnOutsideClick(event) {
             }
         });
 
-        let lastSearchTerm = ''; // Track the last search term
+        let lastSearchTerm = '';
 
-function filterNodes() {
-    const searchInput = document.getElementById('searchInput');
-    const searchTerm = searchInput.value.toLowerCase();
-    const resultsDiv = document.getElementById('searchResults');
-    const clearButton = document.getElementById('clearSearch');
+        function filterNodes() {
+            const searchInput = document.getElementById('searchInput');
+            const searchTerm = searchInput.value.toLowerCase();
+            const resultsDiv = document.getElementById('searchResults');
+            const clearButton = document.getElementById('clearSearch');
 
-    // Show or hide the clear button
-    clearButton.style.display = searchTerm ? 'block' : 'none';
+            clearButton.style.display = searchTerm ? 'block' : 'none';
 
-    // If the search term has changed, reset matching nodes and index
-    if (searchTerm !== lastSearchTerm) {
-        matchingNodes = [];
-        currentMatchIndex = 0;
-        lastSearchTerm = searchTerm;
-    }
-
-    // Highlight matching nodes
-    if (!searchTerm) {
-        resultsDiv.innerHTML = '';
-        researchData.forEach(research => {
-            const node = document.getElementById(`node-${research.id}`);
-            if (node) {
-                node.style.opacity = '1';
-                node.classList.remove('node-highlight');
+            if (searchTerm !== lastSearchTerm) {
+                matchingNodes = [];
+                currentMatchIndex = 0;
+                lastSearchTerm = searchTerm;
             }
-        });
-        return;
-    }
 
-    const matches = [];
-    researchData.forEach(research => {
-        const node = document.getElementById(`node-${research.id}`);
-        const isMatch =
-            research.name.toLowerCase().includes(searchTerm) ||
-            research.requirements.toLowerCase().includes(searchTerm) ||
-            research.buildings.some(building =>
-                building.replace('-industrialist.jpg', '').replace(/-/g, ' ').toLowerCase().includes(searchTerm)
-            );
-
-        if (node) {
-            node.style.opacity = isMatch ? '1' : '0.2';
-            if (isMatch) {
-                node.classList.add('node-highlight');
-                matches.push(research.id);
-            } else {
-                node.classList.remove('node-highlight');
+            if (!searchTerm) {
+                resultsDiv.innerHTML = '';
+                researchData.forEach(research => {
+                    const node = document.getElementById(`node-${research.id}`);
+                    if (node) {
+                        node.style.opacity = '1';
+                        node.classList.remove('node-highlight');
+                    }
+                });
+                return;
             }
+
+            const matches = [];
+            researchData.forEach(research => {
+                const node = document.getElementById(`node-${research.id}`);
+                const isMatch =
+                    research.name.toLowerCase().includes(searchTerm) ||
+                    research.requirements.toLowerCase().includes(searchTerm) ||
+                    research.buildings.some(building =>
+                        building.replace('-industrialist.jpg', '').replace(/-/g, ' ').toLowerCase().includes(searchTerm)
+                    );
+
+                if (node) {
+                    node.style.opacity = isMatch ? '1' : '0.2';
+                    if (isMatch) {
+                        node.classList.add('node-highlight');
+                        matches.push(research.id);
+                    } else {
+                        node.classList.remove('node-highlight');
+                    }
+                }
+            });
+
+            resultsDiv.innerHTML = `<div style="color: #72efdd; font-size: 0.8rem; margin-top: 5px;">Found ${matches.length} matching research nodes</div>`;
+
+            matchingNodes = matches;
         }
-    });
-
-    resultsDiv.innerHTML = `<div style="color: #72efdd; font-size: 0.8rem; margin-top: 5px;">Found ${matches.length} matching research nodes</div>`;
-
-    // Update the matching nodes array
-    matchingNodes = matches;
-}
 
         let scale = 1;
         const treeContainer = document.getElementById('treeContainer');
@@ -1481,53 +1484,49 @@ function filterNodes() {
         }
 
         let currentMatchIndex = 0;
-let matchingNodes = [];
+        let matchingNodes = [];
 
-document.getElementById('searchInput').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        if (matchingNodes.length > 0) {
-            const nodeId = matchingNodes[currentMatchIndex];
-            const node = document.getElementById(`node-${nodeId}`);
+        document.getElementById('searchInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (matchingNodes.length > 0) {
+                    const nodeId = matchingNodes[currentMatchIndex];
+                    const node = document.getElementById(`node-${nodeId}`);
 
-            if (node) {
-                const rect = node.getBoundingClientRect();
-                const container = document.querySelector('.container');
+                    if (node) {
+                        const rect = node.getBoundingClientRect();
+                        const container = document.querySelector('.container');
 
-                // Pan to the node
-                container.scrollLeft = node.offsetLeft - container.clientWidth / 2 + rect.width / 2;
-                container.scrollTop = node.offsetTop - container.clientHeight / 2 + rect.height / 2;
+                        container.scrollLeft = node.offsetLeft - container.clientWidth / 2 + rect.width / 2;
+                        container.scrollTop = node.offsetTop - container.clientHeight / 2 + rect.height / 2;
+                        scale = 1;
+                        treeContainer.style.transform = `scale(${scale})`;
+                        treeContainer.style.transformOrigin = 'top left';
 
-                // Zoom in on the node
-                scale = 1; // Adjust zoom level as needed
-                treeContainer.style.transform = `scale(${scale})`;
-                treeContainer.style.transformOrigin = 'top left';
-
-                // Cycle to the next match
-                currentMatchIndex = (currentMatchIndex + 1) % matchingNodes.length;
+                        currentMatchIndex = (currentMatchIndex + 1) % matchingNodes.length;
+                    }
+                }
             }
+        });
+
+        function clearSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const resultsDiv = document.getElementById('searchResults');
+
+            searchInput.value = '';
+            resultsDiv.innerHTML = '';
+            matchingNodes = [];
+            currentMatchIndex = 0;
+
+            researchData.forEach(research => {
+                const node = document.getElementById(`node-${research.id}`);
+                if (node) {
+                    node.style.opacity = '1';
+                    node.classList.remove('node-highlight');
+                }
+            });
+
+            document.getElementById('clearSearch').style.display = 'none';
         }
-    }
-});
-
-function clearSearch() {
-    const searchInput = document.getElementById('searchInput');
-    const resultsDiv = document.getElementById('searchResults');
-
-    searchInput.value = '';
-    resultsDiv.innerHTML = '';
-    matchingNodes = [];
-    currentMatchIndex = 0;
-
-    researchData.forEach(research => {
-        const node = document.getElementById(`node-${research.id}`);
-        if (node) {
-            node.style.opacity = '1';
-            node.classList.remove('node-highlight');
-        }
-    });
-
-    document.getElementById('clearSearch').style.display = 'none';
-}
 
         window.onload = function () {
             generateTree();
