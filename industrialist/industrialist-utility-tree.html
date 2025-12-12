@@ -142,7 +142,7 @@
         .building-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 5px;
             padding: 5px;
         }
 
@@ -152,16 +152,17 @@
             margin-bottom: 10px;
             border-bottom: 1px solid #7209b7;
             padding-bottom: 5px;
+            font-size: 0.9rem;
         }
 
         .building-item {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    height: 100%;
-}
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100%;
+        }
 
         .building-item:last-child {
             border-bottom: none;
@@ -169,25 +170,29 @@
         }
 
         .building-image {
-    width: 100%;
-    height: 70px;
-    object-fit: contain;
-}
+            width: 100%;
+            height: 70px;
+            object-fit: contain;
+            border: 1px solid #4cc9f0;
+        }
 
         .building-name {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.7); /* Dark background with transparency */
-    color: #ffffff; /* White text for contrast */
-    font-weight: bold;
-    font-size: 0.7rem;
-    text-align: center;
-    padding: 2px 0;
-    word-break: break-word;
-    z-index: 1;
-}
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 2px 0;
+            word-break: break-word;
+            z-index: 1;
+            border-top: 1px solid #4cc9f0;
+            border-left: 1px solid #4cc9f0;
+            border-right: 1px solid #4cc9f0;
+        }
 
         .building-count {
             color: #f72585;
@@ -262,15 +267,35 @@
             -ms-user-select: text;
             user-select: text;
         }
+
+        #clearSearch {
+    position: absolute;
+    right: 20px;
+    top: 22px;
+    background: #7209b7;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    display: none; /* Initially hidden */
+}
+
+#clearSearch:hover {
+    background: #4cc9f0;
+}
     </style>
 </head>
 
 <body>
 
     <div class="search-filter">
-        <input type="text" id="searchInput" placeholder="Search buildings and nodes..." onkeyup="filterNodes()">
-        <div id="searchResults"></div>
-    </div>
+    <input type="text" id="searchInput" placeholder="Search buildings and nodes..." onkeyup="filterNodes()" autocomplete="off">
+    <button id="clearSearch" onclick="clearSearch()">X</button>
+    <div id="searchResults"></div>
+</div>
 
     <div class="container">
         <div class="tree-container" id="treeContainer">
@@ -834,62 +859,72 @@
             });
 
             researchData.forEach(research => {
-                const node = document.createElement('div');
-                node.className = 'research-node';
-                node.style.left = `${research.x}px`;
-                node.style.top = `${research.y}px`;
-                node.id = `node-${research.id}`;
+        const node = document.createElement('div');
+        node.className = 'research-node';
+        node.style.left = `${research.x}px`;
+        node.style.top = `${research.y}px`;
+        node.id = `node-${research.id}`;
 
-                const tierIndicator = document.createElement('div');
-                tierIndicator.className = 'tier-indicator';
-                tierIndicator.textContent = `Tier ${research.tier}`;
-                node.appendChild(tierIndicator);
+        const tierIndicator = document.createElement('div');
+        tierIndicator.className = 'tier-indicator';
+        tierIndicator.textContent = `Tier ${research.tier}`;
+        node.appendChild(tierIndicator);
 
-                if (research.name.includes("Theory Research")) {
-                    node.classList.add('node-theory');
-                }
-
-                const rpMatch = research.requirements.match(/([\d,]+)\s*RP/);
-                if (rpMatch) {
-                    const rpValue = parseInt(rpMatch[1].replace(/,/g, ''));
-                    if (rpValue <= 100) node.style.borderColor = '#4cc9f0';
-                    else if (rpValue <= 1000) node.style.borderColor = '#4361ee';
-                    else if (rpValue <= 10000) node.style.borderColor = '#3a0ca3';
-                    else if (rpValue <= 100000) node.style.borderColor = '#7209b7';
-                    else node.style.borderColor = '#f72585';
-                }
-
-                const header = document.createElement('div');
-                header.className = 'node-header';
-                header.textContent = research.name;
-                node.appendChild(header);
-
-                const requirements = document.createElement('div');
-                requirements.className = 'node-requirements';
-                requirements.textContent = research.requirements;
-                node.appendChild(requirements);
-
-                if (research.requirements.includes("Sell")) {
-                    const sellReq = document.createElement('div');
-                    sellReq.className = 'node-sell-requirement';
-                    const sellMatch = research.requirements.match(/Sell (.+)/);
-                    if (sellMatch) {
-                        sellReq.textContent = sellMatch[0];
-                    }
-                    node.appendChild(sellReq);
-                }
-
-                node.addEventListener('mouseenter', (e) => showTooltip(e, research));
-                node.addEventListener('mouseleave', hideTooltip);
-
-                container.appendChild(node);
-            });
-
-            const maxX = Math.max(...researchData.map(r => r.x)) + 300;
-            const maxY = Math.max(...researchData.map(r => r.y)) + 200;
-            container.style.minWidth = `${CONTENT_WIDTH + PADDING}px`;
-            container.style.minHeight = `${CONTENT_HEIGHT + PADDING}px`;
+        if (research.name.includes("Theory Research")) {
+            node.classList.add('node-theory');
         }
+
+        const rpMatch = research.requirements.match(/([\d,]+)\s*RP/);
+        if (rpMatch) {
+            const rpValue = parseInt(rpMatch[1].replace(/,/g, ''));
+            if (rpValue <= 100) node.style.borderColor = '#4cc9f0';
+            else if (rpValue <= 1000) node.style.borderColor = '#4361ee';
+            else if (rpValue <= 10000) node.style.borderColor = '#3a0ca3';
+            else if (rpValue <= 100000) node.style.borderColor = '#7209b7';
+            else node.style.borderColor = '#f72585';
+        }
+
+        const header = document.createElement('div');
+        header.className = 'node-header';
+        header.textContent = research.name;
+        node.appendChild(header);
+
+        const requirements = document.createElement('div');
+        requirements.className = 'node-requirements';
+        requirements.textContent = research.requirements;
+        node.appendChild(requirements);
+
+        if (research.requirements.includes("Sell")) {
+            const sellReq = document.createElement('div');
+            sellReq.className = 'node-sell-requirement';
+            const sellMatch = research.requirements.match(/Sell (.+)/);
+            if (sellMatch) {
+                sellReq.textContent = sellMatch[0];
+            }
+            node.appendChild(sellReq);
+        }
+
+        // Add hover event for desktop
+        node.addEventListener('mouseenter', (e) => showTooltip(e, research));
+        node.addEventListener('mouseleave', hideTooltip);
+
+        // Add click event for mobile
+        node.addEventListener('click', (e) => {
+            if (currentTooltip) {
+                hideTooltip(); // Close any existing tooltip
+            } else {
+                showTooltip(e, research); // Show the tooltip for the clicked node
+            }
+        });
+
+        container.appendChild(node);
+    });
+
+    const maxX = Math.max(...researchData.map(r => r.x)) + 300;
+    const maxY = Math.max(...researchData.map(r => r.y)) + 200;
+    container.style.minWidth = `${CONTENT_WIDTH + PADDING}px`;
+    container.style.minHeight = `${CONTENT_HEIGHT + PADDING}px`;
+}
 
         const CONTENT_WIDTH = 1900;
         const CONTENT_HEIGHT = 1800;
@@ -1084,7 +1119,7 @@
                 info.style.color = '#ccc';
                 tooltip.appendChild(info);
             } else {
-                header.textContent = `Buildings Unlocked (${research.buildings.length})`;
+                header.textContent = `Buildings (${research.buildings.length})`;
                 tooltip.appendChild(header);
 
                 const gridContainer = document.createElement('div');
@@ -1199,45 +1234,63 @@
             }
         });
 
-        function filterNodes() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const resultsDiv = document.getElementById('searchResults');
+        let lastSearchTerm = ''; // Track the last search term
 
-            if (!searchTerm) {
-                resultsDiv.innerHTML = '';
-                researchData.forEach(research => {
-                    const node = document.getElementById(`node-${research.id}`);
-                    if (node) {
-                        node.style.opacity = '1';
-                        node.classList.remove('node-highlight');
-                    }
-                });
-                return;
+function filterNodes() {
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput.value.toLowerCase();
+    const resultsDiv = document.getElementById('searchResults');
+    const clearButton = document.getElementById('clearSearch');
+
+    // Show or hide the clear button
+    clearButton.style.display = searchTerm ? 'block' : 'none';
+
+    // If the search term has changed, reset matching nodes and index
+    if (searchTerm !== lastSearchTerm) {
+        matchingNodes = [];
+        currentMatchIndex = 0;
+        lastSearchTerm = searchTerm;
+    }
+
+    // Highlight matching nodes
+    if (!searchTerm) {
+        resultsDiv.innerHTML = '';
+        researchData.forEach(research => {
+            const node = document.getElementById(`node-${research.id}`);
+            if (node) {
+                node.style.opacity = '1';
+                node.classList.remove('node-highlight');
             }
+        });
+        return;
+    }
 
-            const matches = [];
-            researchData.forEach(research => {
-                const node = document.getElementById(`node-${research.id}`);
-                const isMatch =
-                    research.name.toLowerCase().includes(searchTerm) ||
-                    research.requirements.toLowerCase().includes(searchTerm) ||
-                    research.buildings.some(building =>
-                        building.replace('-industrialist.jpg', '').replace(/-/g, ' ').toLowerCase().includes(searchTerm)
-                    );
+    const matches = [];
+    researchData.forEach(research => {
+        const node = document.getElementById(`node-${research.id}`);
+        const isMatch =
+            research.name.toLowerCase().includes(searchTerm) ||
+            research.requirements.toLowerCase().includes(searchTerm) ||
+            research.buildings.some(building =>
+                building.replace('-industrialist.jpg', '').replace(/-/g, ' ').toLowerCase().includes(searchTerm)
+            );
 
-                if (node) {
-                    node.style.opacity = isMatch ? '1' : '0.2';
-                    if (isMatch) {
-                        node.classList.add('node-highlight');
-                        matches.push(research.name);
-                    } else {
-                        node.classList.remove('node-highlight');
-                    }
-                }
-            });
-
-            resultsDiv.innerHTML = `<div style="color: #72efdd; font-size: 0.8rem; margin-top: 5px;">Found ${matches.length} matching research nodes</div>`;
+        if (node) {
+            node.style.opacity = isMatch ? '1' : '0.2';
+            if (isMatch) {
+                node.classList.add('node-highlight');
+                matches.push(research.id);
+            } else {
+                node.classList.remove('node-highlight');
+            }
         }
+    });
+
+    resultsDiv.innerHTML = `<div style="color: #72efdd; font-size: 0.8rem; margin-top: 5px;">Found ${matches.length} matching research nodes</div>`;
+
+    // Update the matching nodes array
+    matchingNodes = matches;
+}
 
         let scale = 1;
         const treeContainer = document.getElementById('treeContainer');
@@ -1272,6 +1325,55 @@
                 container.scrollTop = scrollTopRatio * container.scrollHeight;
             });
         }
+
+        let currentMatchIndex = 0;
+let matchingNodes = [];
+
+document.getElementById('searchInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        if (matchingNodes.length > 0) {
+            const nodeId = matchingNodes[currentMatchIndex];
+            const node = document.getElementById(`node-${nodeId}`);
+
+            if (node) {
+                const rect = node.getBoundingClientRect();
+                const container = document.querySelector('.container');
+
+                // Pan to the node
+                container.scrollLeft = node.offsetLeft - container.clientWidth / 2 + rect.width / 2;
+                container.scrollTop = node.offsetTop - container.clientHeight / 2 + rect.height / 2;
+
+                // Zoom in on the node
+                scale = 1; // Adjust zoom level as needed
+                treeContainer.style.transform = `scale(${scale})`;
+                treeContainer.style.transformOrigin = 'top left';
+
+                // Cycle to the next match
+                currentMatchIndex = (currentMatchIndex + 1) % matchingNodes.length;
+            }
+        }
+    }
+});
+
+function clearSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('searchResults');
+
+    searchInput.value = '';
+    resultsDiv.innerHTML = '';
+    matchingNodes = [];
+    currentMatchIndex = 0;
+
+    researchData.forEach(research => {
+        const node = document.getElementById(`node-${research.id}`);
+        if (node) {
+            node.style.opacity = '1';
+            node.classList.remove('node-highlight');
+        }
+    });
+
+    document.getElementById('clearSearch').style.display = 'none';
+}
 
         window.onload = function () {
             generateTree();
