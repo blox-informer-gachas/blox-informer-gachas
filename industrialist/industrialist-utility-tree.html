@@ -959,86 +959,149 @@
             container.scrollTop = Math.max(0, Math.min(maxScrollY, container.scrollTop));
         }
 
+        let initialPinchDistance = null;
+let lastScale = 1;
+let isPinching = false;
+
         function initPanning() {
-            const container = document.querySelector('.container');
-            const treeContainer = document.getElementById('treeContainer');
+    const container = document.querySelector('.container');
+    const treeContainer = document.getElementById('treeContainer');
 
-            container.addEventListener('mousedown', startPan);
-            container.addEventListener('mousemove', doPan);
-            container.addEventListener('mouseup', endPan);
-            container.addEventListener('mouseleave', endPan);
+    container.addEventListener('mousedown', startPan);
+    container.addEventListener('mousemove', doPan);
+    container.addEventListener('mouseup', endPan);
+    container.addEventListener('mouseleave', endPan);
 
-            container.addEventListener('touchstart', handleTouchStart, { passive: false });
-            container.addEventListener('touchmove', handleTouchMove, { passive: false });
-            container.addEventListener('touchend', handleTouchEnd);
-            container.addEventListener('touchcancel', handleTouchEnd);
+    // Updated touch event handlers with pinch-to-zoom support
+    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd);
+    container.addEventListener('touchcancel', handleTouchEnd);
 
-            treeContainer.addEventListener('dragstart', (e) => e.preventDefault());
+    treeContainer.addEventListener('dragstart', (e) => e.preventDefault());
 
-            function startPan(e) {
-                isPanning = true;
-                container.classList.add('dragging');
+    function handleTouchStart(e) {
+        if (e.touches.length === 1) {
+            startPan(e);
+        } else if (e.touches.length === 2) {
+            // Start pinch-to-zoom
+            isPinching = true;
+            isPanning = false;
+            initialPinchDistance = getDistance(e.touches[0], e.touches[1]);
+            lastScale = scale;
+            e.preventDefault();
+        }
+    }
 
-                if (e.type === 'mousedown') {
-                    startX = e.pageX;
-                    startY = e.pageY;
-                } else if (e.touches && e.touches.length === 1) {
-                    startX = e.touches[0].pageX;
-                    startY = e.touches[0].pageY;
-                }
+    function handleTouchMove(e) {
+        if (isPinching && e.touches.length === 2) {
+            // Handle pinch-to-zoom
+            const currentDistance = getDistance(e.touches[0], e.touches[1]);
+            const zoomFactor = currentDistance / initialPinchDistance;
+            
+            // Calculate center point between two fingers
+            const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+            const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+            
+            // Convert to container coordinates
+            const rect = container.getBoundingClientRect();
+            const containerX = centerX - rect.left;
+            const containerY = centerY - rect.top;
+            
+            // Apply zoom
+            zoomToPoint(zoomFactor, containerX, containerY);
+            
+            initialPinchDistance = currentDistance;
+            e.preventDefault();
+        } else if (e.touches.length === 1 && isPanning) {
+            doPan(e);
+        }
+    }
 
-                scrollLeft = container.scrollLeft;
-                scrollTop = container.scrollTop;
+    function handleTouchEnd(e) {
+        if (e.touches.length < 2) {
+            isPinching = false;
+            initialPinchDistance = null;
+        }
+        if (e.touches.length === 0) {
+            endPan();
+        }
+    }
 
-                e.preventDefault();
-                return false;
-            }
+    // Helper function to calculate distance between two touch points
+    function getDistance(touch1, touch2) {
+        const dx = touch1.clientX - touch2.clientX;
+        const dy = touch1.clientY - touch2.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
 
-            function doPan(e) {
-                if (!isPanning) return;
+    // Rest of the existing panning functions remain the same...
+    function startPan(e) {
+        if (isPinching) return;
+        
+        isPanning = true;
+        container.classList.add('dragging');
 
-                let currentX, currentY;
+        if (e.type === 'mousedown') {
+            startX = e.pageX;
+            startY = e.pageY;
+        } else if (e.touches && e.touches.length === 1) {
+            startX = e.touches[0].pageX;
+            startY = e.touches[0].pageY;
+        }
 
-                if (e.type === 'mousemove') {
-                    currentX = e.pageX;
-                    currentY = e.pageY;
-                } else if (e.touches && e.touches.length === 1) {
-                    currentX = e.touches[0].pageX;
-                    currentY = e.touches[0].pageY;
-                } else {
-                    return;
-                }
+        scrollLeft = container.scrollLeft;
+        scrollTop = container.scrollTop;
 
-                const walkX = startX - currentX;
-                const walkY = startY - currentY;
+        e.preventDefault();
+        return false;
+    }
 
-                let newScrollLeft = scrollLeft + walkX;
-                let newScrollTop = scrollTop + walkY;
+    function doPan(e) {
+        if (!isPanning || isPinching) return;
 
-                const containerRect = container.getBoundingClientRect();
-                const scaledWidth = CONTENT_WIDTH * scale;
-                const scaledHeight = CONTENT_HEIGHT * scale;
-                const visibleWidth = Math.min(containerRect.width, scaledWidth);
-                const visibleHeight = Math.min(containerRect.height, scaledHeight);
+        let currentX, currentY;
 
-                const maxScrollX = Math.max(0, scaledWidth - visibleWidth);
-                const maxScrollY = Math.max(0, scaledHeight - visibleHeight);
+        if (e.type === 'mousemove') {
+            currentX = e.pageX;
+            currentY = e.pageY;
+        } else if (e.touches && e.touches.length === 1) {
+            currentX = e.touches[0].pageX;
+            currentY = e.touches[0].pageY;
+        } else {
+            return;
+        }
 
-                newScrollLeft = Math.max(0, Math.min(maxScrollX, newScrollLeft));
-                newScrollTop = Math.max(0, Math.min(maxScrollY, newScrollTop));
+        const walkX = startX - currentX;
+        const walkY = startY - currentY;
 
-                container.scrollLeft = newScrollLeft;
-                container.scrollTop = newScrollTop;
+        let newScrollLeft = scrollLeft + walkX;
+        let newScrollTop = scrollTop + walkY;
 
-                e.preventDefault();
-                return false;
-            }
+        const containerRect = container.getBoundingClientRect();
+        const scaledWidth = CONTENT_WIDTH * scale;
+        const scaledHeight = CONTENT_HEIGHT * scale;
+        const visibleWidth = Math.min(containerRect.width, scaledWidth);
+        const visibleHeight = Math.min(containerRect.height, scaledHeight);
 
-            function endPan() {
-                isPanning = false;
-                container.classList.remove('dragging');
-                applyScrollBoundaries();
-            }
+        const maxScrollX = Math.max(0, scaledWidth - visibleWidth);
+        const maxScrollY = Math.max(0, scaledHeight - visibleHeight);
+
+        newScrollLeft = Math.max(0, Math.min(maxScrollX, newScrollLeft));
+        newScrollTop = Math.max(0, Math.min(maxScrollY, newScrollTop));
+
+        container.scrollLeft = newScrollLeft;
+        container.scrollTop = newScrollTop;
+
+        e.preventDefault();
+        return false;
+    }
+
+    function endPan() {
+        isPanning = false;
+        container.classList.remove('dragging');
+        applyScrollBoundaries();
+    }
 
             function handleTouchStart(e) {
                 if (e.touches.length === 1) {
@@ -1058,119 +1121,142 @@
         }
 
         function showTooltip(event, research) {
-            hideTooltip();
+    hideTooltip();
 
-            const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip';
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
 
-            const header = document.createElement('div');
-            header.className = 'tooltip-header';
+    const header = document.createElement('div');
+    header.className = 'tooltip-header';
 
-            if (research.buildings.length === 0) {
-                header.textContent = research.name;
-                tooltip.appendChild(header);
+    if (research.buildings.length === 0) {
+        header.textContent = research.name;
+        tooltip.appendChild(header);
 
-                const info = document.createElement('div');
-                info.className = 'building-name';
-                info.textContent = 'No buildings unlocked';
-                info.style.textAlign = 'center';
-                info.style.padding = '10px';
-                tooltip.appendChild(info);
-            } else {
-                header.textContent = `Buildings Unlocked (${research.buildings.length})`;
-                tooltip.appendChild(header);
+        const info = document.createElement('div');
+        info.className = 'building-name';
+        info.textContent = 'No buildings unlocked';
+        info.style.textAlign = 'center';
+        info.style.padding = '10px';
+        tooltip.appendChild(info);
+    } else {
+        header.textContent = `Buildings Unlocked (${research.buildings.length})`;
+        tooltip.appendChild(header);
 
-                const gridContainer = document.createElement('div');
-                gridContainer.className = 'building-grid';
+        const gridContainer = document.createElement('div');
+        gridContainer.className = 'building-grid';
 
-                if (research.buildings.length === 1) {
-                    gridContainer.style.gridTemplateColumns = '1fr';
-                } else if (research.buildings.length <= 4) {
-                    gridContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
-                } else if (research.buildings.length <= 6) {
-                    gridContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
-                } else if (research.buildings.length <= 8) {
-                    gridContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
-                } else if (research.buildings.length <= 10) {
-                    gridContainer.style.gridTemplateColumns = 'repeat(5, 1fr)';
-                } else if (research.buildings.length <= 12) {
-                    gridContainer.style.gridTemplateColumns = 'repeat(6, 1fr)';
-                } else {
-                    gridContainer.style.gridTemplateColumns = 'repeat(7, 1fr)';
-                    tooltip.style.maxWidth = '750px';
-                }
-
-                research.buildings.forEach((building, index) => {
-                    const buildingDiv = document.createElement('div');
-                    buildingDiv.className = 'building-item';
-
-                    const img = document.createElement('img');
-                    img.className = 'building-image';
-                    img.src = `https://cms.bloxinformer.com/wp-content/uploads/2025/12/${building}`;
-                    img.alt = building.replace('-industrialist.jpg', '').replace(/-/g, ' ');
-                    img.onerror = function () {
-                        this.onerror = null;
-                        this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><rect width="100%" height="100%" fill="%231a1a2e"/><text x="50%" y="50%" font-family="Arial" fill="%2372efdd" text-anchor="middle" dy=".3em">Image not found</text></svg>';
-                    };
-
-                    const name = document.createElement('div');
-                    name.className = 'building-name';
-
-                    let displayName = building.replace('-industrialist.jpg', '').replace('-industrialist-.jpg', '').replace('-industrialis.jpg', '').replace('.jpg', '').replace(/-/g, ' ');
-                    displayName = displayName.split(' ')
-                        .map(word => {
-                            const match = word.match(/([a-zA-Z]+)(\d+)$/);
-                            if (match) {
-                                return match[1].charAt(0).toUpperCase() + match[1].slice(1) + ' ' + match[2];
-                            }
-                            return word.charAt(0).toUpperCase() + word.slice(1);
-                        })
-                        .join(' ');
-
-                    name.textContent = displayName;
-
-                    buildingDiv.appendChild(img);
-                    buildingDiv.appendChild(name);
-                    gridContainer.appendChild(buildingDiv);
-                });
-
-                tooltip.appendChild(gridContainer);
-            }
-
-            document.body.appendChild(tooltip);
-
-            positionTooltip(tooltip, event);
-
-            currentTooltip = tooltip;
+        if (research.buildings.length === 1) {
+            gridContainer.style.gridTemplateColumns = '1fr';
+        } else if (research.buildings.length <= 4) {
+            gridContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        } else if (research.buildings.length <= 6) {
+            gridContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        } else if (research.buildings.length <= 8) {
+            gridContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        } else if (research.buildings.length <= 10) {
+            gridContainer.style.gridTemplateColumns = 'repeat(5, 1fr)';
+        } else if (research.buildings.length <= 12) {
+            gridContainer.style.gridTemplateColumns = 'repeat(6, 1fr)';
+        } else {
+            gridContainer.style.gridTemplateColumns = 'repeat(7, 1fr)';
+            tooltip.style.maxWidth = '750px';
+            tooltip.style.maxHeight = '70vh';
+            tooltip.style.overflowY = 'auto';
+            tooltip.style.overflowX = 'hidden';
         }
 
-        function positionTooltip(tooltip, event) {
-            const tooltipRect = tooltip.getBoundingClientRect();
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
+        research.buildings.forEach((building, index) => {
+            const buildingDiv = document.createElement('div');
+            buildingDiv.className = 'building-item';
 
-            let left = event.pageX + 15;
-            let top = event.pageY + 15;
+            const img = document.createElement('img');
+            img.className = 'building-image';
+            img.src = `https://cms.bloxinformer.com/wp-content/uploads/2025/12/${building}`;
+            img.alt = building.replace('-industrialist.jpg', '').replace(/-/g, ' ');
+            img.onerror = function() {
+                this.onerror = null;
+                this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><rect width="100%" height="100%" fill="%231a1a2e"/><text x="50%" y="50%" font-family="Arial" fill="%2372efdd" text-anchor="middle" dy=".3em">Image not found</text></svg>';
+            };
 
-            if (left + tooltipRect.width > viewportWidth) {
-                left = event.pageX - tooltipRect.width - 15;
-            }
+            const name = document.createElement('div');
+            name.className = 'building-name';
 
-            if (left < 0) {
-                left = 15;
-            }
+            let displayName = building.replace('-industrialist.jpg', '').replace('-industrialist-.jpg', '').replace(/-/g, ' ');
+            displayName = displayName.split(' ')
+                .map(word => {
+                    const match = word.match(/([a-zA-Z]+)(\d+)$/);
+                    if (match) {
+                        return match[1].charAt(0).toUpperCase() + match[1].slice(1) + ' ' + match[2];
+                    }
+                    return word.charAt(0).toUpperCase() + word.slice(1);
+                })
+                .join(' ');
 
-            if (top + tooltipRect.height > viewportHeight) {
-                top = event.pageY - tooltipRect.height - 15;
-            }
+            name.textContent = displayName;
 
-            if (top < 0) {
-                top = 15;
-            }
+            buildingDiv.appendChild(img);
+            buildingDiv.appendChild(name);
+            gridContainer.appendChild(buildingDiv);
+        });
 
-            tooltip.style.left = `${left}px`;
-            tooltip.style.top = `${top}px`;
+        tooltip.appendChild(gridContainer);
+    }
+
+    document.body.appendChild(tooltip);
+
+    // Position tooltip once and don't update on mousemove
+    positionTooltip(tooltip, event, true);
+
+    currentTooltip = tooltip;
+    
+    // Add a flag to prevent repositioning for large tooltips
+    if (research.buildings.length > 8) {
+        tooltip.dataset.largeTooltip = 'true';
+    }
+}
+
+function positionTooltip(tooltip, event, isInitialPositioning = false) {
+    // Don't reposition large tooltips during mouse movement
+    if (!isInitialPositioning && tooltip.dataset.largeTooltip === 'true') {
+        return;
+    }
+
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let left = event.pageX + 15;
+    let top = event.pageY + 15;
+
+    // Check right edge
+    if (left + tooltipRect.width > viewportWidth) {
+        left = event.pageX - tooltipRect.width - 15;
+    }
+
+    // Check left edge
+    if (left < 0) {
+        left = 15;
+    }
+
+    // Check bottom edge - for large tooltips, position at top if near bottom
+    if (top + tooltipRect.height > viewportHeight) {
+        if (tooltip.dataset.largeTooltip === 'true') {
+            // For large tooltips, position at top with some margin
+            top = Math.max(15, viewportHeight - tooltipRect.height - 15);
+        } else {
+            top = event.pageY - tooltipRect.height - 15;
         }
+    }
+
+    // Check top edge
+    if (top < 0) {
+        top = 15;
+    }
+
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+}
 
         function hideTooltip() {
             if (currentTooltip) {
@@ -1186,14 +1272,11 @@
         });
 
         window.addEventListener('resize', () => {
-            if (currentTooltip) {
-                const event = new MouseEvent('mousemove', {
-                    clientX: event.clientX,
-                    clientY: event.clientY
-                });
-                positionTooltip(currentTooltip, event);
-            }
-        });
+    if (currentTooltip && currentTooltip.dataset.largeTooltip === 'true') {
+        const event = new MouseEvent('mousemove');
+        positionTooltip(currentTooltip, event, true);
+    }
+});
 
         function filterNodes() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
