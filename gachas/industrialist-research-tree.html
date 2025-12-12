@@ -27,20 +27,7 @@
             min-height: 100vh;
         }
 
-        .container {
-            max-width: 100%;
-            height: 100vh;
-            /* Full viewport height */
-            overflow: hidden;
-            /* Hide scrollbars, we'll handle panning manually */
-            padding: 20px 0;
-            position: relative;
-            cursor: grab;
-            -webkit-overflow-scrolling: touch;
-            touch-action: none;
-            /* Disable all browser touch actions */
-            overscroll-behavior: none;
-        }
+
 
         .container.dragging {
             cursor: grabbing;
@@ -48,13 +35,31 @@
 
         .tree-container {
             position: relative;
-            min-height: 1200px;
+            min-height: 1900px;
             padding: 50px;
-            min-width: 2500px;
+            min-width: 3200px;
             user-select: none;
-            /* Prevent text selection */
             pointer-events: all;
-            /* Ensure it can receive events */
+        }
+
+        .container {
+            max-width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            padding: 20px 0;
+            position: relative;
+            cursor: grab;
+            -webkit-overflow-scrolling: touch;
+            touch-action: none;
+            overscroll-behavior: none;
+            overflow-x: auto;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .container::-webkit-scrollbar {
+            display: none;
         }
 
         .tree-container.dragging {
@@ -71,8 +76,8 @@
             min-height: 100px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             transition: all 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
             z-index: 10;
-            /* Increased z-index */
         }
 
         .research-node:hover {
@@ -83,7 +88,6 @@
         }
 
         .node-header {
-            font-size: 14px;
             font-weight: bold;
             color: #4cc9f0;
             margin-bottom: 8px;
@@ -92,23 +96,21 @@
         }
 
         .node-requirements {
-            font-size: 12px;
+            font-size: 0.8rem;
             color: #72efdd;
             margin-top: 5px;
         }
 
         .node-sell-requirement {
-            font-size: 11px;
+            font-size: 0.85rem;
             color: #f72585;
             margin-top: 3px;
             font-style: italic;
         }
 
-        /* Updated connection styles */
         .connection {
             position: absolute;
             z-index: 1;
-            /* Lower than nodes */
             pointer-events: none;
         }
 
@@ -122,34 +124,42 @@
             background-color: #4cc9f0;
         }
 
-        /* Tooltip styles remain the same */
         .tooltip {
-            position: absolute;
+            position: fixed;
             background: rgba(26, 26, 46, 0.95);
             border: 2px solid #7209b7;
             border-radius: 8px;
             padding: 15px;
-            width: 300px;
-            max-width: 300px;
+            overflow-y: auto;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
             z-index: 1000;
             display: block;
             backdrop-filter: blur(5px);
+            max-width: 400px;
+        }
+
+        .building-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 5px;
         }
 
         .tooltip-header {
             color: #7209b7;
             font-weight: bold;
             margin-bottom: 10px;
-            font-size: 16px;
             border-bottom: 1px solid #7209b7;
             padding-bottom: 5px;
         }
 
         .building-item {
-            margin-bottom: 15px;
-            border-bottom: 1px dashed #333;
+            margin-bottom: 0;
             padding-bottom: 10px;
+            break-inside: avoid;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .building-item:last-child {
@@ -159,22 +169,21 @@
 
         .building-image {
             width: 100%;
-            height: 150px;
+            height: 120px;
             object-fit: contain;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
             margin-bottom: 8px;
-            border: 1px solid #444;
         }
 
         .building-name {
-            font-size: 13px;
             color: #b5b5b5;
             text-align: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+            word-break: break-word;
+            margin-top: auto;
         }
 
         .building-count {
-            font-size: 11px;
             color: #f72585;
             text-align: center;
             margin-top: 2px;
@@ -186,60 +195,10 @@
             right: 10px;
             background: #7209b7;
             color: white;
-            font-size: 10px;
+            font-size: 0.7rem;
             padding: 2px 6px;
             border-radius: 10px;
             font-weight: bold;
-        }
-
-        .legend {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(26, 26, 46, 0.9);
-            border: 1px solid #4cc9f0;
-            border-radius: 8px;
-            padding: 15px;
-            font-size: 12px;
-            z-index: 1000;
-        }
-
-        .legend h3 {
-            color: #4cc9f0;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .legend-item {
-            margin-bottom: 5px;
-        }
-
-        .legend-color {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            margin-right: 8px;
-            border-radius: 2px;
-        }
-
-        .rp-0-100 {
-            background-color: #4cc9f0;
-        }
-
-        .rp-101-1000 {
-            background-color: #4361ee;
-        }
-
-        .rp-1001-10000 {
-            background-color: #3a0ca3;
-        }
-
-        .rp-10001-100000 {
-            background-color: #7209b7;
-        }
-
-        .rp-100001-plus {
-            background-color: #f72585;
         }
 
         .search-filter {
@@ -261,7 +220,6 @@
             border: 1px solid #4cc9f0;
             border-radius: 4px;
             color: white;
-            margin-bottom: 10px;
         }
 
         .node-highlight {
@@ -304,18 +262,46 @@
 <body>
 
     <div class="search-filter">
-        <input type="text" id="searchInput" placeholder="Search research nodes..." onkeyup="filterNodes()">
+        <input type="text" id="searchInput" placeholder="Search buildings and nodes..." onkeyup="filterNodes()">
         <div id="searchResults"></div>
     </div>
 
     <div class="container">
         <div class="tree-container" id="treeContainer">
-            <!-- Research nodes and connections will be generated here -->
         </div>
     </div>
 
     <script>
-        // Research data extracted from the table
+        /* Row Y-coordinates
+        1: 100
+        2: 250
+        3: 400
+        4: 550
+        5: 700  - mid row
+        6: 850
+        7: 1000
+        8: 1150
+        9: 1300
+        10: 1450
+        11: 1600
+        12: 1750  */
+
+        /* Tier X-coordinates
+        0: 50
+        1: 300
+        2: 550
+        3: 800
+        4: 1050
+        5: 1300
+        6: 1550
+        7: 1800
+        8: 2050
+        9: 2300
+        10: 2550
+        11: 2800
+        12: 3050  */
+
+        // Research data
         const researchData = [
             {
                 id: "production",
@@ -722,7 +708,7 @@
                 name: "Concrete Production",
                 requirements: "15000 RP",
                 unlocks: ["radioactive_waste_storage"],
-                buildings: ["raw-mill2-industrialist.jpg", "industrial-kiln2-industrialist.jpg"],
+                buildings: ["raw-mill2-industrialist-.jpg", "industrial-kiln2-industrialist.jpg"],
                 tier: 7,
                 x: 1800,
                 y: 700
@@ -1039,23 +1025,15 @@
             }
         ];
 
-        // ADJUST ALL NODE POSITIONS FOR BETTER SPACING
-        // We need to increase x spacing for tiers and y spacing between nodes
         researchData.forEach(node => {
-            // Increase horizontal spacing between tiers
-            node.x = 50 + node.tier * 300; // 300px between tiers instead of 200
-
-            // Keep vertical positions but add more spacing
-            // You may need to adjust individual y values for better tree structure
+            node.x = 50 + node.tier * 300;
         });
 
-        // Map for quick lookup
         const researchMap = {};
         researchData.forEach(research => {
             researchMap[research.id] = research;
         });
 
-        // Build connections
         const connections = [];
         researchData.forEach(research => {
             research.unlocks.forEach(unlockId => {
@@ -1072,54 +1050,33 @@
             });
         });
 
-        // Generate tree with improved connection logic
         function generateTree() {
             const container = document.getElementById('treeContainer');
 
-            // Clear container
             container.innerHTML = '';
 
-            // Create connections first (so they appear behind nodes)
             connections.forEach(conn => {
                 const fromNode = researchMap[conn.from];
                 const toNode = researchMap[conn.to];
-
-                // Calculate connection points
-                // Start from right middle of source node
-                const startX = fromNode.x + 200; // Node width
-                const startY = fromNode.y + 50;  // Middle of node (assuming 100px height)
-
-                // End at left middle of target node
+                const startX = fromNode.x + 200;
+                const startY = fromNode.y + 50;
                 const endX = toNode.x;
-                const endY = toNode.y + 50;      // Middle of node
-
-                // Connection type: direct line or L-shaped
-                const horizontalGap = 50; // Space between node and vertical line
-
-                // For nodes in same tier group (coming from same parent)
-                // We need to create proper tree structure
-
-                // Check if multiple nodes share the same parent
+                const endY = toNode.y + 50;
+                const horizontalGap = 50;
                 const siblings = connections.filter(c => c.from === conn.from);
 
                 if (siblings.length > 1) {
-                    // Multiple children - create tree structure
-                    // Sort siblings by y position
                     siblings.sort((a, b) => a.toY - b.toY);
 
-                    // Find min and max y for vertical line
                     let minY = Math.min(...siblings.map(s => s.toY + 50));
                     let maxY = Math.max(...siblings.map(s => s.toY + 50));
 
                     if (fromNode.id === "gold_refining") {
-                        // Move the trunk up by 50px
                         minY -= 75;
                     } else if (fromNode.id === "gold_acid_refinery") {
-                        // Move the trunk down by 50px  
                         maxY += 75;
                     }
 
-                    // Create vertical trunk line
                     const verticalTrunk = document.createElement('div');
                     verticalTrunk.className = 'connection vertical-line';
                     verticalTrunk.style.left = `${startX + horizontalGap}px`;
@@ -1127,8 +1084,6 @@
                     verticalTrunk.style.height = `${maxY - minY}px`;
                     container.appendChild(verticalTrunk);
 
-                    // Create horizontal connection for this specific node
-                    // Horizontal line from parent to vertical trunk
                     const horizontal1 = document.createElement('div');
                     horizontal1.className = 'connection horizontal-line';
                     horizontal1.style.left = `${startX}px`;
@@ -1136,7 +1091,6 @@
                     horizontal1.style.width = `${horizontalGap}px`;
                     container.appendChild(horizontal1);
 
-                    // Horizontal line from vertical trunk to child
                     const horizontal2 = document.createElement('div');
                     horizontal2.className = 'connection horizontal-line';
                     horizontal2.style.left = `${startX + horizontalGap}px`;
@@ -1145,8 +1099,6 @@
                     container.appendChild(horizontal2);
 
                 } else {
-                    // Single child - simple L-shaped connection
-                    // Horizontal line from parent
                     const horizontal1 = document.createElement('div');
                     horizontal1.className = 'connection horizontal-line';
                     horizontal1.style.left = `${startX}px`;
@@ -1154,7 +1106,6 @@
                     horizontal1.style.width = `${horizontalGap}px`;
                     container.appendChild(horizontal1);
 
-                    // Vertical line (if needed)
                     if (Math.abs(startY - endY) > 10) {
                         const verticalLine = document.createElement('div');
                         verticalLine.className = 'connection vertical-line';
@@ -1165,7 +1116,6 @@
                         container.appendChild(verticalLine);
                     }
 
-                    // Horizontal line to child
                     const horizontal2 = document.createElement('div');
                     horizontal2.className = 'connection horizontal-line';
                     horizontal2.style.left = `${startX + horizontalGap}px`;
@@ -1175,7 +1125,6 @@
                 }
             });
 
-            // Create nodes (after connections so they appear on top)
             researchData.forEach(research => {
                 const node = document.createElement('div');
                 node.className = 'research-node';
@@ -1183,18 +1132,15 @@
                 node.style.top = `${research.y}px`;
                 node.id = `node-${research.id}`;
 
-                // Add tier indicator
                 const tierIndicator = document.createElement('div');
                 tierIndicator.className = 'tier-indicator';
                 tierIndicator.textContent = `Tier ${research.tier}`;
                 node.appendChild(tierIndicator);
 
-                // Add theory research class
                 if (research.name.includes("Theory Research")) {
                     node.classList.add('node-theory');
                 }
 
-                // Add cost-based color coding
                 const rpMatch = research.requirements.match(/([\d,]+)\s*RP/);
                 if (rpMatch) {
                     const rpValue = parseInt(rpMatch[1].replace(/,/g, ''));
@@ -1205,7 +1151,6 @@
                     else node.style.borderColor = '#f72585';
                 }
 
-                // Create node content
                 const header = document.createElement('div');
                 header.className = 'node-header';
                 header.textContent = research.name;
@@ -1216,7 +1161,6 @@
                 requirements.textContent = research.requirements;
                 node.appendChild(requirements);
 
-                // Add sell requirements if present
                 if (research.requirements.includes("Sell")) {
                     const sellReq = document.createElement('div');
                     sellReq.className = 'node-sell-requirement';
@@ -1227,21 +1171,21 @@
                     node.appendChild(sellReq);
                 }
 
-                // Add hover event for tooltip
                 node.addEventListener('mouseenter', (e) => showTooltip(e, research));
                 node.addEventListener('mouseleave', hideTooltip);
 
                 container.appendChild(node);
             });
 
-            // Set container size based on nodes
             const maxX = Math.max(...researchData.map(r => r.x)) + 300;
             const maxY = Math.max(...researchData.map(r => r.y)) + 200;
-            container.style.minWidth = `${maxX}px`;
-            container.style.minHeight = `${maxY}px`;
+            container.style.minWidth = `${CONTENT_WIDTH + PADDING}px`;
+            container.style.minHeight = `${CONTENT_HEIGHT + PADDING}px`;
         }
 
-        // Tooltip functions (remain the same)
+        const CONTENT_WIDTH = 4000;
+        const CONTENT_HEIGHT = 2000;
+        const PADDING = 200;
         let currentTooltip = null;
         let isPanning = false;
         let startX, startY;
@@ -1254,72 +1198,84 @@
         container.addEventListener('wheel', handleWheel, { passive: false });
 
         function handleWheel(e) {
-            // Prevent default scrolling
             e.preventDefault();
 
-            // Use Ctrl key + wheel or just wheel for zoom
             const delta = e.deltaY || e.detail || e.wheelDelta;
             const zoomSpeed = 0.1;
 
-            // Get mouse position relative to container
             const rect = container.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
 
-            // Calculate zoom
             const zoomFactor = delta > 0 ? 1 - zoomSpeed : 1 + zoomSpeed;
             zoomToPoint(zoomFactor, mouseX, mouseY);
         }
 
         function zoomToPoint(zoomFactor, centerX, centerY) {
-            // Clamp the new scale
             const newScale = scale * zoomFactor;
+
+            const containerRect = container.getBoundingClientRect();
+            const minScaleX = containerRect.width / (CONTENT_WIDTH + PADDING);
+            const minScaleY = containerRect.height / (CONTENT_HEIGHT + PADDING);
+            const minScale = Math.min(minScaleX, minScaleY, 0.5);
+
             const clampedScale = Math.max(minScale, Math.min(maxScale, newScale));
 
-            if (clampedScale === scale) return; // No change needed
+            if (clampedScale === scale) return;
 
-            // Calculate scroll position to keep the center point fixed
             const scrollX = container.scrollLeft;
             const scrollY = container.scrollTop;
 
-            // Calculate new scroll position
             const newScrollX = (scrollX + centerX) * (clampedScale / scale) - centerX;
             const newScrollY = (scrollY + centerY) * (clampedScale / scale) - centerY;
 
-            // Apply zoom
             scale = clampedScale;
             treeContainer.style.transform = `scale(${scale})`;
             treeContainer.style.transformOrigin = 'top left';
 
-            // Update scroll position to maintain center
             container.scrollLeft = newScrollX;
             container.scrollTop = newScrollY;
+
+            applyScrollBoundaries();
+        }
+
+        function applyScrollBoundaries() {
+            const containerRect = container.getBoundingClientRect();
+            const treeRect = treeContainer.getBoundingClientRect();
+
+            const scaledWidth = CONTENT_WIDTH * scale;
+            const scaledHeight = CONTENT_HEIGHT * scale;
+
+            const visibleWidth = Math.min(containerRect.width, scaledWidth);
+            const visibleHeight = Math.min(containerRect.height, scaledHeight);
+
+            const maxScrollX = Math.max(0, scaledWidth - visibleWidth);
+            const maxScrollY = Math.max(0, scaledHeight - visibleHeight);
+
+            container.scrollLeft = Math.max(0, Math.min(maxScrollX, container.scrollLeft));
+            container.scrollTop = Math.max(0, Math.min(maxScrollY, container.scrollTop));
         }
 
         function initPanning() {
             const container = document.querySelector('.container');
             const treeContainer = document.getElementById('treeContainer');
 
-            // Mouse events
             container.addEventListener('mousedown', startPan);
             container.addEventListener('mousemove', doPan);
             container.addEventListener('mouseup', endPan);
             container.addEventListener('mouseleave', endPan);
 
-            // Touch events for mobile
             container.addEventListener('touchstart', handleTouchStart, { passive: false });
             container.addEventListener('touchmove', handleTouchMove, { passive: false });
             container.addEventListener('touchend', handleTouchEnd);
             container.addEventListener('touchcancel', handleTouchEnd);
 
-            // Prevent default drag behavior for images
             treeContainer.addEventListener('dragstart', (e) => e.preventDefault());
 
             function startPan(e) {
                 isPanning = true;
                 container.classList.add('dragging');
 
-                // Get initial position
                 if (e.type === 'mousedown') {
                     startX = e.pageX;
                     startY = e.pageY;
@@ -1328,7 +1284,6 @@
                     startY = e.touches[0].pageY;
                 }
 
-                // Store current scroll position
                 scrollLeft = container.scrollLeft;
                 scrollTop = container.scrollTop;
 
@@ -1351,13 +1306,26 @@
                     return;
                 }
 
-                // Calculate how far we've moved
                 const walkX = startX - currentX;
                 const walkY = startY - currentY;
 
-                // Apply the movement to scroll position
-                container.scrollLeft = scrollLeft + walkX;
-                container.scrollTop = scrollTop + walkY;
+                let newScrollLeft = scrollLeft + walkX;
+                let newScrollTop = scrollTop + walkY;
+
+                const containerRect = container.getBoundingClientRect();
+                const scaledWidth = CONTENT_WIDTH * scale;
+                const scaledHeight = CONTENT_HEIGHT * scale;
+                const visibleWidth = Math.min(containerRect.width, scaledWidth);
+                const visibleHeight = Math.min(containerRect.height, scaledHeight);
+
+                const maxScrollX = Math.max(0, scaledWidth - visibleWidth);
+                const maxScrollY = Math.max(0, scaledHeight - visibleHeight);
+
+                newScrollLeft = Math.max(0, Math.min(maxScrollX, newScrollLeft));
+                newScrollTop = Math.max(0, Math.min(maxScrollY, newScrollTop));
+
+                container.scrollLeft = newScrollLeft;
+                container.scrollTop = newScrollTop;
 
                 e.preventDefault();
                 return false;
@@ -1366,6 +1334,7 @@
             function endPan() {
                 isPanning = false;
                 container.classList.remove('dragging');
+                applyScrollBoundaries();
             }
 
             function handleTouchStart(e) {
@@ -1386,16 +1355,15 @@
         }
 
         function showTooltip(event, research) {
+            hideTooltip();
+
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+
+            const header = document.createElement('div');
+            header.className = 'tooltip-header';
 
             if (research.buildings.length === 0) {
-                // Create tooltip even if no buildings
-                const tooltip = document.createElement('div');
-                tooltip.className = 'tooltip';
-                tooltip.style.left = `${event.pageX + 15}px`;
-                tooltip.style.top = `${event.pageY + 15}px`;
-
-                const header = document.createElement('div');
-                header.className = 'tooltip-header';
                 header.textContent = research.name;
                 tooltip.appendChild(header);
 
@@ -1405,46 +1373,89 @@
                 info.style.textAlign = 'center';
                 info.style.padding = '10px';
                 tooltip.appendChild(info);
+            } else {
+                header.textContent = `Buildings Unlocked (${research.buildings.length})`;
+                tooltip.appendChild(header);
 
-                document.body.appendChild(tooltip);
-                currentTooltip = tooltip;
-                return;
+                const gridContainer = document.createElement('div');
+                gridContainer.className = 'building-grid';
+
+                if (research.buildings.length === 1) {
+                    gridContainer.style.gridTemplateColumns = '1fr';
+                } else {
+                    gridContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                }
+
+                research.buildings.forEach((building, index) => {
+                    const buildingDiv = document.createElement('div');
+                    buildingDiv.className = 'building-item';
+
+                    const img = document.createElement('img');
+                    img.className = 'building-image';
+                    img.src = `https://cms.bloxinformer.com/wp-content/uploads/2025/12/${building}`;
+                    img.alt = building.replace('-industrialist.jpg', '').replace(/-/g, ' ');
+                    img.onerror = function () {
+                        this.onerror = null;
+                        this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><rect width="100%" height="100%" fill="%231a1a2e"/><text x="50%" y="50%" font-family="Arial" fill="%2372efdd" text-anchor="middle" dy=".3em">Image not found</text></svg>';
+                    };
+
+                    const name = document.createElement('div');
+                    name.className = 'building-name';
+
+                    let displayName = building.replace('-industrialist.jpg', '').replace('-industrialist-.jpg', '').replace(/-/g, ' ');
+                    displayName = displayName.split(' ')
+                        .map(word => {
+                            const match = word.match(/([a-zA-Z]+)(\d+)$/);
+                            if (match) {
+                                return match[1].charAt(0).toUpperCase() + match[1].slice(1) + ' ' + match[2];
+                            }
+                            return word.charAt(0).toUpperCase() + word.slice(1);
+                        })
+                        .join(' ');
+
+                    name.textContent = displayName;
+
+                    buildingDiv.appendChild(img);
+                    buildingDiv.appendChild(name);
+                    gridContainer.appendChild(buildingDiv);
+                });
+
+                tooltip.appendChild(gridContainer);
             }
 
-            const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip';
-            tooltip.style.left = `${event.pageX + 15}px`;
-            tooltip.style.top = `${event.pageY + 15}px`;
-
-            const header = document.createElement('div');
-            header.className = 'tooltip-header';
-            header.textContent = `Buildings Unlocked (${research.buildings.length})`;
-            tooltip.appendChild(header);
-
-            research.buildings.forEach((building, index) => {
-                const buildingDiv = document.createElement('div');
-                buildingDiv.className = 'building-item';
-
-                const img = document.createElement('img');
-                img.className = 'building-image';
-                img.src = `https://cms.bloxinformer.com/wp-content/uploads/2025/12/${building}`;
-                img.alt = building.replace('-industrialist.jpg', '').replace(/-/g, ' ');
-                img.onerror = function () {
-                    this.onerror = null; // Prevent infinite loop
-                    this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><rect width="100%" height="100%" fill="%231a1a2e"/><text x="50%" y="50%" font-family="Arial" font-size="14" fill="%2372efdd" text-anchor="middle" dy=".3em">Image not found</text></svg>';
-                };
-
-                const name = document.createElement('div');
-                name.className = 'building-name';
-                name.textContent = building.replace('-industrialist.jpg', '').replace(/-/g, ' ');
-
-                buildingDiv.appendChild(img);
-                buildingDiv.appendChild(name);
-                tooltip.appendChild(buildingDiv);
-            });
-
             document.body.appendChild(tooltip);
+
+            positionTooltip(tooltip, event);
+
             currentTooltip = tooltip;
+        }
+
+        function positionTooltip(tooltip, event) {
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let left = event.pageX + 15;
+            let top = event.pageY + 15;
+
+            if (left + tooltipRect.width > viewportWidth) {
+                left = event.pageX - tooltipRect.width - 15;
+            }
+
+            if (left < 0) {
+                left = 15;
+            }
+
+            if (top + tooltipRect.height > viewportHeight) {
+                top = event.pageY - tooltipRect.height - 15;
+            }
+
+            if (top < 0) {
+                top = 15;
+            }
+
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
         }
 
         function hideTooltip() {
@@ -1454,15 +1465,22 @@
             }
         }
 
-        // Move tooltip with mouse
         document.addEventListener('mousemove', (e) => {
             if (currentTooltip) {
-                currentTooltip.style.left = `${e.pageX + 15}px`;
-                currentTooltip.style.top = `${e.pageY + 15}px`;
+                positionTooltip(currentTooltip, e);
             }
         });
 
-        // Search and filter functionality (remain the same)
+        window.addEventListener('resize', () => {
+            if (currentTooltip) {
+                const event = new MouseEvent('mousemove', {
+                    clientX: event.clientX,
+                    clientY: event.clientY
+                });
+                positionTooltip(currentTooltip, event);
+            }
+        });
+
         function filterNodes() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const resultsDiv = document.getElementById('searchResults');
@@ -1482,8 +1500,12 @@
             const matches = [];
             researchData.forEach(research => {
                 const node = document.getElementById(`node-${research.id}`);
-                const isMatch = research.name.toLowerCase().includes(searchTerm) ||
-                    research.requirements.toLowerCase().includes(searchTerm);
+                const isMatch =
+                    research.name.toLowerCase().includes(searchTerm) ||
+                    research.requirements.toLowerCase().includes(searchTerm) ||
+                    research.buildings.some(building =>
+                        building.replace('-industrialist.jpg', '').replace(/-/g, ' ').toLowerCase().includes(searchTerm)
+                    );
 
                 if (node) {
                     node.style.opacity = isMatch ? '1' : '0.2';
@@ -1496,11 +1518,9 @@
                 }
             });
 
-            // Show search results count
-            resultsDiv.innerHTML = `<div style="color: #72efdd; font-size: 12px; margin-top: 5px;">Found ${matches.length} matching research nodes</div>`;
+            resultsDiv.innerHTML = `<div style="color: #72efdd; font-size: 0.8rem; margin-top: 5px;">Found ${matches.length} matching research nodes</div>`;
         }
 
-        // Zoom and view controls (remain the same)
         let scale = 1;
         const treeContainer = document.getElementById('treeContainer');
 
@@ -1513,7 +1533,6 @@
             treeContainer.style.transform = `scale(${scale})`;
             treeContainer.style.transformOrigin = 'top left';
 
-            // Maintain scroll position
             requestAnimationFrame(() => {
                 container.scrollLeft = scrollLeftRatio * container.scrollWidth;
                 container.scrollTop = scrollTopRatio * container.scrollHeight;
@@ -1530,34 +1549,28 @@
             treeContainer.style.transform = `scale(${scale})`;
             treeContainer.style.transformOrigin = 'top left';
 
-            // Maintain scroll position
             requestAnimationFrame(() => {
                 container.scrollLeft = scrollLeftRatio * container.scrollWidth;
                 container.scrollTop = scrollTopRatio * container.scrollHeight;
             });
         }
 
-        function resetView() {
-            scale = 1;
-            treeContainer.style.transform = `scale(${scale})`;
-            treeContainer.style.transformOrigin = 'top left';
-        }
-
-        // Initialize tree on load
         window.onload = function () {
             generateTree();
             initPanning();
 
-            // Center the view on initial load
             const container = document.querySelector('.container');
             const treeContainer = document.getElementById('treeContainer');
 
-            // Center the viewport on the tree
             const centerX = treeContainer.scrollWidth / 2 - container.clientWidth / 2;
             const centerY = treeContainer.scrollHeight / 2 - container.clientHeight / 2;
 
             container.scrollLeft = centerX;
             container.scrollTop = centerY;
+
+            setTimeout(() => {
+                applyScrollBoundaries();
+            }, 100);
         };
     </script>
 </body>
