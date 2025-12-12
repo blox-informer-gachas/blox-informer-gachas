@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Industrialist Utility Tree</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            background-color: #0a0a12;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e0e0e0;
+            padding: 20px;
+            overflow-x: auto;
+            min-height: 100vh;
+            overflow-y: hidden;
+        }
+
+
+
+        .container.dragging {
+            cursor: grabbing;
+        }
+
+        .tree-container {
+            position: relative;
+            min-height: 1900px;
+            padding: 50px;
+            min-width: 3200px;
+            user-select: none;
+            pointer-events: all;
+        }
+
+        .container {
+            max-width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            padding: 20px 0;
+            position: relative;
+            cursor: grab;
+            -webkit-overflow-scrolling: touch;
+            touch-action: none;
+            overscroll-behavior: none;
+            overflow-x: auto;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tree-container.dragging {
+            cursor: grabbing;
+        }
+
+        .research-node {
+            position: absolute;
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 2px solid #4cc9f0;
+            border-radius: 8px;
+            padding: 15px;
+            width: 200px;
+            min-height: 100px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            z-index: 10;
+        }
+
+        .research-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(76, 201, 240, 0.3);
+            border-color: #72efdd;
+            z-index: 100;
+        }
+
+        .node-header {
+            font-weight: bold;
+            color: #4cc9f0;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #4cc9f0;
+            padding-bottom: 4px;
+        }
+
+        .node-requirements {
+            font-size: 0.8rem;
+            color: #72efdd;
+            margin-top: 5px;
+        }
+
+        .node-sell-requirement {
+            font-size: 0.85rem;
+            color: #f72585;
+            margin-top: 3px;
+            font-style: italic;
+        }
+
+        .connection {
+            position: absolute;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .horizontal-line {
+            height: 2px;
+            background-color: #4cc9f0;
+        }
+
+        .vertical-line {
+            width: 2px;
+            background-color: #4cc9f0;
+        }
+
+        .tooltip {
+            position: fixed;
+            background: rgba(26, 26, 46, 0.95);
+            border: 2px solid #7209b7;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: block;
+            backdrop-filter: blur(5px);
+            max-width: 600px;
+        }
+
+        .building-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 5px;
+        }
+
+        .tooltip-header {
+            color: #7209b7;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #7209b7;
+            padding-bottom: 5px;
+        }
+
+        .building-item {
+            margin-bottom: 0;
+            padding-bottom: 10px;
+            break-inside: avoid;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .building-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .building-image {
+            width: 100%;
+            height: 85px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .building-name {
+            color: #b5b5b5;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.7rem;
+            word-break: break-word;
+            margin-top: auto;
+        }
+
+        .building-count {
+            color: #f72585;
+            text-align: center;
+            margin-top: 2px;
+        }
+
+        .tier-indicator {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: #7209b7;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .search-filter {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(26, 26, 46, 0.9);
+            border: 1px solid #4cc9f0;
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 1000;
+            width: 250px;
+        }
+
+        .search-filter input {
+            width: 100%;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #4cc9f0;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .node-highlight {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 201, 240, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 201, 240, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 201, 240, 0);
+            }
+        }
+
+        .node-theory {
+            background: linear-gradient(145deg, #0a0a12, #16213e);
+            border-color: #7209b7;
+        }
+
+        .node-theory .node-header {
+            color: #7209b7;
+        }
+
+        .search-filter,
+        .legend {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="search-filter">
+        <input type="text" id="searchInput" placeholder="Search buildings and nodes..." onkeyup="filterNodes()">
+        <div id="searchResults"></div>
+    </div>
+
+    <div class="container">
+        <div class="tree-container" id="treeContainer">
+        </div>
+    </div>
+
+    <script>
+        /* Row Y-coordinates
+        1: 100
+        2: 250
+        3: 400
+        4: 550
+        5: 700  - mid row
+        6: 850
+        7: 1000
+        8: 1150
+        9: 1300
+        10: 1450
+        11: 1600  */
+
+        /* Tier X-coordinates
+        0: 50
+        1: 300
+        2: 550
+        3: 800
+        4: 1050
+        5: 1300
+        6: 1550
+        7: 1800
+        8: 2050
+        9: 2300
+        10: 2550
+        11: 2800
+        12: 3050  */
+
+        // Research data
+        const researchData = [
+            // Tier 0 - Root node
+            {
+                id: "utility",
+                name: "Utility",
+                requirements: "0 RP",
+                unlocks: ["pollution", "logic", "transportation", "silos_tanks", "pipes"],
+                buildings: [
+                    "time-tracker-industrialist.jpg",
+                    "decoration-industrialist.jpg",
+                    "metal-sign-industrialist.jpg",
+                    "flag-industrialist.jpg",
+                    "light-industrialist.jpg",
+                    "light2-industrialist.jpg",
+                    "inclined-light-industrialist.jpg",
+                    "inclined-light2-industrialist.jpg"
+                ],
+                tier: 0,
+                x: 50,
+                y: 700
+            },
+
+            // Tier 1
+            {
+                id: "pollution",
+                name: "Pollution",
+                requirements: "25 RP",
+                unlocks: ["liquid_burner_dump", "scrubber"],
+                buildings: [
+                    "pollution-meter-industrialist.jpg",
+                    "liquid-dump-industrialist.jpg"
+                ],
+                tier: 1,
+                x: 300,
+                y: 175
+            },
+            {
+                id: "logic",
+                name: "Logic",
+                requirements: "2,500 RP",
+                unlocks: ["advanced_logic"],
+                buildings: [
+                    "and-gate-industrialist.jpg",
+                    "logic-clock-industrialist.jpg",
+                    "logic-item-valve-pipe-industrialist.jpg",
+                    "logic-fluid-valve-pipe-industrialist.jpg",
+                    "logic-knot-industrialist.jpg",
+                    "logic-memory-industrialist.jpg",
+                    "logic-relay-industrialist.jpg",
+                    "logic-switch-industrialist.jpg",
+                    "not-gate-industrialist.jpg",
+                    "resistor-industrialist.jpg",
+                    "white-led-industrialist.jpg",
+                    "xor-gate-industrialist.jpg",
+                    "or-gate-industrialist.jpg",
+                    "pollution-gate-industrialist.jpg",
+                    "logic-button.jpg",
+                    "logic-delay-industrialist.jpg",
+                    "time-gate-industrialist.jpg",
+                    "fluid-meter-industrialist.jpg",
+                    "logic-meter-industrialist.jpg",
+                    "nand-gate-industrialist.jpg",
+                    "nor-gate-industrialist.jpg",
+                    "item-meter-industrialist.jpg",
+                    "logic-pulse-industrialist.jpg",
+                    "logic-pole-industrialist.jpg",
+                    "huge-spotlight-industrialist.jpg",
+                    "logic-random-industrialist.jpg"
+                ],
+                tier: 1,
+                x: 300,
+                y: 400
+            },
+            {
+                id: "transportation",
+                name: "Transportation (Theory Research)",
+                requirements: "20 RP",
+                unlocks: ["liquid_truck_depot", "truck_depot"],
+                buildings: [],
+                tier: 1,
+                x: 300,
+                y: 625
+            },
+            {
+                id: "silos_tanks",
+                name: "Silos & Tanks (Theory Research)",
+                requirements: "5 RP",
+                unlocks: ["small_item_storage_silo", "small_fluid_storage_silo"],
+                buildings: [],
+                tier: 1,
+                x: 300,
+                y: 925
+            },
+            {
+                id: "pipes",
+                name: "Pipes",
+                requirements: "50 RP",
+                unlocks: ["better_item_pipes", "intersection_pipes", "better_fluid_pipes"],
+                buildings: [
+                    "fluid-pipe-junction-industrialist.jpg",
+                    "fluid-pipe-section-industrialist.jpg",
+                    "fluid-pipe-turn-industrialist.jpg",
+                    "pipe-junction-industrialist.jpg",
+                    "pile-selection-industrialist.jpg",
+                    "pipe-turn-industrialist.jpg",
+                    "short-fluid-pipe-industrialist.jpg",
+                    "short-pipe-industrialist.jpg"
+                ],
+                tier: 1,
+                x: 300,
+                y: 1300
+            },
+
+            // Tier 2
+            {
+                id: "liquid_burner_dump",
+                name: "Liquid Burner (Dump)",
+                requirements: "1,200 RP",
+                unlocks: [],
+                buildings: ["liquid-burner-industrialist.jpg"],
+                tier: 2,
+                x: 550,
+                y: 100
+            },
+            {
+                id: "scrubber",
+                name: "Scrubber",
+                requirements: "9,000 RP",
+                unlocks: [],
+                buildings: ["scrubber-industrialist.jpg"],
+                tier: 2,
+                x: 550,
+                y: 250
+            },
+            {
+                id: "advanced_logic",
+                name: "Advanced Logic",
+                requirements: "15,000 RP",
+                unlocks: [],
+                buildings: [
+                    "logic-dabble-industrialist.jpg",
+                    "color-led-industrialist.jpg",
+                    "seven-segment-display-industrialist.jpg",
+                    "logic-adder-industrialist.jpg"
+                ],
+                tier: 2,
+                x: 550,
+                y: 400
+            },
+            {
+                id: "liquid_truck_depot",
+                name: "Liquid Truck Depot",
+                requirements: "500 RP",
+                unlocks: ["large_liquid_truck_depot"],
+                buildings: ["liquid-truck-depot-industrialist.jpg"],
+                tier: 2,
+                x: 550,
+                y: 550
+            },
+            {
+                id: "truck_depot",
+                name: "Truck Depot",
+                requirements: "10 RP",
+                unlocks: ["van_depot"],
+                buildings: ["truck-depot-industrialist.jpg"],
+                tier: 2,
+                x: 550,
+                y: 700
+            },
+            {
+                id: "small_item_storage_silo",
+                name: "Small Item Storage Silo",
+                requirements: "10 RP",
+                unlocks: ["medium_item_storage_silo"],
+                buildings: ["small-item-storage-silo-industrialist.jpg"],
+                tier: 2,
+                x: 550,
+                y: 850
+            },
+            {
+                id: "small_fluid_storage_silo",
+                name: "Small Fluid Storage Silo",
+                requirements: "25 RP",
+                unlocks: ["medium_fluid_storage_silo"],
+                buildings: ["small-item-storage-silo-industrialist.jpg"], // Note: Same image as item silo
+                tier: 2,
+                x: 550,
+                y: 1000
+            },
+            {
+                id: "better_item_pipes",
+                name: "Better Item Pipes",
+                requirements: "1,500 RP",
+                unlocks: ["long_pipes", "better_intersection_pipes"],
+                buildings: [
+                    "pipe-junction2-industrialist.jpg",
+                    "pipe-section2-industrialis.jpg",
+                    "pipe-turn2-industrialist.jpg",
+                    "short-pipe2-industrialist.jpg"
+                ],
+                tier: 2,
+                x: 550,
+                y: 1150
+            },
+            {
+                id: "intersection_pipes",
+                name: "Intersection Pipes",
+                requirements: "250 RP",
+                unlocks: ["better_intersection_pipes"],
+                buildings: [
+                    "rusty-fluid-pipe-and-item-intersection-industrialis.jpg",
+                    "rusty-fluid-pipe-intersection-industrialis.jpg",
+                    "rusty-pipe-intersection.jpg"
+                ],
+                tier: 2,
+                x: 550,
+                y: 1300
+            },
+            {
+                id: "better_fluid_pipes",
+                name: "Better Fluid Pipes",
+                requirements: "1,500 RP",
+                unlocks: ["better_intersection_pipes", "long_fluid_pipes", "large_fluid_pipes"],
+                buildings: [
+                    "fluid-pipe-junction2-industrialist.jpg",
+                    "fluid-pipe-section2-industrialist.jpg",
+                    "fluid-pipe-turn2-industrialist.jpg",
+                    "short-fluid-pipe2-industrialist.jpg"
+                ],
+                tier: 2,
+                x: 550,
+                y: 1450
+            },
+
+            // Tier 3
+            {
+                id: "large_liquid_truck_depot",
+                name: "Large Liquid Truck Depot",
+                requirements: "15,000 RP",
+                unlocks: [],
+                buildings: ["large-liquid-truck-depot-industrialis.jpg"],
+                tier: 3,
+                x: 800,
+                y: 550
+            },
+            {
+                id: "van_depot",
+                name: "Van Depot",
+                requirements: "250 RP",
+                unlocks: ["huge_truck_depot"],
+                buildings: ["van-depot-industrialis.jpg"],
+                tier: 3,
+                x: 800,
+                y: 700
+            },
+            {
+                id: "medium_item_storage_silo",
+                name: "Medium Item Storage Silo",
+                requirements: "1,500 RP",
+                unlocks: ["gold_item_storage_silo"],
+                buildings: ["medium-item-storage-silo-industrialis.jpg"],
+                tier: 3,
+                x: 800,
+                y: 850
+            },
+            {
+                id: "medium_fluid_storage_silo",
+                name: "Medium Fluid Storage Silo",
+                requirements: "1,500 RP",
+                unlocks: ["gold_fluid_storage_silo"],
+                buildings: ["medium-fluid-storage-silo-industrialis.jpg"],
+                tier: 3,
+                x: 800,
+                y: 1000
+            },
+            {
+                id: "long_pipes",
+                name: "Long Pipes",
+                requirements: "3,000 RP",
+                unlocks: ["item_overflow_gate"],
+                buildings: [
+                    "long-pipe2-industrialis.jpg",
+                    "pipe2-industrialis.jpg"
+                ],
+                tier: 3,
+                x: 800,
+                y: 1150
+            },
+            {
+                id: "better_intersection_pipes",
+                name: "Better Intersection Pipes",
+                requirements: "2,500 RP",
+                unlocks: ["valve_control"],
+                buildings: [
+                    "fluid-pipe-intersection-industrialis.jpg",
+                    "pipe-intersection-industrialis.jpg",
+                    "fluid-pipe-and-item-intersection-industrialis.jpg"
+                ],
+                tier: 3,
+                x: 800,
+                y: 1300
+            },
+            {
+                id: "long_fluid_pipes",
+                name: "Long Fluid Pipes",
+                requirements: "3,000 RP",
+                unlocks: ["liquid_overflow_gate"],
+                buildings: [
+                    "long-fluid-pipe2-industrialis.jpg",
+                    "fluid-pipe2-industrialis.jpg"
+                ],
+                tier: 3,
+                x: 800,
+                y: 1450
+            },
+            {
+                id: "large_fluid_pipes",
+                name: "Large Fluid Pipes",
+                requirements: "50,000 RP",
+                unlocks: ["large_liquid_valve_control"],
+                buildings: [
+                    "large-fluid-pipe-industrialis.jpg",
+                    "large-fluid-pipe-conversion-industrialis.jpg",
+                    "large-fluid-pipe-passthrough-industrialis.jpg",
+                    "large-fluid-pipe-intersection-industrialis.jpg",
+                    "large-fluid-pipe-item-passthrough-industrialis.jpg",
+                    "large-fluid-pipe-junction-industrialis.jpg",
+                    "large-fluid-pipe-section-industrialis.jpg",
+                    "large-fluid-pipe-turn-industrialis.jpg",
+                    "long-large-fluid-pipe-industrialis.jpg",
+                    "short-large-fluid-pipe-industrialis.jpg"
+                ],
+                tier: 3,
+                x: 800,
+                y: 1600
+            },
+
+            // Tier 4
+            {
+                id: "huge_truck_depot",
+                name: "Huge Truck Depot",
+                requirements: "5,500 RP",
+                unlocks: [],
+                buildings: ["huge-truck-depot-industrialis.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 700
+            },
+            {
+                id: "gold_item_storage_silo",
+                name: "Gold Item Storage Silo",
+                requirements: "25,000 RP",
+                unlocks: [],
+                buildings: ["gold-item-storage-silo-industrialis.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 850
+            },
+            {
+                id: "gold_fluid_storage_silo",
+                name: "Gold Fluid Storage Silo",
+                requirements: "25,000 RP",
+                unlocks: [],
+                buildings: ["gold-fluid-storage-silo-industrialis.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 1000
+            },
+            {
+                id: "item_overflow_gate",
+                name: "Item Overflow Gate",
+                requirements: "1,000 RP",
+                unlocks: [],
+                buildings: ["item-overflow-gate-industrialis.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 1150
+            },
+            {
+                id: "valve_control",
+                name: "Valve Control",
+                requirements: "500 RP",
+                unlocks: [],
+                buildings: [
+                    "valve-control-industrialis.jpg",
+                    "item-valve-control-industrialis.jpg",
+                    "pipe-valve-industrialis.jpg"
+                ],
+                tier: 4,
+                x: 1050,
+                y: 1300
+            },
+            {
+                id: "liquid_overflow_gate",
+                name: "Liquid Overflow Gate",
+                requirements: "1,000 RP",
+                unlocks: ["cold_bypass_pipe"],
+                buildings: ["overflow-gate-industrialis.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 1450
+            },
+            {
+                id: "large_liquid_valve_control",
+                name: "Large Liquid Valve Control",
+                requirements: "50,000 RP",
+                unlocks: [],
+                buildings: ["large-liquid-control-industrialis.jpg"],
+                tier: 4,
+                x: 1050,
+                y: 1600
+            },
+
+            // Tier 5
+            {
+                id: "cold_bypass_pipe",
+                name: "Cold Bypass Pipe",
+                requirements: "2,000 RP",
+                unlocks: [],
+                buildings: ["cold-bypass-pipe-industrialis.jpg"],
+                tier: 5,
+                x: 1300,
+                y: 1450
+            }
+        ];
+
+        researchData.forEach(node => {
+            node.x = 50 + node.tier * 300;
+        });
+
+        const researchMap = {};
+        researchData.forEach(research => {
+            researchMap[research.id] = research;
+        });
+
+        const connections = [];
+        researchData.forEach(research => {
+            research.unlocks.forEach(unlockId => {
+                if (researchMap[unlockId]) {
+                    connections.push({
+                        from: research.id,
+                        to: unlockId,
+                        fromX: research.x,
+                        fromY: research.y,
+                        toX: researchMap[unlockId].x,
+                        toY: researchMap[unlockId].y
+                    });
+                }
+            });
+        });
+
+        function generateTree() {
+            const container = document.getElementById('treeContainer');
+
+            container.innerHTML = '';
+
+            connections.forEach(conn => {
+                const fromNode = researchMap[conn.from];
+                const toNode = researchMap[conn.to];
+                const startX = fromNode.x + 200;
+                const startY = fromNode.y + 50;
+                const endX = toNode.x;
+                const endY = toNode.y + 50;
+                const horizontalGap = 50;
+                const siblings = connections.filter(c => c.from === conn.from);
+
+                if (siblings.length > 1) {
+                    siblings.sort((a, b) => a.toY - b.toY);
+
+                    let minY = Math.min(...siblings.map(s => s.toY + 50));
+                    let maxY = Math.max(...siblings.map(s => s.toY + 50));
+
+                    if (fromNode.id === "gold_refining") {
+                        minY -= 75;
+                    } else if (fromNode.id === "gold_acid_refinery") {
+                        maxY += 75;
+                    }
+
+                    const verticalTrunk = document.createElement('div');
+                    verticalTrunk.className = 'connection vertical-line';
+                    verticalTrunk.style.left = `${startX + horizontalGap}px`;
+                    verticalTrunk.style.top = `${minY}px`;
+                    verticalTrunk.style.height = `${maxY - minY}px`;
+                    container.appendChild(verticalTrunk);
+
+                    const horizontal1 = document.createElement('div');
+                    horizontal1.className = 'connection horizontal-line';
+                    horizontal1.style.left = `${startX}px`;
+                    horizontal1.style.top = `${startY}px`;
+                    horizontal1.style.width = `${horizontalGap}px`;
+                    container.appendChild(horizontal1);
+
+                    const horizontal2 = document.createElement('div');
+                    horizontal2.className = 'connection horizontal-line';
+                    horizontal2.style.left = `${startX + horizontalGap}px`;
+                    horizontal2.style.top = `${endY}px`;
+                    horizontal2.style.width = `${endX - (startX + horizontalGap)}px`;
+                    container.appendChild(horizontal2);
+
+                } else {
+                    const horizontal1 = document.createElement('div');
+                    horizontal1.className = 'connection horizontal-line';
+                    horizontal1.style.left = `${startX}px`;
+                    horizontal1.style.top = `${startY}px`;
+                    horizontal1.style.width = `${horizontalGap}px`;
+                    container.appendChild(horizontal1);
+
+                    if (Math.abs(startY - endY) > 10) {
+                        const verticalLine = document.createElement('div');
+                        verticalLine.className = 'connection vertical-line';
+                        const vertX = startX + horizontalGap;
+                        verticalLine.style.left = `${vertX}px`;
+                        verticalLine.style.top = `${Math.min(startY, endY)}px`;
+                        verticalLine.style.height = `${Math.abs(endY - startY)}px`;
+                        container.appendChild(verticalLine);
+                    }
+
+                    const horizontal2 = document.createElement('div');
+                    horizontal2.className = 'connection horizontal-line';
+                    horizontal2.style.left = `${startX + horizontalGap}px`;
+                    horizontal2.style.top = `${endY}px`;
+                    horizontal2.style.width = `${endX - (startX + horizontalGap)}px`;
+                    container.appendChild(horizontal2);
+                }
+            });
+
+            researchData.forEach(research => {
+                const node = document.createElement('div');
+                node.className = 'research-node';
+                node.style.left = `${research.x}px`;
+                node.style.top = `${research.y}px`;
+                node.id = `node-${research.id}`;
+
+                const tierIndicator = document.createElement('div');
+                tierIndicator.className = 'tier-indicator';
+                tierIndicator.textContent = `Tier ${research.tier}`;
+                node.appendChild(tierIndicator);
+
+                if (research.name.includes("Theory Research")) {
+                    node.classList.add('node-theory');
+                }
+
+                const rpMatch = research.requirements.match(/([\d,]+)\s*RP/);
+                if (rpMatch) {
+                    const rpValue = parseInt(rpMatch[1].replace(/,/g, ''));
+                    if (rpValue <= 100) node.style.borderColor = '#4cc9f0';
+                    else if (rpValue <= 1000) node.style.borderColor = '#4361ee';
+                    else if (rpValue <= 10000) node.style.borderColor = '#3a0ca3';
+                    else if (rpValue <= 100000) node.style.borderColor = '#7209b7';
+                    else node.style.borderColor = '#f72585';
+                }
+
+                const header = document.createElement('div');
+                header.className = 'node-header';
+                header.textContent = research.name;
+                node.appendChild(header);
+
+                const requirements = document.createElement('div');
+                requirements.className = 'node-requirements';
+                requirements.textContent = research.requirements;
+                node.appendChild(requirements);
+
+                if (research.requirements.includes("Sell")) {
+                    const sellReq = document.createElement('div');
+                    sellReq.className = 'node-sell-requirement';
+                    const sellMatch = research.requirements.match(/Sell (.+)/);
+                    if (sellMatch) {
+                        sellReq.textContent = sellMatch[0];
+                    }
+                    node.appendChild(sellReq);
+                }
+
+                node.addEventListener('mouseenter', (e) => showTooltip(e, research));
+                node.addEventListener('mouseleave', hideTooltip);
+
+                container.appendChild(node);
+            });
+
+            const maxX = Math.max(...researchData.map(r => r.x)) + 300;
+            const maxY = Math.max(...researchData.map(r => r.y)) + 200;
+            container.style.minWidth = `${CONTENT_WIDTH + PADDING}px`;
+            container.style.minHeight = `${CONTENT_HEIGHT + PADDING}px`;
+        }
+
+        const CONTENT_WIDTH = 1900;
+        const CONTENT_HEIGHT = 1800;
+        const PADDING = 200;
+        let currentTooltip = null;
+        let isPanning = false;
+        let startX, startY;
+        let scrollLeft, scrollTop;
+        let isZooming = false;
+        const container = document.querySelector('.container');
+        const minScale = 0.1;
+        const maxScale = 5;
+
+        container.addEventListener('wheel', handleWheel, { passive: false });
+
+        function handleWheel(e) {
+            e.preventDefault();
+
+            const delta = e.deltaY || e.detail || e.wheelDelta;
+            const zoomSpeed = 0.1;
+
+            const rect = container.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const zoomFactor = delta > 0 ? 1 - zoomSpeed : 1 + zoomSpeed;
+            zoomToPoint(zoomFactor, mouseX, mouseY);
+        }
+
+        function zoomToPoint(zoomFactor, centerX, centerY) {
+            const newScale = scale * zoomFactor;
+
+            const containerRect = container.getBoundingClientRect();
+            const minScaleX = containerRect.width / (CONTENT_WIDTH + PADDING);
+            const minScaleY = containerRect.height / (CONTENT_HEIGHT + PADDING);
+            const minScale = Math.min(minScaleX, minScaleY, 0.5);
+
+            const clampedScale = Math.max(minScale, Math.min(maxScale, newScale));
+
+            if (clampedScale === scale) return;
+
+            const scrollX = container.scrollLeft;
+            const scrollY = container.scrollTop;
+
+            const newScrollX = (scrollX + centerX) * (clampedScale / scale) - centerX;
+            const newScrollY = (scrollY + centerY) * (clampedScale / scale) - centerY;
+
+            scale = clampedScale;
+            treeContainer.style.transform = `scale(${scale})`;
+            treeContainer.style.transformOrigin = 'top left';
+
+            container.scrollLeft = newScrollX;
+            container.scrollTop = newScrollY;
+
+            applyScrollBoundaries();
+        }
+
+        function applyScrollBoundaries() {
+            const containerRect = container.getBoundingClientRect();
+            const treeRect = treeContainer.getBoundingClientRect();
+
+            const scaledWidth = CONTENT_WIDTH * scale;
+            const scaledHeight = CONTENT_HEIGHT * scale;
+
+            const visibleWidth = Math.min(containerRect.width, scaledWidth);
+            const visibleHeight = Math.min(containerRect.height, scaledHeight);
+
+            const maxScrollX = Math.max(0, scaledWidth - visibleWidth);
+            const maxScrollY = Math.max(0, scaledHeight - visibleHeight);
+
+            container.scrollLeft = Math.max(0, Math.min(maxScrollX, container.scrollLeft));
+            container.scrollTop = Math.max(0, Math.min(maxScrollY, container.scrollTop));
+        }
+
+        function initPanning() {
+            const container = document.querySelector('.container');
+            const treeContainer = document.getElementById('treeContainer');
+
+            container.addEventListener('mousedown', startPan);
+            container.addEventListener('mousemove', doPan);
+            container.addEventListener('mouseup', endPan);
+            container.addEventListener('mouseleave', endPan);
+
+            container.addEventListener('touchstart', handleTouchStart, { passive: false });
+            container.addEventListener('touchmove', handleTouchMove, { passive: false });
+            container.addEventListener('touchend', handleTouchEnd);
+            container.addEventListener('touchcancel', handleTouchEnd);
+
+            treeContainer.addEventListener('dragstart', (e) => e.preventDefault());
+
+            function startPan(e) {
+                isPanning = true;
+                container.classList.add('dragging');
+
+                if (e.type === 'mousedown') {
+                    startX = e.pageX;
+                    startY = e.pageY;
+                } else if (e.touches && e.touches.length === 1) {
+                    startX = e.touches[0].pageX;
+                    startY = e.touches[0].pageY;
+                }
+
+                scrollLeft = container.scrollLeft;
+                scrollTop = container.scrollTop;
+
+                e.preventDefault();
+                return false;
+            }
+
+            function doPan(e) {
+                if (!isPanning) return;
+
+                let currentX, currentY;
+
+                if (e.type === 'mousemove') {
+                    currentX = e.pageX;
+                    currentY = e.pageY;
+                } else if (e.touches && e.touches.length === 1) {
+                    currentX = e.touches[0].pageX;
+                    currentY = e.touches[0].pageY;
+                } else {
+                    return;
+                }
+
+                const walkX = startX - currentX;
+                const walkY = startY - currentY;
+
+                let newScrollLeft = scrollLeft + walkX;
+                let newScrollTop = scrollTop + walkY;
+
+                const containerRect = container.getBoundingClientRect();
+                const scaledWidth = CONTENT_WIDTH * scale;
+                const scaledHeight = CONTENT_HEIGHT * scale;
+                const visibleWidth = Math.min(containerRect.width, scaledWidth);
+                const visibleHeight = Math.min(containerRect.height, scaledHeight);
+
+                const maxScrollX = Math.max(0, scaledWidth - visibleWidth);
+                const maxScrollY = Math.max(0, scaledHeight - visibleHeight);
+
+                newScrollLeft = Math.max(0, Math.min(maxScrollX, newScrollLeft));
+                newScrollTop = Math.max(0, Math.min(maxScrollY, newScrollTop));
+
+                container.scrollLeft = newScrollLeft;
+                container.scrollTop = newScrollTop;
+
+                e.preventDefault();
+                return false;
+            }
+
+            function endPan() {
+                isPanning = false;
+                container.classList.remove('dragging');
+                applyScrollBoundaries();
+            }
+
+            function handleTouchStart(e) {
+                if (e.touches.length === 1) {
+                    startPan(e);
+                }
+            }
+
+            function handleTouchMove(e) {
+                if (e.touches.length === 1) {
+                    doPan(e);
+                }
+            }
+
+            function handleTouchEnd() {
+                endPan();
+            }
+        }
+
+        function showTooltip(event, research) {
+            hideTooltip();
+
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+
+            const header = document.createElement('div');
+            header.className = 'tooltip-header';
+
+            if (research.buildings.length === 0) {
+                header.textContent = research.name;
+                tooltip.appendChild(header);
+
+                const info = document.createElement('div');
+                info.className = 'building-name';
+                info.textContent = 'No buildings unlocked';
+                info.style.textAlign = 'center';
+                info.style.padding = '10px';
+                tooltip.appendChild(info);
+            } else {
+                header.textContent = `Buildings Unlocked (${research.buildings.length})`;
+                tooltip.appendChild(header);
+
+                const gridContainer = document.createElement('div');
+                gridContainer.className = 'building-grid';
+
+                if (research.buildings.length === 1) {
+                    gridContainer.style.gridTemplateColumns = '1fr';
+                } else if (research.buildings.length <= 4) {
+                    gridContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                } else if (research.buildings.length <= 6) {
+                    gridContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
+                } else if (research.buildings.length <= 8) {
+                    gridContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                } else if (research.buildings.length <= 10) {
+                    gridContainer.style.gridTemplateColumns = 'repeat(5, 1fr)';
+                } else if (research.buildings.length <= 12) {
+                    gridContainer.style.gridTemplateColumns = 'repeat(6, 1fr)';
+                } else {
+                    gridContainer.style.gridTemplateColumns = 'repeat(7, 1fr)';
+                    tooltip.style.maxWidth = '750px';
+                }
+
+                research.buildings.forEach((building, index) => {
+                    const buildingDiv = document.createElement('div');
+                    buildingDiv.className = 'building-item';
+
+                    const img = document.createElement('img');
+                    img.className = 'building-image';
+                    img.src = `https://cms.bloxinformer.com/wp-content/uploads/2025/12/${building}`;
+                    img.alt = building.replace('-industrialist.jpg', '').replace(/-/g, ' ');
+                    img.onerror = function () {
+                        this.onerror = null;
+                        this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><rect width="100%" height="100%" fill="%231a1a2e"/><text x="50%" y="50%" font-family="Arial" fill="%2372efdd" text-anchor="middle" dy=".3em">Image not found</text></svg>';
+                    };
+
+                    const name = document.createElement('div');
+                    name.className = 'building-name';
+
+                    let displayName = building.replace('-industrialist.jpg', '').replace('-industrialist-.jpg', '').replace('-industrialis.jpg', '').replace('.jpg', '').replace(/-/g, ' ');
+                    displayName = displayName.split(' ')
+                        .map(word => {
+                            const match = word.match(/([a-zA-Z]+)(\d+)$/);
+                            if (match) {
+                                return match[1].charAt(0).toUpperCase() + match[1].slice(1) + ' ' + match[2];
+                            }
+                            return word.charAt(0).toUpperCase() + word.slice(1);
+                        })
+                        .join(' ');
+
+                    name.textContent = displayName;
+
+                    buildingDiv.appendChild(img);
+                    buildingDiv.appendChild(name);
+                    gridContainer.appendChild(buildingDiv);
+                });
+
+                tooltip.appendChild(gridContainer);
+            }
+
+            document.body.appendChild(tooltip);
+
+            positionTooltip(tooltip, event);
+
+            currentTooltip = tooltip;
+        }
+
+        function positionTooltip(tooltip, event) {
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let left = event.pageX + 15;
+            let top = event.pageY + 15;
+
+            if (left + tooltipRect.width > viewportWidth) {
+                left = event.pageX - tooltipRect.width - 15;
+            }
+
+            if (left < 0) {
+                left = 15;
+            }
+
+            if (top + tooltipRect.height > viewportHeight) {
+                top = event.pageY - tooltipRect.height - 15;
+            }
+
+            if (top < 0) {
+                top = 15;
+            }
+
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
+        }
+
+        function hideTooltip() {
+            if (currentTooltip) {
+                currentTooltip.remove();
+                currentTooltip = null;
+            }
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (currentTooltip) {
+                positionTooltip(currentTooltip, e);
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            if (currentTooltip) {
+                const event = new MouseEvent('mousemove', {
+                    clientX: event.clientX,
+                    clientY: event.clientY
+                });
+                positionTooltip(currentTooltip, event);
+            }
+        });
+
+        function filterNodes() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const resultsDiv = document.getElementById('searchResults');
+
+            if (!searchTerm) {
+                resultsDiv.innerHTML = '';
+                researchData.forEach(research => {
+                    const node = document.getElementById(`node-${research.id}`);
+                    if (node) {
+                        node.style.opacity = '1';
+                        node.classList.remove('node-highlight');
+                    }
+                });
+                return;
+            }
+
+            const matches = [];
+            researchData.forEach(research => {
+                const node = document.getElementById(`node-${research.id}`);
+                const isMatch =
+                    research.name.toLowerCase().includes(searchTerm) ||
+                    research.requirements.toLowerCase().includes(searchTerm) ||
+                    research.buildings.some(building =>
+                        building.replace('-industrialist.jpg', '').replace(/-/g, ' ').toLowerCase().includes(searchTerm)
+                    );
+
+                if (node) {
+                    node.style.opacity = isMatch ? '1' : '0.2';
+                    if (isMatch) {
+                        node.classList.add('node-highlight');
+                        matches.push(research.name);
+                    } else {
+                        node.classList.remove('node-highlight');
+                    }
+                }
+            });
+
+            resultsDiv.innerHTML = `<div style="color: #72efdd; font-size: 0.8rem; margin-top: 5px;">Found ${matches.length} matching research nodes</div>`;
+        }
+
+        let scale = 1;
+        const treeContainer = document.getElementById('treeContainer');
+
+        function zoomIn() {
+            const container = document.querySelector('.container');
+            const scrollLeftRatio = container.scrollLeft / container.scrollWidth;
+            const scrollTopRatio = container.scrollTop / container.scrollHeight;
+
+            scale *= 1.2;
+            treeContainer.style.transform = `scale(${scale})`;
+            treeContainer.style.transformOrigin = 'top left';
+
+            requestAnimationFrame(() => {
+                container.scrollLeft = scrollLeftRatio * container.scrollWidth;
+                container.scrollTop = scrollTopRatio * container.scrollHeight;
+            });
+        }
+
+        function zoomOut() {
+            const container = document.querySelector('.container');
+            const scrollLeftRatio = container.scrollLeft / container.scrollWidth;
+            const scrollTopRatio = container.scrollTop / container.scrollHeight;
+
+            scale *= 0.8;
+            if (scale < 0.1) scale = 0.1;
+            treeContainer.style.transform = `scale(${scale})`;
+            treeContainer.style.transformOrigin = 'top left';
+
+            requestAnimationFrame(() => {
+                container.scrollLeft = scrollLeftRatio * container.scrollWidth;
+                container.scrollTop = scrollTopRatio * container.scrollHeight;
+            });
+        }
+
+        window.onload = function () {
+            generateTree();
+            initPanning();
+
+            const container = document.querySelector('.container');
+            const treeContainer = document.getElementById('treeContainer');
+
+            const centerX = treeContainer.scrollWidth / 2 - container.clientWidth / 2;
+            const centerY = treeContainer.scrollHeight / 2 - container.clientHeight / 2;
+
+            container.scrollLeft = centerX;
+            container.scrollTop = centerY;
+
+            setTimeout(() => {
+                applyScrollBoundaries();
+            }, 100);
+        };
+    </script>
+</body>
+
+</html>
