@@ -136,7 +136,7 @@
             z-index: 1000;
             display: block;
             backdrop-filter: blur(5px);
-            max-width: 400px;
+            max-width: 600px;
         }
 
         .building-grid {
@@ -170,7 +170,7 @@
 
         .building-image {
             width: 100%;
-            height: 120px;
+            height: 85px;
             object-fit: contain;
             margin-bottom: 8px;
         }
@@ -179,7 +179,7 @@
             color: #b5b5b5;
             text-align: center;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             word-break: break-word;
             margin-top: auto;
         }
@@ -1383,8 +1383,19 @@
 
                 if (research.buildings.length === 1) {
                     gridContainer.style.gridTemplateColumns = '1fr';
-                } else {
+                } else if (research.buildings.length <= 4) {
                     gridContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                } else if (research.buildings.length <= 6) {
+                    gridContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
+                } else if (research.buildings.length <= 8) {
+                    gridContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                } else if (research.buildings.length <= 10) {
+                    gridContainer.style.gridTemplateColumns = 'repeat(5, 1fr)';
+                } else if (research.buildings.length <= 12) {
+                    gridContainer.style.gridTemplateColumns = 'repeat(6, 1fr)';
+                } else {
+                    gridContainer.style.gridTemplateColumns = 'repeat(7, 1fr)';
+                    tooltip.style.maxWidth = '750px';
                 }
 
                 research.buildings.forEach((building, index) => {
