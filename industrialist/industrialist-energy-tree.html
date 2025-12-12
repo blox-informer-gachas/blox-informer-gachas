@@ -1648,7 +1648,7 @@
 
                         container.scrollLeft = node.offsetLeft - container.clientWidth / 2 + rect.width / 2;
                         container.scrollTop = node.offsetTop - container.clientHeight / 2 + rect.height / 2;
-                        scale = 1;
+                        scale = 0.75;
                         treeContainer.style.transform = `scale(${scale})`;
                         treeContainer.style.transformOrigin = 'top left';
 
@@ -1685,7 +1685,7 @@
             const container = document.querySelector('.container');
             const treeContainer = document.getElementById('treeContainer');
 
-            scale = 0.5;
+            scale = 0.25;
             treeContainer.style.transform = `scale(${scale})`;
             treeContainer.style.transformOrigin = 'top left';
             const centerX = (treeContainer.scrollWidth * scale - container.clientWidth) / 2;
