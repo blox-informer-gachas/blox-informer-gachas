@@ -286,6 +286,69 @@
 #clearSearch:hover {
     background: #4cc9f0;
 }
+
+.zoom-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    z-index: 1000;
+    background: rgba(26, 26, 46, 0.9);
+    border: 1px solid #4cc9f0;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.zoom-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #1a1a2e, #16213e);
+    border: 2px solid #4cc9f0;
+    color: #4cc9f0;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.zoom-btn:hover {
+    background: linear-gradient(145deg, #4cc9f0, #4361ee);
+    color: #0a0a12;
+    transform: scale(1.1);
+}
+
+.zoom-reset {
+    font-size: 16px;
+}
+
+/* For mobile devices */
+@media (max-width: 768px) {
+    .zoom-controls {
+        bottom: 70px; /* Higher up to avoid mobile browser UI */
+        right: 10px;
+        padding: 8px;
+    }
+    
+    .zoom-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 24px;
+    }
+    .zoom-btn {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+}
     </style>
 </head>
 
@@ -301,6 +364,11 @@
         <div class="tree-container" id="treeContainer">
         </div>
     </div>
+    <div class="zoom-controls">
+    <button class="zoom-btn zoom-in" title="Zoom In">+</button>
+    <button class="zoom-btn zoom-out" title="Zoom Out">-</button>
+    <button class="zoom-btn zoom-reset" title="Reset Zoom">⟳</button>
+</div>
 
     <script>
         /* Row Y-coordinates
@@ -859,72 +927,66 @@
             });
 
             researchData.forEach(research => {
-        const node = document.createElement('div');
-        node.className = 'research-node';
-        node.style.left = `${research.x}px`;
-        node.style.top = `${research.y}px`;
-        node.id = `node-${research.id}`;
+                const node = document.createElement('div');
+                node.className = 'research-node';
+                node.style.left = `${research.x}px`;
+                node.style.top = `${research.y}px`;
+                node.id = `node-${research.id}`;
 
-        const tierIndicator = document.createElement('div');
-        tierIndicator.className = 'tier-indicator';
-        tierIndicator.textContent = `Tier ${research.tier}`;
-        node.appendChild(tierIndicator);
+                const tierIndicator = document.createElement('div');
+                tierIndicator.className = 'tier-indicator';
+                tierIndicator.textContent = `Tier ${research.tier}`;
+                node.appendChild(tierIndicator);
 
-        if (research.name.includes("Theory Research")) {
-            node.classList.add('node-theory');
+                if (research.name.includes("Theory Research")) {
+                    node.classList.add('node-theory');
+                }
+
+                const rpMatch = research.requirements.match(/([\d,]+)\s*RP/);
+                if (rpMatch) {
+                    const rpValue = parseInt(rpMatch[1].replace(/,/g, ''));
+                    if (rpValue <= 100) node.style.borderColor = '#4cc9f0';
+                    else if (rpValue <= 1000) node.style.borderColor = '#4361ee';
+                    else if (rpValue <= 10000) node.style.borderColor = '#3a0ca3';
+                    else if (rpValue <= 100000) node.style.borderColor = '#7209b7';
+                    else node.style.borderColor = '#f72585';
+                }
+
+                const header = document.createElement('div');
+                header.className = 'node-header';
+                header.textContent = research.name;
+                node.appendChild(header);
+
+                const requirements = document.createElement('div');
+                requirements.className = 'node-requirements';
+                requirements.textContent = research.requirements;
+                node.appendChild(requirements);
+
+                if (research.requirements.includes("Sell")) {
+                    const sellReq = document.createElement('div');
+                    sellReq.className = 'node-sell-requirement';
+                    const sellMatch = research.requirements.match(/Sell (.+)/);
+                    if (sellMatch) {
+                        sellReq.textContent = sellMatch[0];
+                    }
+                    node.appendChild(sellReq);
+                }
+
+                node.addEventListener('mouseenter', (e) => showTooltip(e, research));
+node.addEventListener('mouseleave', hideTooltip);
+node.addEventListener('touchstart', (e) => {
+    e.stopPropagation(); // Prevent triggering panning
+    showTooltip(e, research);
+});
+
+                container.appendChild(node);
+            });
+
+            const maxX = Math.max(...researchData.map(r => r.x)) + 300;
+            const maxY = Math.max(...researchData.map(r => r.y)) + 200;
+            container.style.minWidth = `${CONTENT_WIDTH + PADDING}px`;
+            container.style.minHeight = `${CONTENT_HEIGHT + PADDING}px`;
         }
-
-        const rpMatch = research.requirements.match(/([\d,]+)\s*RP/);
-        if (rpMatch) {
-            const rpValue = parseInt(rpMatch[1].replace(/,/g, ''));
-            if (rpValue <= 100) node.style.borderColor = '#4cc9f0';
-            else if (rpValue <= 1000) node.style.borderColor = '#4361ee';
-            else if (rpValue <= 10000) node.style.borderColor = '#3a0ca3';
-            else if (rpValue <= 100000) node.style.borderColor = '#7209b7';
-            else node.style.borderColor = '#f72585';
-        }
-
-        const header = document.createElement('div');
-        header.className = 'node-header';
-        header.textContent = research.name;
-        node.appendChild(header);
-
-        const requirements = document.createElement('div');
-        requirements.className = 'node-requirements';
-        requirements.textContent = research.requirements;
-        node.appendChild(requirements);
-
-        if (research.requirements.includes("Sell")) {
-            const sellReq = document.createElement('div');
-            sellReq.className = 'node-sell-requirement';
-            const sellMatch = research.requirements.match(/Sell (.+)/);
-            if (sellMatch) {
-                sellReq.textContent = sellMatch[0];
-            }
-            node.appendChild(sellReq);
-        }
-
-        // Add hover event for desktop
-        node.addEventListener('mouseenter', (e) => showTooltip(e, research));
-        node.addEventListener('mouseleave', hideTooltip);
-
-        // Add click event for mobile
-        node.addEventListener('click', (e) => {
-            if (currentTooltip) {
-                hideTooltip(); // Close any existing tooltip
-            } else {
-                showTooltip(e, research); // Show the tooltip for the clicked node
-            }
-        });
-
-        container.appendChild(node);
-    });
-
-    const maxX = Math.max(...researchData.map(r => r.x)) + 300;
-    const maxY = Math.max(...researchData.map(r => r.y)) + 200;
-    container.style.minWidth = `${CONTENT_WIDTH + PADDING}px`;
-    container.style.minHeight = `${CONTENT_HEIGHT + PADDING}px`;
-}
 
         const CONTENT_WIDTH = 1900;
         const CONTENT_HEIGHT = 1800;
@@ -981,6 +1043,45 @@
 
             applyScrollBoundaries();
         }
+        function resetZoom() {
+    const container = document.querySelector('.container');
+    const treeContainer = document.getElementById('treeContainer');
+    
+    scale = 0.5;
+    treeContainer.style.transform = `scale(${scale})`;
+    treeContainer.style.transformOrigin = 'top left';
+    
+    const centerX = (treeContainer.scrollWidth * scale - container.clientWidth) / 2;
+    const centerY = (treeContainer.scrollHeight * scale - container.clientHeight) / 2;
+
+    container.scrollLeft = centerX;
+    container.scrollTop = centerY;
+
+    setTimeout(() => {
+        applyScrollBoundaries();
+    }, 100);
+}
+
+// Add event listeners for zoom buttons (put this in window.onload)
+document.querySelector('.zoom-in').addEventListener('click', zoomIn);
+document.querySelector('.zoom-out').addEventListener('click', zoomOut);
+document.querySelector('.zoom-reset').addEventListener('click', resetZoom);
+
+// Also add touch event listeners for mobile
+document.querySelector('.zoom-in').addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    zoomIn();
+});
+
+document.querySelector('.zoom-out').addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    zoomOut();
+});
+
+document.querySelector('.zoom-reset').addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    resetZoom();
+});
 
         function applyScrollBoundaries() {
             const containerRect = container.getBoundingClientRect();
@@ -1098,10 +1199,25 @@
         }
 
         function showTooltip(event, research) {
-            hideTooltip();
-
-            const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip';
+    // Hide any existing tooltip first
+    hideTooltip();
+    
+    // Create new tooltip
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    
+    // Get coordinates for both mouse and touch events
+    let clientX, clientY;
+    
+    if (event.touches && event.touches[0]) {
+        // Touch event
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+    } else {
+        // Mouse event
+        clientX = event.clientX;
+        clientY = event.clientY;
+    }
 
             const header = document.createElement('div');
             header.className = 'tooltip-header';
@@ -1176,40 +1292,78 @@
                 tooltip.appendChild(gridContainer);
             }
 
-            document.body.appendChild(tooltip);
+            const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '✕';
+    closeBtn.style.cssText = `
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: #7209b7;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+        cursor: pointer;
+        display: none;
+    `;
+    
+    // Show close button only on mobile/touch devices
+    if ('ontouchstart' in window) {
+        closeBtn.style.display = 'block';
+        closeBtn.addEventListener('click', hideTooltip);
+    }
+    
+    tooltip.appendChild(closeBtn);
 
-            positionTooltip(tooltip, event);
+            // Position tooltip
+    positionTooltip(tooltip, clientX, clientY);
+    
+    document.body.appendChild(tooltip);
+    currentTooltip = tooltip;
+    
+    // On mobile, hide tooltip when tapping outside
+    if ('ontouchstart' in window) {
+        setTimeout(() => {
+            document.addEventListener('touchstart', hideTooltipOnOutsideClick, { once: true });
+        }, 100);
+    }
+}
 
-            currentTooltip = tooltip;
-        }
+function hideTooltipOnOutsideClick(event) {
+    if (currentTooltip && !currentTooltip.contains(event.target)) {
+        hideTooltip();
+    }
+}
 
-        function positionTooltip(tooltip, event) {
-            const tooltipRect = tooltip.getBoundingClientRect();
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
+        function positionTooltip(tooltip, clientX, clientY) {
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
 
-            let left = event.pageX + 15;
-            let top = event.pageY + 15;
+    let left = clientX + 15;
+    let top = clientY + 15;
 
-            if (left + tooltipRect.width > viewportWidth) {
-                left = event.pageX - tooltipRect.width - 15;
-            }
+    if (left + tooltipRect.width > viewportWidth) {
+        left = clientX - tooltipRect.width - 15;
+    }
 
-            if (left < 0) {
-                left = 15;
-            }
+    if (left < 0) {
+        left = 15;
+    }
 
-            if (top + tooltipRect.height > viewportHeight) {
-                top = event.pageY - tooltipRect.height - 15;
-            }
+    if (top + tooltipRect.height > viewportHeight) {
+        top = clientY - tooltipRect.height - 15;
+    }
 
-            if (top < 0) {
-                top = 15;
-            }
+    if (top < 0) {
+        top = 15;
+    }
 
-            tooltip.style.left = `${left}px`;
-            tooltip.style.top = `${top}px`;
-        }
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+}
 
         function hideTooltip() {
             if (currentTooltip) {
