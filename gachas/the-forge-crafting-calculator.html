@@ -1919,7 +1919,7 @@
             color: var(--text-secondary);
             text-align: center;
             font-style: italic;
-            opacity: 0.8;
+            opacity: 0.9;
             margin-top: 10px;
         }
 
@@ -2142,6 +2142,7 @@
                         <div class="filter-option active" data-filter="all">All Ores</div>
                         <div class="filter-option" data-filter="stonewake">Stonewake's Cross</div>
                         <div class="filter-option" data-filter="kingdom">Forgotten Kingdom</div>
+                        <div class="filter-option" data-filter="frostspire">Frostspire Expanse</div>
                         <div class="filter-option" data-filter="goblin">Goblin Cave</div>
                         <div class="filter-option" data-filter="enemy">Enemy Drops</div>
                         <div class="dropdown-divider"></div>
@@ -2324,7 +2325,22 @@
             "Blue Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/blue-crystal-the-forge-calculator.png",
             "Rainbow Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/rainbow-crystal-the-forge-calculator.png",
             "Arcane Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/arcane-crystal-the-forge-calculator.png",
-            "Fichillium": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/fichillium-the-forge-calculator.png"
+            "Fichillium": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/fichillium-the-forge-calculator.png",
+            // New ores
+            "Tungsten": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/tungsten-the-forge-calculator.png",
+            "Sulfur": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/sulfur-the-forge-calculator.png",
+            "Pumice": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/pumice-the-forge-calculator.png",
+            "Graphite": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/graphite-the-forge-calculator.png",
+            "Aetherit": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/aetherit-the-forge-calculator.png",
+            "Scheelite": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/scheelite-the-forge-calculator.png",
+            "Larimar": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/larimar-the-forge-calculator.png",
+            "Neurotite": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/neurotite-the-forge-calculator.png",
+            "Frost Fossil": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/frost-fossil-the-forge-calculator.png",
+            "Tide Carve": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/tide-carve-the-forge-calculator.png",
+            "Velchire": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/velchire-the-forge-calculator.png",
+            "Sanctis": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/sanctis-the-forge-calculator.png",
+            "Snowite": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/snowite-the-forge-calculator.png",
+            "Iceite": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/iceite-the-forge-calculator.png",
         };
 
         const itemImages = {
@@ -2555,7 +2571,41 @@
             // Enemy Drops
             { id: 43, name: "Boneite", multiplier: 1.2, rarity: "rare", area: "enemy", color: "#f5f5dc", traitType: null, traits: [] },
             { id: 44, name: "Dark Boneite", multiplier: 2.25, rarity: "rare", area: "enemy", color: "#696969", traitType: null, traits: [] },
-            { id: 45, name: "Slimite", multiplier: 2.25, rarity: "epic", area: "enemy", color: "#32cd32", traitType: null, traits: [] }
+            { id: 45, name: "Slimite", multiplier: 2.25, rarity: "epic", area: "enemy", color: "#32cd32", traitType: null, traits: [] },
+
+            // Fichillium is defined above with id 46
+            // Frostspire Expanse
+            { id: 47, name: "Tungsten", multiplier: 2.6, rarity: "common", area: "frostspire", color: "#a5b1c9", traitType: null, traits: [] },
+            { id: 48, name: "Sulfur", multiplier: 2.75, rarity: "uncommon", area: "frostspire", color: "#e0dbb3", traitType: null, traits: [] },
+            { id: 49, name: "Pumice", multiplier: 2.9, rarity: "rare", area: "frostspire", color: "#d6cedd", traitType: "armor", traits: [
+                { description: "+{health}% extra health.", scaling: { health: { min: 0.5, max: 5 } }, type: "armor" }
+            ]},
+            { id: 50, name: "Graphite", multiplier: 3.1, rarity: "rare", area: "frostspire", color: "#656b7b", traitType: "armor", traits: [
+                { description: "Reduce incoming physical damage by {damage}%. Has 20% chance per hit.", scaling: { damage: { min: 1.2, max: 12 } }, type: "armor" }
+            ]},
+            { id: 51, name: "Aetherit", multiplier: 3.4, rarity: "rare", area: "frostspire", color: "#e2f0ff", traitType: "armor", traits: [
+                { description: "+{speed}% extra movement speed.", scaling: { speed: { min: 0.5, max: 5 } }, type: "armor" }
+            ]},
+            { id: 52, name: "Scheelite", multiplier: 3.3, rarity: "rare", area: "frostspire", color: "#f5c4a3", traitType: null, traits: [] },
+            { id: 53, name: "Larimar", multiplier: 4.1, rarity: "epic", area: "frostspire", color: "#aac3e1", traitType: null, traits: [] },
+            { id: 54, name: "Neurotite", multiplier: 4.3, rarity: "epic", area: "frostspire", color: "#65809b", traitType: null, traits: [] },
+            { id: 55, name: "Frost Fossil", multiplier: 4.5, rarity: "epic", area: "frostspire", color: "#5d7a7e", traitType: "all", traits: [
+                { description: "Increase physical damage by +{damage}% and decrease movement speed by -{speed}%.", scaling: { damage: { min: 1.75, max: 17.5 }, speed: { min: 0.5, max: 5 } }, type: "all" }
+            ]},
+            { id: 56, name: "Tide Carve", multiplier: 4.7, rarity: "epic", area: "frostspire", color: "#3d3c66", traitType: null, traits: [] },
+            { id: 57, name: "Velchire", multiplier: 5.5, rarity: "legendary", area: "frostspire", color: "#f0fdb8", traitType: "armor", traits: [
+                { description: "+{speed}% extra movement speed.", scaling: { speed: { min: 2, max: 20 } }, type: "armor" }
+            ]},
+            { id: 58, name: "Sanctis", multiplier: 6.0, rarity: "legendary", area: "frostspire", color: "#b6b9c8", traitType: "armor", traits: [
+                { description: "+{stamina}% more stamina.", scaling: { stamina: { min: 1.8, max: 18 } }, type: "armor" }
+            ]},
+            { id: 59, name: "Snowite", multiplier: 8.0, rarity: "legendary", area: "frostspire", color: "#dcd9d4", traitType: "weapon", traits: [
+                { description: "Applies {slow}% attack speed and movement speed slow for {duration}s. 30% chance on hit.", scaling: { slow: { min: 1.5, max: 15 }, duration: { min: 0.3, max: 3 }}, type: "weapon" }
+            ]},
+            { id: 60, name: "Iceite", multiplier: 10.5, rarity: "mythical", area: "frostspire", color: "#6591c0", traitType: "weapon", traits: [
+                { description: "Freeze enemies for {duration}s. 25% chance on hit. Has a cooldown of 12s.", scaling: { duration: { min: 0.2, max: 2 }}, type: "weapon" }
+            ]},
+
         ];
 
         const traitIconMapping = {
@@ -3340,6 +3390,10 @@
             }
 
             previewCard.innerHTML = `
+            <div class="preview-header" style="display: flex; align-items: center; flex-direction: column; margin-bottom: 10px; margin-top: -5px;">
+            <h2 class="preview-section-title" style="margin-top: 0; color: var(--text-secondary);">Forge Preview</h2>
+            <span class="prediction-note" style="margin-top: 0;">(Just a preview, forge results may vary!)</span>
+            </div>
         <div class="inventory-card-header" style="justify-content: space-between; border-color: ${oreColor}40; position: relative;">
             ${itemImage ? `
                 <div class="forge-result-image" style="border-color: ${oreColor}; background-image: url('${itemImage}'); width: 120px; height: 90px;"></div>
