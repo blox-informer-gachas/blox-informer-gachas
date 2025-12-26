@@ -32,6 +32,8 @@
             --stonewake-teal: #0a6e6e;
             --animation-speed: 0.3s;
             --border-radius: 12px;
+            --divine: #885ec6;
+            --exotic: #f081db;
         }
 
         * {
@@ -150,7 +152,6 @@
             font-weight: 600;
             font-size: 0.95rem;
             border: 2px solid var(--border);
-            backdrop-filter: blur(10px);
         }
 
         .toggle-btn.active {
@@ -195,7 +196,6 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
             animation: fadeIn var(--animation-speed) ease-out;
         }
 
@@ -520,7 +520,7 @@
         /* Ores Grid */
         .ores-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             gap: 10px;
             min-height: 240px;
             max-height: 240px;
@@ -536,7 +536,7 @@
             border: 3px solid transparent;
             position: relative;
             overflow: hidden;
-            aspect-ratio: 232/173;
+            aspect-ratio: 1/1;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -574,7 +574,7 @@
             text-align: center;
             font-size: 0.95rem;
             font-weight: bold;
-            padding: 3px 5px;
+            padding: 5px 5px;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8),
                 -1px -1px 0 rgba(0, 0, 0, 0.5),
                 1px -1px 0 rgba(0, 0, 0, 0.5),
@@ -592,7 +592,7 @@
             color: white;
             font-size: 0.85rem;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9),
                 -1px -1px 0 rgba(0, 0, 0, 0.5),
                 1px -1px 0 rgba(0, 0, 0, 0.5),
                 -1px 1px 0 rgba(0, 0, 0, 0.5),
@@ -682,6 +682,8 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             margin-bottom: 15px;
+            margin-left: 60px;
+            margin-right: 60px;
         }
 
         .slot {
@@ -690,7 +692,7 @@
             text-align: center;
             border: 2px dashed var(--border);
             transition: all 0.3s;
-            aspect-ratio: 232/173;
+            aspect-ratio: 1/1;
             position: relative;
             overflow: hidden;
         }
@@ -727,11 +729,11 @@
 
         .slot-ore-name {
             position: absolute;
-            top: 8px;
+            top: 10px;
             left: 0;
             right: 0;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
             font-weight: bold;
             padding: 3px 5px;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8),
@@ -779,7 +781,6 @@
             padding: 5px;
             text-align: center;
             border: 1px solid var(--primary-light);
-            backdrop-filter: blur(10px);
             box-shadow: var(--card-shadow);
             transition: all 0.3s ease;
         }
@@ -888,7 +889,6 @@
             border: 2px solid var(--primary-light);
             border-left: 4px solid var(--primary);
             transition: all var(--animation-speed);
-            backdrop-filter: blur(10px);
             cursor: pointer;
             position: relative;
             overflow: hidden;
@@ -1028,7 +1028,6 @@
             background: rgba(255, 255, 255, 0.1);
             color: var(--text);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
         }
 
         .reset-btn:hover {
@@ -1097,7 +1096,6 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            backdrop-filter: blur(10px);
             border: 1px solid var(--primary-dark);
             text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
         }
@@ -1114,7 +1112,6 @@
             border-radius: 10px;
             padding: 10px;
             border: 1px solid var(--primary-light);
-            backdrop-filter: blur(10px);
             text-align: center;
             transition: all var(--animation-speed) ease;
         }
@@ -1160,7 +1157,6 @@
             border: 1px solid var(--primary-light);
             border-radius: 10px;
             padding: 5px 10px;
-            backdrop-filter: blur(10px);
             transition: all var(--animation-speed);
         }
 
@@ -1185,33 +1181,67 @@
         }
 
         /* Area Toggle */
-        .area-toggle-btn {
-            font-size: 0.85rem;
-            padding: 8px 15px;
-            border-radius: 20px;
+        #area-toggle-btn {
+            font-size: 0.8rem;
+            padding: 5px 12px;
+            border-radius: 15px;
+            color: var(--text);
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
             transition: all var(--animation-speed);
-            font-weight: 600;
         }
 
-        .area-toggle-btn.kingdom {
-            background: linear-gradient(135deg, #FF6600, #cc5200);
+        #area-toggle-btn:hover {
+            background: var(--primary-light);
             border-color: var(--primary);
-            color: white;
-        }
-
-        .area-toggle-btn.stonewake {
-            background: linear-gradient(135deg, #1da5a5, #084e4e);
-            border-color: var(--stonewake-teal);
-            color: white;
-        }
-
-        .area-toggle-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .area-option {
+            padding: 10px 15px;
+            color: var(--text);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .area-option:last-child {
+            border-bottom: none;
+        }
+
+        .area-option:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .area-option.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            position: relative;
+        }
+
+        /* Frostspire specific styling */
+        .frostspire-active {
+            background: linear-gradient(135deg, #6ab7ff, #1a7fc9) !important;
+            border-color: #6ab7ff !important;
+        }
+
+        .kingdom-active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+            border-color: var(--primary) !important;
+        }
+
+        .stonewake-active {
+            background: linear-gradient(135deg, var(--stonewake-teal), #084e4e) !important;
+            border-color: var(--stonewake-teal) !important;
         }
 
         /* Tooltip */
@@ -1496,6 +1526,11 @@
         /* Responsive Design */
         @media (max-width: 768px) {
 
+            .slots-container {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
             .forge-result-tags {
                 justify-content: center;
             }
@@ -1598,6 +1633,24 @@
             border-image: var(--relic) 1;
         }
 
+        .divine {
+            border-color: var(--divine);
+            border-image: var(--divine) 1;
+        }
+
+        .exotic {
+            border-color: var(--exotic);
+            border-image: var(--exotic) 1;
+        }
+
+        .divine .ore-name {
+            color: var(--divine);
+        }
+
+        .exotic .ore-name {
+            color: var(--exotic);
+        }
+
         .common .ore-name {
             color: var(--common);
         }
@@ -1675,11 +1728,9 @@
             overflow: hidden;
             min-height: 200px;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
             box-shadow: 0 0px 12px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             transition: all 0.3s ease;
         }
 
@@ -1734,7 +1785,6 @@
             border-radius: 8px;
             padding: 8px 12px 0px 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
         }
 
         .inventory-stat-row {
@@ -1915,11 +1965,10 @@
         }
 
         .prediction-note {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
             text-align: center;
             font-style: italic;
-            opacity: 0.9;
             margin-top: 10px;
         }
 
@@ -2126,8 +2175,8 @@
         <section class="inventory-section">
             <div class="section-title">
                 <span><i class="fas fa-gem"></i> Ore List / Select Ores</span>
-                <button class="quick-craft-btn" id="inventory-btn">
-                    <i class="fas fa-bag-shopping"></i> Inventory
+                <button class="quick-craft-btn" id="quick-craft-btn">
+                    <i class="fas fa-bolt"></i> Quick Craft
                 </button>
             </div>
 
@@ -2143,6 +2192,7 @@
                         <div class="filter-option" data-filter="stonewake">Stonewake's Cross</div>
                         <div class="filter-option" data-filter="kingdom">Forgotten Kingdom</div>
                         <div class="filter-option" data-filter="frostspire">Frostspire Expanse</div>
+                        <div class="filter-option" data-filter="peak">The Peak</div>
                         <div class="filter-option" data-filter="goblin">Goblin Cave</div>
                         <div class="filter-option" data-filter="enemy">Enemy Drops</div>
                         <div class="dropdown-divider"></div>
@@ -2166,9 +2216,26 @@
         <section class="mix-section">
             <div class="section-title">
                 <span><i class="fas fa-fire"></i> Forge</span>
-                <button class="quick-craft-btn" id="quick-craft-btn">
-                    <i class="fas fa-bolt"></i> Quick Craft
-                </button>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="filters-dropdown" style="position: relative;">
+                        <button class="filter-btn dropdown-toggle" id="area-toggle-btn">
+                            <i class="fas fa-map-marker-alt"></i> <span style="font-weight: 600;"
+                                id="area-label">Frostspire Expanse</span>
+                            <i class="fas fa-chevron-down" style="font-size: 0.8rem; margin-left: 5px;"></i>
+                        </button>
+                        <div class="dropdown-menu" id="area-dropdown" style="min-width: 180px;">
+                            <div class="area-option" data-area="frostspire">
+                                <i class="fas fa-snowflake"></i> Frostspire Expanse
+                            </div>
+                            <div class="area-option" data-area="kingdom">
+                                <i class="fas fa-crown"></i> Forgotten Kingdom
+                            </div>
+                            <div class="area-option" data-area="stonewake">
+                                <i class="fas fa-mountain"></i> Stonewake's Cross
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="slots-container" id="ore-slots">
@@ -2218,9 +2285,8 @@
             <div class="section-title">
                 <span><i class="fas fa-chart-pie"></i> Forge Chances</span>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <button class="area-toggle-btn" id="area-toggle-btn"
-                        style="font-size: 0.8rem; padding: 5px 12px; border-radius: 15px; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                        <i class="fas fa-map-marker-alt"></i> <span id="area-label">Forgotten Kingdom</span>
+                    <button class="quick-craft-btn" id="inventory-btn">
+                        <i class="fas fa-bag-shopping"></i> Inventory
                     </button>
                 </div>
 
@@ -2326,7 +2392,7 @@
             "Rainbow Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/rainbow-crystal-the-forge-calculator.png",
             "Arcane Crystal": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/arcane-crystal-the-forge-calculator.png",
             "Fichillium": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/fichillium-the-forge-calculator.png",
-            // New ores
+            // Frostspire
             "Tungsten": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/tungsten-the-forge-calculator.png",
             "Sulfur": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/sulfur-the-forge-calculator.png",
             "Pumice": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/pumice-the-forge-calculator.png",
@@ -2341,6 +2407,23 @@
             "Sanctis": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/sanctis-the-forge-calculator.png",
             "Snowite": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/snowite-the-forge-calculator.png",
             "Iceite": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/iceite-the-forge-calculator.png",
+
+            // Peak
+            "Mistvein": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/mistvein-ore-the-forge.png",
+            "Lgarite": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/lgarite-ore-the-forge.png",
+            "Voidfractal": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/voidfractal-ore-the-forge.png",
+            "Moltenfrost": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/moltenfrost-ore-the-forge.png",
+            "Crimsonite": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/crimsonite-ore-the-forge.png",
+            "Malachite": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/malachite-ore-the-forge.png",
+            "Aquajade": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/aquajade-ore-the-forge.png",
+            "Cryptex": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/cryptex-ore-the-forge.png",
+            "Galestor": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/galestor-ore-the-forge.png",
+            "Voidstar": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/voidstar-ore-the-forge.png",
+            "Etherealite": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/etherealite-ore-the-forge.png",
+            "Suryafal": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/suryafal-ore-the-forge.png",
+            "Heavenite": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/heavenite-ore-the-forge.jpg",
+            "Gargantuan": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/gargantuan-ore-the-forge.png",
+            "Mosasaursit": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/10/mosasaursit-ore-the-forge.jpg"
         };
 
         const itemImages = {
@@ -2356,11 +2439,13 @@
             "Cutlass": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/cutlass-the-forge-calculator.png",
             "Rapier": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/rapier-the-forge-calculator.png",
             "Chaos": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/chaos-the-forge-calculator.png",
+            "Hell Slayer": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/hell-slayer-the-forge-calculator.png",
 
             // Gauntlets
             "Ironhand": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/ironhand-the-forge-calculator.png",
             "Boxing Gloves": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/boxing-gloves-the-forge-calculator.png",
             "Relevator": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/relevator-the-forge-calculator.png",
+            "Savage Claws": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/savage-claws-the-forge-calculator.png",
 
             // Katanas
             "Uchigatana": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/uchigatana-the-forge-calculator.png",
@@ -2370,9 +2455,30 @@
             "Crusader Sword": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/crusader-sword-the-forge-calculator.png",
             "Long Sword": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/long-sword-the-forge-calculator.png",
 
+            //Maces
+            "Mace": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/mace-the-forge-calculator.png",
+            "Winged Mace": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/winged-mace-the-forge-calculator.png",
+            "Spiked Mace": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/spiked-mace-the-forge-calculator.png",
+            "Hammerhead Mace": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/hammerhead-mace-the-forge-calculator.png",
+            "Grave Maker": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/grave-maker-the-forge-calculator.png",
+
+            // Axes
+            "Axe": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/axe-the-forge-calculator.png",
+            "Battleaxe": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/battleaxe-the-forge-calculator.png",
+            "Curved Handle Axe": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/spade-armed-axe-the-forge-calculator.png",
+            "Spade Armed Axe": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/curved-handle-axe-the-forge-calculator.png",
+
+            // Spears
+            "Spear": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/spear-the-forge-calculator.png",
+            "Trident": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/trident-the-forge-calculator.png",
+            "Angelic Spear": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/angelic-spear-the-forge-calculator.png",
+            "Demonic Spear": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/demonic-spear-the-forge-calculator.png",
+
             // Great Axes
             "Scythe": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/scythe-the-forge-calculator.png",
             "Double Battle Axe": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/double-battle-axe-the-forge-calculator.png",
+            "Greater Battle Axe": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/greater-battle-axe-the-forge-calculator.png",
+            "Wyvern Axe": "https://cms.bloxinformer.com/wp-content/uploads/2025/12/wyvern-axe-the-forge-calculator.png",
 
             // Colossal Swords
             "Great Sword": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/great-sword-the-forge-calculator.png",
@@ -2389,18 +2495,24 @@
             // Medium Armor
             "Medium Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/medium-helmet-the-forge-calculator.png",
             "Samurai Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/samurai-helmet-the-forge-calculator.png",
+            "Viking Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/samurai-helmet-the-forge-calculator.png",
             "Medium Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/medium-leggings-the-forge-calculator.png",
             "Samurai Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/samurai-leggings-the-forge-calculator.png",
+            "Viking Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/samurai-leggings-the-forge-calculator.png",
             "Medium Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/medium-chestplate-the-forge-calculator.png",
             "Samurai Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/samurai-chestplate-the-forge-calculator.png",
+            "Viking Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/samurai-chestplate-the-forge-calculator.png",
 
             // Heavy Armor
             "Knight Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/knight-helmet-the-forge-calculator.png",
             "Dark Knight Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-helmet-the-forge-calculator.png",
+            "Wolf Helmet": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-chestplate-the-forge-calculator.png",
             "Knight Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/knight-leggings-the-forge-calculator.png",
             "Dark Knight Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-leggings-the-forge-calculator.png",
+            "Wolf Leggings": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-chestplate-the-forge-calculator.png",
             "Knight Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/knight-chestplate-the-forge-calculator.png",
-            "Dark Knight Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-chestplate-the-forge-calculator.png"
+            "Dark Knight Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-chestplate-the-forge-calculator.png",
+            "Wolf Chestplate": "https://cms.bloxinformer.com/wp-content/uploads/2025/04/dark-knight-chestplate-the-forge-calculator.png"
         };
 
         const baseItemStats = {
@@ -2414,11 +2526,29 @@
                 "Gladius": { damage: 15.75, atkSpeed: 0.62, range: 8, price: 120, type: "Straight Sword" },
                 "Cutlass": { damage: 18.75, atkSpeed: 0.66, range: 8, price: 120, type: "Straight Sword" },
                 "Rapier": { damage: 15, atkSpeed: 0.49, range: 8, price: 120, type: "Straight Sword" },
-                "Chaos": { damage: 18.75, atkSpeed: 0.59, range: 8, price: 120, type: "Straight Sword" },
+                "Chaos": { damage: 18.75, atkSpeed: 0.59, range: 6, price: 120, type: "Straight Sword" },
+                "Hell Slayer": { damage: 20.25, atkSpeed: 0.59, range: 8, price: 120, type: "Straight Sword" },
 
                 "Ironhand": { damage: 15.2, atkSpeed: 0.51, range: 6, price: 205, type: "Gauntlet" },
                 "Boxing Gloves": { damage: 16, atkSpeed: 0.59, range: 6, price: 205, type: "Gauntlet" },
                 "Relevator": { damage: 19.2, atkSpeed: 0.69, range: 6, price: 205, type: "Gauntlet" },
+                "Savage Claws": { damage: 16, atkSpeed: 0.47, range: 6, price: 205, type: "Gauntlet" },
+
+                "Mace": { damage: 12, atkSpeed: 0.46, range: 8, price: 205, type: "Mace" },
+                "Spiked Mace": { damage: 12.6, atkSpeed: 0.46, range: 8, price: 205, type: "Mace" },
+                "Winged Mace": { damage: 13.2, atkSpeed: 0.46, range: 8, price: 205, type: "Mace" },
+                "Hammerhead Mace": { damage: 13.8, atkSpeed: 0.46, range: 8, price: 205, type: "Mace" },
+                "Grave Maker": { damage: 15.6, atkSpeed: 0.46, range: 8, price: 205, type: "Mace" },
+
+                "Axe": { damage: 14, atkSpeed: 0.48, range: 8, price: 205, type: "Axe" },
+                "Battleaxe": { damage: 14.7, atkSpeed: 0.48, range: 8, price: 205, type: "Axe" },
+                "Curved Handle Axe": { damage: 15.4, atkSpeed: 0.48, range: 8, price: 205, type: "Axe" },
+                "Spade Armed Axe": { damage: 16.1, atkSpeed: 0.48, range: 8, price: 205, type: "Axe" },
+
+                "Spear": { damage: 15, atkSpeed: 0.45, range: 11, price: 120, type: "Spear" },
+                "Trident": { damage: 15, atkSpeed: 0.45, range: 11, price: 120, type: "Spear" },
+                "Demonic Spear": { damage: 18, atkSpeed: 0.56, range: 11, price: 120, type: "Spear" },
+                "Angelic Spear": { damage: 19.5, atkSpeed: 0.41, range: 11, price: 120, type: "Spear" },
 
                 "Uchigatana": { damage: 17, atkSpeed: 0.6, range: 9, price: 324, type: "Katana" },
                 "Tachi": { damage: 17.85, atkSpeed: 0.63, range: 9, price: 324, type: "Katana" },
@@ -2426,8 +2556,10 @@
                 "Crusader Sword": { damage: 24, atkSpeed: 1.0, range: 9, price: 485, type: "Great Sword" },
                 "Long Sword": { damage: 24, atkSpeed: 1.11, range: 9, price: 485, type: "Great Sword" },
 
-                "Scythe": { damage: 28.5, atkSpeed: 0.95, range: 9, price: 850, type: "Great Axe" },
                 "Double Battle Axe": { damage: 31.5, atkSpeed: 1.05, range: 9, price: 850, type: "Great Axe" },
+                "Scythe": { damage: 28.5, atkSpeed: 0.95, range: 9, price: 850, type: "Great Axe" },
+                "Greater Battle Axe": { damage: 34.5, atkSpeed: 1, range: 9, price: 850, type: "Great Axe" },
+                "Wyvern Axe": { damage: 37.5, atkSpeed: 0.91, range: 9, price: 850, type: "Great Axe" },
 
                 "Great Sword": { damage: 40, atkSpeed: 1.12, range: 10, price: 1355, type: "Colossal Sword" },
                 "Dragon Slayer": { damage: 44, atkSpeed: 1.12, range: 10, price: 1355, type: "Colossal Sword" },
@@ -2442,17 +2574,23 @@
 
                 "Medium Helmet": { health: 6.25, price: 335, def: 12, type: "Medium Helmet" },
                 "Samurai Helmet": { health: 8, price: 335, def: 16, type: "Medium Helmet" },
+                "Viking Helmet": { health: 10.5, price: 402, def: 20, type: "Medium Helmet" },
                 "Medium Leggings": { health: 7.5, price: 485, def: 15, type: "Medium Leggings" },
                 "Samurai Leggings": { health: 9, price: 485, def: 20, type: "Medium Leggings" },
+                "Viking Leggings": { health: 11, price: 630, def: 25, type: "Medium Leggings" },
                 "Medium Chestplate": { health: 8.75, price: 850, def: 18, type: "Medium Chestplate" },
                 "Samurai Chestplate": { health: 12.75, price: 850, def: 24, type: "Medium Chestplate" },
+                "Viking Chestplate": { health: 15, price: 1210, def: 30, type: "Medium Chestplate" },
 
                 "Knight Helmet": { health: 12.5, price: 1020, def: 24, type: "Heavy Helmet" },
                 "Dark Knight Helmet": { health: 18.75, price: 1224, def: 38, type: "Heavy Helmet" },
+                "Wolf Helmet": { health: 25, price: 1330, def: 50, type: "Heavy Helmet" },
                 "Knight Leggings": { health: 13.75, price: 1200, def: 28, type: "Heavy Leggings" },
                 "Dark Knight Leggings": { health: 21.875, price: 1440, def: 44, type: "Heavy Leggings" },
+                "Wolf Leggings": { health: 28, price: 1560, def: 56, type: "Heavy Leggings" },
                 "Knight Chestplate": { health: 16.25, price: 1355, def: 32, type: "Heavy Chestplate" },
-                "Dark Knight Chestplate": { health: 25, price: 1626, def: 50, type: "Heavy Chestplate" }
+                "Dark Knight Chestplate": { health: 25, price: 1626, def: 50, type: "Heavy Chestplate" },
+                "Wolf Chestplate": { health: 35, price: 1812, def: 70, type: "Heavy Chestplate" }
             }
         };
 
@@ -2577,49 +2715,122 @@
             // Frostspire Expanse
             { id: 47, name: "Tungsten", multiplier: 2.6, rarity: "common", area: "frostspire", color: "#a5b1c9", traitType: null, traits: [] },
             { id: 48, name: "Sulfur", multiplier: 2.75, rarity: "uncommon", area: "frostspire", color: "#e0dbb3", traitType: null, traits: [] },
-            { id: 49, name: "Pumice", multiplier: 2.9, rarity: "rare", area: "frostspire", color: "#d6cedd", traitType: "armor", traits: [
-                { description: "+{health}% extra health.", scaling: { health: { min: 0.5, max: 5 } }, type: "armor" }
-            ]},
-            { id: 50, name: "Graphite", multiplier: 3.1, rarity: "rare", area: "frostspire", color: "#656b7b", traitType: "armor", traits: [
-                { description: "Reduce incoming physical damage by {damage}%. Has 20% chance per hit.", scaling: { damage: { min: 1.2, max: 12 } }, type: "armor" }
-            ]},
-            { id: 51, name: "Aetherit", multiplier: 3.4, rarity: "rare", area: "frostspire", color: "#e2f0ff", traitType: "armor", traits: [
-                { description: "+{speed}% extra movement speed.", scaling: { speed: { min: 0.5, max: 5 } }, type: "armor" }
-            ]},
+            {
+                id: 49, name: "Pumice", multiplier: 2.9, rarity: "rare", area: "frostspire", color: "#d6cedd", traitType: "armor", traits: [
+                    { description: "+{health}% extra health.", scaling: { health: { min: 0.5, max: 5 } }, type: "armor" }
+                ]
+            },
+            {
+                id: 50, name: "Graphite", multiplier: 3.1, rarity: "rare", area: "frostspire", color: "#656b7b", traitType: "armor", traits: [
+                    { description: "Reduce incoming physical damage by {damage}%. Has 20% chance per hit.", scaling: { damage: { min: 1.2, max: 12 } }, type: "armor" }
+                ]
+            },
+            {
+                id: 51, name: "Aetherit", multiplier: 3.4, rarity: "rare", area: "frostspire", color: "#e2f0ff", traitType: "armor", traits: [
+                    { description: "+{speed}% extra movement speed.", scaling: { speed: { min: 0.5, max: 5 } }, type: "armor" }
+                ]
+            },
             { id: 52, name: "Scheelite", multiplier: 3.3, rarity: "rare", area: "frostspire", color: "#f5c4a3", traitType: null, traits: [] },
             { id: 53, name: "Larimar", multiplier: 4.1, rarity: "epic", area: "frostspire", color: "#aac3e1", traitType: null, traits: [] },
             { id: 54, name: "Neurotite", multiplier: 4.3, rarity: "epic", area: "frostspire", color: "#65809b", traitType: null, traits: [] },
-            { id: 55, name: "Frost Fossil", multiplier: 4.5, rarity: "epic", area: "frostspire", color: "#5d7a7e", traitType: "all", traits: [
-                { description: "Increase physical damage by +{damage}% and decrease movement speed by -{speed}%.", scaling: { damage: { min: 1.75, max: 17.5 }, speed: { min: 0.5, max: 5 } }, type: "all" }
-            ]},
+            {
+                id: 55, name: "Frost Fossil", multiplier: 4.5, rarity: "epic", area: "frostspire", color: "#5d7a7e", traitType: "all", traits: [
+                    { description: "Increase physical damage by +{damage}% and decrease movement speed by -{speed}%.", scaling: { damage: { min: 1.75, max: 17.5 }, speed: { min: 0.5, max: 5 } }, type: "all" }
+                ]
+            },
             { id: 56, name: "Tide Carve", multiplier: 4.7, rarity: "epic", area: "frostspire", color: "#3d3c66", traitType: null, traits: [] },
-            { id: 57, name: "Velchire", multiplier: 5.5, rarity: "legendary", area: "frostspire", color: "#f0fdb8", traitType: "armor", traits: [
-                { description: "+{speed}% extra movement speed.", scaling: { speed: { min: 2, max: 20 } }, type: "armor" }
-            ]},
-            { id: 58, name: "Sanctis", multiplier: 6.0, rarity: "legendary", area: "frostspire", color: "#b6b9c8", traitType: "armor", traits: [
-                { description: "+{stamina}% more stamina.", scaling: { stamina: { min: 1.8, max: 18 } }, type: "armor" }
-            ]},
-            { id: 59, name: "Snowite", multiplier: 8.0, rarity: "legendary", area: "frostspire", color: "#dcd9d4", traitType: "weapon", traits: [
-                { description: "Applies {slow}% attack speed and movement speed slow for {duration}s. 30% chance on hit.", scaling: { slow: { min: 1.5, max: 15 }, duration: { min: 0.3, max: 3 }}, type: "weapon" }
-            ]},
-            { id: 60, name: "Iceite", multiplier: 10.5, rarity: "mythical", area: "frostspire", color: "#6591c0", traitType: "weapon", traits: [
-                { description: "Freeze enemies for {duration}s. 25% chance on hit. Has a cooldown of 12s.", scaling: { duration: { min: 0.2, max: 2 }}, type: "weapon" }
-            ]},
+            {
+                id: 57, name: "Velchire", multiplier: 5.5, rarity: "legendary", area: "frostspire", color: "#f0fdb8", traitType: "armor", traits: [
+                    { description: "+{speed}% extra movement speed.", scaling: { speed: { min: 2, max: 20 } }, type: "armor" }
+                ]
+            },
+            {
+                id: 58, name: "Sanctis", multiplier: 6.0, rarity: "legendary", area: "frostspire", color: "#b6b9c8", traitType: "armor", traits: [
+                    { description: "+{stamina}% more stamina.", scaling: { stamina: { min: 1.8, max: 18 } }, type: "armor" }
+                ]
+            },
+            {
+                id: 59, name: "Snowite", multiplier: 8.0, rarity: "legendary", area: "frostspire", color: "#dcd9d4", traitType: "weapon", traits: [
+                    { description: "Applies {slow}% attack speed and movement speed slow for {duration}s. 30% chance on hit.", scaling: { slow: { min: 1.5, max: 15 }, duration: { min: 0.3, max: 3 } }, type: "weapon" }
+                ]
+            },
+            {
+                id: 60, name: "Iceite", multiplier: 10.5, rarity: "mythical", area: "frostspire", color: "#6591c0", traitType: "weapon", traits: [
+                    { description: "Freeze enemies for {duration}s. 25% chance on hit. Has a cooldown of 12s.", scaling: { duration: { min: 0.2, max: 2 } }, type: "weapon" }
+                ]
+            },
 
+
+            // Peak
+            { id: 61, name: "Mistvein", multiplier: 7.2, rarity: "rare", area: "peak", color: "#adb8f5", traitType: null, traits: [] },
+            { id: 62, name: "Lgarite", multiplier: 7.5, rarity: "rare", area: "peak", color: "#f57d60", traitType: null, traits: [] },
+            { id: 63, name: "Voidfractal", multiplier: 8.0, rarity: "rare", area: "peak", color: "#aca0ee", traitType: null, traits: [] },
+            { id: 64, name: "Moltenfrost", multiplier: 8.3, rarity: "epic", area: "peak", color: "#adcae5", traitType: null, traits: [] },
+            {
+                id: 65, name: "Crimsonite", multiplier: 8.5, rarity: "epic", area: "peak", color: "#c26073", traitType: "weapon", traits: [
+                    { description: "Increase physical damage by +{damage}%.", scaling: { damage: { min: 0.2, max: 20 } }, type: "weapon" }
+                ]
+            },
+            {
+                id: 66, name: "Malachite", multiplier: 8.8, rarity: "epic", area: "peak", color: "#a89be4", traitType: "weapon", traits: [
+                    { description: "Deals {damage}% of your weapon damage per second as poison for {duration}s. 33% chance to hit.", scaling: { damage: { min: 1, max: 10 }, duration: { min: 0.3, max: 3 } }, type: "weapon" }
+                ]
+            },
+            { id: 67, name: "Aquajade", multiplier: 9.0, rarity: "epic", area: "peak", color: "#7fdce4", traitType: null, traits: [] },
+            { id: 68, name: "Cryptex", multiplier: 9.3, rarity: "epic", area: "peak", color: "#5ec9da", traitType: null, traits: [] },
+            { id: 69, name: "Galestor", multiplier: 9.5, rarity: "epic", area: "peak", color: "#495d77", traitType: null, traits: [] },
+            {
+                id: 70, name: "Voidstar", multiplier: 10.0, rarity: "legendary", area: "peak", color: "#c393f7", traitType: "weapon", traits: [
+                    { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%, but lowers vitality by -{health}%.", scaling: { crit: { min: 3.3, max: 33 }, critDamage: { min: 1.5, max: 15 }, health: { min: 1.5, max: 15 } }, type: "weapon" }
+                ]
+            },
+            {
+                id: 71, name: "Etherealite", multiplier: 11.1, rarity: "mythical", area: "peak", color: "#e8b9e1", traitType: "armor", traits: [
+                    { description: "Increases vitality by +{health}%.", scaling: { health: { min: 3.5, max: 35 } }, type: "armor" }
+                ]
+            },
+            { id: 72, name: "Suryafal", multiplier: 17.5, rarity: "relic", area: "peak", color: "#f69e40", traitType: null, traits: [] },
+            { id: 73, name: "Heavenite", multiplier: 25.0, rarity: "divine", area: "peak", color: "#fff4c0", traitType: null, traits: [] },
+            { id: 74, name: "Gargantuan", multiplier: 33.3, rarity: "divine", area: "peak", color: "#ffde65", traitType: null, traits: [] },
+            {
+                id: 75, name: "Mosasaursit", multiplier: 50.0, rarity: "exotic", area: "peak", color: "#687196", traitType: "armor", traits: [
+                    { description: "Increases vitality by +{health}%, but lowers movement speed by -{speed}%.", scaling: { health: { min: 6.5, max: 65 }, speed: { min: 2.5, max: 25 } }, type: "armor" }
+                ]
+            }
         ];
 
         const traitIconMapping = {
-            13: { icon: 'fas fa-skull-crossbones', color: '#5f4937' },
-            24: { icon: 'fas fa-heart', color: '#4b2e87' },
-            27: { icon: 'fas fa-crosshairs', color: '#8e4a4c' },
-            28: { icon: 'fas fa-skull', color: '#97c889' },
-            29: { icon: 'fas fa-heart', color: '#9f61fa' },
-            30: { icon: 'fas fa-fan', color: '#fab67f' },
-            31: { icon: 'fas fa-fire', color: '#a4532e' },
-            32: { icon: 'fas fa-bomb', color: '#f77b61' },
-            33: { icon: 'fas fa-running', color: '#9ac9fa' },
-            34: { icon: 'fas fa-fire', color: '#7d1b1d' },
-            35: { icon: 'fas fa-ghost', color: '#f0f0f0' }
+            // Stonewake's Cross
+            13: { icon: 'fas fa-skull-crossbones', color: '#5f4937' }, // Poopite
+
+            // Forgotten Kingdom
+            24: { icon: 'fas fa-heart', color: '#4b2e87' }, // Obsidian
+            27: { icon: 'fas fa-crosshairs', color: '#8e4a4c' }, // Rivalite
+            28: { icon: 'fas fa-skull', color: '#97c889' }, // Uranium
+            29: { icon: 'fas fa-heart', color: '#9f61fa' }, // Mythril
+            30: { icon: 'fas fa-fan', color: '#fab67f' }, // Eye Ore
+            31: { icon: 'fas fa-fire', color: '#a4532e' }, // Fireite
+            32: { icon: 'fas fa-bomb', color: '#f77b61' }, // Magmaite
+            33: { icon: 'fas fa-running', color: '#9ac9fa' }, // Lightite
+            34: { icon: 'fas fa-fire', color: '#7d1b1d' }, // Demonite
+            35: { icon: 'fas fa-ghost', color: '#f0f0f0' }, // Darkryte
+
+            // Frostspire Expanse
+            49: { icon: 'fas fa-heart', color: '#d6cedd' }, // Pumice
+            50: { icon: 'fas fa-shield', color: '#656b7b' }, // Graphite
+            51: { icon: 'fas fa-running', color: '#e2f0ff' }, // Aetherit
+            55: { icon: 'fas fa-fan', color: '#5d7a7e' }, // Frost Fossil
+            57: { icon: 'fas fa-running', color: '#f0fdb8' }, // Velchire
+            58: { icon: 'fas fa-shield', color: '#b6b9c8' }, // Sanctis
+            59: { icon: 'fas fa-snowflake', color: '#dcd9d4' }, // Snowite
+            60: { icon: 'fas fa-snowflake', color: '#6591c0' },  // Iceite
+
+            // Peak
+            65: { icon: 'fas fa-fan', color: '#c26073' }, // Crimsonite
+            66: { icon: 'fas fa-skull-crossbones', color: '#a89be4' }, // Malachite
+            70: { icon: 'fas fa-crosshairs', color: '#c393f7' }, // Voidstar
+            71: { icon: 'fas fa-heart', color: '#e8b9e1' }, // Etherealite
+            75: { icon: 'fas fa-heart', color: '#687196' }  // Mosasaursit
         };
 
         // Weapon probability data
@@ -2673,6 +2884,58 @@
             49: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
             50: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 }
         };
+
+        const weaponProbabilitiesFrostspire = {
+            3: { "Dagger": 1.0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            4: { "Dagger": 0.86, "Straight Sword": 0.14, "Mace": 0, "Axe": 0, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            5: { "Dagger": 0.35, "Straight Sword": 0.65, "Mace": 0, "Axe": 0, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            6: { "Dagger": 0.14, "Straight Sword": 0.86, "Mace": 0, "Axe": 0, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            7: { "Dagger": 0.06, "Straight Sword": 0.74, "Mace": 0.2, "Axe": 0, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            8: { "Dagger": 0.02, "Straight Sword": 0.44, "Mace": 0.54, "Axe": 0.12, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            9: { "Dagger": 0.01, "Straight Sword": 0.24, "Mace": 0.65, "Axe": 0.1, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            10: { "Dagger": 0, "Straight Sword": 0.11, "Mace": 0.47, "Axe": 0.42, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            11: { "Dagger": 0, "Straight Sword": 0.05, "Mace": 0.32, "Axe": 0.63, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            12: { "Dagger": 0, "Straight Sword": 0.03, "Mace": 0.22, "Axe": 0.72, "Spear": 0.03, "Great Axe": 0, "Colossal Sword": 0 },
+            13: { "Dagger": 0, "Straight Sword": 0.01, "Mace": 0.15, "Axe": 0.62, "Spear": 0.22, "Great Axe": 0, "Colossal Sword": 0 },
+            14: { "Dagger": 0, "Straight Sword": 0.01, "Mace": 0.08, "Axe": 0.46, "Spear": 0.45, "Great Axe": 0, "Colossal Sword": 0 },
+            15: { "Dagger": 0, "Straight Sword": 0, "Mace": 0.05, "Axe": 0.35, "Spear": 0.6, "Great Axe": 0, "Colossal Sword": 0 },
+            16: { "Dagger": 0, "Straight Sword": 0, "Mace": 0.03, "Axe": 0.26, "Spear": 0.70, "Great Axe": 0.01, "Colossal Sword": 0 },
+            17: { "Dagger": 0, "Straight Sword": 0, "Mace": 0.02, "Axe": 0.19, "Spear": 0.68, "Great Axe": 0.11, "Colossal Sword": 0 },
+            18: { "Dagger": 0, "Straight Sword": 0, "Mace": 0.02, "Axe": 0.13, "Spear": 0.57, "Great Axe": 0.28, "Colossal Sword": 0 },
+            19: { "Dagger": 0, "Straight Sword": 0, "Mace": 0.01, "Axe": 0.08, "Spear": 0.46, "Great Axe": 0.45, "Colossal Sword": 0 },
+            20: { "Dagger": 0, "Straight Sword": 0, "Mace": 0.01, "Axe": 0.06, "Spear": 0.36, "Great Axe": 0.57, "Colossal Sword": 0 },
+            21: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0.04, "Spear": 0.29, "Great Axe": 0.65, "Colossal Sword": 0.02 },
+            22: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0.03, "Spear": 0.23, "Great Axe": 0.67, "Colossal Sword": 0.07 },
+            23: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0.02, "Spear": 0.19, "Great Axe": 0.66, "Colossal Sword": 0.13 },
+            24: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0.02, "Spear": 0.15, "Great Axe": 0.63, "Colossal Sword": 0.2 },
+            25: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0.01, "Spear": 0.12, "Great Axe": 0.6, "Colossal Sword": 0.27 },
+            26: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0.01, "Spear": 0.1, "Great Axe": 0.56, "Colossal Sword": 0.32 },
+            27: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0.01, "Spear": 0.09, "Great Axe": 0.53, "Colossal Sword": 0.37 },
+            28: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0.01, "Spear": 0.07, "Great Axe": 0.5, "Colossal Sword": 0.42 },
+            29: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0.01, "Spear": 0.07, "Great Axe": 0.47, "Colossal Sword": 0.46 },
+            30: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0.01, "Spear": 0.06, "Great Axe": 0.45, "Colossal Sword": 0.49 },
+            31: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.05, "Great Axe": 0.44, "Colossal Sword": 0.51 },
+            32: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.05, "Great Axe": 0.41, "Colossal Sword": 0.54 },
+            33: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.04, "Great Axe": 0.39, "Colossal Sword": 0.57 },
+            34: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.04, "Great Axe": 0.38, "Colossal Sword": 0.58 },
+            35: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.04, "Great Axe": 0.37, "Colossal Sword": 0.59 },
+            36: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.03, "Great Axe": 0.36, "Colossal Sword": 0.61 },
+            37: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.03, "Great Axe": 0.35, "Colossal Sword": 0.62 },
+            38: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.03, "Great Axe": 0.34, "Colossal Sword": 0.63 },
+            39: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.03, "Great Axe": 0.33, "Colossal Sword": 0.64 },
+            40: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.03, "Great Axe": 0.32, "Colossal Sword": 0.65 },
+            41: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.03, "Great Axe": 0.32, "Colossal Sword": 0.65 },
+            42: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.03, "Great Axe": 0.31, "Colossal Sword": 0.66 },
+            43: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.31, "Colossal Sword": 0.67 },
+            44: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.3, "Colossal Sword": 0.68 },
+            45: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.3, "Colossal Sword": 0.68 },
+            46: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.29, "Colossal Sword": 0.69 },
+            47: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.29, "Colossal Sword": 0.69 },
+            48: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
+            49: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
+            50: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 }
+        };
+
         // Armor probability data
         const armorProbabilities = {
             3: { "Light Helmet": 1.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
@@ -2737,6 +3000,11 @@
                         { name: "Dagger", chance: "1/1", probability: 1.0 },
                         { name: "Gladius Dagger", chance: "1/4", probability: 0.25 },
                         { name: "Hook", chance: "1/16", probability: 0.0625 }
+                    ],
+                    "frostspire": [
+                        { name: "Dagger", chance: "1/1", probability: 1.0 },
+                        { name: "Gladius Dagger", chance: "1/4", probability: 0.25 },
+                        { name: "Hook", chance: "1/16", probability: 0.0625 }
                     ]
                 },
                 "Straight Sword": {
@@ -2750,6 +3018,13 @@
                         { name: "Cutlass", chance: "1/2", probability: 0.5 },
                         { name: "Rapier", chance: "1/4", probability: 0.25 },
                         { name: "Chaos", chance: "1/16", probability: 0.0625 }
+                    ],
+                    "frostspire": [
+                        { name: "Falchion", chance: "1/1", probability: 1.0 },
+                        { name: "Cutlass", chance: "1/2", probability: 0.5 },
+                        { name: "Rapier", chance: "1/4", probability: 0.25 },
+                        { name: "Chaos", chance: "1/16", probability: 0.0625 },
+                        { name: "Hell Slayer", chance: "1/20", probability: 0.0625 }
                     ]
                 },
                 "Gauntlet": {
@@ -2759,7 +3034,8 @@
                     ],
                     "kingdom": [
                         { name: "Ironhand", chance: "1/1", probability: 1.0 },
-                        { name: "Relevator", chance: "1/4", probability: 0.25 }
+                        { name: "Relevator", chance: "1/4", probability: 0.25 },
+                        { name: "Savage Claws", chance: "1/4", probability: 0.25 }
                     ]
                 },
                 "Katana": {
@@ -2780,6 +3056,31 @@
                         { name: "Long Sword", chance: "1/2", probability: 0.5 }
                     ]
                 },
+                "Mace": {
+                    "frostspire": [
+                        { name: "Mace", chance: "1/1", probability: 1.0 },
+                        { name: "Spiked Mace", chance: "1/2", probability: 0.5 },
+                        { name: "Winged Mace", chance: "1/4", probability: 0.25 },
+                        { name: "Hammerhead Mace", chance: "1/8", probability: 0.125 },
+                        { name: "Grave Maker", chance: "1/16", probability: 0.0625 }
+                    ]
+                },
+                "Axe": {
+                    "frostspire": [
+                        { name: "Axe", chance: "1/1", probability: 1.0 },
+                        { name: "Battleaxe", chance: "1/2", probability: 0.5 },
+                        { name: "Curved Handle Axe", chance: "1/4", probability: 0.25 },
+                        { name: "Spade Armed Axe", chance: "1/8", probability: 0.125 }
+                    ]
+                },
+                "Spear": {
+                    "frostspire": [
+                        { name: "Spear", chance: "1/1", probability: 1.0 },
+                        { name: "Trident", chance: "1/2", probability: 0.5 },
+                        { name: "Demonic Spear", chance: "1/4", probability: 0.25 },
+                        { name: "Angelic Spear", chance: "1/8", probability: 0.125 }
+                    ]
+                },
                 "Great Axe": {
                     "stonewake": [
                         { name: "Double Battle Axe", chance: "1/1", probability: 1.0 }
@@ -2787,6 +3088,13 @@
                     "kingdom": [
                         { name: "Double Battle Axe", chance: "1/1", probability: 1.0 },
                         { name: "Scythe", chance: "1/4", probability: 0.25 }
+                    ],
+                    "frostspire": [
+                        { name: "Double Battle Axe", chance: "1/1", probability: 1.0 },
+                        { name: "Scythe", chance: "1/4", probability: 0.25 },
+                        { name: "Greater Battle Axe", chance: "1/4", probability: 0.0625 },
+                        { name: "Wyvern Axe", chance: "1/4", probability: 0.0625 }
+
                     ]
                 },
                 "Colossal Sword": {
@@ -2800,27 +3108,41 @@
                         { name: "Hammer", chance: "1/4", probability: 0.25 },
                         { name: "Skull Crusher", chance: "1/8", probability: 0.125 },
                         { name: "Dragon Slayer", chance: "1/16", probability: 0.0625 }
+                    ],
+                    "frostspire": [
+                        { name: "Great Sword", chance: "1/1", probability: 1.0 },
+                        { name: "Hammer", chance: "1/4", probability: 0.25 },
+                        { name: "Skull Crusher", chance: "1/8", probability: 0.125 },
+                        { name: "Dragon Slayer", chance: "1/16", probability: 0.0625 }
                     ]
                 }
             },
             armor: {
                 "Light Helmet": {
                     "stonewake": [{ name: "Light Helmet", chance: "1/1", probability: 1.0 }],
-                    "kingdom": [{ name: "Light Helmet", chance: "1/1", probability: 1.0 }]
+                    "kingdom": [{ name: "Light Helmet", chance: "1/1", probability: 1.0 }],
+                    "frostspire": [{ name: "Light Helmet", chance: "1/1", probability: 1.0 }]
                 },
                 "Light Leggings": {
                     "stonewake": [{ name: "Light Leggings", chance: "1/1", probability: 1.0 }],
-                    "kingdom": [{ name: "Light Leggings", chance: "1/1", probability: 1.0 }]
+                    "kingdom": [{ name: "Light Leggings", chance: "1/1", probability: 1.0 }],
+                    "frostspire": [{ name: "Light Leggings", chance: "1/1", probability: 1.0 }]
                 },
                 "Light Chestplate": {
                     "stonewake": [{ name: "Light Chestplate", chance: "1/1", probability: 1.0 }],
-                    "kingdom": [{ name: "Light Chestplate", chance: "1/1", probability: 1.0 }]
+                    "kingdom": [{ name: "Light Chestplate", chance: "1/1", probability: 1.0 }],
+                    "frostspire": [{ name: "Light Chestplate", chance: "1/1", probability: 1.0 }]
                 },
                 "Medium Helmet": {
                     "stonewake": [{ name: "Medium Helmet", chance: "1/1", probability: 1.0 }],
                     "kingdom": [
                         { name: "Medium Helmet", chance: "1/1", probability: 1.0 },
                         { name: "Samurai Helmet", chance: "1/2", probability: 0.5 }
+                    ],
+                    "frostspire": [
+                        { name: "Medium Helmet", chance: "1/1", probability: 1.0 },
+                        { name: "Samurai Helmet", chance: "1/2", probability: 0.5 },
+                        { name: "Viking Helmet", chance: "1/4", probability: 0.25 }
                     ]
                 },
                 "Medium Leggings": {
@@ -2828,6 +3150,11 @@
                     "kingdom": [
                         { name: "Medium Leggings", chance: "1/1", probability: 1.0 },
                         { name: "Samurai Leggings", chance: "1/2", probability: 0.5 }
+                    ],
+                    "frostspire": [
+                        { name: "Medium Leggings", chance: "1/1", probability: 1.0 },
+                        { name: "Samurai Leggings", chance: "1/2", probability: 0.5 },
+                        { name: "Viking Leggings", chance: "1/4", probability: 0.25 }
                     ]
                 },
                 "Medium Chestplate": {
@@ -2835,6 +3162,11 @@
                     "kingdom": [
                         { name: "Medium Chestplate", chance: "1/1", probability: 1.0 },
                         { name: "Samurai Chestplate", chance: "1/2", probability: 0.5 }
+                    ],
+                    "frostspire": [
+                        { name: "Medium Chestplate", chance: "1/1", probability: 1.0 },
+                        { name: "Samurai Chestplate", chance: "1/2", probability: 0.5 },
+                        { name: "Viking Chestplate", chance: "1/4", probability: 0.25 }
                     ]
                 },
                 "Heavy Helmet": {
@@ -2842,6 +3174,11 @@
                     "kingdom": [
                         { name: "Knight Helmet", chance: "1/1", probability: 1.0 },
                         { name: "Dark Knight Helmet", chance: "1/2", probability: 0.5 }
+                    ],
+                    "frostspire": [
+                        { name: "Knight Helmet", chance: "1/1", probability: 1.0 },
+                        { name: "Dark Knight Helmet", chance: "1/2", probability: 0.5 },
+                        { name: "Wolf Helmet", chance: "1/4", probability: 0.25 }
                     ]
                 },
                 "Heavy Leggings": {
@@ -2849,6 +3186,11 @@
                     "kingdom": [
                         { name: "Knight Leggings", chance: "1/1", probability: 1.0 },
                         { name: "Dark Knight Leggings", chance: "1/2", probability: 0.5 }
+                    ],
+                    "frostspire": [
+                        { name: "Knight Leggings", chance: "1/1", probability: 1.0 },
+                        { name: "Dark Knight Leggings", chance: "1/2", probability: 0.5 },
+                        { name: "Wolf Leggings", chance: "1/4", probability: 0.25 }
                     ]
                 },
                 "Heavy Chestplate": {
@@ -2856,6 +3198,11 @@
                     "kingdom": [
                         { name: "Knight Chestplate", chance: "1/1", probability: 1.0 },
                         { name: "Dark Knight Chestplate", chance: "1/2", probability: 0.5 }
+                    ],
+                    "frostspire": [
+                        { name: "Knight Chestplate", chance: "1/1", probability: 1.0 },
+                        { name: "Dark Knight Chestplate", chance: "1/2", probability: 0.5 },
+                        { name: "Wolf Chestplate", chance: "1/4", probability: 0.25 }
                     ]
                 }
             }
@@ -2885,6 +3232,19 @@
             }
         };
 
+        const optimalCountsFrostspire = {
+            weapon: {
+                "Dagger": 3,
+                "Straight Sword": 6,
+                "Mace": 9,
+                "Axe": 12,
+                "Spear": 16,
+                "Great Axe": 22,
+                "Colossal Sword": 36
+            },
+            armor: optimalCounts.armor
+        };
+
         let currentMode = 'weapon';
         let oreMix = [];
         let activeFilter = 'all';
@@ -2893,7 +3253,7 @@
         let quickCraftItem = null;
         let selectedTraits = [];
         let currentStep = 0;
-        let currentArea = 'kingdom';
+        let currentArea = 'frostspire';
         let highestProbabilityItem = null;
         let forgedItems = JSON.parse(localStorage.getItem('forgedItems') || '[]');
         const MAX_INVENTORY_SIZE = 20;
@@ -2905,7 +3265,6 @@
         const filtersToggle = document.getElementById('filters-toggle');
         const filtersDropdown = document.getElementById('filters-dropdown');
         const filterOptions = document.querySelectorAll('.filter-option');
-
         const oreInventory = document.getElementById('ore-inventory');
         const oreSlotsContainer = document.getElementById('ore-slots');
         const probabilityList = document.getElementById('probability-list');
@@ -3157,11 +3516,13 @@
 
             if (lowerName.includes('fire') || lowerName.includes('magma')) return 'fas fa-fire';
             if (lowerName.includes('demon') || lowerName.includes('dark')) return 'fas fa-ghost';
-            if (lowerName.includes('light')) return 'fas fa-running';
-            if (lowerName.includes('myth') || lowerName.includes('obsidian')) return 'fas fa-heart';
-            if (lowerName.includes('rival')) return 'fas fa-crosshairs';
-            if (lowerName.includes('uranium') || lowerName.includes('poop')) return 'fas fa-skull-crossbones';
-            if (lowerName.includes('eye')) return 'fas fa-fan';
+            if (lowerName.includes('light') || lowerName.includes('aetherit') || lowerName.includes('velchire')) return 'fas fa-running';
+            if (lowerName.includes('myth') || lowerName.includes('obsidian') || lowerName.includes('pumice') || lowerName.includes('etheralite') || lowerName.includes('mosasaursit')) return 'fas fa-heart';
+            if (lowerName.includes('rival') || lowerName.includes('voidstar')) return 'fas fa-crosshairs';
+            if (lowerName.includes('uranium') || lowerName.includes('poop') || lowerName.includes('malachite')) return 'fas fa-skull-crossbones';
+            if (lowerName.includes('eye') || lowerName.includes('frost fossil') || lowerName.includes('crimsonite')) return 'fas fa-fan';
+            if (lowerName.includes('graphite') || lowerName.includes('sanctis')) return 'fas fa-shield';
+            if (lowerName.includes('snowite') || lowerName.includes('iceite')) return 'fas fa-snowflake';
 
             return 'fas fa-gem';
         }
@@ -3231,7 +3592,12 @@
             });
             const multiplier = multiplierSum / totalOres;
 
-            const probabilities = currentMode === 'weapon' ? weaponProbabilities : armorProbabilities;
+            let probabilities;
+            if (currentMode === 'weapon') {
+                probabilities = currentArea === 'frostspire' ? weaponProbabilitiesFrostspire : weaponProbabilities;
+            } else {
+                probabilities = armorProbabilities;
+            }
             const counts = Object.keys(probabilities).map(Number);
             const closestCount = counts.reduce((prev, curr) => {
                 return (Math.abs(curr - totalOres) < Math.abs(prev - totalOres) ? curr : prev);
@@ -3580,6 +3946,15 @@
             }
         }
 
+        function getAreaDisplayName(area) {
+            switch (area) {
+                case 'kingdom': return 'Forgotten Kingdom';
+                case 'stonewake': return 'Stonewake\'s Cross';
+                case 'frostspire': return 'Frostspire Expanse';
+                default: return 'Unknown Area';
+            }
+        }
+
         function showVariantTooltip(itemName, event, typeClass = '') {
             const tooltip = document.getElementById('variant-tooltip');
             const tooltipTitle = document.getElementById('tooltip-item-name');
@@ -3595,9 +3970,9 @@
             const variants = specificItemVariants[currentMode]?.[itemName]?.[currentArea];
 
             if (!variants || variants.length === 0) {
-                tooltipContent.innerHTML = `<p>No specific variants available for ${itemName} in ${currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross'}.</p>`;
+                tooltipContent.innerHTML = `<p>No specific variants available for ${itemName} in ${getAreaDisplayName(currentArea)}.</p>`;
             } else {
-                let html = `<p style="margin-bottom: 10px; color: ${borderColor};">Available in ${currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross'}:</p>`;
+                let html = `<p style="margin-bottom: 10px; color: ${borderColor};">Available in ${getAreaDisplayName(currentArea)}:</p>`;
                 html += '<ul class="variant-list">';
 
                 variants.forEach(variant => {
@@ -3667,21 +4042,59 @@
         function updateAreaToggle() {
             const areaToggle = document.getElementById('area-toggle-btn');
             const areaLabel = document.getElementById('area-label');
+            const areaDropdown = document.getElementById('area-dropdown');
 
             function applyAreaClasses() {
-                areaLabel.textContent = currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross';
-                areaToggle.classList.toggle('kingdom', currentArea === 'kingdom');
-                areaToggle.classList.toggle('stonewake', currentArea === 'stonewake');
+                const areaNames = {
+                    'frostspire': 'Frostspire Expanse',
+                    'kingdom': 'Forgotten Kingdom',
+                    'stonewake': 'Stonewake\'s Cross'
+                };
+                areaLabel.textContent = areaNames[currentArea];
+
+                areaToggle.classList.remove('frostspire-active', 'kingdom-active', 'stonewake-active');
+                areaToggle.classList.add(`${currentArea}-active`);
+
+                document.querySelectorAll('#area-dropdown .area-option').forEach(option => {
+                    option.classList.remove('active');
+                    if (option.dataset.area === currentArea) {
+                        option.classList.add('active');
+                    }
+                });
             }
 
             applyAreaClasses();
 
-            areaToggle.addEventListener('click', () => {
-                currentArea = currentArea === 'kingdom' ? 'stonewake' : 'kingdom';
-                applyAreaClasses();
+            areaToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                areaDropdown.classList.toggle('show');
+            });
 
-                updateProbabilities();
-                updateItemPreview();
+            document.querySelectorAll('#area-dropdown .area-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const newArea = option.dataset.area;
+                    if (newArea !== currentArea) {
+                        currentArea = newArea;
+                        applyAreaClasses();
+
+                        areaDropdown.classList.remove('show');
+                        selectedPreviewVariant = { baseItemType: null, variantName: null };
+
+                        updateProbabilities();
+                        updateItemPreview();
+
+                        if (isQuickCraft) {
+                            isQuickCraft = false;
+                            quickCraftTargetItem = null;
+                        }
+                    }
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!areaDropdown.contains(e.target) && !areaToggle.contains(e.target)) {
+                    areaDropdown.classList.remove('show');
+                }
             });
         }
 
@@ -3960,7 +4373,14 @@
             probabilityList.innerHTML = '';
 
             const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
-            const probabilities = currentMode === 'weapon' ? weaponProbabilities : armorProbabilities;
+
+            let probabilities;
+            if (currentMode === 'weapon') {
+                probabilities = currentArea === 'frostspire' ? weaponProbabilitiesFrostspire : weaponProbabilities;
+            } else {
+                probabilities = armorProbabilities;
+            }
+
             const optimal = currentMode === 'weapon' ? optimalCounts.weapon : optimalCounts.armor;
 
             let closestCount = 3;
@@ -3987,6 +4407,9 @@
                     else if (itemName === 'Great Sword') typeClass = 'weapon-great-sword';
                     else if (itemName === 'Great Axe') typeClass = 'weapon-great-axe';
                     else if (itemName === 'Colossal Sword') typeClass = 'weapon-colossal-sword';
+                    else if (itemName === 'Mace') typeClass = 'weapon-gauntlet';
+                    else if (itemName === 'Axe') typeClass = 'weapon-katana';
+                    else if (itemName === 'Spear') typeClass = 'weapon-great-sword';
                 } else {
                     if (itemName.includes('Light')) typeClass = 'armor-light';
                     else if (itemName.includes('Medium')) typeClass = 'armor-medium';
@@ -3998,14 +4421,14 @@
                 itemElement.dataset.itemName = itemName;
 
                 itemElement.innerHTML = `
-    <div class="item-header">
-        <div class="item-name">${itemName}</div>
-        <div class="probability-value">${probabilityPercent}%</div>
-    </div>
-    <div class="probability-bar">
-        <div class="probability-fill" style="width: ${probabilityPercent}%"></div>
-    </div>
-`;
+            <div class="item-header">
+                <div class="item-name">${itemName}</div>
+                <div class="probability-value">${probabilityPercent}%</div>
+            </div>
+            <div class="probability-bar">
+                <div class="probability-fill" style="width: ${probabilityPercent}%"></div>
+            </div>
+        `;
 
                 itemElement.addEventListener('click', (e) => {
                     showVariantTooltip(itemName, e, typeClass);
@@ -4021,11 +4444,11 @@
 
             if (totalOres < 3) {
                 probabilityList.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 30px; color: var(--text-secondary);">
-                        <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                        <p>Add at least 3 ores to see forge chances</p>
-                    </div>
-                `;
+            <div style="grid-column: 1 / -1; text-align: center; padding: 30px; color: var(--text-secondary);">
+                <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <p>Add at least 3 ores to see forge chances</p>
+            </div>
+        `;
             }
         }
 
@@ -4224,7 +4647,12 @@
 
         function loadItemOptions() {
             itemOptions.innerHTML = '';
-            const items = quickCraftType === 'weapon' ? optimalCounts.weapon : optimalCounts.armor;
+            let items;
+            if (quickCraftType === 'weapon') {
+                items = currentArea === 'frostspire' ? optimalCountsFrostspire.weapon : optimalCounts.weapon;
+            } else {
+                items = optimalCounts.armor;
+            }
             if (quickCraftType !== currentMode) {
                 currentMode = quickCraftType;
                 if (currentMode === 'weapon') {
@@ -4560,6 +4988,34 @@
         function getRandomVariant(itemType) {
             const variants = specificItemVariants[currentMode]?.[itemType]?.[currentArea];
             if (!variants || variants.length === 0) {
+                if (currentArea === 'frostspire') {
+                    let baseVariants;
+                    if (itemType === 'Mace') {
+                        baseVariants = specificItemVariants[currentMode]?.['Gauntlet']?.[currentArea];
+                    } else if (itemType === 'Axe') {
+                        baseVariants = specificItemVariants[currentMode]?.['Katana']?.[currentArea];
+                    } else if (itemType === 'Spear') {
+                        baseVariants = specificItemVariants[currentMode]?.['Great Sword']?.[currentArea];
+                    }
+
+                    if (baseVariants && baseVariants.length > 0) {
+                        const weightedVariants = getVariantProbabilities(baseVariants);
+                        if (weightedVariants) {
+                            let random = Math.random();
+                            let cumulative = 0;
+
+                            for (const variant of weightedVariants) {
+                                cumulative += variant.normalizedProb;
+                                if (random <= cumulative) {
+                                    return variant;
+                                }
+                            }
+
+                            return weightedVariants[0];
+                        }
+                    }
+                }
+
                 return { name: itemType, chance: "1/1", probability: 1.0 };
             }
 
@@ -4695,7 +5151,13 @@
             if (isQuickCraft && quickCraftTargetItem) {
                 selectedItemType = quickCraftTargetItem;
             } else {
-                const probabilities = currentMode === 'weapon' ? weaponProbabilities : armorProbabilities;
+                let probabilities;
+                if (currentMode === 'weapon') {
+                    probabilities = currentArea === 'frostspire' ? weaponProbabilitiesFrostspire : weaponProbabilities;
+                } else {
+                    probabilities = armorProbabilities;
+                }
+
                 const counts = Object.keys(probabilities).map(Number);
                 const closestCount = counts.reduce((prev, curr) => {
                     return (Math.abs(curr - totalOres) < Math.abs(prev - totalOres) ? curr : prev);
@@ -4763,8 +5225,33 @@
             const content = document.getElementById('forge-result-body');
 
             const bgColor = result.mainOre ? result.mainOre.color : '#FF6600';
-            const areaBgColor = currentArea === 'kingdom' ? 'var(--primary-light)' : 'rgba(8,78,78,0.2)';
-            const areaColor = currentArea === 'kingdom' ? 'var(--primary)' : 'var(--stonewake-teal)';
+            let areaBgColor, areaColor, areaIcon, areaName;
+
+            switch (currentArea) {
+                case 'kingdom':
+                    areaBgColor = 'var(--primary-light)';
+                    areaColor = 'var(--primary)';
+                    areaIcon = 'fas fa-crown';
+                    areaName = 'Forgotten Kingdom';
+                    break;
+                case 'stonewake':
+                    areaBgColor = 'rgba(8,78,78,0.2)';
+                    areaColor = 'var(--stonewake-teal)';
+                    areaIcon = 'fas fa-mountain';
+                    areaName = 'Stonewake\'s Cross';
+                    break;
+                case 'frostspire':
+                    areaBgColor = 'rgba(106,183,255,0.2)';
+                    areaColor = '#6ab7ff';
+                    areaIcon = 'fas fa-snowflake';
+                    areaName = 'Frostspire Expanse';
+                    break;
+                default:
+                    areaBgColor = 'var(--primary-light)';
+                    areaColor = 'var(--primary)';
+                    areaIcon = 'fas fa-map-marker-alt';
+                    areaName = 'Unknown Area';
+            }
 
             const itemImage = itemImages[result.itemName] || '';
 
@@ -4792,9 +5279,9 @@
                         <div class="forge-tag" style="background: ${bgColor}30; color: ${bgColor}; border-color: ${bgColor};">
                             <i class="fas fa-gem"></i> ${result.mainOre?.name || 'Stone'}
                         </div>
-                        <div class="forge-tag" style="background: ${areaBgColor}; color: ${areaColor}; border-color: ${areaColor};">
-                            <i class="fas fa-map-marker-alt"></i> ${currentArea === 'kingdom' ? 'Forgotten Kingdom' : 'Stonewake\'s Cross'}
-                        </div>
+                        <div class="forge-tag" style="background: ${areaBgColor}; border-color: ${areaColor}; color: ${areaColor};">
+                        <i class="${areaIcon}"></i> ${areaName}
+                    </div>
                     </div>
                 </div>
             </div>
