@@ -2725,7 +2725,7 @@
             },
             {
                 id: 50, name: "Graphite", multiplier: 3.1, rarity: "rare", area: "frostspire", color: "#656b7b", traitType: "armor", traits: [
-                    { description: "Reduce incoming physical damage by {damage}%. Has 20% chance per hit.", scaling: { damage: { min: 1.2, max: 12 } }, type: "armor" }
+                    { description: "Reduce incoming physical damage by {damage}%. Has {chance}% chance per hit.", scaling: { damage: { min: 1.2, max: 12 }, chance: { min: 2, max: 20 } }, type: "armor" }
                 ]
             },
             {
@@ -2754,12 +2754,12 @@
             },
             {
                 id: 59, name: "Snowite", multiplier: 8.0, rarity: "legendary", area: "frostspire", color: "#dcd9d4", traitType: "weapon", traits: [
-                    { description: "Applies {slow}% attack speed and movement speed slow for {duration}s. 30% chance on hit.", scaling: { slow: { min: 1.5, max: 15 }, duration: { min: 0.3, max: 3 } }, type: "weapon" }
+                    { description: "Applies {slow}% attack speed and movement speed slow for {duration}s. {chance}% chance on hit.", scaling: { slow: { min: 1.5, max: 15 }, duration: { min: 0.3, max: 3 }, chance: { min: 3, max: 30 } }, type: "weapon" }
                 ]
             },
             {
                 id: 60, name: "Iceite", multiplier: 10.5, rarity: "mythical", area: "frostspire", color: "#6591c0", traitType: "weapon", traits: [
-                    { description: "Freeze enemies for {duration}s. 25% chance on hit. Has a cooldown of 12s.", scaling: { duration: { min: 0.2, max: 2 } }, type: "weapon" }
+                    { description: "Freeze enemies for {duration}s. {chance}% chance on hit. Has a cooldown of {cooldown}s.", scaling: { duration: { min: 0.2, max: 2 }, chance: { min: 2.5, max: 25 }, cooldown: { min: 1.2, max: 12 } }, type: "weapon" }
                 ]
             },
             {
@@ -2776,12 +2776,12 @@
             { id: 65, name: "Moltenfrost", multiplier: 8.3, rarity: "epic", area: "peak", color: "#adcae5", traitType: null, traits: [] },
             {
                 id: 66, name: "Crimsonite", multiplier: 8.5, rarity: "epic", area: "peak", color: "#c26073", traitType: "weapon", traits: [
-                    { description: "Increase physical damage by +{damage}%.", scaling: { damage: { min: 0.2, max: 20 } }, type: "weapon" }
+                    { description: "Increase physical damage by +{damage}%.", scaling: { damage: { min: 2, max: 20 } }, type: "weapon" }
                 ]
             },
             {
                 id: 67, name: "Malachite", multiplier: 8.8, rarity: "epic", area: "peak", color: "#a89be4", traitType: "weapon", traits: [
-                    { description: "Deals {damage}% of your weapon damage per second as poison for {duration}s. 33% chance to hit.", scaling: { damage: { min: 1, max: 10 }, duration: { min: 0.3, max: 3 } }, type: "weapon" }
+                    { description: "Deals {damage}% of your weapon damage per second as poison for {duration}s. {chance}% chance to hit.", scaling: { damage: { min: 1, max: 10 }, duration: { min: 0.3, max: 3 }, chance: { min: 3.3, max: 33 } }, type: "weapon" }
                 ]
             },
             { id: 68, name: "Aquajade", multiplier: 9.0, rarity: "epic", area: "peak", color: "#7fdce4", traitType: null, traits: [] },
@@ -2789,7 +2789,7 @@
             { id: 70, name: "Galestor", multiplier: 9.5, rarity: "epic", area: "peak", color: "#495d77", traitType: null, traits: [] },
             {
                 id: 71, name: "Voidstar", multiplier: 10.0, rarity: "legendary", area: "peak", color: "#c393f7", traitType: "weapon", traits: [
-                    { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%, but lowers vitality by -{health}%.", scaling: { crit: { min: 3.3, max: 33 }, critDamage: { min: 1.5, max: 15 }, health: { min: 1.5, max: 15 } }, type: "weapon" }
+                    { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%, but lowers health by -{health}%.", scaling: { crit: { min: 3.3, max: 33 }, critDamage: { min: 1.5, max: 15 }, health: { min: 1.5, max: 15 } }, type: "weapon" }
                 ]
             },
             {
