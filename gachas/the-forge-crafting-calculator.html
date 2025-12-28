@@ -2646,7 +2646,7 @@
             },
             {
                 id: 28, name: "Uranium", multiplier: 3.0, rarity: "legendary", area: "kingdom", color: "#97c889", traitType: "armor", traits: [
-                    { description: "Deal {damage}% of max health as AoE DMG while in-combat.", scaling: { damage: { min: 0.5, max: 5 } }, type: "armor" }
+                    { description: "Deal {damage}% of max health as AoE DMG while in-combat.", scaling: { damage: { min: 0.12, max: 1.2 } }, type: "armor" }
                 ]
             },
             {
@@ -2764,7 +2764,7 @@
             },
             {
                 id: 61, name: "Mosasaursit", multiplier: 7.0, rarity: "exotic", area: "frostspire", color: "#687196", traitType: "armor", traits: [
-                    { description: "Increases health by +{health}%, but lowers movement speed by -{speed}%.", scaling: { health: { min: 6.5, max: 65 }, speed: { min: 2.5, max: 25 } }, type: "armor" }
+                    { description: "Increases health by +{health}%, but lowers movement speed by -{speed}%.", scaling: { health: { min: 3.5, max: 35 }, speed: { min: 2.5, max: 25 } }, type: "armor" }
                 ]
             },
 
@@ -2797,9 +2797,9 @@
                     { description: "+{health}% extra health.", scaling: { health: { min: 3.5, max: 35 } }, type: "armor" }
                 ]
             },
-            { id: 73, name: "Suryafal", multiplier: 15.5, rarity: "relic", area: "peak", color: "#f69e40", traitType: null, traits: [] },
-            { id: 74, name: "Heavenite", multiplier: 25.0, rarity: "divine", area: "peak", color: "#fff4c0", traitType: null, traits: [] },
-            { id: 75, name: "Gargantuan", multiplier: 33.3, rarity: "divine", area: "peak", color: "#ffde65", traitType: null, traits: [] }
+            { id: 73, name: "Suryafal", multiplier: 15.0, rarity: "relic", area: "peak", color: "#f69e40", traitType: null, traits: [] },
+            { id: 74, name: "Heavenite", multiplier: 20.0, rarity: "divine", area: "peak", color: "#fff4c0", traitType: null, traits: [] },
+            { id: 75, name: "Gargantuan", multiplier: 25.0, rarity: "divine", area: "peak", color: "#ffde65", traitType: null, traits: [] }
         ];
 
         const traitIconMapping = {
@@ -3028,7 +3028,7 @@
                         { name: "Cutlass", chance: "1/2", probability: 0.5 },
                         { name: "Rapier", chance: "1/4", probability: 0.25 },
                         { name: "Chaos", chance: "1/16", probability: 0.0625 },
-                        { name: "Hell Slayer", chance: "1/20", probability: 0.0625 }
+                        { name: "Hell Slayer", chance: "1/10", probability: 0.1 }
                     ]
                 },
                 "Gauntlet": {
