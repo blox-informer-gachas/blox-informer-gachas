@@ -985,14 +985,14 @@
         }
 
         .control-btn {
-            padding: 10px 30px;
+            padding: 10px 15px;
             border-radius: 25px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 5px;
             font-size: 0.9rem;
             position: relative;
             overflow: hidden;
@@ -1235,8 +1235,8 @@
         }
 
         .kingdom-active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
-            border-color: var(--primary) !important;
+            background: linear-gradient(135deg, #FF6600, #cc5200) !important;
+            border-color: #FF6600 !important;
         }
 
         .stonewake-active {
@@ -2262,14 +2262,17 @@
                 <div class="inventory-card forge-preview-card" id="forge-preview-card" style="display: none;">
                 </div>
             </div>
-            <div style="display: flex; gap: 10px; justify-content: center;" class="controls">
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" class="controls">
                 <button class="control-btn forge-btn" id="forge-btn">
                     <i class="fas fa-fire"></i> Forge Item
+                </button>
+                <button class="control-btn forge-btn" id="forge-variant-btn"
+                    style="background: linear-gradient(135deg, var(--divine), #6a11cb);">
+                    <i class="fas fa-bullseye"></i> Forge Variant
                 </button>
                 <button class="control-btn reset-btn" id="reset-btn">
                     <i class="fas fa-redo"></i> Reset Forge
                 </button>
-
             </div>
             <div class="traits-container">
                 <div class="section-title">
@@ -2759,44 +2762,44 @@
                     { description: "Freeze enemies for {duration}s. 25% chance on hit. Has a cooldown of 12s.", scaling: { duration: { min: 0.2, max: 2 } }, type: "weapon" }
                 ]
             },
+            {
+                id: 61, name: "Mosasaursit", multiplier: 7.0, rarity: "exotic", area: "frostspire", color: "#687196", traitType: "armor", traits: [
+                    { description: "Increases health by +{health}%, but lowers movement speed by -{speed}%.", scaling: { health: { min: 6.5, max: 65 }, speed: { min: 2.5, max: 25 } }, type: "armor" }
+                ]
+            },
 
 
             // Peak
-            { id: 61, name: "Mistvein", multiplier: 7.2, rarity: "rare", area: "peak", color: "#adb8f5", traitType: null, traits: [] },
-            { id: 62, name: "Lgarite", multiplier: 7.5, rarity: "rare", area: "peak", color: "#f57d60", traitType: null, traits: [] },
-            { id: 63, name: "Voidfractal", multiplier: 8.0, rarity: "rare", area: "peak", color: "#aca0ee", traitType: null, traits: [] },
-            { id: 64, name: "Moltenfrost", multiplier: 8.3, rarity: "epic", area: "peak", color: "#adcae5", traitType: null, traits: [] },
+            { id: 62, name: "Mistvein", multiplier: 7.2, rarity: "rare", area: "peak", color: "#adb8f5", traitType: null, traits: [] },
+            { id: 63, name: "Lgarite", multiplier: 7.5, rarity: "rare", area: "peak", color: "#f57d60", traitType: null, traits: [] },
+            { id: 64, name: "Voidfractal", multiplier: 8.0, rarity: "rare", area: "peak", color: "#aca0ee", traitType: null, traits: [] },
+            { id: 65, name: "Moltenfrost", multiplier: 8.3, rarity: "epic", area: "peak", color: "#adcae5", traitType: null, traits: [] },
             {
-                id: 65, name: "Crimsonite", multiplier: 8.5, rarity: "epic", area: "peak", color: "#c26073", traitType: "weapon", traits: [
+                id: 66, name: "Crimsonite", multiplier: 8.5, rarity: "epic", area: "peak", color: "#c26073", traitType: "weapon", traits: [
                     { description: "Increase physical damage by +{damage}%.", scaling: { damage: { min: 0.2, max: 20 } }, type: "weapon" }
                 ]
             },
             {
-                id: 66, name: "Malachite", multiplier: 8.8, rarity: "epic", area: "peak", color: "#a89be4", traitType: "weapon", traits: [
+                id: 67, name: "Malachite", multiplier: 8.8, rarity: "epic", area: "peak", color: "#a89be4", traitType: "weapon", traits: [
                     { description: "Deals {damage}% of your weapon damage per second as poison for {duration}s. 33% chance to hit.", scaling: { damage: { min: 1, max: 10 }, duration: { min: 0.3, max: 3 } }, type: "weapon" }
                 ]
             },
-            { id: 67, name: "Aquajade", multiplier: 9.0, rarity: "epic", area: "peak", color: "#7fdce4", traitType: null, traits: [] },
-            { id: 68, name: "Cryptex", multiplier: 9.3, rarity: "epic", area: "peak", color: "#5ec9da", traitType: null, traits: [] },
-            { id: 69, name: "Galestor", multiplier: 9.5, rarity: "epic", area: "peak", color: "#495d77", traitType: null, traits: [] },
+            { id: 68, name: "Aquajade", multiplier: 9.0, rarity: "epic", area: "peak", color: "#7fdce4", traitType: null, traits: [] },
+            { id: 69, name: "Cryptex", multiplier: 9.3, rarity: "epic", area: "peak", color: "#5ec9da", traitType: null, traits: [] },
+            { id: 70, name: "Galestor", multiplier: 9.5, rarity: "epic", area: "peak", color: "#495d77", traitType: null, traits: [] },
             {
-                id: 70, name: "Voidstar", multiplier: 10.0, rarity: "legendary", area: "peak", color: "#c393f7", traitType: "weapon", traits: [
+                id: 71, name: "Voidstar", multiplier: 10.0, rarity: "legendary", area: "peak", color: "#c393f7", traitType: "weapon", traits: [
                     { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%, but lowers vitality by -{health}%.", scaling: { crit: { min: 3.3, max: 33 }, critDamage: { min: 1.5, max: 15 }, health: { min: 1.5, max: 15 } }, type: "weapon" }
                 ]
             },
             {
-                id: 71, name: "Etherealite", multiplier: 11.1, rarity: "mythical", area: "peak", color: "#e8b9e1", traitType: "armor", traits: [
-                    { description: "Increases vitality by +{health}%.", scaling: { health: { min: 3.5, max: 35 } }, type: "armor" }
+                id: 72, name: "Etherealite", multiplier: 11.1, rarity: "mythical", area: "peak", color: "#e8b9e1", traitType: "armor", traits: [
+                    { description: "+{health}% extra health.", scaling: { health: { min: 3.5, max: 35 } }, type: "armor" }
                 ]
             },
-            { id: 72, name: "Suryafal", multiplier: 17.5, rarity: "relic", area: "peak", color: "#f69e40", traitType: null, traits: [] },
-            { id: 73, name: "Heavenite", multiplier: 25.0, rarity: "divine", area: "peak", color: "#fff4c0", traitType: null, traits: [] },
-            { id: 74, name: "Gargantuan", multiplier: 33.3, rarity: "divine", area: "peak", color: "#ffde65", traitType: null, traits: [] },
-            {
-                id: 75, name: "Mosasaursit", multiplier: 7.0, rarity: "exotic", area: "peak", color: "#687196", traitType: "armor", traits: [
-                    { description: "Increases vitality by +{health}%, but lowers movement speed by -{speed}%.", scaling: { health: { min: 6.5, max: 65 }, speed: { min: 2.5, max: 25 } }, type: "armor" }
-                ]
-            }
+            { id: 73, name: "Suryafal", multiplier: 15.5, rarity: "relic", area: "peak", color: "#f69e40", traitType: null, traits: [] },
+            { id: 74, name: "Heavenite", multiplier: 25.0, rarity: "divine", area: "peak", color: "#fff4c0", traitType: null, traits: [] },
+            { id: 75, name: "Gargantuan", multiplier: 33.3, rarity: "divine", area: "peak", color: "#ffde65", traitType: null, traits: [] }
         ];
 
         const traitIconMapping = {
@@ -2824,13 +2827,14 @@
             58: { icon: 'fas fa-shield', color: '#b6b9c8' }, // Sanctis
             59: { icon: 'fas fa-snowflake', color: '#dcd9d4' }, // Snowite
             60: { icon: 'fas fa-snowflake', color: '#6591c0' },  // Iceite
+            61: { icon: 'fas fa-heart', color: '#687196' },  // Mosasaursit
 
             // Peak
-            65: { icon: 'fas fa-fan', color: '#c26073' }, // Crimsonite
-            66: { icon: 'fas fa-skull-crossbones', color: '#a89be4' }, // Malachite
-            70: { icon: 'fas fa-crosshairs', color: '#c393f7' }, // Voidstar
-            71: { icon: 'fas fa-heart', color: '#e8b9e1' }, // Etherealite
-            75: { icon: 'fas fa-heart', color: '#687196' }  // Mosasaursit
+            66: { icon: 'fas fa-fan', color: '#c26073' }, // Crimsonite
+            67: { icon: 'fas fa-skull-crossbones', color: '#a89be4' }, // Malachite
+            71: { icon: 'fas fa-crosshairs', color: '#c393f7' }, // Voidstar
+            72: { icon: 'fas fa-heart', color: '#e8b9e1' }, // Etherealite
+
         };
 
         // Weapon probability data
@@ -3297,6 +3301,7 @@
         const inventoryCards = document.getElementById('inventory-cards');
         const totalForged = document.getElementById('total-forged');
         const totalValue = document.getElementById('total-value');
+        const forgeVariantBtn = document.getElementById('forge-variant-btn');
 
         function init() {
             renderOreInventory();
@@ -5218,6 +5223,57 @@
             }, 300);
         }
 
+        function forgeSelectedVariant() {
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+
+            if (totalOres < 3) return;
+            if (!selectedPreviewVariant.baseItemType || !selectedPreviewVariant.variantName) return;
+
+            const forgeBtn = document.getElementById('forge-variant-btn');
+            const originalText = forgeBtn.innerHTML;
+            forgeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Forging Variant...';
+            forgeBtn.disabled = true;
+
+            setTimeout(() => {
+                let multiplierSum = 0;
+                oreMix.forEach(item => {
+                    const ore = oreData.find(o => o.id === item.id);
+                    multiplierSum += ore.multiplier * item.count;
+                });
+                const multiplier = multiplierSum / totalOres;
+
+                const selectedItemType = selectedPreviewVariant.baseItemType;
+                const itemName = selectedPreviewVariant.variantName;
+                const mainOre = getMainOre();
+                const scaledStats = calculateScaledStats(itemName, multiplier);
+                const activeTraits = getActiveTraits();
+
+                const variant = {
+                    name: itemName,
+                    chance: "Guaranteed",
+                    probability: 1.0
+                };
+
+                const result = {
+                    itemName: itemName,
+                    itemType: selectedItemType,
+                    variant: variant,
+                    multiplier: multiplier,
+                    mainOre: mainOre,
+                    stats: scaledStats,
+                    traits: activeTraits,
+                    area: currentArea,
+                    totalOres: totalOres
+                };
+
+                showForgeResult(result);
+                saveForgedItem(result);
+
+                forgeBtn.innerHTML = originalText;
+                forgeBtn.disabled = false;
+            }, 300);
+        }
+
 
         function showForgeResult(result) {
             const modal = document.getElementById('forge-result-modal');
@@ -5484,6 +5540,10 @@
                 currentSearchTerm = e.target.value;
                 renderOreInventory();
                 updateOreSlots();
+            });
+
+            forgeVariantBtn.addEventListener('click', () => {
+                forgeSelectedVariant();
             });
 
             const forgeBtn = document.getElementById('forge-btn');
