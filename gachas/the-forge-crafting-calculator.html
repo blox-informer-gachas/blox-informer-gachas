@@ -2803,7 +2803,9 @@
             },
             { id: 73, name: "Suryafal", multiplier: 15.0, rarity: "relic", area: "peak", color: "#f69e40", traitType: null, traits: [] },
             { id: 74, name: "Heavenite", multiplier: 20.0, rarity: "divine", area: "peak", color: "#fff4c0", traitType: null, traits: [] },
-            { id: 75, name: "Gargantuan", multiplier: 25.0, rarity: "divine", area: "peak", color: "#ffde65", traitType: null, traits: [] }
+            { id: 75, name: "Gargantuan", multiplier: 25.0, rarity: "divine", area: "peak", color: "#ffde65", traitType: null, traits: [
+                    { description: "Deals {damage}% of your weapon damage as explosion damage and burns the enemy for {dotdamage}% of your weapon damage per second for {duration}s. {chance}% chance to hit.", scaling: { damage: { min: 5, max: 50 }, duration: { min: 0.2, max: 2 }, chance: { min: 3, max: 30 }, dotdamage: { min: 2, max: 20 } }, type: "weapon" }
+                ] }
         ];
 
         const traitIconMapping = {
