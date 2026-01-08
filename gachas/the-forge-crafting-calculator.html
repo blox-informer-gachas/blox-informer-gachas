@@ -2826,9 +2826,11 @@
             },
             { id: 73, name: "Suryafal", multiplier: 15.0, rarity: "relic", area: "peak", color: "#f69e40", traitType: null, traits: [] },
             { id: 74, name: "Heavenite", multiplier: 20.0, rarity: "divine", area: "peak", color: "#fff4c0", traitType: null, traits: [] },
-            { id: 75, name: "Gargantuan", multiplier: 25.0, rarity: "divine", area: "peak", color: "#ffde65", traitType: "weapon", traits: [
+            {
+                id: 75, name: "Gargantuan", multiplier: 25.0, rarity: "divine", area: "peak", color: "#ffde65", traitType: "weapon", traits: [
                     { description: "Deals {damage}% of your weapon damage as explosion damage and burns the enemy for {dotdamage}% of your weapon damage per second for {duration}s. {chance}% chance to hit.", scaling: { damage: { min: 5, max: 50 }, duration: { min: 0.2, max: 2 }, chance: { min: 3, max: 30 }, dotdamage: { min: 2, max: 20 } }, type: "weapon" }
-                ] },
+                ]
+            },
 
             // New boss ores and Raven Cave ores
             {
@@ -2846,12 +2848,16 @@
                     { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%. {chance}% chance to slow enemies for {duration}s on-hit.", scaling: { crit: { min: 4, max: 40 }, critDamage: { min: 1.5, max: 15 }, chance: { min: 2.5, max: 25 }, duration: { min: 0.3, max: 3 } }, type: "weapon" }
                 ]
             },
-            { id: 79, name: "Frogite", multiplier: 8.5, rarity: "epic", area: "frostspire", color: "#b4ff88", traitType: "armor", traits: [
+            {
+                id: 79, name: "Frogite", multiplier: 8.5, rarity: "epic", area: "frostspire", color: "#b4ff88", traitType: "armor", traits: [
                     { description: "Increases jump height by +{height}% and dash distance by +{dash}.", scaling: { height: { min: 1.25, max: 12.5 }, dash: { min: 0.75, max: 7.5 } }, type: "armor" }
-                ] },
-            { id: 80, name: "Moon Stone", multiplier: 9.5, rarity: "legendary", area: "frostspire", color: "#8efdff", traitType: "weapon", traits: [
+                ]
+            },
+            {
+                id: 80, name: "Moon Stone", multiplier: 9.5, rarity: "legendary", area: "frostspire", color: "#8efdff", traitType: "weapon", traits: [
                     { description: "Increases physical damage by +{damage}% during the night.", scaling: { damage: { min: 2.5, max: 25 } }, type: "weapon" }
-                ] },
+                ]
+            },
             { id: 81, name: "Gulabite", multiplier: 9.99, rarity: "legendary", area: "frostspire", color: "#ff58df", traitType: null, traits: [] },
             { id: 82, name: "Coinite", multiplier: 1.0, rarity: "legendary", area: "frostspire", color: "#ad8764", traitType: null, traits: [] },
             {
@@ -2865,9 +2871,11 @@
                     { description: "Heal {damage}% of physical damage dealt on-hit.", scaling: { damage: { min: 0.7, max: 7 } }, type: "weapon" }
                 ]
             },
-            { id: 86, name: "Heart Of The Island", multiplier: 18.5, rarity: "relic", area: "frostspire", color: "#f9696d", traitType: "armor", traits: [
+            {
+                id: 86, name: "Heart Of The Island", multiplier: 18.5, rarity: "relic", area: "frostspire", color: "#f9696d", traitType: "armor", traits: [
                     { description: "Increases your health by {health}%, and your physical damage and movement speed by {damage}% for 8 seconds when your health drops below 35%.", scaling: { health: { min: 1.5, max: 15 }, damage: { min: 2.5, max: 25 } }, type: "armor" }
-                ] }
+                ]
+            }
         ];
 
         const traitIconMapping = {
@@ -3659,6 +3667,35 @@
             updateInventoryUI();
         }
 
+        function calculateMultipliers(oreMix) {
+            let statsMultiplierSum = 0;
+            let priceMultiplierSum = 0;
+            let totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+
+            if (totalOres === 0) {
+                return { statsMultiplier: 0, priceMultiplier: 0 };
+            }
+
+            oreMix.forEach(item => {
+                const ore = oreData.find(o => o.id === item.id);
+                let statMultiplier = ore.multiplier;
+                let priceMultiplier = ore.multiplier;
+
+                if (ore.name === "Coinite") {
+                    priceMultiplier = 15;
+                    statMultiplier = 1;
+                }
+
+                statsMultiplierSum += statMultiplier * item.count;
+                priceMultiplierSum += priceMultiplier * item.count;
+            });
+
+            const statsMultiplier = statsMultiplierSum / totalOres;
+            const priceMultiplier = priceMultiplierSum / totalOres;
+
+            return { statsMultiplier, priceMultiplier };
+        }
+
         function updateItemPreview() {
             const previewContainer = document.getElementById('item-preview-container');
             const previewPlaceholder = document.getElementById('forge-preview-placeholder');
@@ -3673,12 +3710,7 @@
                 return;
             }
 
-            let multiplierSum = 0;
-            oreMix.forEach(item => {
-                const ore = oreData.find(o => o.id === item.id);
-                multiplierSum += ore.multiplier * item.count;
-            });
-            const multiplier = multiplierSum / totalOres;
+            const { statsMultiplier, priceMultiplier } = calculateMultipliers(oreMix);
 
             let probabilities;
             if (currentMode === 'weapon') {
@@ -3732,22 +3764,7 @@
 
             if (!baseItemName) return;
 
-            const baseStats = baseItemStats[currentMode][baseItemName];
-            const scaledStats = {
-                ...baseStats
-            };
-
-            if (currentMode === 'weapon') {
-                scaledStats.damage = baseStats.damage * multiplier;
-                scaledStats.price = baseStats.price * multiplier;
-            } else {
-                scaledStats.def = baseStats.def * multiplier;
-                scaledStats.price = baseStats.price * multiplier;
-            }
-
-            if (hasValueMultiplier()) {
-                scaledStats.price *= 1.25;
-            }
+            const scaledStats = calculateScaledStats(baseItemName, statsMultiplier, priceMultiplier);
 
             const activeTraits = getActiveTraits();
             const mainOre = getMainOre();
@@ -3870,7 +3887,7 @@
                     </div>
                     </span>
                     <span class="preview-multiplier" style="font-weight: bold; background: ${oreColor}20; color: ${oreColor}; font-size: 0.8rem; padding: 2px 8px; border-radius: 10px; border: 1px solid ${oreColor}40;">
-                    ${multiplier.toFixed(2)}x
+                    ${statsMultiplier.toFixed(2)}x
                 </span>
                 </div> 
             </div>
@@ -4757,6 +4774,7 @@
                 }
                 updateProbabilities();
             }
+            updateItemPreview();
 
             Object.entries(items).forEach(([itemName, optimalCount]) => {
                 const option = document.createElement('div');
@@ -5179,18 +5197,18 @@
             return hasLegendaryOrRarerKingdom || hasRareOrRarerFrostspireOrPeak;
         }
 
-        function calculateScaledStats(itemName, multiplier) {
+        function calculateScaledStats(itemName, statsMultiplier, priceMultiplier) {
             const stats = baseItemStats[currentMode][itemName];
             if (!stats) return null;
 
             const scaled = { ...stats };
 
             if (currentMode === 'weapon') {
-                scaled.damage = stats.damage * multiplier;
-                scaled.price = stats.price * multiplier;
+                scaled.damage = stats.damage * statsMultiplier;
+                scaled.price = stats.price * priceMultiplier;
             } else {
-                scaled.def = stats.def * multiplier;
-                scaled.price = stats.price * multiplier;
+                scaled.def = stats.def * statsMultiplier;
+                scaled.price = stats.price * priceMultiplier;
             }
 
             if (hasValueMultiplier()) {
@@ -5260,12 +5278,7 @@
             forgeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Forging...';
             forgeBtn.disabled = true;
 
-            let multiplierSum = 0;
-            oreMix.forEach(item => {
-                const ore = oreData.find(o => o.id === item.id);
-                multiplierSum += ore.multiplier * item.count;
-            });
-            const multiplier = multiplierSum / totalOres;
+            const { statsMultiplier, priceMultiplier } = calculateMultipliers(oreMix);
 
             let selectedItemType;
 
@@ -5306,7 +5319,7 @@
             const variant = getRandomVariant(selectedItemType);
             const itemName = variant.name.replace(/\s*\[.*?\]\s*/g, '');
             const mainOre = getMainOre();
-            const scaledStats = calculateScaledStats(itemName, multiplier);
+            const scaledStats = calculateScaledStats(itemName, statsMultiplier, priceMultiplier);
             const activeTraits = getActiveTraits();
 
             setTimeout(() => {
@@ -5314,7 +5327,9 @@
                     itemName: itemName,
                     itemType: selectedItemType,
                     variant: variant,
-                    multiplier: multiplier,
+                    multiplier: statsMultiplier,
+                    statsMultiplier: statsMultiplier,
+                    priceMultiplier: priceMultiplier,
                     mainOre: mainOre,
                     stats: scaledStats,
                     traits: activeTraits,
@@ -5326,7 +5341,9 @@
                     itemName: itemName,
                     itemType: selectedItemType,
                     variant: variant,
-                    multiplier: multiplier,
+                    multiplier: statsMultiplier,
+                    statsMultiplier: statsMultiplier,
+                    priceMultiplier: priceMultiplier,
                     mainOre: mainOre,
                     stats: scaledStats,
                     traits: activeTraits,
@@ -5352,17 +5369,11 @@
             forgeBtn.disabled = true;
 
             setTimeout(() => {
-                let multiplierSum = 0;
-                oreMix.forEach(item => {
-                    const ore = oreData.find(o => o.id === item.id);
-                    multiplierSum += ore.multiplier * item.count;
-                });
-                const multiplier = multiplierSum / totalOres;
-
+                const { statsMultiplier, priceMultiplier } = calculateMultipliers(oreMix);
                 const selectedItemType = selectedPreviewVariant.baseItemType;
                 const itemName = selectedPreviewVariant.variantName;
                 const mainOre = getMainOre();
-                const scaledStats = calculateScaledStats(itemName, multiplier);
+                const scaledStats = calculateScaledStats(itemName, statsMultiplier, priceMultiplier);
                 const activeTraits = getActiveTraits();
 
                 const variant = {
@@ -5375,7 +5386,9 @@
                     itemName: itemName,
                     itemType: selectedItemType,
                     variant: variant,
-                    multiplier: multiplier,
+                    multiplier: statsMultiplier,
+                    statsMultiplier: statsMultiplier,
+                    priceMultiplier: priceMultiplier,
                     mainOre: mainOre,
                     stats: scaledStats,
                     traits: activeTraits,
@@ -5443,7 +5456,7 @@
                     </div>
                     <div class="forge-result-tags">
                         <div class="forge-tag" style="background: var(--primary-light); color: var(--text-secondary);">
-                            <i class="fas fa-percent"></i> ${result.multiplier.toFixed(2)}x Multi
+                            <i class="fas fa-percent"></i> ${result.statsMultiplier.toFixed(2)}x Multi
                         </div>
                         <div class="forge-tag" style="background: var(--primary-light); color: var(--text-secondary);">
                             <i class="fas fa-star"></i> [100]% Masterwork
