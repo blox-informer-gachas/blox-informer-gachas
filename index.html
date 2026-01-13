@@ -168,12 +168,10 @@
             <p class="subtitle">A collection of interactive gacha simulators</p>
         </header>
         <div class="simulators-grid" id="simulatorsGrid">
-            <!-- Simulator cards will be added here dynamically -->
         </div>
     </div>
 
     <script>
-        // Array of gacha simulators - add new ones here
         const simulators = [
             {
                 name: "Test Gacha",
@@ -219,21 +217,18 @@
             grid.appendChild(card);
         });
 
-        // Toggle embed code visibility
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('embed-toggle')) {
                 const index = e.target.getAttribute('data-index');
                 const embedDiv = document.getElementById(`embed-${index}`);
                 embedDiv.classList.toggle('show-embed');
                 
-                // Update button text
                 e.target.textContent = embedDiv.classList.contains('show-embed') 
                     ? 'Hide Embed Code' 
                     : 'Embed Code';
             }
         });
 
-        // Copy embed code to clipboard
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('copy-embed')) {
                 const index = e.target.getAttribute('data-index');
