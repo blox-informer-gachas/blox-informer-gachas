@@ -1984,7 +1984,7 @@
 
         .preview-variant-tooltip {
             pointer-events: auto !important;
-            max-height: 255px;
+            max-height: 260px;
             overflow-y: auto;
         }
 
@@ -2565,7 +2565,7 @@
                 "Hook": { damage: 9.46, atkSpeed: 0.39, realSpeed: 0.52, range: 6, price: 74.8, type: "Dagger" },
                 "Shark's Fang": { damage: 7.74, atkSpeed: 0.27, realSpeed: 0.36, range: 6, price: 74.8, type: "Dagger" },
                 "Cultist Dagger": { damage: 10.5, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 74.8, type: "Dagger" },
-                "Curved Dagger": { damage:  9.9, atkSpeed: 0.30, realSpeed: 0.41, range: 6, price: 74.8, type: "Dagger" },
+                "Curved Dagger": { damage: 9.9, atkSpeed: 0.30, realSpeed: 0.41, range: 6, price: 74.8, type: "Dagger" },
 
                 "Gladius": { damage: 15.75, atkSpeed: 0.62, realSpeed: 0.70, range: 8, price: 120, type: "Straight Sword" },
                 "Falchion": { damage: 15, atkSpeed: 0.59, realSpeed: 0.74, range: 8, price: 126, type: "Straight Sword" },
@@ -3125,16 +3125,16 @@
             {
                 id: 31, name: "Fireite", multiplier: 4.5, rarity: "legendary", area: "kingdom", color: "#a4532e", traitType: "weapon", traits: [
                     {
-                        description: "Deals {damage}% of weapon damage as fire per second for 2 seconds. 30% chance on hit.",
-                        scaling: { damage: { min: 2, max: 20 } }, type: "weapon"
+                        description: "Deals {damage}% of weapon damage as fire per second for {duration}s. {chance}% chance on hit.",
+                        scaling: { damage: { min: 2, max: 20 }, duration: { min: 0.2, max: 2 }, chance: { min: 3, max: 30 } }, type: "weapon"
                     }
                 ]
             },
             {
                 id: 32, name: "Magmaite", multiplier: 5.0, rarity: "legendary", area: "kingdom", color: "#f77b61", traitType: "weapon", traits: [
                     {
-                        description: "Cause an explosion on hit, dealing {damage}% of weapon damage as AoE damage. 35% chance on hit.",
-                        scaling: { damage: { min: 5, max: 50 } }, type: "weapon"
+                        description: "Cause an explosion on hit, dealing {damage}% of weapon damage as AoE damage. {chance}% chance on hit.",
+                        scaling: { damage: { min: 5, max: 50 }, chance: { min: 3.5, max: 35 } }, type: "weapon"
                     }
                 ]
             },
@@ -3261,7 +3261,7 @@
             { id: 74, name: "Heavenite", multiplier: 20.0, rarity: "divine", area: "peak", color: "#fff4c0", traitType: null, traits: [] },
             {
                 id: 75, name: "Gargantuan", multiplier: 25.0, rarity: "divine", area: "peak", color: "#ffde65", traitType: "weapon", traits: [
-                    { description: "Deals {damage}% of your weapon damage as explosion damage and burns the enemy for {dotdamage}% of your weapon damage per second for {duration}s. {chance}% chance to hit.", scaling: { damage: { min: 5, max: 50 }, duration: { min: 0.2, max: 2 }, chance: { min: 3, max: 30 }, dotdamage: { min: 2, max: 20 } }, type: "weapon" }
+                    { description: "Deals {damage}% of your weapon damage as explosion damage and burn the enemy for {dotdamage}% of your weapon damage per second for {duration}s. {chance}% chance to hit.", scaling: { damage: { min: 5, max: 50 }, duration: { min: 0.2, max: 2 }, chance: { min: 3, max: 30 }, dotdamage: { min: 2, max: 20 } }, type: "weapon" }
                 ]
             },
 
@@ -3273,7 +3273,7 @@
             },
             {
                 id: 77, name: "Yeti Heart", multiplier: 7.7, rarity: "mythical", area: "enemy", color: "#adafb9", traitType: "weapon", traits: [
-                    { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%. {speed}% increased attack speed.", scaling: { crit: { min: 3, max: 30 }, critDamage: { min: 1, max: 10 }, speed: { min: 1, max: 10 } }, type: "weapon" }
+                    { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%. +{speed}% increased attack speed.", scaling: { crit: { min: 3, max: 30 }, critDamage: { min: 1, max: 10 }, speed: { min: 1, max: 10 } }, type: "weapon" }
                 ]
             },
             {
@@ -3306,7 +3306,7 @@
             },
             {
                 id: 86, name: "Heart Of The Island", multiplier: 18.5, rarity: "relic", area: "frostspire", color: "#f9696d", traitType: "armor", traits: [
-                    { description: "Increases your health by {health}%, and your physical damage and movement speed by {damage}% for 8 seconds when your health drops below 35%.", scaling: { health: { min: 1.5, max: 15 }, damage: { min: 2.5, max: 25 } }, type: "armor" }
+                    { description: "Increases your health by +{health}%, and your physical damage and movement speed by +{damage}% for 8 seconds when your health drops below 35%.", scaling: { health: { min: 1.5, max: 15 }, damage: { min: 2.5, max: 25 } }, type: "armor" }
                 ]
             }
         ];
@@ -3343,6 +3343,7 @@
             67: { icon: 'fas fa-skull-crossbones', color: '#a89be4' }, // Malachite
             71: { icon: 'fas fa-crosshairs', color: '#c393f7' }, // Voidstar
             72: { icon: 'fas fa-heart', color: '#e8b9e1' }, // Etherealite
+            75: { icon: 'fas fa-bomb', color: '#ffde65' },  // Gargantuan
 
             //Raven Cave
             76: { icon: 'fas fa-crosshairs', color: '#ddeefb' }, // Prismatic Heart
@@ -3535,6 +3536,7 @@
                 }
                 let statsHTML = '';
                 if (item.mode === 'weapon') {
+                    const baseDps = item.stats.damage / item.stats.realSpeed;
                     statsHTML = `
                 <div class="inventory-stat-row">
                     <span class="inventory-stat-label">
@@ -3553,13 +3555,21 @@
                     </span>
                 </div>
                 <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-gauge"></i> Real DPS
-                    </span>
-                    <span class="inventory-stat-value" style="color: var(--exotic);">
-                        ${dps ? (dps.toFixed(2)) : ''}
-                    </span>
-                </div>
+            <span class="inventory-stat-label">
+                <i class="fas fa-gauge"></i> Base DPS
+            </span>
+            <span class="inventory-stat-value" style="color: var(--exotic);">
+                ${baseDps.toFixed(2)}
+            </span>
+        </div>
+        <div class="inventory-stat-row">
+            <span class="inventory-stat-label">
+                <i class="fas fa-gauge"></i> Trait DPS
+            </span>
+            <span class="inventory-stat-value" style="color: var(--mythical);">
+                ${item.stats.dpsWithTraits ? item.stats.dpsWithTraits.toFixed(2) : baseDps.toFixed(2)}
+            </span>
+        </div>
                 <div class="inventory-stat-row">
                     <span class="inventory-stat-label">
                         <i class="fas fa-ruler"></i> Range
@@ -3889,7 +3899,15 @@
                     <i class="fas fa-gauge"></i> Real DPS
                 </span>
                 <span class="inventory-stat-value" style="color: var(--exotic);">
-                    ${dps ? (dps.toFixed(2)) : ''}
+                    ${scaledStats.baseDps ? scaledStats.baseDps.toFixed(2) : ''}
+                </span>
+            </div>
+            <div class="inventory-stat-row">
+                <span class="inventory-stat-label">
+                    <i class="fas fa-gauge"></i> Trait-Adjusted DPS
+                </span>
+                <span class="inventory-stat-value" style="color: var(--mythical);">
+                    ${scaledStats.dpsWithTraits ? scaledStats.dpsWithTraits.toFixed(2) : ''}
                 </span>
             </div>
             <div class="inventory-stat-row">
@@ -3909,6 +3927,7 @@
                 </span>
             </div>
         `;
+
             } else {
                 statsHTML = `
             <div class="inventory-stat-row">
@@ -3940,7 +3959,6 @@
 
             previewCard.innerHTML = `
             <div class="preview-header" style="display: flex; align-items: center; flex-direction: column; margin-bottom: 10px; margin-top: -5px;">
-            <span class="prediction-note" style="margin-top: 0;">(Just a preview, forge results may vary!)</span>
             </div>
         <div class="inventory-card-header" style="justify-content: space-between; border-color: ${oreColor}40; position: relative;">
             ${itemImage ? `
@@ -5271,6 +5289,7 @@
             return hasLegendaryOrRarerKingdom || hasRareOrRarerFrostspireOrPeak;
         }
 
+        // Update the calculateScaledStats function to include DPS calculation
         function calculateScaledStats(itemName, statsMultiplier, priceMultiplier) {
             const stats = baseItemStats[currentMode][itemName];
             if (!stats) return null;
@@ -5280,6 +5299,13 @@
             if (currentMode === 'weapon') {
                 scaled.damage = stats.damage * statsMultiplier;
                 scaled.price = stats.price * priceMultiplier;
+
+                // Calculate DPS with and without traits
+                const dpsInfo = calculateRealDPSWithTraits(scaled.damage, stats.realSpeed, scaled);
+                scaled.baseDps = dpsInfo.baseDps;
+                scaled.dpsWithTraits = dpsInfo.dpsWithTraits;
+                scaled.adjustedAttackSpeed = dpsInfo.adjustedAttackSpeed;
+                scaled.traitSummary = dpsInfo.traitSummary;
             } else {
                 scaled.def = stats.def * statsMultiplier;
                 scaled.price = stats.price * priceMultiplier;
@@ -5514,6 +5540,7 @@
 
             const itemImage = itemImages[result.itemName] || '';
             const dps = currentMode === 'weapon' ? (result.stats.damage / result.stats.realSpeed) : null;
+            const baseDps = result.stats.damage / result.stats.realSpeed;
 
             content.innerHTML = `
         <div class="forge-result-container" style="background: linear-gradient(135deg, ${bgColor}15 0%, ${bgColor}08 25%, rgba(0,0,0,0.1) 50%, ${bgColor}08 75%, ${bgColor}15 100%); border: 2px solid ${bgColor}40;">
@@ -5556,10 +5583,14 @@
                         <div class="forge-stat-value" style="color: var(--rare);">${result.stats.atkSpeed}s (${result.stats.realSpeed.toFixed(2) || '0.00'})</div>
                         <div class="forge-stat-label">ATK SPEED</div>
                     </div>
-                    <div class="forge-stat-item" style="grid-column: 1 / -1;">
-                        <div class="forge-stat-value" style="color: var(--exotic);">${dps ? (dps.toFixed(2)) : ''}</div>
-                        <div class="forge-stat-label">Real DPS</div>
-                    </div>
+                    <div class="forge-stat-item">
+            <div class="forge-stat-value" style="color: var(--exotic);">${baseDps.toFixed(2)}</div>
+            <div class="forge-stat-label">BASE DPS</div>
+        </div>
+        <div class="forge-stat-item">
+            <div class="forge-stat-value" style="color: var(--mythical);">${result.stats.dpsWithTraits ? result.stats.dpsWithTraits.toFixed(2) : baseDps.toFixed(2)}</div>
+            <div class="forge-stat-label">TRAIT-ADJUSTED DPS</div>
+        </div>
                     <div class="forge-stat-item">
                         <div class="forge-stat-value" style="color: var(--relic);">${result.stats.range} studs</div>
                         <div class="forge-stat-label">RANGE</div>
@@ -5711,6 +5742,157 @@
             if (initialActive) {
                 filtersToggle.innerHTML = `<i class="fas fa-filter"></i> ${initialActive.textContent}`;
             }
+        }
+
+        // Real DPS calculation with traits
+        const BASE_CRIT_CHANCE = 0;
+        const BASE_CRIT_DAMAGE = 1.5;
+
+        function extractWeaponTraits() {
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+            const traits = {
+                physicalDamageIncrease: 0,
+                critChanceIncrease: 0,
+                critDamageIncrease: 0,
+                attackSpeedIncrease: 0,
+                onHitEffects: []
+            };
+
+            oreMix.forEach(item => {
+                const ore = oreData.find(o => o.id === item.id);
+                const percentage = (item.count / totalOres) * 100;
+
+                if (ore.traits && ore.traits.length > 0 && percentage >= 10) {
+                    ore.traits.forEach(trait => {
+                        if (trait.type === 'weapon' || trait.type === 'all') {
+                            let scaledValues = {};
+                            Object.keys(trait.scaling).forEach(key => {
+                                const scale = trait.scaling[key];
+                                let value = 0;
+
+                                if (percentage >= 30) {
+                                    value = scale.max;
+                                } else if (percentage >= 10) {
+                                    const scaleFactor = (percentage - 10) / 20;
+                                    value = scale.min + (scale.max - scale.min) * scaleFactor;
+                                }
+
+                                scaledValues[key] = Math.round(value * 10) / 10;
+                            });
+
+                            categorizeTrait(trait, scaledValues, traits);
+                        }
+                    });
+                }
+            });
+
+            return traits;
+        }
+
+        function categorizeTrait(trait, scaledValues, traits) {
+            const desc = trait.description.toLowerCase();
+
+            // Physical damage increase
+            if (desc.includes('increase physical damage') || desc.includes('+{damage}%')) {
+                if (scaledValues.damage !== undefined) {
+                    traits.physicalDamageIncrease += scaledValues.damage;
+                }
+            }
+
+            // Critical chance increase
+            if (desc.includes('critical chance') || desc.includes('crit') && desc.includes('%')) {
+                if (scaledValues.crit !== undefined) {
+                    traits.critChanceIncrease += scaledValues.crit;
+                }
+            }
+
+            // Critical damage increase
+            if (desc.includes('critical damage') || desc.includes('critdamage') ||
+                (desc.includes('crit') && desc.includes('damage'))) {
+                if (scaledValues.critDamage !== undefined) {
+                    traits.critDamageIncrease += scaledValues.critDamage;
+                }
+            }
+
+            // Attack speed increase
+            if (desc.includes('attack speed') && desc.includes('%')) {
+                if (scaledValues.speed !== undefined) {
+                    traits.attackSpeedIncrease += scaledValues.speed;
+                }
+            }
+
+            // On-hit effects
+            if (desc.includes('explosion') || desc.includes('fire') ||
+                desc.includes('poison') || desc.includes('burn') ||
+                desc.includes('deal') || desc.includes('damage') && desc.includes('on hit')) {
+
+                if (scaledValues.damage !== undefined && scaledValues.chance !== undefined) {
+                    const effectMultiplier = (scaledValues.chance / 100) * (scaledValues.damage / 100);
+                    if (effectMultiplier > 0) {
+                        traits.onHitEffects.push({
+                            type: getEffectType(desc),
+                            avgDamageMultiplier: effectMultiplier
+                        });
+                    }
+                }
+
+                if (scaledValues.dotdamage !== undefined && scaledValues.chance !== undefined) {
+                    const burnMultiplier = (scaledValues.chance / 100) * (scaledValues.dotdamage / 100);
+                    if (burnMultiplier > 0) {
+                        traits.onHitEffects.push({
+                            type: 'burn',
+                            avgDamageMultiplier: burnMultiplier
+                        });
+                    }
+                }
+            }
+        }
+
+        function getEffectType(description) {
+            if (description.includes('explosion')) return 'explosion';
+            if (description.includes('fire')) return 'fire';
+            if (description.includes('poison')) return 'poison';
+            if (description.includes('burn')) return 'burn';
+            return 'onHit';
+        }
+
+        function calculateRealDPSWithTraits(baseDamage, baseRealSpeed, scaledStats) {
+            const weaponTraits = extractWeaponTraits();
+
+            const attackSpeedMultiplier = 1 + (weaponTraits.attackSpeedIncrease / 100);
+            const adjustedAttackSpeed = baseRealSpeed / attackSpeedMultiplier;
+
+            const physicalDamageMultiplier = 1 + (weaponTraits.physicalDamageIncrease / 100);
+            const baseDamageWithTraits = baseDamage * physicalDamageMultiplier;
+
+            const totalCritChance = BASE_CRIT_CHANCE + weaponTraits.critChanceIncrease;
+            const totalCritDamageMultiplier = BASE_CRIT_DAMAGE + (weaponTraits.critDamageIncrease / 100);
+
+            const critContribution = (totalCritChance / 100) * (totalCritDamageMultiplier - 1);
+            const avgDamagePerHit = baseDamageWithTraits * (1 + critContribution);
+
+            let onHitEffectDamage = 0;
+            weaponTraits.onHitEffects.forEach(effect => {
+                onHitEffectDamage += effect.avgDamageMultiplier * baseDamageWithTraits;
+            });
+
+            const totalAvgDamagePerHit = avgDamagePerHit + onHitEffectDamage;
+            const dpsWithTraits = totalAvgDamagePerHit / adjustedAttackSpeed;
+            const baseDps = baseDamage / baseRealSpeed;
+
+            return {
+                baseDps: baseDps,
+                dpsWithTraits: dpsWithTraits,
+                adjustedAttackSpeed: adjustedAttackSpeed,
+                traitSummary: {
+                    physicalDamageIncrease: weaponTraits.physicalDamageIncrease,
+                    critChanceIncrease: weaponTraits.critChanceIncrease,
+                    critDamageIncrease: weaponTraits.critDamageIncrease,
+                    attackSpeedIncrease: weaponTraits.attackSpeedIncrease,
+                    onHitEffectCount: weaponTraits.onHitEffects.length,
+                    totalOnHitMultiplier: weaponTraits.onHitEffects.reduce((sum, effect) => sum + effect.avgDamageMultiplier, 0) * 100
+                }
+            };
         }
 
         function setupEventListeners() {
