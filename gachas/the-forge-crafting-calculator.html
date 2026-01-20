@@ -187,7 +187,6 @@
 
         /* Modal Styles */
         .modal-overlay {
-            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -197,11 +196,14 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            animation: fadeIn var(--animation-speed) ease-out;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--animation-speed) ease-out, visibility var(--animation-speed) ease-out;
         }
 
         .modal-overlay.show {
-            display: flex;
+            opacity: 1;
+            visibility: visible;
         }
 
         .modal-content {
@@ -214,8 +216,14 @@
             overflow-y: auto;
             box-shadow: var(--card-shadow);
             border: 2px solid var(--primary-dark);
-            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-origin: center center;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .modal-header {
@@ -896,24 +904,26 @@
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .probability-item::before {
+        .probability-item::before,
+        .inventory-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
             opacity: 0;
             transition: opacity var(--animation-speed) ease;
         }
 
-        .probability-item:hover::before {
+        .probability-item:hover::before,
+        .inventory-card:hover::before {
             opacity: 1;
         }
 
         .probability-item:hover {
-            transform: translateY(-5px);
+
             box-shadow: var(--card-shadow);
         }
 
@@ -1092,7 +1102,7 @@
         .forge-tag {
             padding: 6px 15px;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.70rem;
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -1111,7 +1121,7 @@
         .forge-stat-item {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
-            padding: 10px;
+            padding: 5px;
             border: 1px solid var(--primary-light);
             text-align: center;
             transition: all var(--animation-speed) ease;
@@ -1275,20 +1285,18 @@
             margin: 0;
         }
 
-        .tooltip-content {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
         .variant-list {
             list-style: none;
             padding: 0;
             margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .variant-item {
             padding: 8px;
             margin-bottom: 5px;
+            margin-right: 5px;
             background-color: rgba(255, 255, 255, 0.05);
             border-radius: 5px;
             display: flex;
@@ -1570,6 +1578,12 @@
                 height: 100%;
             }
 
+            .modal-overlay.show {
+                position: fixed;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
             .traits-grid {
                 grid-template-columns: 1fr;
             }
@@ -1749,9 +1763,8 @@
         }
 
         .inventory-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0px 12px rgba(0, 0, 0, 0.5),
-                0 0 20px var(--primary-glow);
+            box-shadow: 0 0 12px var(--primary-glow);
+
             border-color: var(--primary);
         }
 
@@ -2090,6 +2103,224 @@
         .preview-variant-tooltip {
             animation: tooltipFadeIn 0.2s ease !important;
         }
+
+        /* Probabilities v2 */
+        .probability-item.locked {
+            border-color: var(--success) !important;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.1));
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .probability-item.unavailable {
+            opacity: 0.4;
+            filter: grayscale(0.7);
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .probability-item.unavailable:hover {
+            transform: none !important;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 0.85rem;
+            color: var(--text);
+            flex: 1;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            padding-right: 10px;
+        }
+
+        .probability-value {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .probability-bar-container {
+            position: relative;
+            margin-bottom: 6px;
+        }
+
+        .probability-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 16px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        .probability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--text-secondary));
+            border-radius: 12px;
+            position: relative;
+            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            min-width: 0;
+        }
+
+        .probability-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        .percentage-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .lock-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .lock-icon:hover {
+            color: var(--primary);
+        }
+
+        .lock-icon.locked {
+            color: var(--success);
+        }
+
+        .lock-icon.locked:hover {
+            color: #4CAF50;
+        }
+
+        .lock-icon.available {
+            color: var(--primary);
+        }
+
+        .lock-icon.disabled {
+            color: var(--text-secondary);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .lock-icon.disabled:hover {
+            opacity: 1;
+        }
+
+        .lock-requirement {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 2px;
+            font-weight: 600;
+        }
+
+        .lock-requirement.met {
+            color: var(--success);
+        }
+
+        .lock-requirement.not-met {
+            color: var(--warning);
+        }
+
+        .lock-tooltip {
+            display: none;
+            position: absolute;
+            top: -5px;
+            right: 26px;
+            transform: translateX(0);
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            min-width: 180px;
+            max-width: 220px;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+
+        .lock-icon:hover .lock-tooltip {
+            display: block;
+        }
+
+        .variant-tooltip-fix {
+            position: fixed;
+            z-index: 1001;
+        }
+
+        .preview-lock-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid var(--success);
+            color: var(--success);
+            padding: 2px 6px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+            position: absolute;
+            top: -10px;
+            right: -5px;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 5px rgba(76, 175, 80, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+
+        #variant-tooltip {
+            max-width: 300px;
+            max-height: 60vh;
+            overflow-y: auto;
+            z-index: 1001;
+        }
+
+        #variant-tooltip.showing {
+            display: block !important;
+        }
     </style>
 </head>
 
@@ -2352,6 +2583,7 @@
         </div>
     </div>
     </div>
+    </div>
 
     <script>
         const oreImages = {
@@ -2604,7 +2836,7 @@
 
                 "Uchigatana": { damage: 17, atkSpeed: 0.6, realSpeed: 0.69, range: 9, price: 324, type: "Katana" },
                 "Tachi": { damage: 17.85, atkSpeed: 0.63, realSpeed: 0.73, range: 9, price: 356.4, type: "Katana" },
-                "Straight Edge Katana": { damage: 18.7, atkSpeed: 0.69, realSpeed: 0.35, range: 9, price: 388.8, type: "Katana" },
+                "Straight Edge Katana": { damage: 18.7, atkSpeed: 0.6, realSpeed: 0.69, range: 9, price: 388.8, type: "Katana" },
 
                 "Crusader Sword": { damage: 24, atkSpeed: 1.0, realSpeed: 1.19, range: 9, price: 485, type: "Great Sword" },
                 "Long Sword": { damage: 24, atkSpeed: 1.11, realSpeed: 1.32, range: 9, price: 509.25, type: "Great Sword" },
@@ -2710,7 +2942,13 @@
             47: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.29, "Colossal Sword": 0.69 },
             48: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
             49: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
-            50: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 }
+            50: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
+            51: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.27, "Colossal Sword": 0.71 },
+            52: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.27, "Colossal Sword": 0.71 },
+            53: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.27, "Colossal Sword": 0.71 },
+            54: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.26, "Colossal Sword": 0.72 },
+            55: { "Dagger": 0, "Straight Sword": 0, "Gauntlet": 0, "Katana": 0, "Great Sword": 0.02, "Great Axe": 0.26, "Colossal Sword": 0.72 }
+
         };
 
         const weaponProbabilitiesFrostspire = {
@@ -2761,7 +2999,12 @@
             47: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.29, "Colossal Sword": 0.69 },
             48: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
             49: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
-            50: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 }
+            50: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
+            51: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.27, "Colossal Sword": 0.71 },
+            52: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.27, "Colossal Sword": 0.71 },
+            53: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.27, "Colossal Sword": 0.71 },
+            54: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.26, "Colossal Sword": 0.72 },
+            55: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.26, "Colossal Sword": 0.72 }
         };
 
         // Armor probability data
@@ -2814,6 +3057,11 @@
             48: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.15, "Heavy Chestplate": 0.83 },
             49: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.14, "Heavy Chestplate": 0.84 },
             50: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.14, "Heavy Chestplate": 0.84 },
+            51: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.14, "Heavy Chestplate": 0.84 },
+            52: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.13, "Heavy Chestplate": 0.85 },
+            53: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.13, "Heavy Chestplate": 0.85 },
+            54: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.13, "Heavy Chestplate": 0.85 },
+            55: { "Light Helmet": 0.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0.02, "Heavy Leggings": 0.12, "Heavy Chestplate": 0.86 }
         };
 
         const specificItemVariants = {
@@ -3258,7 +3506,11 @@
                 ]
             },
             { id: 73, name: "Suryafal", multiplier: 15.0, rarity: "relic", area: "peak", color: "#f69e40", traitType: null, traits: [] },
-            { id: 74, name: "Heavenite", multiplier: 20.0, rarity: "divine", area: "peak", color: "#fff4c0", traitType: null, traits: [] },
+            {
+                id: 74, name: "Heavenite", multiplier: 20.0, rarity: "divine", area: "peak", color: "#fff4c0", traitType: "weapon", traits: [
+                    { description: "{chance}% to smite the enemy on hit, dealing {damage} flat damage.", scaling: { damage: { min: 2.5, max: 25 }, chance: { min: 4, max: 40 } }, type: "weapon" }
+                ]
+            },
             {
                 id: 75, name: "Gargantuan", multiplier: 25.0, rarity: "divine", area: "peak", color: "#ffde65", traitType: "weapon", traits: [
                     { description: "Deals {damage}% of your weapon damage as explosion damage and burn the enemy for {dotdamage}% of your weapon damage per second for {duration}s. {chance}% chance to hit.", scaling: { damage: { min: 5, max: 50 }, duration: { min: 0.2, max: 2 }, chance: { min: 3, max: 30 }, dotdamage: { min: 2, max: 20 } }, type: "weapon" }
@@ -3343,6 +3595,7 @@
             67: { icon: 'fas fa-skull-crossbones', color: '#a89be4' }, // Malachite
             71: { icon: 'fas fa-crosshairs', color: '#c393f7' }, // Voidstar
             72: { icon: 'fas fa-heart', color: '#e8b9e1' }, // Etherealite
+            74: { icon: 'fas fa-bolt-lightning', color: '#fff4c0' },  // Heavenite
             75: { icon: 'fas fa-bomb', color: '#ffde65' },  // Gargantuan
 
             //Raven Cave
@@ -3394,10 +3647,49 @@
             armor: optimalCounts.armor
         };
 
+        const lockReqs = {
+            weapon: {
+                "Dagger": 3,
+                "Straight Sword": 9,
+                "Gauntlet": 14,
+                "Katana": 18,
+                "Great Sword": 24,
+                "Great Axe": 31,
+                "Colossal Sword": 50
+            },
+            armor: {
+                "Light Helmet": 3,
+                "Light Leggings": 11,
+                "Light Chestplate": 15,
+                "Medium Helmet": 20,
+                "Medium Leggings": 24,
+                "Medium Chestplate": 30,
+                "Heavy Helmet": 35,
+                "Heavy Leggings": 42,
+                "Heavy Chestplate": 52
+            }
+        };
+
+        const lockReqsFrostspire = {
+            weapon: {
+                "Dagger": 3,
+                "Straight Sword": 9,
+                "Mace": 14,
+                "Axe": 18,
+                "Spear": 24,
+                "Great Axe": 31,
+                "Colossal Sword": 50
+            },
+            armor: optimalCounts.armor
+        };
+
         let currentMode = 'weapon';
         let oreMix = [];
         let activeFilter = 'all';
 
+        let lockedItemType = null;
+        let lockRequirements = {};
+        let isItemLocked = false;
         let quickCraftType = null;
         let quickCraftItem = null;
         let selectedTraits = [];
@@ -3459,18 +3751,113 @@
             setupForgeResultModal();
             setupInventorySystem();
             setupFiltersDropdown();
+            updateForgeButtonState();
         }
 
         document.getElementById('tooltip-close').addEventListener('click', () => {
-            document.getElementById('variant-tooltip').style.display = 'none';
+            const tooltip = document.getElementById('variant-tooltip');
+            tooltip.style.display = 'none';
+            tooltip.classList.remove('showing');
         });
 
         document.addEventListener('click', (e) => {
             const tooltip = document.getElementById('variant-tooltip');
-            if (tooltip.style.display === 'block' && !tooltip.contains(e.target) && !e.target.closest('.probability-item')) {
+            if (tooltip.classList.contains('showing') && !tooltip.contains(e.target) && !e.target.closest('.probability-item')) {
                 tooltip.style.display = 'none';
+                tooltip.classList.remove('showing');
             }
         });
+
+        function getRequiredOresForLock(itemType) {
+            if (currentMode === 'weapon') {
+                if (currentArea === 'frostspire') {
+                    return lockReqsFrostspire.weapon[itemType] || lockReqs.weapon[itemType] || 999;
+                } else {
+                    return lockReqs.weapon[itemType] || 999;
+                }
+            } else {
+                return lockReqs.armor[itemType] || 999;
+            }
+        }
+
+        function toggleItemLock(itemType) {
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+            const requiredOres = getRequiredOresForLock(itemType);
+
+            if (lockedItemType === itemType) {
+                lockedItemType = null;
+                isItemLocked = false;
+                updateProbabilities();
+                updateItemPreview();
+                return;
+            }
+
+            if (totalOres >= requiredOres) {
+                lockedItemType = itemType;
+                isItemLocked = true;
+                updateProbabilities();
+                updateItemPreview();
+            } else {
+                const needed = requiredOres - totalOres;
+            }
+        }
+
+        function checkLockValidity() {
+            if (!lockedItemType) return;
+
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+            const requiredOres = getRequiredOresForLock(lockedItemType);
+
+            if (totalOres < requiredOres) {
+                lockedItemType = null;
+                isItemLocked = false;
+                updateProbabilities();
+                updateItemPreview();
+            }
+        }
+
+        function clearLock() {
+            lockedItemType = null;
+            isItemLocked = false;
+            updateProbabilities();
+            updateItemPreview();
+        }
+
+        function getLockStatusText(itemType) {
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+            const requiredOres = getRequiredOresForLock(itemType);
+
+            if (totalOres >= requiredOres) {
+                return `<div class="lock-requirement met">✓ Ready to lock</div>`;
+            } else {
+                const needed = requiredOres - totalOres;
+                return `<div class="lock-requirement not-met">${needed} more ore${needed !== 1 ? 's' : ''} needed</div>`;
+            }
+        }
+
+        function updateForgeButtonState() {
+            const forgeBtn = document.getElementById('forge-btn');
+            const forgeVariantBtn = document.getElementById('forge-variant-btn');
+            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
+
+            if (isItemLocked && lockedItemType) {
+                forgeBtn.innerHTML = `<i class="fas fa-lock"></i> Forge ${lockedItemType}`;
+                forgeBtn.style.background = 'linear-gradient(135deg, var(--success), #2e7d32)';
+            } else {
+                forgeBtn.innerHTML = `<i class="fas fa-fire"></i> Forge Item`;
+                forgeBtn.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
+            }
+
+            if (totalOres < 3) {
+                forgeBtn.disabled = true;
+                forgeVariantBtn.disabled = true;
+            } else {
+                forgeBtn.disabled = false;
+                if (!isItemLocked || (selectedPreviewVariant.baseItemType === lockedItemType && selectedPreviewVariant.variantName)) {
+                    forgeVariantBtn.disabled = false;
+                }
+            }
+        }
 
         function saveForgedItem(result) {
             const inventoryItem = {
@@ -3708,8 +4095,12 @@
 
         function setupInventorySystem() {
             inventoryBtn.addEventListener('click', () => {
-                inventoryModal.style.display = 'flex';
-                setTimeout(() => inventoryModal.classList.add('show'), 10);
+                const modal = document.getElementById('inventory-modal');
+                modal.style.display = 'flex';
+                modal.offsetHeight;
+                requestAnimationFrame(() => {
+                    modal.classList.add('show');
+                });
 
                 if (window.innerWidth <= 480) {
                     document.body.classList.add('modal-open');
@@ -3719,11 +4110,10 @@
             });
 
             function closeInventoryModal() {
-                inventoryModal.style.animation = 'fadeOut 0.3s ease';
+                const modal = document.getElementById('inventory-modal');
+                modal.classList.remove('show');
                 setTimeout(() => {
-                    inventoryModal.style.display = 'none';
-                    inventoryModal.classList.remove('show');
-                    inventoryModal.style.animation = '';
+                    modal.style.display = 'none';
                     document.body.classList.remove('modal-open');
                 }, 300);
             }
@@ -3802,12 +4192,17 @@
             let highestProb = 0;
             let highestItem = null;
 
-            Object.entries(currentProbs).forEach(([itemName, probability]) => {
-                if (probability > highestProb) {
-                    highestProb = probability;
-                    highestItem = itemName;
-                }
-            });
+            if (isItemLocked && lockedItemType) {
+                highestItem = lockedItemType;
+                highestProb = 1.0;
+            } else {
+                Object.entries(currentProbs).forEach(([itemName, probability]) => {
+                    if (probability > highestProb) {
+                        highestProb = probability;
+                        highestItem = itemName;
+                    }
+                });
+            }
 
             if (!highestItem) {
                 previewPlaceholder.style.display = 'block';
@@ -3914,9 +4309,7 @@
                 <span class="inventory-stat-label">
                     <i class="fas fa-ruler"></i> Range
                 </span>
-                <span class="inventory-stat-value" style="color: var(--relic)">
-                    ${scaledStats.range || '0'} studs
-                </span>
+                <span class="inventory-stat-value" style="color: var(--relic)">${scaledStats.range || '0'} studs</span>
             </div>
             <div class="inventory-stat-row">
                 <span class="inventory-stat-label">
@@ -3927,7 +4320,6 @@
                 </span>
             </div>
         `;
-
             } else {
                 statsHTML = `
             <div class="inventory-stat-row">
@@ -3957,20 +4349,25 @@
         `;
             }
 
+            const isLockedItem = isItemLocked && lockedItemType === highestItem;
+
             previewCard.innerHTML = `
-            <div class="preview-header" style="display: flex; align-items: center; flex-direction: column; margin-bottom: 10px; margin-top: -5px;">
-            </div>
+        <div class="preview-header" style="display: flex; align-items: center; flex-direction: column; margin-bottom: 10px; margin-top: -5px;">
+        </div>
         <div class="inventory-card-header" style="justify-content: space-between; border-color: ${oreColor}40; position: relative;">
             ${itemImage ? `
                 <div class="forge-result-image" style="border-color: ${oreColor}; background-image: url('${itemImage}'); width: 120px; height: 90px;"></div>
             ` : ''}
             <div style="flex-grow: 1; margin-left: 10px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
-                <div class="inventory-card-item" style="color: ${oreColor}; margin-bottom: 5px;">${mainOre?.name || 'Unknown Ore'} ${baseItemName}</div>
+                <div class="inventory-card-item" style="color: ${oreColor}; margin-bottom: 5px; display: flex; align-items: center; gap: 8px;">
+                    ${mainOre?.name || 'Unknown Ore'} ${baseItemName}
+                    ${isLockedItem ? '<span class="preview-lock-indicator"><i class="fas fa-lock" style="font-size: 0.6rem;"></i> Locked</span>' : ''}
+                </div>
                 <div style="display: flex; align-items: center; gap: 5px; position: relative; flex-wrap: wrap;">
                     <span style="color: var(--text-secondary);font-weight: bold; background: ${oreColor}20; padding: 2px 8px 2px 8px; border-radius: 10px; border: 1px solid ${oreColor}40;">
                         <div class="preview-tooltip-trigger" data-item-type="${highestItem}" style="cursor: pointer; color: ${oreColor}; font-size: 0.8rem;">
                         <i class="fas fa-info-circle"></i> ${highestItem}
-<div class="preview-variant-tooltip" style="display: none; position: absolute; background: var(--card-bg); border: 1px solid ${oreColor}; border-radius: 8px; padding: 10px; min-width: 180px; max-width: 220px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); left: -60px;">
+                        <div class="preview-variant-tooltip" style="display: none; position: absolute; background: var(--card-bg); border: 1px solid ${oreColor}; border-radius: 8px; padding: 10px; min-width: 180px; max-width: 220px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); left: -60px;">
                             <div style="font-weight: bold; color: ${oreColor}; margin-bottom: 5px; font-size: 0.8rem;">Available Variants</div>
                             <div style="color: var(--text-secondary); font-size: 0.75rem; line-height: 1.3;">
                                 ${getPreviewTooltipContent(highestItem, oreColor)}
@@ -3995,8 +4392,12 @@
         ${traitsHTML}
         
         <div class="prediction-note">
-            <i class="fas fa-info-circle"></i> <span style="font-weight: bold;">${(calculateFinalProbability(highestItem, highestProb) * 100).toFixed(2)}%</span> forge chance for the ${selectedPreviewVariant.variantName || highestItem} variant.
-        </div
+            <i class="fas fa-info-circle"></i> 
+            <span style="font-weight: bold;">
+               ${(calculateFinalProbability(highestItem, highestProb) * 100).toFixed(2) + '%'}
+            </span> 
+            forge chance for the ${selectedPreviewVariant.variantName || highestItem} variant.
+        </div>
     `;
 
             previewCard.style.background = `linear-gradient(135deg, ${oreColor}15 0%, ${oreColor}08 25%, rgba(0,0,0,0.1) 50%, ${oreColor}08 75%, ${oreColor}15 100%)`;
@@ -4037,6 +4438,13 @@
 
 
         function calculateFinalProbability(itemType, itemTypeProb) {
+            if (isItemLocked && lockedItemType) {
+                if (itemType !== lockedItemType) {
+                    return 0;
+                }
+                itemTypeProb = 1.0;
+            }
+
             const variants = specificItemVariants[currentMode]?.[itemType]?.[currentArea];
 
             if (!variants || variants.length === 0) {
@@ -4155,7 +4563,15 @@
             }
         }
 
+        function isCurrentItemLocked() {
+            return isItemLocked && lockedItemType;
+        }
+
         function showVariantTooltip(itemName, event, typeClass = '') {
+            const existingTooltip = document.getElementById('variant-tooltip');
+            if (existingTooltip.style.display === 'block') {
+                existingTooltip.style.display = 'none';
+            }
             const tooltip = document.getElementById('variant-tooltip');
             const tooltipTitle = document.getElementById('tooltip-item-name');
             const tooltipContent = document.getElementById('tooltip-content');
@@ -4196,22 +4612,24 @@
 
             tooltipTitle.textContent = `${itemName} Variants`;
 
-            positionTooltip(tooltip, event);
+            positionTooltipRelativeToElement(tooltip, probabilityItem);
 
             tooltip.style.display = 'block';
+            tooltip.classList.add('showing');
         }
 
-        function positionTooltip(tooltip, event) {
+        function positionTooltipRelativeToElement(tooltip, element) {
             tooltip.style.display = 'block';
+
+            tooltip.offsetHeight;
+
             const tooltipRect = tooltip.getBoundingClientRect();
+            const elementRect = element.getBoundingClientRect();
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
 
-            const clickX = event.clientX;
-            const clickY = event.clientY;
-
-            let top = clickY + 10;
-            let left = clickX;
+            let left = elementRect.left + (elementRect.width / 2) - (tooltipRect.width / 2);
+            let top = elementRect.bottom + 10;
 
             if (left + tooltipRect.width > viewportWidth - 10) {
                 left = viewportWidth - tooltipRect.width - 10;
@@ -4222,21 +4640,18 @@
             }
 
             if (top + tooltipRect.height > viewportHeight - 10) {
-                top = clickY - tooltipRect.height - 10;
+                top = elementRect.top - tooltipRect.height - 10;
 
                 if (top < 10) {
-                    top = viewportHeight - tooltipRect.height - 10;
+                    top = 10;
                 }
-            }
-
-            if (top < 10) {
-                top = 10;
             }
 
             tooltip.style.position = 'fixed';
             tooltip.style.top = `${top}px`;
             tooltip.style.left = `${left}px`;
-            tooltip.style.transform = 'none';
+            tooltip.style.zIndex = '1001';
+            tooltip.classList.add('variant-tooltip-fix');
         }
 
         function updateAreaToggle() {
@@ -4279,6 +4694,7 @@
 
                         areaDropdown.classList.remove('show');
                         selectedPreviewVariant = { baseItemType: null, variantName: null };
+                        clearLock();
 
                         updateProbabilities();
                         updateItemPreview();
@@ -4394,6 +4810,7 @@
 
             updateOreSlots();
             updateProbabilities();
+            checkLockValidity();
         }
 
         function removeOreFromMix(oreId) {
@@ -4409,6 +4826,7 @@
 
             updateOreSlots();
             updateProbabilities();
+            checkLockValidity();
         }
 
         function updateOreSlots() {
@@ -4584,8 +5002,8 @@
             const optimal = currentMode === 'weapon' ? optimalCounts.weapon : optimalCounts.armor;
 
             let closestCount = 3;
-            if (totalOres >= 50) {
-                closestCount = 50;
+            if (totalOres >= 55) {
+                closestCount = 55;
             } else if (totalOres >= 3) {
                 const counts = Object.keys(probabilities).map(Number);
                 closestCount = counts.reduce((prev, curr) => {
@@ -4597,6 +5015,12 @@
 
             Object.entries(currentProbs).forEach(([itemName, probability]) => {
                 const probabilityPercent = (probability * 100).toFixed(1);
+
+                const requiredOres = getRequiredOresForLock(itemName);
+                const isLockable = totalOres >= requiredOres;
+                const isLocked = lockedItemType === itemName;
+                const isUnavailable = isItemLocked && !isLocked;
+                const displayPercent = isLocked ? '100' : probabilityPercent;
 
                 let typeClass = '';
                 if (currentMode === 'weapon') {
@@ -4617,26 +5041,70 @@
                 }
 
                 const itemElement = document.createElement('div');
-                itemElement.className = `probability-item ${typeClass}`;
+                itemElement.className = `probability-item ${typeClass} ${isLocked ? 'locked' : ''} ${isUnavailable ? 'unavailable' : ''}`;
                 itemElement.dataset.itemName = itemName;
+
+                let lockIconClass = 'lock-icon';
+                if (isLocked) {
+                    lockIconClass += ' locked';
+                } else if (isLockable) {
+                    lockIconClass += ' available';
+                } else {
+                    lockIconClass += ' disabled';
+                }
+
+                let lockTooltipContent = '';
+                if (isLocked) {
+                    lockTooltipContent = `Click to unlock ${itemName}`;
+                } else if (isLockable) {
+                    lockTooltipContent = `Click to lock ${itemName}`;
+                } else {
+                    const needed = requiredOres - totalOres;
+                    lockTooltipContent = `Need ${needed} more ore${needed !== 1 ? 's' : ''} (${requiredOres} total)`;
+                }
 
                 itemElement.innerHTML = `
             <div class="item-header">
                 <div class="item-name">${itemName}</div>
-                <div class="probability-value">${probabilityPercent}%</div>
+                <div class="lock-icon-container">
+                    <div class="${lockIconClass}" data-item="${itemName}">
+                        <i class="fas ${isLocked ? 'fa-lock' : 'fa-unlock'}"></i>
+                        <div class="lock-tooltip" style="opacity: 1 !important;">
+                            ${lockTooltipContent}
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="probability-bar">
-                <div class="probability-fill" style="width: ${probabilityPercent}%"></div>
+            
+            <div class="probability-bar-container">
+                <div class="probability-bar">
+                    <div class="probability-fill" style="width: ${displayPercent}%"></div>
+                </div>
+                <div class="percentage-center">${displayPercent}%</div>
             </div>
         `;
 
+                const lockIcon = itemElement.querySelector('.lock-icon');
+
+                if (!lockIcon.classList.contains('disabled')) {
+                    lockIcon.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        toggleItemLock(itemName);
+                    });
+                }
+
                 itemElement.addEventListener('click', (e) => {
-                    showVariantTooltip(itemName, e, typeClass);
-                    e.stopPropagation();
+                    if (!e.target.closest('.lock-icon') && !e.target.closest('.lock-icon-container')) {
+                        if (!isUnavailable) {
+                            showVariantTooltip(itemName, e, typeClass);
+                        }
+                    }
                 });
 
                 itemElement.addEventListener('mouseenter', () => {
-                    itemElement.style.cursor = 'pointer';
+                    if (!isUnavailable) {
+                        itemElement.style.cursor = 'pointer';
+                    }
                 });
 
                 probabilityList.appendChild(itemElement);
@@ -4650,12 +5118,27 @@
             </div>
         `;
             }
+
+            updateForgeButtonState();
+        }
+
+        function closeModalSmoothly(modal) {
+            modal.classList.remove('show');
+
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+            }, 300);
         }
 
         function setupQuickCraft() {
             quickCraftBtn.addEventListener('click', () => {
                 quickCraftModal.style.display = 'flex';
-                setTimeout(() => quickCraftModal.classList.add('show'), 10);
+                quickCraftModal.offsetHeight;
+
+                requestAnimationFrame(() => {
+                    quickCraftModal.classList.add('show');
+                });
 
                 if (window.innerWidth <= 480) {
                     document.body.classList.add('modal-open');
@@ -4664,39 +5147,24 @@
                 resetQuickCraft();
                 showStep(0);
                 updateProgressBar(0);
-                setTimeout(() => quickCraftModal.focus(), 10);
             });
 
             modalClose.addEventListener('click', () => {
-                resetQuickCraft();
-                quickCraftModal.style.animation = 'fadeOut 0.3s ease';
-                setTimeout(() => {
-                    quickCraftModal.style.display = 'none';
-                    quickCraftModal.classList.remove('show');
-                    quickCraftModal.style.animation = '';
-                    document.body.classList.remove('modal-open');
-                }, 300);
+                closeModalSmoothly(quickCraftModal);
                 resetQuickCraft();
             });
 
             quickCraftModal.addEventListener('click', (e) => {
                 if (e.target === quickCraftModal) {
+                    closeModalSmoothly(quickCraftModal);
                     resetQuickCraft();
-                    quickCraftModal.style.animation = 'fadeOut 0.3s ease';
-                    setTimeout(() => {
-                        quickCraftModal.style.display = 'none';
-                        quickCraftModal.classList.remove('show');
-                        quickCraftModal.style.animation = '';
-                        document.body.classList.remove('modal-open');
-                    }, 300);
                 }
             });
 
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && quickCraftModal.style.display === 'flex') {
+                if (e.key === 'Escape' && quickCraftModal.classList.contains('show')) {
+                    closeModalSmoothly(quickCraftModal);
                     resetQuickCraft();
-                    quickCraftModal.style.display = 'none';
-                    document.body.classList.remove('modal-open');
                 }
             });
 
@@ -5289,7 +5757,6 @@
             return hasLegendaryOrRarerKingdom || hasRareOrRarerFrostspireOrPeak;
         }
 
-        // Update the calculateScaledStats function to include DPS calculation
         function calculateScaledStats(itemName, statsMultiplier, priceMultiplier) {
             const stats = baseItemStats[currentMode][itemName];
             if (!stats) return null;
@@ -5300,7 +5767,6 @@
                 scaled.damage = stats.damage * statsMultiplier;
                 scaled.price = stats.price * priceMultiplier;
 
-                // Calculate DPS with and without traits
                 const dpsInfo = calculateRealDPSWithTraits(scaled.damage, stats.realSpeed, scaled);
                 scaled.baseDps = dpsInfo.baseDps;
                 scaled.dpsWithTraits = dpsInfo.dpsWithTraits;
@@ -5399,20 +5865,24 @@
 
                 const currentProbs = probabilities[closestCount] || {};
 
-                let random = Math.random();
-                selectedItemType = null;
-                let cumulativeProb = 0;
+                if (isItemLocked && lockedItemType) {
+                    selectedItemType = lockedItemType;
+                } else {
+                    let random = Math.random();
+                    selectedItemType = null;
+                    let cumulativeProb = 0;
 
-                for (const [itemType, prob] of Object.entries(currentProbs)) {
-                    cumulativeProb += prob;
-                    if (random <= cumulativeProb) {
-                        selectedItemType = itemType;
-                        break;
+                    for (const [itemType, prob] of Object.entries(currentProbs)) {
+                        cumulativeProb += prob;
+                        if (random <= cumulativeProb) {
+                            selectedItemType = itemType;
+                            break;
+                        }
                     }
-                }
 
-                if (!selectedItemType) {
-                    selectedItemType = Object.keys(currentProbs)[0];
+                    if (!selectedItemType) {
+                        selectedItemType = Object.keys(currentProbs)[0];
+                    }
                 }
             }
 
@@ -5642,7 +6112,12 @@
     `;
 
             modal.style.display = 'flex';
-            modal.classList.add('show');
+            modal.offsetHeight;
+
+            requestAnimationFrame(() => {
+                modal.classList.add('show');
+            });
+
             if (window.innerWidth <= 480) {
                 document.body.classList.add('modal-open');
             }
@@ -5655,11 +6130,9 @@
             const forgeAgainBtn = document.getElementById('forge-again-btn');
 
             function closeModal() {
-                modal.style.animation = 'fadeOut 0.3s ease';
+                modal.classList.remove('show');
                 setTimeout(() => {
                     modal.style.display = 'none';
-                    modal.classList.remove('show');
-                    modal.style.animation = '';
                     document.body.classList.remove('modal-open');
                 }, 300);
             }
@@ -5755,7 +6228,8 @@
                 critChanceIncrease: 0,
                 critDamageIncrease: 0,
                 attackSpeedIncrease: 0,
-                onHitEffects: []
+                onHitEffects: [],
+                flatDamageEffects: []
             };
 
             oreMix.forEach(item => {
@@ -5780,7 +6254,7 @@
                                 scaledValues[key] = Math.round(value * 10) / 10;
                             });
 
-                            categorizeTrait(trait, scaledValues, traits);
+                            categorizeTrait(trait, scaledValues, traits, percentage);
                         }
                     });
                 }
@@ -5821,10 +6295,22 @@
                 }
             }
 
-            // On-hit effects
-            if (desc.includes('explosion') || desc.includes('fire') ||
+            // On-hit flat damage effects
+            if (desc.includes('flat damage') || (trait.scaling.damage && !desc.includes('% of'))) {
+                if (scaledValues.damage !== undefined && scaledValues.chance !== undefined) {
+                    const avgFlatDamage = (scaledValues.chance / 100) * scaledValues.damage;
+                    traits.flatDamageEffects.push({
+                        type: 'flat',
+                        avgFlatDamage: avgFlatDamage,
+                        procChance: scaledValues.chance / 100,
+                        flatDamage: scaledValues.damage
+                    });
+                }
+            }
+            // Percentage-based on-hit effects
+            else if (desc.includes('explosion') || desc.includes('fire') ||
                 desc.includes('poison') || desc.includes('burn') ||
-                desc.includes('deal') || desc.includes('damage') && desc.includes('on hit')) {
+                desc.includes('deal') || (desc.includes('damage') && desc.includes('on hit'))) {
 
                 if (scaledValues.damage !== undefined && scaledValues.chance !== undefined) {
                     const effectMultiplier = (scaledValues.chance / 100) * (scaledValues.damage / 100);
@@ -5876,7 +6362,12 @@
                 onHitEffectDamage += effect.avgDamageMultiplier * baseDamageWithTraits;
             });
 
-            const totalAvgDamagePerHit = avgDamagePerHit + onHitEffectDamage;
+            let flatDamagePerHit = 0;
+            weaponTraits.flatDamageEffects.forEach(effect => {
+                flatDamagePerHit += effect.avgFlatDamage;
+            });
+
+            const totalAvgDamagePerHit = avgDamagePerHit + onHitEffectDamage + flatDamagePerHit;
             const dpsWithTraits = totalAvgDamagePerHit / adjustedAttackSpeed;
             const baseDps = baseDamage / baseRealSpeed;
 
@@ -5890,7 +6381,9 @@
                     critDamageIncrease: weaponTraits.critDamageIncrease,
                     attackSpeedIncrease: weaponTraits.attackSpeedIncrease,
                     onHitEffectCount: weaponTraits.onHitEffects.length,
-                    totalOnHitMultiplier: weaponTraits.onHitEffects.reduce((sum, effect) => sum + effect.avgDamageMultiplier, 0) * 100
+                    flatDamageEffectCount: weaponTraits.flatDamageEffects.length,
+                    totalOnHitMultiplier: weaponTraits.onHitEffects.reduce((sum, effect) => sum + effect.avgDamageMultiplier, 0) * 100,
+                    totalFlatDamage: weaponTraits.flatDamageEffects.reduce((sum, effect) => sum + effect.avgFlatDamage, 0)
                 }
             };
         }
@@ -5902,6 +6395,7 @@
                 armorToggle.classList.remove('active');
                 applyColorScheme(weaponColors);
                 resetPreviewSelection();
+                clearLock();
                 updateProbabilities();
                 updateItemPreview();
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
@@ -5913,6 +6407,7 @@
                 weaponToggle.classList.remove('active');
                 applyColorScheme(armorColors);
                 resetPreviewSelection();
+                clearLock();
                 updateProbabilities();
                 updateItemPreview();
                 updateActiveTraits(oreMix.reduce((sum, item) => sum + item.count, 0));
@@ -5923,6 +6418,7 @@
                 oreSearchInput.value = '';
                 currentSearchTerm = '';
                 resetPreviewSelection();
+                clearLock();
                 renderOreInventory();
                 updateOreSlots();
                 updateProbabilities();
