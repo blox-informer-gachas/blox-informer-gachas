@@ -1100,7 +1100,7 @@
         }
 
         .forge-tag {
-            padding: 6px 15px;
+            padding: 4px 10px;
             border-radius: 20px;
             font-size: 0.70rem;
             font-weight: bold;
@@ -2321,6 +2321,69 @@
         #variant-tooltip.showing {
             display: block !important;
         }
+
+        .quality-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid var(--text-secondary);
+        }
+
+        .quality-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .quality-label i {
+            color: var(--text-secondary);
+        }
+
+        .quality-slider {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, var(--error), var(--warning), var(--success));
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .quality-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .quality-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .quality-value {
+            min-width: 40px;
+            font-weight: bold;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
     </style>
 </head>
 
@@ -2453,8 +2516,7 @@
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div class="filters-dropdown" style="position: relative;">
                         <button class="filter-btn dropdown-toggle" id="area-toggle-btn">
-                            <i class="fas fa-map-marker-alt"></i> <span style="font-weight: 600;"
-                                id="area-label">Frostspire Expanse</span>
+                            <i class="fas fa-map-marker-alt"></i> <span style="font-weight: 600;" id="area-label">Frostspire Expanse</span>
                             <i class="fas fa-chevron-down" style="font-size: 0.8rem; margin-left: 5px;"></i>
                         </button>
                         <div class="dropdown-menu" id="area-dropdown" style="min-width: 180px;">
@@ -2487,6 +2549,15 @@
                 </div>
             </div>
 
+            <div class="quality-slider-container">
+                <div class="quality-label">
+                    <i class="fas fa-gem"></i>
+                    <span>Quality:</span>
+                </div>
+                <input type="range" min="0" max="100" value="100" class="quality-slider" id="quality-slider">
+                <div class="quality-value" id="quality-value">100%</div>
+            </div>
+
             <div class="forge-preview-container" id="item-preview-container">
                 <div class="forge-preview-placeholder" id="forge-preview-placeholder">
                     <i class="fas fa-info-circle"></i>
@@ -2496,6 +2567,7 @@
                 <div class="inventory-card forge-preview-card" id="forge-preview-card" style="display: none;">
                 </div>
             </div>
+            
             <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" class="controls">
                 <button class="control-btn forge-btn" id="forge-btn">
                     <i class="fas fa-fire"></i> Forge Item
@@ -2508,6 +2580,7 @@
                     <i class="fas fa-redo"></i> Reset Forge
                 </button>
             </div>
+            
             <div class="traits-container">
                 <div class="section-title">
                     <span><i class="fas fa-magic"></i> Ore Traits</span>
@@ -3394,8 +3467,8 @@
             {
                 id: 34, name: "Demonite", multiplier: 5.5, rarity: "mythical", area: "kingdom", color: "#7d1b1d", traitType: "armor", traits: [
                     {
-                        description: "Deals {damage}% of weapon damage as fire per second for 2 seconds. 15% chance on hit and 25% chance when hit by an enemy.",
-                        scaling: { damage: { min: 2, max: 20 } }, type: "armor"
+                        description: "Deals {damage}% of weapon damage as fire per second for 2 seconds. {chance}% on hit and {chance2}% chance when hit by an enemy.",
+                        scaling: { damage: { min: 2, max: 20 }, chance: { min: 1.5, max: 15 }, chance2: { min: 2.5, max: 25 } }, type: "armor"
                     }
                 ]
             },
@@ -3686,7 +3759,7 @@
         let currentMode = 'weapon';
         let oreMix = [];
         let activeFilter = 'all';
-
+        let qualityFactor = 1.0;
         let lockedItemType = null;
         let lockRequirements = {};
         let isItemLocked = false;
@@ -3767,6 +3840,11 @@
                 tooltip.classList.remove('showing');
             }
         });
+
+
+        function getQualityFactor() {
+            return 0.5 + (qualityFactor * 0.5);
+        }
 
         function getRequiredOresForLock(itemType) {
             if (currentMode === 'weapon') {
@@ -5762,10 +5840,11 @@
             if (!stats) return null;
 
             const scaled = { ...stats };
+            const qualityScale = getQualityFactor();
 
             if (currentMode === 'weapon') {
-                scaled.damage = stats.damage * statsMultiplier;
-                scaled.price = stats.price * priceMultiplier;
+                scaled.damage = stats.damage * statsMultiplier * qualityScale;
+                scaled.price = stats.price * priceMultiplier * qualityScale;
 
                 const dpsInfo = calculateRealDPSWithTraits(scaled.damage, stats.realSpeed, scaled);
                 scaled.baseDps = dpsInfo.baseDps;
@@ -5773,8 +5852,8 @@
                 scaled.adjustedAttackSpeed = dpsInfo.adjustedAttackSpeed;
                 scaled.traitSummary = dpsInfo.traitSummary;
             } else {
-                scaled.def = stats.def * statsMultiplier;
-                scaled.price = stats.price * priceMultiplier;
+                scaled.def = stats.def * statsMultiplier * qualityScale;
+                scaled.price = stats.price * priceMultiplier * qualityScale;
             }
 
             if (hasValueMultiplier()) {
@@ -6011,6 +6090,7 @@
             const itemImage = itemImages[result.itemName] || '';
             const dps = currentMode === 'weapon' ? (result.stats.damage / result.stats.realSpeed) : null;
             const baseDps = result.stats.damage / result.stats.realSpeed;
+            const qualityScale = getQualityFactor();
 
             content.innerHTML = `
         <div class="forge-result-container" style="background: linear-gradient(135deg, ${bgColor}15 0%, ${bgColor}08 25%, rgba(0,0,0,0.1) 50%, ${bgColor}08 75%, ${bgColor}15 100%); border: 2px solid ${bgColor}40;">
@@ -6031,7 +6111,7 @@
                             <i class="fas fa-percent"></i> ${result.statsMultiplier.toFixed(2)}x Multi
                         </div>
                         <div class="forge-tag" style="background: var(--primary-light); color: var(--text-secondary);">
-                            <i class="fas fa-star"></i> [100]% Masterwork
+                            <i class="fas fa-star"></i> ${((qualityScale - 0.5) * 200).toFixed(0)}% Quality
                         </div>
                         <div class="forge-tag" style="background: ${bgColor}30; color: ${bgColor}; border-color: ${bgColor};">
                             <i class="fas fa-gem"></i> ${result.mainOre?.name || 'Stone'}
@@ -6087,9 +6167,6 @@
             
             ${result.traits.length > 0 ? `
                 <div class="traits-section">
-                    <div class="section-title">
-                        <span><i class="fas fa-magic"></i> Item Traits</span>
-                    </div>
                     <div class="traits-list-container">
                         ${result.traits.map(trait => `
                             <div class="forge-trait-item" style="border-color: ${trait.oreColor || 'var(--primary)'}40;">
@@ -6441,6 +6518,15 @@
                     simulateForge();
                 });
             }
+
+            const qualitySlider = document.getElementById('quality-slider');
+            const qualityValue = document.getElementById('quality-value');
+            
+            qualitySlider.addEventListener('input', function() {
+                qualityFactor = parseInt(this.value) / 100;
+                qualityValue.textContent = `${this.value}%`;
+                updateItemPreview();
+            });
         }
 
         document.addEventListener('DOMContentLoaded', init);
