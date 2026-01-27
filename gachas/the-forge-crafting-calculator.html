@@ -784,33 +784,6 @@
         }
 
         /* Stats & Traits */
-        .stat-box {
-            background: linear-gradient(135deg, var(--primary-light), rgba(0, 0, 0, 0.2));
-            border-radius: var(--border-radius);
-            padding: 5px;
-            text-align: center;
-            border: 1px solid var(--primary-light);
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s ease;
-        }
-
-        .stat-box:hover {
-            border: 1px solid var(--primary);
-            transition: all 0.3s ease;
-        }
-
-        .stat-title {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--primary);
-            text-shadow: 0 0 10px var(--primary-glow);
-        }
 
         /* Traits Section */
         .traits-container {
@@ -904,8 +877,7 @@
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .probability-item::before,
-        .inventory-card::before {
+        .probability-item::before {
             content: '';
             position: absolute;
             top: 0;
@@ -917,8 +889,7 @@
             transition: opacity var(--animation-speed) ease;
         }
 
-        .probability-item:hover::before,
-        .inventory-card:hover::before {
+        .probability-item:hover::before {
             opacity: 1;
         }
 
@@ -1048,148 +1019,6 @@
         }
 
         /* Forge Result Modal */
-        .forge-result-container {
-            padding: 15px 10px;
-            border-radius: var(--border-radius);
-        }
-
-        #forge-result-content {
-            max-width: 700px;
-            animation: modalSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .forge-result-header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 10px;
-        }
-
-        .forge-result-image {
-            width: 140px;
-            height: 105px;
-            background-size: cover;
-            background-position: center;
-            border-radius: 10px;
-            border: 3px solid;
-            box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
-            flex-shrink: 0;
-        }
-
-        .forge-result-details {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .forge-result-name {
-            font-size: 1.4rem;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .forge-result-type {
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-            color: var(--text-secondary);
-        }
-
-        .forge-result-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .forge-tag {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.70rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid var(--primary-dark);
-            text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
-        }
-
-        .forge-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .forge-stat-item {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 5px;
-            border: 1px solid var(--primary-light);
-            text-align: center;
-            transition: all var(--animation-speed) ease;
-        }
-
-        .forge-stat-item:hover {
-            background: rgba(0, 0, 0, 0.05);
-            border-color: var(--primary);
-            box-shadow: var(--glow);
-            transform: translateY(-3px);
-            transition: all var(--animation-speed) ease;
-        }
-
-        .forge-stat-label {
-            color: var(--text);
-            font-size: 0.7rem;
-            opacity: 0.7;
-        }
-
-        .forge-stat-value {
-            font-size: 1rem;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        .traits-section {
-            margin-top: 10px;
-        }
-
-        .traits-list-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .trait-placeholder {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .forge-trait-item {
-            background: var(--primary-light);
-            border: 1px solid var(--primary-light);
-            border-radius: 10px;
-            padding: 5px 10px;
-            transition: all var(--animation-speed);
-        }
-
-        .forge-trait-item:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--glow);
-        }
-
-        .forge-trait-ore {
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            gap: 6px;
-            text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
-        }
-
-        .forge-trait-desc {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
 
         /* Area Toggle */
         #area-toggle-btn {
@@ -1572,7 +1401,6 @@
 
         @media (max-width: 480px) {
             body.modal-open {
-                position: fixed;
                 overflow: hidden;
                 width: 100%;
                 height: 100%;
@@ -1732,274 +1560,7 @@
             padding: 10px;
         }
 
-        .inventory-card {
-            background: linear-gradient(135deg,
-                    rgba(30, 30, 30, 0.9) 0%,
-                    rgba(20, 20, 20, 0.95) 100%);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            border: 2px solid var(--border);
-            position: relative;
-            overflow: hidden;
-            min-height: 200px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0px 12px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s ease;
-        }
 
-        .inventory-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: linear-gradient(45deg, var(--ore-color-light) 25%, transparent 25%, transparent 50%, var(--ore-color-light) 50%, var(--ore-color-light) 75%, transparent 75%, transparent);
-            background-size: 6px 6px;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .inventory-card:hover {
-            box-shadow: 0 0 12px var(--primary-glow);
-
-            border-color: var(--primary);
-        }
-
-        .inventory-card-header {
-            position: relative;
-            z-index: 1;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-        }
-
-        .inventory-card-ore {
-            color: var(--primary);
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .inventory-card-item {
-            color: var(--text);
-            font-weight: bold;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-        }
-
-        .inventory-card-stats {
-            position: relative;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 8px;
-            padding: 8px 12px 0px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .inventory-stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            position: relative;
-            padding: 4px 0;
-        }
-
-        .inventory-stat-row:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg,
-                    transparent 0%,
-                    rgba(255, 255, 255, 0.1) 50%,
-                    transparent 100%);
-        }
-
-        .inventory-stat-label {
-            color: var(--text-secondary);
-            flex: 1;
-            font-weight: 600;
-        }
-
-        .inventory-stat-value {
-            color: var(--text);
-            font-weight: bold;
-            text-align: right;
-            min-width: 60px;
-        }
-
-        .inventory-card-traits {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-wrap: wrap;
-            flex-direction: row-reverse;
-            gap: 6px;
-            margin-top: 10px;
-        }
-
-        .trait-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(0, 0, 0, 0.6);
-            position: relative;
-        }
-
-        .trait-icon::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg,
-                    rgba(255, 255, 255, 0.1) 0%,
-                    rgba(255, 255, 255, 0.05) 50%,
-                    rgba(255, 255, 255, 0) 100%);
-            z-index: 1;
-        }
-
-        .trait-icon:hover {
-            transform: translateY(-3px) scale(1.1);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .trait-icon i {
-            color: white;
-            text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
-        }
-
-        .trait-tooltip {
-            position: absolute;
-            bottom: 120%;
-            right: 0;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px;
-            font-size: 0.8rem;
-            min-width: 180px;
-            max-width: 220px;
-            display: none;
-            z-index: 10;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        }
-
-        .trait-icon:nth-child(2) .trait-tooltip {
-            left: 50%;
-            right: auto;
-            transform: translateX(-80%);
-        }
-
-        .trait-icon:nth-child(3) .trait-tooltip {
-            right: 50%;
-            left: auto;
-            transform: translateX(35%);
-        }
-
-        .trait-icon:nth-child(4) .trait-tooltip {
-            left: 50%;
-            right: auto;
-            transform: translateX(-50%);
-        }
-
-        .trait-icon:hover .trait-tooltip {
-            display: block;
-        }
-
-        .trait-tooltip strong {
-            color: var(--primary);
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .trait-tooltip p {
-            color: var(--text-secondary);
-            margin: 0;
-            line-height: 1.3;
-        }
-
-        .inventory-empty {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-        }
-
-        .inventory-empty i {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .forge-preview-container {
-            margin: 15px 0;
-            border-radius: var(--border-radius);
-            background: rgba(0, 0, 0, 0.2);
-            border: 2px dashed var(--border);
-            align-items: center;
-            transition: all var(--animation-speed);
-        }
-
-        .forge-preview-container.has-preview {
-            background: transparent;
-            border: none;
-        }
-
-        .forge-preview-placeholder {
-            text-align: center;
-            color: var(--text-secondary);
-            padding: 40px 20px;
-        }
-
-        .forge-preview-placeholder i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .forge-preview-placeholder p {
-            font-size: 0.95rem;
-        }
-
-        .prediction-note {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            text-align: center;
-            font-style: italic;
-            margin-top: 10px;
-        }
-
-        .preview-tooltip-trigger {
-            position: relative;
-            transition: all 0.2s ease;
-        }
-
-        .preview-tooltip-trigger:hover {
-            transition: all 0.2s ease;
-        }
-
-        .preview-variant-tooltip {
-            pointer-events: auto !important;
-            max-height: 260px;
-            overflow-y: auto;
-        }
 
         .quick-craft-progress {
             display: flex;
@@ -2274,11 +1835,6 @@
             display: block;
         }
 
-        .variant-tooltip-fix {
-            position: fixed;
-            z-index: 1001;
-        }
-
         .preview-lock-indicator {
             display: inline-flex;
             align-items: center;
@@ -2311,16 +1867,7 @@
             }
         }
 
-        #variant-tooltip {
-            max-width: 300px;
-            max-height: 60vh;
-            overflow-y: auto;
-            z-index: 1001;
-        }
-
-        #variant-tooltip.showing {
-            display: block !important;
-        }
+        /* Quality slider */
 
         .quality-slider-container {
             display: flex;
@@ -2384,6 +1931,370 @@
             text-align: center;
         }
 
+        /* Everything item card related */
+        .item-card {
+            background: linear-gradient(135deg,
+                    rgba(30, 30, 30, 0.9) 0%,
+                    rgba(20, 20, 20, 0.95) 100%);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            border: 2px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg,
+                    var(--ore-color-light) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    var(--ore-color-light) 50%,
+                    var(--ore-color-light) 75%,
+                    transparent 75%,
+                    transparent);
+            background-size: 6px 6px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .item-card.inventory::before {
+            opacity: 1;
+        }
+
+        .item-card:hover {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+
+        }
+
+        .trait-placeholder {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .forge-preview-placeholder {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px 20px;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+        }
+
+        .forge-preview-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .forge-preview-placeholder p {
+            font-size: 0.95rem;
+        }
+
+        .item-card-header {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .item-card-image {
+            width: 120px;
+            height: 90px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+            border: 2px solid;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+            flex-shrink: 0;
+        }
+
+        .item-card-ore {
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .item-card-name {
+            color: var(--text);
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            margin-bottom: 8px;
+        }
+
+        .item-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .item-card-tag {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid;
+            text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
+        }
+
+        .item-card-variant-selector {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .item-card-variant-trigger {
+            background: var(--ore-color-light);
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--ore-color);
+            color: var(--ore-color);
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .item-card-variant-trigger:hover {
+            background: var(--ore-color);
+            color: white;
+        }
+
+        .variant-tooltip {
+            display: none;
+            position: absolute;
+            background: var(--card-bg);
+            border: 1px solid var(--ore-color);
+            border-radius: 8px;
+            padding: 10px;
+            min-width: 180px;
+            max-width: 220px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            top: 100%;
+            left: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1001;
+        }
+
+
+        .variant-tooltip.showing {
+            display: block !important;
+        }
+
+        .item-card-variant-selector:hover .variant-tooltip {
+            display: block;
+        }
+
+        .item-card-stats {
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .item-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            position: relative;
+            padding: 4px 0;
+        }
+
+        .item-stat-row:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    transparent 100%);
+        }
+
+        .item-stat-label {
+            color: var(--text-secondary);
+            flex: 1;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .item-stat-value {
+            color: var(--text);
+            font-weight: bold;
+            text-align: right;
+            min-width: 70px;
+        }
+
+        .item-card-traits {
+            position: relative;
+            z-index: 2;
+            margin-top: 10px;
+        }
+
+        /* Trait stuff */
+        .traits-full-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .trait-full-item {
+            background: var(--ore-color-light);
+            border: 1px solid var(--ore-color-light);
+            border-radius: 8px;
+            padding: 8px 12px;
+            transition: all var(--animation-speed);
+        }
+
+        .trait-full-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--glow);
+        }
+
+        .trait-full-ore {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            gap: 6px;
+            text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
+            margin-bottom: 4px;
+        }
+
+        .trait-full-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .traits-icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .trait-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        .trait-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.1) 0%,
+                    rgba(255, 255, 255, 0.05) 50%,
+                    rgba(255, 255, 255, 0) 100%);
+            z-index: 1;
+        }
+
+        .trait-icon:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .trait-icon i {
+            color: white;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+            z-index: 2;
+            position: relative;
+        }
+
+        /* Trait tooltips */
+        .trait-tooltip {
+            position: absolute;
+            bottom: 120%;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 0.8rem;
+            min-width: 180px;
+            max-width: 220px;
+            display: none;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .trait-icon:hover .trait-tooltip {
+            display: block;
+        }
+
+        .trait-tooltip strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .trait-tooltip p {
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .item-card-forge-chance {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .item-card.forged {
+            background: linear-gradient(135deg,
+                    var(--ore-color-light) 0%,
+                    var(--ore-color-light) 15%,
+                    rgba(0, 0, 0, 0.1) 50%,
+                    var(--ore-color-light) 85%,
+                    var(--ore-color-light) 100%);
+        }
     </style>
 </head>
 
@@ -2516,7 +2427,8 @@
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div class="filters-dropdown" style="position: relative;">
                         <button class="filter-btn dropdown-toggle" id="area-toggle-btn">
-                            <i class="fas fa-map-marker-alt"></i> <span style="font-weight: 600;" id="area-label">Frostspire Expanse</span>
+                            <i class="fas fa-map-marker-alt"></i> <span style="font-weight: 600;"
+                                id="area-label">Frostspire Expanse</span>
                             <i class="fas fa-chevron-down" style="font-size: 0.8rem; margin-left: 5px;"></i>
                         </button>
                         <div class="dropdown-menu" id="area-dropdown" style="min-width: 180px;">
@@ -2567,7 +2479,7 @@
                 <div class="inventory-card forge-preview-card" id="forge-preview-card" style="display: none;">
                 </div>
             </div>
-            
+
             <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" class="controls">
                 <button class="control-btn forge-btn" id="forge-btn">
                     <i class="fas fa-fire"></i> Forge Item
@@ -2580,7 +2492,7 @@
                     <i class="fas fa-redo"></i> Reset Forge
                 </button>
             </div>
-            
+
             <div class="traits-container">
                 <div class="section-title">
                     <span><i class="fas fa-magic"></i> Ore Traits</span>
@@ -2756,7 +2668,7 @@
             "Falchion Knife": "https://bloxinformer.com/wp-content/uploads/2025/04/falchion-knife-the-forge-calculator.png",
             "Gladius Dagger": "https://bloxinformer.com/wp-content/uploads/2025/04/gladius-dagger-the-forge-calculator.png",
             "Hook": "https://bloxinformer.com/wp-content/uploads/2025/04/hook-the-forge-calculator.png",
-            "Shark's Fang": "https://bloxinformer.com/wp-content/uploads/2026/01/sharks-fang-the-forge-calculator.png",
+            "Shark Fang": "https://bloxinformer.com/wp-content/uploads/2026/01/sharks-fang-the-forge-calculator.png",
             "Cultist Dagger": "https://bloxinformer.com/wp-content/uploads/2025/04/dagger-the-forge-calculator.png",
             "Curved Dagger": "https://bloxinformer.com/wp-content/uploads/2025/04/dagger-the-forge-calculator.png",
 
@@ -2776,7 +2688,7 @@
             "Boxing Gloves": "https://bloxinformer.com/wp-content/uploads/2025/04/boxing-gloves-the-forge-calculator.png",
             "Relevator": "https://bloxinformer.com/wp-content/uploads/2025/04/relevator-the-forge-calculator.png",
             "Savage Claws": "https://bloxinformer.com/wp-content/uploads/2025/12/savage-claws-the-forge-calculator.png",
-            "Dark Knight's Gauntlets": "https://bloxinformer.com/wp-content/uploads/2025/04/relevator-the-forge-calculator.png",
+            "Dark Knight Gauntlets": "https://bloxinformer.com/wp-content/uploads/2025/04/relevator-the-forge-calculator.png",
 
             // Katanas
             "Uchigatana": "https://bloxinformer.com/wp-content/uploads/2025/04/uchigatana-the-forge-calculator.png",
@@ -2786,7 +2698,7 @@
             // Great Swords
             "Crusader Sword": "https://bloxinformer.com/wp-content/uploads/2025/04/crusader-sword-the-forge-calculator.png",
             "Long Sword": "https://bloxinformer.com/wp-content/uploads/2025/04/long-sword-the-forge-calculator.png",
-            "Dark Knight's Greatsword": "https://bloxinformer.com/wp-content/uploads/2025/04/crusader-sword-the-forge-calculator.png",
+            "Dark Knight Greatsword": "https://bloxinformer.com/wp-content/uploads/2025/04/crusader-sword-the-forge-calculator.png",
 
             //Maces
             "Mace": "https://bloxinformer.com/wp-content/uploads/2025/12/mace-the-forge-calculator.png",
@@ -2815,7 +2727,7 @@
             "Double Battle Axe": "https://bloxinformer.com/wp-content/uploads/2025/04/double-battle-axe-the-forge-calculator.png",
             "Greater Battle Axe": "https://bloxinformer.com/wp-content/uploads/2025/12/greater-battle-axe-the-forge-calculator.png",
             "Wyvern Axe": "https://bloxinformer.com/wp-content/uploads/2025/12/wyvern-axe-the-forge-calculator.png",
-            "Executioner's Greataxe": "https://bloxinformer.com/wp-content/uploads/2026/01/executioners-greataxe-the-forge-calculator.png",
+            "Executioner Greataxe": "https://bloxinformer.com/wp-content/uploads/2026/01/executioners-greataxe-the-forge-calculator.png",
             "Anchored Straight Blade": "https://bloxinformer.com/wp-content/uploads/2026/01/anchored-straight-blade-the-forge-calculator.png",
 
             // Colossal Swords
@@ -2848,18 +2760,18 @@
             "Knight Helmet": "https://bloxinformer.com/wp-content/uploads/2025/04/knight-helmet-the-forge-calculator.png",
             "Dark Knight Helmet": "https://bloxinformer.com/wp-content/uploads/2025/04/dark-knight-helmet-the-forge-calculator.png",
             "Wolf Helmet": "https://bloxinformer.com/wp-content/uploads/2026/01/wolf-helmet-the-forge-calculator.png",
-            "Raven's Helmet": "https://bloxinformer.com/wp-content/uploads/2026/01/ravens-helmet-the-forge-calculator.png",
+            "Raven Helmet": "https://bloxinformer.com/wp-content/uploads/2026/01/ravens-helmet-the-forge-calculator.png",
             "Goblin Crown": "https://bloxinformer.com/wp-content/uploads/2026/01/goblin-crown-helmet-the-forge-calculator.png",
 
             "Knight Leggings": "https://bloxinformer.com/wp-content/uploads/2025/04/knight-leggings-the-forge-calculator.png",
             "Dark Knight Leggings": "https://bloxinformer.com/wp-content/uploads/2025/04/dark-knight-leggings-the-forge-calculator.png",
             "Wolf Leggings": "https://bloxinformer.com/wp-content/uploads/2026/01/wolf-leggings-the-forge-calculator.png",
-            "Raven's Leggings": "https://bloxinformer.com/wp-content/uploads/2025/04/dark-knight-leggings-the-forge-calculator.png",
+            "Raven Leggings": "https://bloxinformer.com/wp-content/uploads/2025/04/dark-knight-leggings-the-forge-calculator.png",
 
             "Knight Chestplate": "https://bloxinformer.com/wp-content/uploads/2025/04/knight-chestplate-the-forge-calculator.png",
             "Dark Knight Chestplate": "https://bloxinformer.com/wp-content/uploads/2025/04/dark-knight-chestplate-the-forge-calculator.png",
             "Wolf Chestplate": "https://bloxinformer.com/wp-content/uploads/2026/01/wolf-chestplate-the-forge-calculator.png",
-            "Raven's Chestplate": "https://bloxinformer.com/wp-content/uploads/2026/01/ravens-chestplate-the-forge-calculator.png",
+            "Raven Chestplate": "https://bloxinformer.com/wp-content/uploads/2026/01/ravens-chestplate-the-forge-calculator.png",
         };
 
         const baseItemStats = {
@@ -2868,7 +2780,7 @@
                 "Falchion Knife": { damage: 8.6, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 71.4, type: "Dagger" },
                 "Gladius Dagger": { damage: 8.6, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 74.8, type: "Dagger" },
                 "Hook": { damage: 9.46, atkSpeed: 0.39, realSpeed: 0.52, range: 6, price: 74.8, type: "Dagger" },
-                "Shark's Fang": { damage: 7.74, atkSpeed: 0.27, realSpeed: 0.36, range: 6, price: 74.8, type: "Dagger" },
+                "Shark Fang": { damage: 7.74, atkSpeed: 0.27, realSpeed: 0.36, range: 6, price: 74.8, type: "Dagger" },
                 "Cultist Dagger": { damage: 10.5, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 74.8, type: "Dagger" },
                 "Curved Dagger": { damage: 9.9, atkSpeed: 0.30, realSpeed: 0.41, range: 6, price: 74.8, type: "Dagger" },
 
@@ -2886,7 +2798,7 @@
                 "Boxing Gloves": { damage: 16, atkSpeed: 0.59, realSpeed: 0.63, range: 6, price: 225.5, type: "Gauntlet" },
                 "Relevator": { damage: 19.2, atkSpeed: 0.69, realSpeed: 0.74, range: 6, price: 246, type: "Gauntlet" },
                 "Savage Claws": { damage: 16, atkSpeed: 0.47, realSpeed: 0.51, range: 6, price: 246, type: "Gauntlet" },
-                "Dark Knight's Gauntlets": { damage: 20, atkSpeed: 0.47, realSpeed: 0.51, range: 6, price: 246, type: "Gauntlet" },
+                "Dark Knight Gauntlets": { damage: 20, atkSpeed: 0.47, realSpeed: 0.51, range: 6, price: 246, type: "Gauntlet" },
 
                 "Mace": { damage: 12, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 205, type: "Mace" },
                 "Spiked Mace": { damage: 12.6, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 215.25, type: "Mace" },
@@ -2913,14 +2825,14 @@
 
                 "Crusader Sword": { damage: 24, atkSpeed: 1.0, realSpeed: 1.19, range: 9, price: 485, type: "Great Sword" },
                 "Long Sword": { damage: 24, atkSpeed: 1.11, realSpeed: 1.32, range: 9, price: 509.25, type: "Great Sword" },
-                "Dark Knight's Greatsword": { damage: 30, atkSpeed: 1.11, realSpeed: 1.32, range: 9, price: 533.5, type: "Great Sword" },
+                "Dark Knight Greatsword": { damage: 30, atkSpeed: 1.11, realSpeed: 1.32, range: 9, price: 533.5, type: "Great Sword" },
 
                 "Double Battle Axe": { damage: 31.5, atkSpeed: 1.05, realSpeed: 1.70, range: 9, price: 850, type: "Great Axe" },
                 "Scythe": { damage: 28.5, atkSpeed: 0.95, realSpeed: 1.54, range: 9, price: 935, type: "Great Axe" },
                 "Greater Battle Axe": { damage: 34.5, atkSpeed: 1, realSpeed: 1.62, range: 9, price: 1020, type: "Great Axe" },
                 "Wyvern Axe": { damage: 37.5, atkSpeed: 0.91, realSpeed: 1.47, range: 9, price: 1020, type: "Great Axe" },
                 "Anchored Straight Blade": { damage: 36, atkSpeed: 1, realSpeed: 1.62, range: 9, price: 1085, type: "Great Axe" },
-                "Executioner's Greataxe": { damage: 39, atkSpeed: 1.05, realSpeed: 1.70, range: 9, price: 1085, type: "Great Axe" },
+                "Executioner Greataxe": { damage: 39, atkSpeed: 1.05, realSpeed: 1.70, range: 9, price: 1085, type: "Great Axe" },
 
                 "Great Sword": { damage: 40, atkSpeed: 1.12, realSpeed: 1.40, range: 10, price: 1355, type: "Colossal Sword" },
                 "Hammer": { damage: 44, atkSpeed: 1.24, realSpeed: 1.56, range: 10, price: 1490.5, type: "Colossal Sword" },
@@ -2951,18 +2863,18 @@
                 "Knight Helmet": { health: 12.5, price: 1020, def: 24, type: "Heavy Helmet" },
                 "Dark Knight Helmet": { health: 18.75, price: 1224, def: 38, type: "Heavy Helmet" },
                 "Wolf Helmet": { health: 25, price: 1326, def: 50, type: "Heavy Helmet" },
-                "Raven's Helmet": { health: 26.5, price: 1377, def: 54, type: "Heavy Helmet" },
+                "Raven Helmet": { health: 26.5, price: 1377, def: 54, type: "Heavy Helmet" },
                 "Goblin Crown": { health: 26, price: 1350, def: 52, type: "Heavy Helmet" },
 
                 "Knight Leggings": { health: 13.75, price: 1200, def: 28, type: "Heavy Leggings" },
                 "Dark Knight Leggings": { health: 21.875, price: 1440, def: 44, type: "Heavy Leggings" },
                 "Wolf Leggings": { health: 28, price: 1560, def: 56, type: "Heavy Leggings" },
-                "Raven's Leggings": { health: 29.75, price: 1620, def: 60, type: "Heavy Leggings" },
+                "Raven Leggings": { health: 29.75, price: 1620, def: 60, type: "Heavy Leggings" },
 
                 "Knight Chestplate": { health: 16.25, price: 1355, def: 32, type: "Heavy Chestplate" },
                 "Dark Knight Chestplate": { health: 25, price: 1626, def: 50, type: "Heavy Chestplate" },
                 "Wolf Chestplate": { health: 35, price: 1761.5, def: 70, type: "Heavy Chestplate" },
-                "Raven's Chestplate": { health: 37, price: 1830, def: 74, type: "Heavy Chestplate" }
+                "Raven Chestplate": { health: 37, price: 1830, def: 74, type: "Heavy Chestplate" }
             }
         };
 
@@ -3154,7 +3066,7 @@
                         { name: "Dagger", chance: "1/1", probability: 1.0 },
                         { name: "Gladius Dagger", chance: "1/4", probability: 0.25 },
                         { name: "Hook", chance: "1/16", probability: 0.0625 },
-                        { name: "Shark's Fang", chance: "1/8", probability: 0.125 },
+                        { name: "Shark Fang", chance: "1/8", probability: 0.125 },
                         { name: "Cultist Dagger", chance: "1/8", probability: 0.125 },
                         { name: "Curved Dagger", chance: "1/8", probability: 0.125 }
                     ]
@@ -3191,7 +3103,7 @@
                         { name: "Ironhand", chance: "1/1", probability: 1.0 },
                         { name: "Relevator", chance: "1/4", probability: 0.25 },
                         { name: "Savage Claws", chance: "1/4", probability: 0.25 },
-                        { name: "Dark Knight's Gauntlets", chance: "1/8", probability: 0.125 }
+                        { name: "Dark Knight Gauntlets", chance: "1/8", probability: 0.125 }
                     ]
                 },
                 "Katana": {
@@ -3211,7 +3123,7 @@
                     "kingdom": [
                         { name: "Crusader Sword", chance: "1/1", probability: 1.0 },
                         { name: "Long Sword", chance: "1/2", probability: 0.5 },
-                        { name: "Dark Knight's Greatsword", chance: "1/8", probability: 0.125 }
+                        { name: "Dark Knight Greatsword", chance: "1/8", probability: 0.125 }
                     ]
                 },
                 "Mace": {
@@ -3256,7 +3168,7 @@
                         { name: "Greater Battle Axe", chance: "1/4", probability: 0.0625 },
                         { name: "Wyvern Axe", chance: "1/4", probability: 0.0625 },
                         { name: "Anchored Straight Blade", chance: "1/8", probability: 0.125 },
-                        { name: "Executioner's Greataxe", chance: "1/8", probability: 0.125 }
+                        { name: "Executioner Greataxe", chance: "1/8", probability: 0.125 }
 
                     ]
                 },
@@ -3345,7 +3257,7 @@
                         { name: "Knight Helmet", chance: "1/1", probability: 1.0 },
                         { name: "Dark Knight Helmet", chance: "1/2", probability: 0.5 },
                         { name: "Wolf Helmet", chance: "1/4", probability: 0.25 },
-                        { name: "Raven's Helmet", chance: "1/8", probability: 0.125 },
+                        { name: "Raven Helmet", chance: "1/8", probability: 0.125 },
                         { name: "Goblin Crown", chance: "1/6", probability: 0.1667 }
                     ]
                 },
@@ -3359,7 +3271,7 @@
                         { name: "Knight Leggings", chance: "1/1", probability: 1.0 },
                         { name: "Dark Knight Leggings", chance: "1/2", probability: 0.5 },
                         { name: "Wolf Leggings", chance: "1/4", probability: 0.25 },
-                        { name: "Raven's Leggings", chance: "1/8", probability: 0.125 }
+                        { name: "Raven Leggings", chance: "1/8", probability: 0.125 }
                     ]
                 },
                 "Heavy Chestplate": {
@@ -3372,7 +3284,7 @@
                         { name: "Knight Chestplate", chance: "1/1", probability: 1.0 },
                         { name: "Dark Knight Chestplate", chance: "1/2", probability: 0.5 },
                         { name: "Wolf Chestplate", chance: "1/4", probability: 0.25 },
-                        { name: "Raven's Chestplate", chance: "1/8", probability: 0.125 }
+                        { name: "Raven Chestplate", chance: "1/8", probability: 0.125 }
                     ]
                 }
             }
@@ -3775,6 +3687,7 @@
         let isQuickCraft = false;
         let quickCraftTargetItem = null;
         let selectedPreviewVariant = { baseItemType: null, variantName: null };
+        let lastForgeWasVariant = false;
         const oreSearchInput = document.getElementById('ore-search');
         const filtersToggle = document.getElementById('filters-toggle');
         const filtersDropdown = document.getElementById('filters-dropdown');
@@ -3925,16 +3838,6 @@
                 forgeBtn.innerHTML = `<i class="fas fa-fire"></i> Forge Item`;
                 forgeBtn.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
             }
-
-            if (totalOres < 3) {
-                forgeBtn.disabled = true;
-                forgeVariantBtn.disabled = true;
-            } else {
-                forgeBtn.disabled = false;
-                if (!isItemLocked || (selectedPreviewVariant.baseItemType === lockedItemType && selectedPreviewVariant.variantName)) {
-                    forgeVariantBtn.disabled = false;
-                }
-            }
         }
 
         function saveForgedItem(result) {
@@ -3991,143 +3894,26 @@
 
             forgedItems.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'inventory-card';
+                card.innerHTML = createItemCard({
+                    type: 'inventory',
+                    itemName: item.itemName,
+                    itemType: item.itemType,
+                    mainOre: item.mainOre,
+                    statsMultiplier: item.multiplier,
+                    priceMultiplier: item.priceMultiplier,
+                    scaledStats: item.stats,
+                    activeTraits: item.traits,
+                    mode: item.mode,
+                    area: item.area,
+                    showVariantTooltip: false,
+                    showForgeChance: false,
+                    showTags: false,
+                    showFullTraits: false,
+                    image: item.image || '',
+                    isLocked: false
+                });
 
-                const oreColor = item.mainOre?.color || (currentMode === 'weapon' ? '#FF6600' : '#19b9b9');
-
-                let dps = null;
-                if (item.mode === 'weapon' && item.stats.atkSpeed && item.stats.damage) {
-                    dps = item.stats.damage / item.stats.atkSpeed;
-                }
-                let statsHTML = '';
-                if (item.mode === 'weapon') {
-                    const baseDps = item.stats.damage / item.stats.realSpeed;
-                    statsHTML = `
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-fan"></i> Damage
-                    </span>
-                    <span class="inventory-stat-value" style="color: var(--primary);">
-                        ${item.stats.damage?.toFixed(2) || '0.00'}
-                    </span>
-                </div>
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-bolt"></i> Attack Speed
-                    </span>
-                    <span class="inventory-stat-value" style="color: var(--rare);">
-                        ${item.stats.atkSpeed?.toFixed(2) || '0.00'}s (${item.stats.realSpeed?.toFixed(2) || '0.00'})
-                    </span>
-                </div>
-                <div class="inventory-stat-row">
-            <span class="inventory-stat-label">
-                <i class="fas fa-gauge"></i> Base DPS
-            </span>
-            <span class="inventory-stat-value" style="color: var(--exotic);">
-                ${baseDps.toFixed(2)}
-            </span>
-        </div>
-        <div class="inventory-stat-row">
-            <span class="inventory-stat-label">
-                <i class="fas fa-gauge"></i> Trait DPS
-            </span>
-            <span class="inventory-stat-value" style="color: var(--mythical);">
-                ${item.stats.dpsWithTraits ? item.stats.dpsWithTraits.toFixed(2) : baseDps.toFixed(2)}
-            </span>
-        </div>
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-ruler"></i> Range
-                    </span>
-                    <span class="inventory-stat-value" style="color: var(--relic)">
-                        ${item.stats.range || '0'} studs
-                    </span>
-                </div>
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-coins"></i> Value
-                    </span>
-                    <span class="inventory-stat-value" style="color: gold;">
-                        $${Math.round(item.stats.price) || '0'}
-                    </span>
-                </div>
-            `;
-                } else {
-                    statsHTML = `
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-heart"></i> Health Bonus
-                    </span>
-                    <span class="inventory-stat-value" style="color: var(--success);">
-                        +${item.stats.health?.toFixed(2) || '0'}%
-                    </span>
-                </div>
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-shield-alt"></i> DEF
-                    </span>
-                    <span class="inventory-stat-value" style="color: var(--primary);">
-                        ${Math.round(item.stats.def) || '0'}
-                    </span>
-                </div>
-                <div class="inventory-stat-row">
-                    <span class="inventory-stat-label">
-                        <i class="fas fa-coins"></i> Value
-                    </span>
-                    <span class="inventory-stat-value" style="color: gold;">
-                        $${Math.round(item.stats.price) || '0'}
-                    </span>
-                </div>
-            `;
-                }
-
-                let traitsHTML = '';
-                if (item.traits && item.traits.length > 0) {
-                    item.traits.forEach((trait, index) => {
-                        const iconClass = getTraitIconClass(trait.oreId);
-                        traitsHTML += `
-                    <div class="trait-icon" style="border-color: ${trait.oreColor || oreColor}; background: ${trait.oreColor || oreColor}30;">
-                        <i class="${iconClass}"></i>
-                        <div class="trait-tooltip">
-                            <strong style="color: ${trait.oreColor || oreColor};">
-                                <i class="fas ${iconClass}" style="color: ${trait.oreColor || oreColor};"></i>
-                                ${trait.oreName}
-                            </strong>
-                            <p>${formatTraitDescription(trait.description)}</p>
-                        </div>
-                    </div>
-                `;
-                    });
-                }
-
-                card.innerHTML = `
-            <div class="inventory-card-header" style="border-color: ${oreColor}40;">
-                <div class="forge-result-image" style="border-color: ${oreColor}; background-image: url('${item.image}'); width: 120px; height: 90px;"></div>
-                <div style="flex-grow: 1; margin-left: 10px;">
-                    <div class="inventory-card-ore">
-                        <i class="fas fa-gem" style="color: ${oreColor};"></i>
-                        <span style="color: ${oreColor};">${item.mainOre?.name || 'Unknown Ore'}</span>
-                    </div>
-                    <div class="inventory-card-item" style="color: ${oreColor};">${item.itemName}</div>
-                </div>
-            </div>
-            
-            <div class="inventory-card-stats" style="border-color: ${oreColor}40;">
-                ${statsHTML}
-            </div>
-            
-            ${traitsHTML ? `
-                <div class="inventory-card-traits">
-                    ${traitsHTML}
-                </div>
-            ` : ''}
-        `;
-
-                card.style.border = `2px solid ${oreColor}40`;
-                card.style.setProperty('--ore-color', oreColor);
-                card.style.setProperty('--ore-color-light', `${oreColor}05`);
-
-                inventoryCards.appendChild(card);
+                inventoryCards.appendChild(card.firstElementChild);
             });
         }
 
@@ -4261,6 +4047,7 @@
             } else {
                 probabilities = armorProbabilities;
             }
+
             const counts = Object.keys(probabilities).map(Number);
             const closestCount = counts.reduce((prev, curr) => {
                 return (Math.abs(curr - totalOres) < Math.abs(prev - totalOres) ? curr : prev);
@@ -4313,199 +4100,35 @@
             if (!baseItemName) return;
 
             const scaledStats = calculateScaledStats(baseItemName, statsMultiplier, priceMultiplier);
-
             const activeTraits = getActiveTraits();
             const mainOre = getMainOre();
-            const oreColor = mainOre ? mainOre.color : 'var(--primary)';
+            const forgeChance = calculateFinalProbability(highestItem, highestProb);
 
             previewPlaceholder.style.display = 'none';
-            previewCard.style.display = 'flex';
+            previewCard.style.display = 'block';
             previewContainer.classList.add('has-preview');
 
-            const itemImage = itemImages[baseItemName] || '';
-
-            let traitsHTML = '';
-            if (activeTraits.length > 0) {
-                traitsHTML = `
-            <div class="inventory-card-traits">
-                ${activeTraits.map((trait, index) => {
-                    const iconClass = getTraitIconClass(trait.oreId);
-                    return `
-                        <div class="trait-icon" style="border-color: ${trait.oreColor || oreColor}; background: ${trait.oreColor || oreColor}30;">
-                            <i class="${iconClass}"></i>
-                            <div class="trait-tooltip">
-                                <strong style="color: ${trait.oreColor || oreColor};">
-                                    <i class="fas ${iconClass}" style="color: ${trait.oreColor || oreColor};"></i>
-                                    ${trait.oreName}
-                                </strong>
-                                <p>${formatTraitDescription(trait.description)}</p>
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-        `;
-            }
-
-            const dps = scaledStats.damage / scaledStats.atkSpeed;
-            let statsHTML = '';
-            if (currentMode === 'weapon') {
-                statsHTML = `
-            <div class="inventory-stat-row">
-                <span class="inventory-stat-label">
-                    <i class="fas fa-fan"></i> Damage
-                </span>
-                <span class="inventory-stat-value" style="color: var(--primary);">
-                    ${scaledStats.damage.toFixed(2) || '0.00'}
-                </span>
-            </div>
-            <div class="inventory-stat-row">
-                <span class="inventory-stat-label">
-                    <i class="fas fa-bolt"></i> Attack Speed
-                </span>
-                <span class="inventory-stat-value" style="color: var(--rare);">
-                    ${scaledStats.atkSpeed.toFixed(2) || '0.00'}s (${scaledStats.realSpeed.toFixed(2) || '0.00'})
-                </span>
-            </div>
-            <div class="inventory-stat-row">
-                <span class="inventory-stat-label">
-                    <i class="fas fa-gauge"></i> Real DPS
-                </span>
-                <span class="inventory-stat-value" style="color: var(--exotic);">
-                    ${scaledStats.baseDps ? scaledStats.baseDps.toFixed(2) : ''}
-                </span>
-            </div>
-            <div class="inventory-stat-row">
-                <span class="inventory-stat-label">
-                    <i class="fas fa-gauge"></i> Trait-Adjusted DPS
-                </span>
-                <span class="inventory-stat-value" style="color: var(--mythical);">
-                    ${scaledStats.dpsWithTraits ? scaledStats.dpsWithTraits.toFixed(2) : ''}
-                </span>
-            </div>
-            <div class="inventory-stat-row">
-                <span class="inventory-stat-label">
-                    <i class="fas fa-ruler"></i> Range
-                </span>
-                <span class="inventory-stat-value" style="color: var(--relic)">${scaledStats.range || '0'} studs</span>
-            </div>
-            <div class="inventory-stat-row">
-                <span class="inventory-stat-label">
-                    <i class="fas fa-coins"></i> Value
-                </span>
-                <span class="inventory-stat-value" style="color: gold;">
-                    $${Math.round(scaledStats.price) || '0'}
-                </span>
-            </div>
-        `;
-            } else {
-                statsHTML = `
-            <div class="inventory-stat-row">
-                <span class="inventory-stat-label">
-                    <i class="fas fa-heart"></i> Health Bonus
-                </span>
-                <span class="inventory-stat-value" style="color: var(--success);">
-                    +${scaledStats.health.toFixed(2) || '0'}%
-                </span>
-            </div>
-            <div class="inventory-stat-row">
-                <span class="inventory-stat-label">
-                    <i class="fas fa-shield-alt"></i> DEF
-                </span>
-                <span class="inventory-stat-value" style="color: var(--primary);">
-                    ${Math.round(scaledStats.def) || '0'}
-                </span>
-            </div>
-            <div class="inventory-stat-row">
-                <span class="inventory-stat-label">
-                    <i class="fas fa-coins"></i> Value
-                </span>
-                <span class="inventory-stat-value" style="color: gold;">
-                    $${Math.round(scaledStats.price) || '0'}
-                </span>
-            </div>
-        `;
-            }
-
-            const isLockedItem = isItemLocked && lockedItemType === highestItem;
-
-            previewCard.innerHTML = `
-        <div class="preview-header" style="display: flex; align-items: center; flex-direction: column; margin-bottom: 10px; margin-top: -5px;">
-        </div>
-        <div class="inventory-card-header" style="justify-content: space-between; border-color: ${oreColor}40; position: relative;">
-            ${itemImage ? `
-                <div class="forge-result-image" style="border-color: ${oreColor}; background-image: url('${itemImage}'); width: 120px; height: 90px;"></div>
-            ` : ''}
-            <div style="flex-grow: 1; margin-left: 10px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
-                <div class="inventory-card-item" style="color: ${oreColor}; margin-bottom: 5px; display: flex; align-items: center; gap: 8px;">
-                    ${mainOre?.name || 'Unknown Ore'} ${baseItemName}
-                    ${isLockedItem ? '<span class="preview-lock-indicator"><i class="fas fa-lock" style="font-size: 0.6rem;"></i> Locked</span>' : ''}
-                </div>
-                <div style="display: flex; align-items: center; gap: 5px; position: relative; flex-wrap: wrap;">
-                    <span style="color: var(--text-secondary);font-weight: bold; background: ${oreColor}20; padding: 2px 8px 2px 8px; border-radius: 10px; border: 1px solid ${oreColor}40;">
-                        <div class="preview-tooltip-trigger" data-item-type="${highestItem}" style="cursor: pointer; color: ${oreColor}; font-size: 0.8rem;">
-                        ${highestItem} <i class="fas fa-caret-down"></i>
-                        <div class="preview-variant-tooltip" style="display: none; position: absolute; background: var(--card-bg); border: 1px solid ${oreColor}; border-radius: 8px; padding: 10px; min-width: 180px; max-width: 220px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); left: -60px;">
-                            <div style="font-weight: bold; color: ${oreColor}; margin-bottom: 5px; font-size: 0.8rem;">Available Variants</div>
-                            <div style="color: var(--text-secondary); font-size: 0.75rem; line-height: 1.3;">
-                                ${getPreviewTooltipContent(highestItem, oreColor)}
-                            </div>
-                        </div>
-                    </div>
-                    </span>
-                    <span class="preview-multiplier" style="font-weight: bold; background: ${oreColor}20; color: ${oreColor}; font-size: 0.8rem; padding: 2px 8px; border-radius: 10px; border: 1px solid ${oreColor}40;">
-                    ${statsMultiplier.toFixed(2)}x
-                </span>
-                </div> 
-            </div>
-        </div>
-        <div style="display: flex; gap: 15px; align-items: flex-start;">
-            <div style="flex: 1;">
-                <div class="inventory-card-stats" style="border-color: ${oreColor}40; margin-bottom: 0px;">
-                    ${statsHTML}
-                </div>
-            </div>
-        </div>
-        
-        ${traitsHTML}
-        
-        <div class="prediction-note">
-            <i class="fas fa-info-circle"></i> 
-            <span style="font-weight: bold;">
-               ${(calculateFinalProbability(highestItem, highestProb) * 100).toFixed(2) + '%'}
-            </span> 
-            forge chance for the ${selectedPreviewVariant.variantName || highestItem} variant.
-        </div>
-    `;
-
-            previewCard.style.background = `linear-gradient(135deg, ${oreColor}15 0%, ${oreColor}08 25%, rgba(0,0,0,0.1) 50%, ${oreColor}08 75%, ${oreColor}15 100%)`;
-            previewCard.style.borderColor = oreColor + '40';
-            previewCard.style.setProperty('--ore-color', oreColor);
-
-            const tooltipTrigger = previewCard.querySelector('.preview-tooltip-trigger');
-            const tooltip = tooltipTrigger?.querySelector('.preview-variant-tooltip');
-
-            tooltipTrigger.addEventListener('mouseenter', () => {
-                tooltip.style.display = 'block';
-            });
-            tooltipTrigger.addEventListener('mouseleave', () => {
-                tooltip.style.display = 'none';
+            previewCard.innerHTML = createItemCard({
+                type: 'preview',
+                itemName: baseItemName,
+                itemType: highestItem,
+                mainOre: mainOre,
+                statsMultiplier: statsMultiplier,
+                priceMultiplier: priceMultiplier,
+                scaledStats: scaledStats,
+                activeTraits: activeTraits,
+                mode: currentMode,
+                variant: selectedPreviewVariant.variantName || highestItem,
+                showVariantTooltip: true,
+                showForgeChance: true,
+                showTags: false,
+                showFullTraits: false,
+                image: itemImages[baseItemName] || '',
+                isLocked: isItemLocked && lockedItemType === highestItem,
+                forgeChance: forgeChance
             });
 
-            if (tooltipTrigger && tooltip) {
-                tooltip.addEventListener('click', function (e) {
-                    const variantOption = e.target.closest('.variant-option');
-                    if (variantOption) {
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        const variantName = variantOption.dataset.variantName;
-                        const baseType = variantOption.dataset.baseType;
-
-                        selectPreviewVariant(baseType, variantName);
-                    }
-                });
-            }
+            updateForgeButtonState();
         }
 
         function resetPreviewSelection() {
@@ -4550,7 +4173,282 @@
             return itemTypeProb * (selectedVariant.probability / totalWeight);
         }
 
-        function getPreviewTooltipContent(itemType, color) {
+        function createItemCard(config) {
+            const {
+                type = 'preview', // 'preview', 'forged', 'inventory'
+                itemName,
+                itemType,
+                mainOre,
+                statsMultiplier,
+                priceMultiplier,
+                scaledStats,
+                activeTraits = [],
+                mode = currentMode,
+                area = currentArea,
+                qualityScale = getQualityFactor(),
+                variant = null,
+                showVariantTooltip = false,
+                showForgeChance = false,
+                showTags = false,
+                showFullTraits = false,
+                image = null,
+                isLocked = false,
+                forgeChance = null
+            } = config;
+
+            const oreColor = mainOre?.color || (mode === 'weapon' ? '#FF6600' : '#19b9b9');
+            const itemImage = image || itemImages[itemName] || '';
+
+            let html = `<div class="item-card forged" style="--ore-color: ${oreColor}; --ore-color-light: ${oreColor}20; border-color: ${oreColor}40;">`;
+
+            html += `
+        <div class="item-card-header">
+            ${itemImage ? `
+                <div class="item-card-image" style="border-color: ${oreColor}; background-image: url('${itemImage}')"></div>
+            ` : ''}
+            <div class="item-card-title">
+                <div class="item-card-name" style="color: ${oreColor}">
+                    ${mainOre?.name || 'Unknown Ore'} ${itemName}
+                    ${isLocked ? '<span style="font-size: 0.7rem; color: var(--success); margin-left: 8px;"><i class="fas fa-lock"></i> Locked</span>' : ''}
+                </div>
+    `;
+
+            if (showVariantTooltip && variant) {
+                html += `
+            <div class="item-card-tags">
+                <div class="item-card-variant-selector">
+                    <div class="item-card-variant-trigger">
+                        ${itemType} <i class="fas fa-caret-down" style="font-size: 1rem;"></i>
+                    </div>
+                    <div class="variant-tooltip">
+                        <div style="font-weight: bold; color: ${oreColor}; margin-bottom: 5px; font-size: 0.8rem;">
+                            Available Variants
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 0.75rem; line-height: 1.3;">
+                            ${getVariantTooltipContent(itemType, oreColor)}
+                        </div>
+                    </div>
+                </div>
+                <span class="item-card-tag" style="background: ${oreColor}20; color: ${oreColor}; border-color: ${oreColor};">
+                    ${statsMultiplier.toFixed(2)}x
+                </span>
+            </div>
+        `;
+            }
+
+            if (showTags) {
+                const areaInfo = getAreaInfo(area);
+                html += `
+                <div class="item-card-tags">
+                    <div class="item-card-tag" style="background: var(--primary-light); color: var(--text-secondary);">
+                        <i class="fas fa-percent"></i> ${statsMultiplier.toFixed(2)}x Multi
+                    </div>
+                    <div class="item-card-tag" style="background: var(--primary-light); color: var(--text-secondary);">
+                        <i class="fas fa-star"></i> ${((qualityScale - 0.5) * 200).toFixed(0)}% Quality
+                    </div>
+                    <div class="item-card-tag" style="background: ${oreColor}30; color: ${oreColor}; border-color: ${oreColor}">
+                        <i class="fas fa-gem"></i> ${mainOre?.name || 'Stone'}
+                    </div>
+                    <div class="item-card-tag" style="background: ${areaInfo.bg}; border-color: ${areaInfo.color}; color: ${areaInfo.color}">
+                        <i class="${areaInfo.icon}"></i> ${areaInfo.name}
+                    </div>
+                </div>
+        `;
+            }
+
+            html += `</div></div>`;
+
+            html += `<div class="item-card-stats" style="border-color: ${oreColor}40;">`;
+
+            if (mode === 'weapon') {
+                const baseDps = scaledStats.damage / scaledStats.realSpeed;
+                html += `
+            <div class="item-stat-row">
+                <span class="item-stat-label">
+                    <i class="fas fa-fan"></i> Damage
+                </span>
+                <span class="item-stat-value" style="color: var(--primary);">
+                    ${scaledStats.damage.toFixed(2)}
+                </span>
+            </div>
+            <div class="item-stat-row">
+                <span class="item-stat-label">
+                    <i class="fas fa-bolt"></i> Attack Speed
+                </span>
+                <span class="item-stat-value" style="color: var(--rare);">
+                    ${scaledStats.atkSpeed.toFixed(2)}s (${scaledStats.realSpeed.toFixed(2)})
+                </span>
+            </div>
+            <div class="item-stat-row">
+                <span class="item-stat-label">
+                    <i class="fas fa-gauge"></i> Base DPS
+                </span>
+                <span class="item-stat-value" style="color: var(--exotic);">
+                    ${baseDps.toFixed(2)}
+                </span>
+            </div>
+        `;
+
+                if (scaledStats.dpsWithTraits) {
+                    html += `
+                <div class="item-stat-row">
+                    <span class="item-stat-label">
+                        <i class="fas fa-gauge"></i> Trait-Adjusted DPS
+                    </span>
+                    <span class="item-stat-value" style="color: var(--mythical);">
+                        ${scaledStats.dpsWithTraits.toFixed(2)}
+                    </span>
+                </div>
+            `;
+                }
+
+                html += `
+            <div class="item-stat-row">
+                <span class="item-stat-label">
+                    <i class="fas fa-ruler"></i> Range
+                </span>
+                <span class="item-stat-value" style="color: var(--relic);">
+                    ${scaledStats.range} studs
+                </span>
+            </div>
+        `;
+            } else {
+                html += `
+            <div class="item-stat-row">
+                <span class="item-stat-label">
+                    <i class="fas fa-heart"></i> Health Bonus
+                </span>
+                <span class="item-stat-value" style="color: var(--success);">
+                    +${scaledStats.health.toFixed(2)}%
+                </span>
+            </div>
+            <div class="item-stat-row">
+                <span class="item-stat-label">
+                    <i class="fas fa-shield-alt"></i> DEF
+                </span>
+                <span class="item-stat-value" style="color: var(--primary);">
+                    ${Math.round(scaledStats.def)}
+                </span>
+            </div>
+        `;
+            }
+
+            html += `
+            <div class="item-stat-row" style="margin-bottom: 0px;">
+                <span class="item-stat-label">
+                    <i class="fas fa-coins"></i> Value
+                </span>
+                <span class="item-stat-value" style="color: gold;">
+                    $${Math.round(scaledStats.price)}
+                </span>
+            </div>
+        </div>
+    `;
+
+            if (activeTraits.length > 0) {
+                if (showFullTraits) {
+                    html += `
+                <div class="item-card-traits">
+                    <div class="traits-full-list">
+            `;
+
+                    activeTraits.forEach(trait => {
+                        const iconClass = getTraitIconClass(trait.oreId);
+                        html += `
+                    <div class="trait-full-item" style="border-color: ${trait.oreColor || oreColor}40;">
+                        <div class="trait-full-ore" style="color: ${trait.oreColor || oreColor}">
+                            <i class="fas ${iconClass}"></i> 
+                            ${trait.oreName} (${trait.percentage.toFixed(1)}%)
+                        </div>
+                        <div class="trait-full-desc">
+                            ${formatTraitDescription(trait.description)}
+                        </div>
+                    </div>
+                `;
+                    });
+
+                    html += `</div></div>`;
+                } else {
+                    html += `
+                <div class="item-card-traits">
+                    <div class="traits-icons">
+            `;
+
+                    activeTraits.forEach((trait, index) => {
+                        const iconClass = getTraitIconClass(trait.oreId);
+                        const traitColor = trait.oreColor || oreColor;
+                        html += `
+                    <div class="trait-icon" 
+                         style="border-color: ${traitColor}; background: ${traitColor}30;"
+                         onmouseover="this.querySelector('.trait-tooltip').style.display='block'"
+                         onmouseout="this.querySelector('.trait-tooltip').style.display='none'">
+                        <i class="${iconClass}"></i>
+                        <div class="trait-tooltip" style="display: none;">
+                            <strong style="color: ${traitColor}">
+                                <i class="fas ${iconClass}" style="color: ${traitColor}"></i>
+                                ${trait.oreName}
+                            </strong>
+                            <p>${formatTraitDescription(trait.description)}</p>
+                        </div>
+                    </div>
+                `;
+                    });
+
+                    html += `</div></div>`;
+                }
+            }
+
+            if (showForgeChance && forgeChance !== null) {
+                html += `
+            <div class="item-card-forge-chance">
+                <i class="fas fa-info-circle"></i> 
+                <span style="font-weight: bold;">
+                    ${(forgeChance * 100).toFixed(2)}%
+                </span> 
+                forge chance for ${variant || itemType} variant
+            </div>
+        `;
+            }
+
+            html += `</div>`;
+
+            return html;
+        }
+
+        function getAreaInfo(area) {
+            switch (area) {
+                case 'kingdom':
+                    return {
+                        bg: 'var(--primary-light)',
+                        color: 'var(--primary)',
+                        icon: 'fas fa-crown',
+                        name: 'Forgotten Kingdom'
+                    };
+                case 'stonewake':
+                    return {
+                        bg: 'rgba(8,78,78,0.2)',
+                        color: 'var(--stonewake-teal)',
+                        icon: 'fas fa-mountain',
+                        name: 'Stonewake\'s Cross'
+                    };
+                case 'frostspire':
+                    return {
+                        bg: 'rgba(106,183,255,0.2)',
+                        color: '#6ab7ff',
+                        icon: 'fas fa-snowflake',
+                        name: 'Frostspire Expanse'
+                    };
+                default:
+                    return {
+                        bg: 'var(--primary-light)',
+                        color: 'var(--primary)',
+                        icon: 'fas fa-map-marker-alt',
+                        name: 'Unknown Area'
+                    };
+            }
+        }
+
+        function getVariantTooltipContent(itemType, color) {
             const variants = specificItemVariants[currentMode]?.[itemType]?.[currentArea];
 
             if (!variants || variants.length === 0) {
@@ -4558,9 +4456,8 @@
             }
 
             if (!selectedPreviewVariant.baseItemType || selectedPreviewVariant.baseItemType !== itemType) {
-                const firstVariant = variants[0];
-                const cleanFirstName = firstVariant.name.replace(/\s*\[.*?\]\s*/, '');
-                selectedPreviewVariant = { baseItemType: itemType, variantName: cleanFirstName };
+                const cleanName = variants[0].name.replace(/\s*\[.*?\]\s*/, '');
+                selectedPreviewVariant = { baseItemType: itemType, variantName: cleanName };
             }
 
             let html = `<div style="display: flex; flex-direction: column; gap: 3px;">`;
@@ -4589,7 +4486,8 @@
                     border-bottom: 1px solid ${color};
                  "
                  onmouseover="this.style.background='${color}20'; this.style.transform='translateY(-1px)'"
-                 onmouseout="this.style.background='${isSelected ? color + '30' : 'transparent'}'; this.style.transform='translateY(0px)'">
+                 onmouseout="this.style.background='${isSelected ? color + '30' : 'transparent'}'; this.style.transform='translateY(0px)'"
+                 onclick="selectPreviewVariant('${itemType}', '${cleanName}')">
                 <div style="
                     color: var(--text); 
                     font-weight: ${isSelected ? 'bold' : '600'}; 
@@ -5911,126 +5809,93 @@
             return traitsList;
         }
 
-        function simulateForge() {
+        function simulateForge(forgeVariant = false) {
             const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
 
             if (totalOres < 3) {
                 return;
             }
 
-            const forgeBtn = document.getElementById('forge-btn');
+            lastForgeWasVariant = forgeVariant;
+
+            const forgeBtn = forgeVariant
+                ? document.getElementById('forge-variant-btn')
+                : document.getElementById('forge-btn');
+
             const originalText = forgeBtn.innerHTML;
-            forgeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Forging...';
+            forgeBtn.innerHTML = forgeVariant
+                ? '<i class="fas fa-spinner fa-spin"></i> Forging Variant...'
+                : '<i class="fas fa-spinner fa-spin"></i> Forging...';
             forgeBtn.disabled = true;
 
             const { statsMultiplier, priceMultiplier } = calculateMultipliers(oreMix);
 
             let selectedItemType;
+            let itemName;
+            let variant;
 
-            if (isQuickCraft && quickCraftTargetItem) {
-                selectedItemType = quickCraftTargetItem;
-            } else {
-                let probabilities;
-                if (currentMode === 'weapon') {
-                    probabilities = currentArea === 'frostspire' ? weaponProbabilitiesFrostspire : weaponProbabilities;
-                } else {
-                    probabilities = armorProbabilities;
+            if (forgeVariant) {
+                if (!selectedPreviewVariant.baseItemType || !selectedPreviewVariant.variantName) {
+                    forgeBtn.innerHTML = originalText;
+                    forgeBtn.disabled = false;
+                    return;
                 }
 
-                const counts = Object.keys(probabilities).map(Number);
-                const closestCount = counts.reduce((prev, curr) => {
-                    return (Math.abs(curr - totalOres) < Math.abs(prev - totalOres) ? curr : prev);
-                });
-
-                const currentProbs = probabilities[closestCount] || {};
-
-                if (isItemLocked && lockedItemType) {
-                    selectedItemType = lockedItemType;
+                selectedItemType = selectedPreviewVariant.baseItemType;
+                itemName = selectedPreviewVariant.variantName;
+                variant = {
+                    name: itemName,
+                    chance: "Guaranteed",
+                    probability: 1.0
+                };
+            } else {
+                if (isQuickCraft && quickCraftTargetItem) {
+                    selectedItemType = quickCraftTargetItem;
                 } else {
-                    let random = Math.random();
-                    selectedItemType = null;
-                    let cumulativeProb = 0;
+                    let probabilities;
+                    if (currentMode === 'weapon') {
+                        probabilities = currentArea === 'frostspire' ? weaponProbabilitiesFrostspire : weaponProbabilities;
+                    } else {
+                        probabilities = armorProbabilities;
+                    }
 
-                    for (const [itemType, prob] of Object.entries(currentProbs)) {
-                        cumulativeProb += prob;
-                        if (random <= cumulativeProb) {
-                            selectedItemType = itemType;
-                            break;
+                    const counts = Object.keys(probabilities).map(Number);
+                    const closestCount = counts.reduce((prev, curr) => {
+                        return (Math.abs(curr - totalOres) < Math.abs(prev - totalOres) ? curr : prev);
+                    });
+
+                    const currentProbs = probabilities[closestCount] || {};
+
+                    if (isItemLocked && lockedItemType) {
+                        selectedItemType = lockedItemType;
+                    } else {
+                        let random = Math.random();
+                        selectedItemType = null;
+                        let cumulativeProb = 0;
+
+                        for (const [itemType, prob] of Object.entries(currentProbs)) {
+                            cumulativeProb += prob;
+                            if (random <= cumulativeProb) {
+                                selectedItemType = itemType;
+                                break;
+                            }
+                        }
+
+                        if (!selectedItemType) {
+                            selectedItemType = Object.keys(currentProbs)[0];
                         }
                     }
-
-                    if (!selectedItemType) {
-                        selectedItemType = Object.keys(currentProbs)[0];
-                    }
                 }
+
+                variant = getRandomVariant(selectedItemType);
+                itemName = variant.name.replace(/\s*\[.*?\]\s*/g, '');
             }
 
-            const variant = getRandomVariant(selectedItemType);
-            const itemName = variant.name.replace(/\s*\[.*?\]\s*/g, '');
             const mainOre = getMainOre();
             const scaledStats = calculateScaledStats(itemName, statsMultiplier, priceMultiplier);
             const activeTraits = getActiveTraits();
 
             setTimeout(() => {
-                showForgeResult({
-                    itemName: itemName,
-                    itemType: selectedItemType,
-                    variant: variant,
-                    multiplier: statsMultiplier,
-                    statsMultiplier: statsMultiplier,
-                    priceMultiplier: priceMultiplier,
-                    mainOre: mainOre,
-                    stats: scaledStats,
-                    traits: activeTraits,
-                    area: currentArea,
-                    totalOres: totalOres
-                });
-
-                saveForgedItem({
-                    itemName: itemName,
-                    itemType: selectedItemType,
-                    variant: variant,
-                    multiplier: statsMultiplier,
-                    statsMultiplier: statsMultiplier,
-                    priceMultiplier: priceMultiplier,
-                    mainOre: mainOre,
-                    stats: scaledStats,
-                    traits: activeTraits,
-                    area: currentArea,
-                    totalOres: totalOres,
-                    mode: currentMode
-                });
-
-                forgeBtn.innerHTML = originalText;
-                forgeBtn.disabled = false;
-            }, 300);
-        }
-
-        function forgeSelectedVariant() {
-            const totalOres = oreMix.reduce((sum, item) => sum + item.count, 0);
-
-            if (totalOres < 3) return;
-            if (!selectedPreviewVariant.baseItemType || !selectedPreviewVariant.variantName) return;
-
-            const forgeBtn = document.getElementById('forge-variant-btn');
-            const originalText = forgeBtn.innerHTML;
-            forgeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Forging Variant...';
-            forgeBtn.disabled = true;
-
-            setTimeout(() => {
-                const { statsMultiplier, priceMultiplier } = calculateMultipliers(oreMix);
-                const selectedItemType = selectedPreviewVariant.baseItemType;
-                const itemName = selectedPreviewVariant.variantName;
-                const mainOre = getMainOre();
-                const scaledStats = calculateScaledStats(itemName, statsMultiplier, priceMultiplier);
-                const activeTraits = getActiveTraits();
-
-                const variant = {
-                    name: itemName,
-                    chance: "Guaranteed",
-                    probability: 1.0
-                };
-
                 const result = {
                     itemName: itemName,
                     itemType: selectedItemType,
@@ -6053,140 +5918,29 @@
             }, 300);
         }
 
-
         function showForgeResult(result) {
             const modal = document.getElementById('forge-result-modal');
             const content = document.getElementById('forge-result-body');
 
-            const bgColor = result.mainOre ? result.mainOre.color : '#FF6600';
-            let areaBgColor, areaColor, areaIcon, areaName;
-
-            switch (currentArea) {
-                case 'kingdom':
-                    areaBgColor = 'var(--primary-light)';
-                    areaColor = 'var(--primary)';
-                    areaIcon = 'fas fa-crown';
-                    areaName = 'Forgotten Kingdom';
-                    break;
-                case 'stonewake':
-                    areaBgColor = 'rgba(8,78,78,0.2)';
-                    areaColor = 'var(--stonewake-teal)';
-                    areaIcon = 'fas fa-mountain';
-                    areaName = 'Stonewake\'s Cross';
-                    break;
-                case 'frostspire':
-                    areaBgColor = 'rgba(106,183,255,0.2)';
-                    areaColor = '#6ab7ff';
-                    areaIcon = 'fas fa-snowflake';
-                    areaName = 'Frostspire Expanse';
-                    break;
-                default:
-                    areaBgColor = 'var(--primary-light)';
-                    areaColor = 'var(--primary)';
-                    areaIcon = 'fas fa-map-marker-alt';
-                    areaName = 'Unknown Area';
-            }
-
-            const itemImage = itemImages[result.itemName] || '';
-            const dps = currentMode === 'weapon' ? (result.stats.damage / result.stats.realSpeed) : null;
-            const baseDps = result.stats.damage / result.stats.realSpeed;
-            const qualityScale = getQualityFactor();
-
-            content.innerHTML = `
-        <div class="forge-result-container" style="background: linear-gradient(135deg, ${bgColor}15 0%, ${bgColor}08 25%, rgba(0,0,0,0.1) 50%, ${bgColor}08 75%, ${bgColor}15 100%); border: 2px solid ${bgColor}40;">
-            <div class="forge-result-header">
-                ${itemImage ? `
-                    <div class="forge-result-image" style="background-image: url('${itemImage}'); border-color: ${bgColor};">
-                    </div>
-                ` : ''}
-                <div class="forge-result-details">
-                    <div class="forge-result-name" style="color: ${bgColor};">
-                        ${result.itemName}
-                    </div>
-                    <div class="forge-result-type">
-                        ${result.itemType} • ${result.mainOre?.rarity ? result.mainOre.rarity.charAt(0).toUpperCase() + result.mainOre.rarity.slice(1) : 'Common'}
-                    </div>
-                    <div class="forge-result-tags">
-                        <div class="forge-tag" style="background: var(--primary-light); color: var(--text-secondary);">
-                            <i class="fas fa-percent"></i> ${result.statsMultiplier.toFixed(2)}x Multi
-                        </div>
-                        <div class="forge-tag" style="background: var(--primary-light); color: var(--text-secondary);">
-                            <i class="fas fa-star"></i> ${((qualityScale - 0.5) * 200).toFixed(0)}% Quality
-                        </div>
-                        <div class="forge-tag" style="background: ${bgColor}30; color: ${bgColor}; border-color: ${bgColor};">
-                            <i class="fas fa-gem"></i> ${result.mainOre?.name || 'Stone'}
-                        </div>
-                        <div class="forge-tag" style="background: ${areaBgColor}; border-color: ${areaColor}; color: ${areaColor};">
-                        <i class="${areaIcon}"></i> ${areaName}
-                    </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="forge-stats-grid">
-                ${currentMode === 'weapon' ? `
-                    <div class="forge-stat-item">
-                        <div class="forge-stat-value" style="color: var(--primary);">${result.stats.damage.toFixed(2)}</div>
-                        <div class="forge-stat-label">DAMAGE</div>
-                    </div>
-                    <div class="forge-stat-item">
-                        <div class="forge-stat-value" style="color: var(--rare);">${result.stats.atkSpeed}s (${result.stats.realSpeed.toFixed(2) || '0.00'})</div>
-                        <div class="forge-stat-label">ATK SPEED</div>
-                    </div>
-                    <div class="forge-stat-item">
-            <div class="forge-stat-value" style="color: var(--exotic);">${baseDps.toFixed(2)}</div>
-            <div class="forge-stat-label">BASE DPS</div>
-        </div>
-        <div class="forge-stat-item">
-            <div class="forge-stat-value" style="color: var(--mythical);">${result.stats.dpsWithTraits ? result.stats.dpsWithTraits.toFixed(2) : baseDps.toFixed(2)}</div>
-            <div class="forge-stat-label">TRAIT-ADJUSTED DPS</div>
-        </div>
-                    <div class="forge-stat-item">
-                        <div class="forge-stat-value" style="color: var(--relic);">${result.stats.range} studs</div>
-                        <div class="forge-stat-label">RANGE</div>
-                    </div>
-                    <div class="forge-stat-item">
-                        <div class="forge-stat-value" style="color: gold;">$${Math.round(result.stats.price)}</div>
-                        <div class="forge-stat-label">VALUE</div>
-                    </div>
-                ` : `
-                    <div class="forge-stat-item">
-                        <div class="forge-stat-value" style="color: var(--success);">+${result.stats.health}%</div>
-                        <div class="forge-stat-label">HEALTH BONUS</div>
-                    </div>
-                    <div class="forge-stat-item">
-                        <div class="forge-stat-value" style="color: var(--primary);">${Math.round(result.stats.def)}</div>
-                        <div class="forge-stat-label">DEF</div>
-                    </div>
-                    <div class="forge-stat-item" style="grid-column: 1 / -1;">
-                        <div class="forge-stat-value" style="color: gold;">$${Math.round(result.stats.price)}</div>
-                        <div class="forge-stat-label">VALUE</div>
-                    </div>
-                `}
-            </div>
-            
-            ${result.traits.length > 0 ? `
-                <div class="traits-section">
-                    <div class="traits-list-container">
-                        ${result.traits.map(trait => `
-                            <div class="forge-trait-item" style="border-color: ${trait.oreColor || 'var(--primary)'}40;">
-                                <div class="forge-trait-ore" style="color: ${trait.oreColor || 'var(--primary)'};">
-                                    <i class="fas ${getTraitIconClass(trait.oreId)}"></i> ${trait.oreName} (${trait.percentage.toFixed(1)}%)
-                                </div>
-                                <div class="forge-trait-desc">
-                                    ${trait.description.replace(
-                /([-+]?\d+(\.\d+)?)([+%s]*)/g,
-                '<span class="scalable-value">$1<span class="scalable-symbol">$3</span></span>'
-            )}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
-
-        </div>
-    `;
+            content.innerHTML = createItemCard({
+                type: 'forged',
+                itemName: result.itemName,
+                itemType: result.itemType,
+                mainOre: result.mainOre,
+                statsMultiplier: result.statsMultiplier,
+                priceMultiplier: result.priceMultiplier,
+                scaledStats: result.stats,
+                activeTraits: result.traits,
+                mode: currentMode,
+                area: currentArea,
+                qualityScale: getQualityFactor(),
+                variant: result.variant,
+                showVariantTooltip: false,
+                showForgeChance: false,
+                showTags: true,
+                showFullTraits: true,
+                image: itemImages[result.itemName] || ''
+            });
 
             modal.style.display = 'flex';
             modal.offsetHeight;
@@ -6219,7 +5973,13 @@
 
             forgeAgainBtn.addEventListener('click', () => {
                 closeModal();
-                setTimeout(() => simulateForge(), 350);
+                setTimeout(() => {
+                    if (lastForgeWasVariant) {
+                        simulateForge(true);
+                    } else {
+                        simulateForge(false);
+                    }
+                }, 350);
             });
 
             modal.addEventListener('click', (e) => {
@@ -6507,22 +6267,24 @@
             });
 
             forgeVariantBtn.addEventListener('click', () => {
-                forgeSelectedVariant();
+                lastForgeWasVariant = true;
+                simulateForge(true);
             });
 
             const forgeBtn = document.getElementById('forge-btn');
             if (forgeBtn) {
                 forgeBtn.addEventListener('click', () => {
+                    lastForgeWasVariant = false;
                     isQuickCraft = false;
                     quickCraftTargetItem = null;
-                    simulateForge();
+                    simulateForge(false);
                 });
             }
 
             const qualitySlider = document.getElementById('quality-slider');
             const qualityValue = document.getElementById('quality-value');
-            
-            qualitySlider.addEventListener('input', function() {
+
+            qualitySlider.addEventListener('input', function () {
                 qualityFactor = parseInt(this.value) / 100;
                 qualityValue.textContent = `${this.value}%`;
                 updateItemPreview();
