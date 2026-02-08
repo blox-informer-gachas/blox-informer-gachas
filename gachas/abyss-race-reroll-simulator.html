@@ -1,0 +1,2464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abyss Race Reroll Simulator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5596a6;
+            --primary-dark: #637c75;
+            --primary-light: rgba(95, 133, 143, 0.2);
+            --primary-glow: rgba(95, 133, 143, 0.6);
+            --background: #0f0f0f;
+            --card-bg: linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);
+            --race-name-bg: linear-gradient(145deg, #1e1e1ebf 0%, #2a2a2a80 100%);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --text: #f0f0f0;
+            --text-secondary: #6eafc0;
+            --border: #444;
+            --success: #4CAF50;
+            --warning: #ff9800;
+            --error: #f44336;
+            --glow: 0 0 15px rgba(95, 133, 143, 0.4);
+            --common: #8c8c8c;
+            --uncommon: #4CAF50;
+            --rare: #509CE7;
+            --epic: #7866c9;
+            --legendary: #c38b38;
+            --mythical: #bc362d;
+            --animation-speed: 0.3s;
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            max-width: 840px;
+            margin: 0 auto;
+            padding: 10px;
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(circle at 20% 80%, var(--primary-light) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, var(--primary-light) 0%, transparent 50%);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            opacity: 0.98;
+        }
+
+        header {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--border-radius);
+            box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+        }
+
+        .main-compact-section {
+            background: linear-gradient(145deg, #1e1e1e80 0%, #2a2a2a80 100%);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            animation: fadeInUp 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-compact-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+        }
+
+        .compact-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 15px;
+            min-height: 400px;
+        }
+
+        .section-header {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-header i {
+            margin-right: 6px;
+        }
+
+        .slot-indicator {
+            font-size: 0.80rem;
+            color: var(--text-secondary);
+            background: var(--primary-light);
+            padding: 2px 8px;
+            border-radius: 15px;
+        }
+
+        .compact-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .compact-slots-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            justify-content: space-evenly;
+        }
+
+        .compact-slot {
+            aspect-ratio: 1.25;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 2px dashed var(--border);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .compact-slot.active {
+            border: 3px solid var(--primary);
+            background-color: var(--primary-light);
+            box-shadow: var(--glow);
+            transition: all 0.3s ease;
+        }
+
+        .compact-slot:hover:not(.active) {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .slot-race-bg {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .slot-race-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-weight: bold;
+            padding: 8px 5px;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8),
+                -1px -1px 0 rgba(0, 0, 0, 0.5),
+                1px -1px 0 rgba(0, 0, 0, 0.5),
+                -1px 1px 0 rgba(0, 0, 0, 0.5),
+                1px 1px 0 rgba(0, 0, 0, 0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            color: var(--primary);
+        }
+
+        .slot-number {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .compact-middle {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .race-display-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            background: rgba(0, 0, 0, 0.3);
+            margin-bottom: 15px;
+            min-height: 250px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            aspect-ratio: 1.25;
+            max-height: 400px;
+        }
+
+        .race-image {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.9;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .race-name-text {
+            background: var(--race-name-bg);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            padding: 12px 15px;
+            margin-bottom: -1px;
+            position: relative;
+            z-index: 5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--primary);
+            border-bottom: none;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stats-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+            padding: 12px 15px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            z-index: 3;
+        }
+
+        .overlay-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .overlay-stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 2px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .overlay-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .compact-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-btn {
+            padding: 12px 15px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            width: 100%;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s;
+        }
+
+        .control-btn:hover::before {
+            left: 100%;
+        }
+
+        .reroll-btn {
+            background: linear-gradient(135deg, #C49E62, #936F43);
+            color: white;
+            box-shadow: 0 6px 25px var(--primary-light);
+        }
+
+        .reroll-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px var(--primary-glow);
+        }
+
+        .lucky-reroll-btn {
+            background: linear-gradient(135deg, #90669B, #6A4D87);
+            color: white;
+            box-shadow: 0 6px 25px rgba(144, 102, 155, 0.3);
+        }
+
+        .lucky-reroll-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(144, 102, 155, 0.4);
+        }
+
+        .auto-roll-btn {
+            background: linear-gradient(135deg, var(--success), #2e7d32);
+            color: white;
+            box-shadow: 0 6px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        .auto-roll-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(76, 175, 80, 0.4);
+        }
+
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--primary);
+        }
+
+        .compact-right {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-panel-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chances-grid-compact {
+            display: grid;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 5px;
+            max-height: 600px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .chance-item-compact {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), var(--primary-light));
+            border-radius: 8px;
+            padding: 10px 12px;
+            border-left: 4px solid;
+            transition: all var(--animation-speed);
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .chance-item-compact:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .chance-item-compact.common {
+            border-left-color: var(--common);
+        }
+
+        .chance-item-compact.uncommon {
+            border-left-color: var(--uncommon);
+        }
+
+        .chance-item-compact.rare {
+            border-left-color: var(--rare);
+        }
+
+        .chance-item-compact.epic {
+            border-left-color: var(--epic);
+        }
+
+        .chance-item-compact.legendary {
+            border-left-color: var(--legendary);
+        }
+
+        .chance-item-compact.mythical {
+            border-left-color: var(--mythical);
+        }
+
+        .chance-header-compact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .chance-name-compact {
+            font-weight: bold;
+            font-size: 0.85rem;
+            color: var(--text);
+            flex: 1;
+        }
+
+        .chance-percentage-compact {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            white-space: nowrap;
+            margin-left: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chance-bar-compact {
+            background: rgba(255, 255, 255, 0.1);
+            height: 6px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 5px;
+            position: relative;
+        }
+
+        .chance-fill-compact {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--text-secondary));
+            border-radius: 12px;
+            position: relative;
+            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            min-width: 0;
+        }
+
+        .chance-fill-compact::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+
+        .perks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            padding-right: 5px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            max-height: 610px;
+        }
+
+        .perk-item {
+            background: var(--primary-light);
+            border: 1px solid var(--primary);
+            border-radius: var(--border-radius);
+            padding: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        @keyframes gentlePulse {
+
+            0%,
+            100% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes raceImageReveal {
+            0% {
+                opacity: 0;
+                transform: scale(0.95);
+                filter: blur(2px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes smoothFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .perk-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-light), transparent);
+            opacity: 0;
+            transition: opacity var(--animation-speed) ease;
+        }
+
+        .perk-item:hover::before {
+            opacity: 1;
+        }
+
+        .perk-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--glow);
+        }
+
+        .perk-icon {
+            color: var(--primary);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .perk-content {
+            flex: 1;
+        }
+
+        .perk-name {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .perk-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn var(--animation-speed) ease-out;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--card-shadow);
+            border: 2px solid var(--primary-dark);
+            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center center;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.6rem;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all var(--animation-speed);
+            position: relative;
+        }
+
+        .modal-close:hover {
+            background: var(--primary-dark);
+            transform: rotate(90deg);
+        }
+
+        .modal-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .modal-option {
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .modal-option:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-light);
+        }
+
+        .modal-option.selected {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .modal-option-image {
+            border-radius: 8px;
+            background-size: cover;
+            margin-bottom: 5px;
+            aspect-ratio: 1.25;
+            width: 90%;
+        }
+
+        .modal-option-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .tooltip {
+            display: none;
+            position: fixed;
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 0;
+            z-index: 1001;
+            max-width: 320px;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            animation: tooltipFadeIn 0.2s ease-out;
+            pointer-events: none;
+        }
+
+        .tooltip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .tooltip-title {
+            font-size: 1.2rem;
+            color: var(--text);
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .tooltip-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: var(--text);
+            font-size: 1.4rem;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+            opacity: 0.7;
+        }
+
+        .tooltip-close:hover {
+            opacity: 1;
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        .tooltip-stats {
+            display: flex;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tooltip-stat {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .tooltip-stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .tooltip-stat-value {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .tooltip-content {
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .tooltip-perks {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tooltip-perk {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+            border-left: 3px solid var(--primary);
+            transition: all 0.2s;
+        }
+
+        .tooltip-perk:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(2px);
+        }
+
+        .tooltip-perk-name {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tooltip-perk-name i {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .tooltip-perk-description {
+            font-size: 0.85rem;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .perk-highlight {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        #target-race-compact {
+            display: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        }
+
+        @keyframes tooltipFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes rollText {
+            0% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes raceReveal {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .compact-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                min-height: auto;
+            }
+
+            .compact-slots-container {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            .compact-slot {
+                width: 30%;
+            }
+
+            .race-display-container {
+                min-height: 200px;
+            }
+
+            .compact-controls {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .compact-controls .control-btn {
+                flex: 1;
+                min-width: 140px;
+            }
+
+            .probability-metrics-compact {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .modal-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .compact-controls {
+                flex-direction: column;
+            }
+
+            .compact-controls .control-btn {
+                width: 100%;
+            }
+
+            .compact-slot {
+                width: 32%;
+                max-width: none;
+            }
+
+            .probability-metrics-compact {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .rolling-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: inherit;
+            animation: overlayFadeIn 0.2s ease-out;
+        }
+
+        @keyframes overlayFadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .rolling-names-container {
+            position: relative;
+            height: 120px;
+            width: 100%;
+            overflow: hidden;
+            perspective: 1000px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rolling-name {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) !important;
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px currentColor;
+            opacity: 0.7;
+            transition: all 0.1s ease;
+            text-align: center;
+            width: 100%;
+            will-change: transform, opacity;
+        }
+
+        .final-rolling-name {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) !important;
+            font-size: 3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 30px currentColor;
+            opacity: 0;
+            text-align: center;
+            width: 100%;
+            animation: finalReveal 0.8s ease-out forwards;
+        }
+
+        .stop-auto-roll-btn {
+            background: linear-gradient(135deg, #f44336, #d32f2f) !important;
+            color: white !important;
+            box-shadow: 0 6px 25px rgba(244, 67, 54, 0.3) !important;
+        }
+
+        .stop-auto-roll-btn:hover {
+            transform: translateY(-3px) scale(1.05) !important;
+            box-shadow: 0 12px 35px rgba(244, 67, 54, 0.4) !important;
+        }
+
+        @keyframes finalReveal {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+                filter: blur(10px);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);
+                filter: blur(0);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #555;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--primary);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        .animation-toggle {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                <h1><i class="fas fa-dice"></i> Abyss Race Reroll Simulator</h1>
+                <div class="animation-toggle" style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+                    <label for="animation-toggle" style="font-size: 0.9rem; cursor: pointer;">
+                        Animation
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="animation-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </header>
+
+        <section class="main-compact-section">
+            <div class="compact-container">
+                <div class="compact-left">
+                    <div class="section-header">
+                        <span><i class="fas fa-user-circle"></i> Race Slots</span>
+                    </div>
+                    <div class="compact-slots-container" id="race-slots">
+                    </div>
+                </div>
+
+                <div class="compact-middle">
+                    <div class="section-header">
+                        <span><i class="fas fa-eye"></i> Current Race</span>
+                        <div class="slot-indicator" id="selected-slot-indicator">
+                            Slot 1 Selected
+                        </div>
+                    </div>
+
+                    <div class="race-name-text" id="current-race-name">Poop
+                    </div>
+
+                    <div class="race-display-container" id="race-display">
+                        <div class="race-image" id="current-race-image"></div>
+                        <div class="stats-overlay">
+                            <div class="overlay-stat">
+                                <div class="overlay-stat-value" id="total-rerolls">0</div>
+                                <div class="overlay-stat-label">Total Rerolls</div>
+                            </div>
+                            <div class="overlay-stat">
+                                <div class="overlay-stat-value" id="robux-spent">0</div>
+                                <div class="overlay-stat-label">Star Shards Spent</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="compact-controls">
+                        <button class="control-btn reroll-btn" id="reroll-btn">
+                            <i class="fas fa-redo"></i> Reroll Slot (100 Star Shards)
+                        </button>
+                        <button class="control-btn lucky-reroll-btn" id="lucky-reroll-btn">
+                            <i class="fas fa-clover"></i> Lucky Reroll (450 Star Shards)
+                        </button>
+                        <button class="control-btn auto-roll-btn" id="auto-roll-btn">
+                            <i class="fas fa-robot"></i> Auto Roll Until Target
+                        </button>
+                        <button class="control-btn reset-btn" id="reset-stats-btn">
+                            <i class="fas fa-redo"></i> Reset Stats
+                        </button>
+                    </div>
+                </div>
+
+                <div class="compact-right">
+                    <div class="section-header">
+                        <span><i class="fas fa-star"></i> Race Perks</span>
+                    </div>
+                    <div class="perks-list" id="perks-list">
+                    </div>
+
+                </div>
+            </div>
+            <div class="section-header" id="right-panel-header">
+                <span style="margin-top: 10px;"><i class="fas fa-percentage"></i> Race Chances</span>
+            </div>
+            <div class="right-panel-content">
+                <div class="chances-grid-compact" id="chances-grid-compact">
+                </div>
+            </div>
+        </section>
+
+        <div class="modal-overlay" id="auto-roll-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-robot"></i> Auto Roll Configuration</h3>
+                    <button class="modal-close" id="auto-roll-close">&times;</button>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <p>Select a target race to auto roll until you get it:</p>
+                </div>
+                <div class="modal-options" id="auto-roll-options">
+                </div>
+                <div class="modal-nav" style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+                    <button class="control-btn reroll-btn" id="start-auto-roll">Start Auto Roll</button>
+                    <button class="control-btn lucky-reroll-btn" id="start-auto-lucky-roll">Start Auto Lucky
+                        Roll</button>
+                    <button class="control-btn reset-btn" id="cancel-auto-roll">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="auto-roll-complete-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-trophy"></i> Auto Roll Complete!</h3>
+                    <button class="modal-close" id="auto-roll-complete-close">&times;</button>
+                </div>
+                <div style="text-align: center; padding: 20px 0;">
+                    <div style="font-size: 1.5rem; color: var(--primary); margin-bottom: 10px;">
+                        <i class="fas fa-check-circle"></i> Success!
+                    </div>
+                    <div style="font-size: 1.2rem; margin-bottom: 15px;">
+                        You obtained <span id="auto-roll-race"
+                            style="color: var(--primary); font-weight: bold;">Poop</span>!
+                    </div>
+                    <div style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 20px;">
+                        It took <span id="auto-roll-count" style="color: var(--primary); font-weight: bold;">0</span>
+                        rerolls
+                        and <span id="auto-roll-robux" style="color: var(--primary); font-weight: bold;">0</span> Star
+                        Shards.
+                    </div>
+                    <div
+                        style="background: var(--primary-light); padding: 15px; border-radius: 10px; margin-top: 20px;">
+                        <div style="font-weight: bold; margin-bottom: 5px;">Statistics:</div>
+                        <div>Average expected rolls: <span id="auto-roll-expected"
+                                style="color: var(--primary);">0</span></div>
+                        <div>Your luck factor: <span id="auto-roll-luck" style="color: var(--primary);">0%</span></div>
+                    </div>
+                </div>
+                <div class="modal-nav" style="display: flex; justify-content: center; margin-top: 20px;">
+                    <button class="control-btn reroll-btn" id="close-auto-roll-complete">Great!</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tooltip" id="race-tooltip">
+            <div class="tooltip-header">
+                <h3 class="tooltip-title" id="tooltip-race-name">Race</h3>
+                <span class="tooltip-close" id="tooltip-close">&times;</span>
+            </div>
+            <div class="tooltip-content" id="tooltip-content">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const raceData = [
+            {
+                name: "Sea Angel",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/sea-angel-race-abyss-calculator.png",
+                rarity: "mythical",
+                percentage: 0.1,
+                luckyPercentage: 0.5,
+                perks: [
+                    "Sea Angel: <span class='perk-highlight'>+10% Speed</span>, <span class='perk-highlight'>+25% Oxygen</span>, <span class='perk-highlight'>+15% Cash</span>",
+                    "Last Breath Sprint: While you are below 20% oxygen, <span class='perk-highlight'>sprinting no longer consumes extra oxygen</span>.",
+                    "Kinetic Wrath: Gain <span class='perk-highlight'>bonus damage equal to 35% of your movement speed</span>.",
+                    "Abyssal Focus: As oxygen falls below 50%, your focus sharpens, <span class='perk-highlight'>increasing catching minigame progress speed</span>. This bonus scales with lower oxygen, and caps at 20% oxygen left."
+                ]
+            },
+            {
+                name: "Kraken",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/kraken-race-abyss-calculator.webp",
+                rarity: "mythical",
+                percentage: 0.1,
+                luckyPercentage: 0.5,
+                perks: [
+                    "Kraken: <span class='perk-highlight'>+20% Weight</span>, <span class='perk-highlight'>+15% XP</span>, <span class='perk-highlight'>+15% Cash</span>",
+                    "Endless Depths: Every fish caught <span class='perk-highlight'>increases Damage by +0.04% permanently</span>. (50% cap)",
+                    "Leviathan's Legacy: After you die, instead of dying, <span class='perk-highlight'>regenerate 100% of your oxygen </span> and <span class='perk-highlight'>deal 300% AoE damage around you</span>. (8 minutes cooldown)"
+                ]
+            },
+            {
+                name: "Shark",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/shark-race-abyss-calculator.webp",
+                rarity: "legendary",
+                percentage: 1,
+                luckyPercentage: 5,
+                perks: [
+                    "Shark: <span class='perk-highlight'>-0.4s Cooldown</span>, <span class='perk-highlight'>+20% Damage</span>",
+                    "Blood Frenzy: While you are below 30% oxygen, you deal <span class='perk-highlight'>30% more damage</span>.",
+                    "Sea Sprint: Tube boost consumes <span class='perk-highlight'>50% less oxygen</span>."
+                ]
+            },
+            {
+                name: "Vampire Squid",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/vampire-squid-race-abyss-calculator.webp",
+                rarity: "legendary",
+                percentage: 1,
+                luckyPercentage: 5,
+                perks: [
+                    "Vampire Squid: <span class='perk-highlight'>+10% XP</span>, <span class='perk-highlight'>+20% Oxygen</span>",
+                    "Blood Siphon: When catching a fish, <span class='perk-highlight'>regen oxygen for 10% of the damage dealt</span>. (15 seconds cooldown)"
+                ]
+            },
+            {
+                name: "Anglerfish",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/anglerfish-race-abyss-calculator.webp",
+                rarity: "epic",
+                percentage: 2.5,
+                luckyPercentage: 10.5,
+                perks: [
+                    "Anglerfish: <span class='perk-highlight'>-0.2s Cooldown</span>, <span class='perk-highlight'>+5% Cash</span>",
+                    "Hunter's Instinct: <span class='perk-highlight'>10% chance</span> for double drops when catching fish.",
+                    "Abyssal Light: <span class='perk-highlight'>Illuminates surroundings</span> in darkness."
+                ]
+            },
+            {
+                name: "Crab",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/crab-race-abyss-calculator.webp",
+                rarity: "epic",
+                percentage: 2.5,
+                luckyPercentage: 10.5,
+                perks: [
+                    "Crab: <span class='perk-highlight'>+15% Oxygen</span>, <span class='perk-highlight'>+15% Weight</span>, <span class='perk-highlight'>+5% XP</span>",
+                    "Iron Shell: <span class='perk-highlight'>25% chance</span> to absorb incoming attacks."
+                ]
+            },
+            {
+                name: "Narwhal",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/narwhal-race-abyss-calculator.webp",
+                rarity: "rare",
+                percentage: 4.7,
+                luckyPercentage: 12.7,
+                perks: [
+                    "Narwhal: <span class='perk-highlight'>+8% Speed</span>, <span class='perk-highlight'>+15% Weight</span>",
+                    "Piercing Horn: <span class='perk-highlight'>10% chance</span> to deal double damage."
+                ]
+            },
+            {
+                name: "Spirit",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/spirit-race-abyss-calculator.webp",
+                rarity: "rare",
+                percentage: 4.7,
+                luckyPercentage: 12.7,
+                perks: [
+                    "Spirit: <span class='perk-highlight'>-0.2s Cooldown</span>, <span class='perk-highlight'>+5% Cash</span>",
+                    "Last Breath: After you die, instead of dying, you <span class='perk-highlight'>regenerate 30% of your oxygen</span>. (3 minutes cooldown)"
+                ]
+            },
+            {
+                name: "Puffer",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/puffer-race-abyss-calculator.webp",
+                rarity: "rare",
+                percentage: 4.7,
+                luckyPercentage: 12.7,
+                perks: [
+                    "Puffer: <span class='perk-highlight'>+10% Oxygen</span>",
+                    "Spiky Body: Reflects <span class='perk-highlight'>20% of incoming melee damage</span> back to the attacker."
+                ]
+            },
+            {
+                name: "Fish",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/fish-race-abyss-calculator.webp",
+                rarity: "uncommon",
+                percentage: 9.7,
+                luckyPercentage: 9,
+                perks: [
+                    "Fish: <span class='perk-highlight'>+10% Oxygen</span>, <span class='perk-highlight'>+5% Speed</span>"
+                ]
+            },
+            {
+                name: "Cyclops",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/cyclops-race-abyss-calculator.webp",
+                rarity: "uncommon",
+                percentage: 9.7,
+                luckyPercentage: 9,
+                perks: [
+                    "Cyclops: <span class='perk-highlight'>-0.2s Cooldown</span>, <span class='perk-highlight'>+10% Damage</span>"
+                ]
+            },
+            {
+                name: "Monkey",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/monkey-race-abyss-calculator.webp",
+                rarity: "uncommon",
+                percentage: 9.7,
+                luckyPercentage: 9,
+                perks: [
+                    "Monkey: <span class='perk-highlight'>+10% Speed</span>, <span class='perk-highlight'>+10% Weight</span>"
+                ]
+            },
+            {
+                name: "Elf",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/elf-race-abyss-calculator.webp",
+                rarity: "common",
+                percentage: 16.67,
+                luckyPercentage: 1,
+                perks: [
+                    "Elf: <span class='perk-highlight'>+5% Speed</span>"
+                ]
+            },
+            {
+                name: "Coral",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/coral-race-abyss-calculator.webp",
+                rarity: "common",
+                percentage: 16.67,
+                luckyPercentage: 1,
+                perks: [
+                    "Coral: <span class='perk-highlight'>+10% Oxygen</span>"
+                ]
+            },
+            {
+                name: "Poop",
+                image: "https://bloxinformer.com/wp-content/uploads/2026/02/poop-race-abyss-calculator.webp",
+                rarity: "common",
+                percentage: 16.67,
+                luckyPercentage: 1,
+                perks: [
+                    "Poop: <span class='perk-highlight'>+10% Damage</span>"
+                ]
+            }
+        ];
+
+        let currentSlot = 0;
+        let slots = [
+            { race: "Poop", rerolls: 0 },
+            { race: "Poop", rerolls: 0 },
+            { race: "Poop", rerolls: 0 }
+        ];
+        let totalRerolls = 0;
+        let robuxSpent = 0;
+        let autoRollTarget = null;
+        let autoRollCount = 0;
+        let autoRollInterval = null;
+        let currentCalculatorRace = "Poop";
+        let tooltipTimeout = null;
+        let currentTooltipRace = null;
+        let animationEnabled = true;
+        let isLuckyAutoRoll = false;
+
+        const raceSlotsContainer = document.getElementById('race-slots');
+        const selectedSlotIndicator = document.getElementById('selected-slot-indicator');
+        const currentRaceImage = document.getElementById('current-race-image');
+        const currentRaceName = document.getElementById('current-race-name');
+        const perksList = document.getElementById('perks-list');
+        const totalRerollsDisplay = document.getElementById('total-rerolls');
+        const robuxSpentDisplay = document.getElementById('robux-spent');
+        const rerollBtn = document.getElementById('reroll-btn');
+        const autoRollBtn = document.getElementById('auto-roll-btn');
+        const resetStatsBtn = document.getElementById('reset-stats-btn');
+        const chancesGridCompact = document.getElementById('chances-grid-compact');
+        const calculatorCompact = document.getElementById('calculator-compact');
+        const backToChancesBtn = document.getElementById('back-to-chances-compact');
+        const calculatorRaceName = document.getElementById('calculator-race-name');
+        const currentRollsInputCompact = document.getElementById('current-rolls-compact');
+        const metric50Compact = document.getElementById('metric-50-compact');
+        const metric75Compact = document.getElementById('metric-75-compact');
+        const metric90Compact = document.getElementById('metric-90-compact');
+        const metric99Compact = document.getElementById('metric-99-compact');
+        const currentChanceValueCompact = document.getElementById('current-chance-value-compact');
+        const currentChanceDetailCompact = document.getElementById('current-chance-detail-compact');
+        const autoRollModal = document.getElementById('auto-roll-modal');
+        const autoRollOptions = document.getElementById('auto-roll-options');
+        const startAutoRollBtn = document.getElementById('start-auto-roll');
+        const cancelAutoRollBtn = document.getElementById('cancel-auto-roll');
+        const autoRollClose = document.getElementById('auto-roll-close');
+        const autoRollCompleteModal = document.getElementById('auto-roll-complete-modal');
+        const autoRollRace = document.getElementById('auto-roll-race');
+        const autoRollCountDisplay = document.getElementById('auto-roll-count');
+        const autoRollRobux = document.getElementById('auto-roll-robux');
+        const autoRollExpected = document.getElementById('auto-roll-expected');
+        const autoRollLuck = document.getElementById('auto-roll-luck');
+        const autoRollCompleteClose = document.getElementById('auto-roll-complete-close');
+        const closeAutoRollComplete = document.getElementById('close-auto-roll-complete');
+        const raceTooltip = document.getElementById('race-tooltip');
+        const tooltipClose = document.getElementById('tooltip-close');
+        const tooltipRaceName = document.getElementById('tooltip-race-name');
+        const tooltipContent = document.getElementById('tooltip-content');
+        const raceDropdownSelected = document.getElementById('race-dropdown-selected');
+        const raceDropdownOptions = document.getElementById('race-dropdown-options');
+        const animationToggle = document.getElementById('animation-toggle');
+        const compactMiddle = document.querySelector('.compact-middle');
+        const luckyRerollBtn = document.getElementById('lucky-reroll-btn');
+        const startAutoLuckyRollBtn = document.getElementById('start-auto-lucky-roll');
+
+        function init() {
+            renderRaceSlots();
+            updateDisplay();
+            renderChancesGridCompact();
+            setupEventListeners();
+            updateStatistics();
+            loadFromLocalStorage();
+            renderAutoRollOptions();
+            setupTooltip();
+            loadAnimationPreference();
+            setupAnimationToggle();
+        }
+
+        function setupAnimationToggle() {
+            const savedAnimation = localStorage.getItem('abyssRaceAnimation');
+            if (savedAnimation !== null) {
+                animationEnabled = savedAnimation === 'true';
+                animationToggle.checked = animationEnabled;
+            }
+
+            animationToggle.addEventListener('change', function () {
+                animationEnabled = this.checked;
+                localStorage.setItem('abyssRaceAnimation', animationEnabled);
+            });
+        }
+
+        function renderRaceSlots() {
+            raceSlotsContainer.innerHTML = '';
+
+            slots.forEach((slot, index) => {
+                const slotElement = document.createElement('div');
+                slotElement.className = `compact-slot ${index === currentSlot ? 'active' : ''}`;
+                slotElement.dataset.index = index;
+
+                const race = raceData.find(r => r.name === slot.race);
+                const imageUrl = race ? race.image : raceData[0].image;
+
+                slotElement.innerHTML = `
+                    <div class="slot-race-bg" style="background-image: url('${imageUrl}')"></div>
+                    <div class="slot-number">${index + 1}</div>
+                `;
+
+                slotElement.addEventListener('click', () => {
+                    currentSlot = index;
+                    renderRaceSlots();
+                    updateDisplay();
+                });
+
+                raceSlotsContainer.appendChild(slotElement);
+            });
+        }
+
+        function updateDisplay() {
+            const currentRace = slots[currentSlot].race;
+            const race = raceData.find(r => r.name === currentRace);
+
+            if (race) {
+                currentRaceImage.style.opacity = '0';
+
+                setTimeout(() => {
+                    currentRaceImage.style.backgroundImage = `url('${race.image}')`;
+                    currentRaceImage.style.opacity = '1';
+                    currentRaceImage.style.animation = 'raceImageReveal 0.5s ease-out';
+                }, 50);
+
+                const raceRarityColor = getRarityColor(race.rarity);
+                currentRaceName.style.backgroundColor = raceRarityColor;
+                currentRaceName.style.borderColor = raceRarityColor;
+                currentRaceName.style.color = raceRarityColor;
+                currentRaceName.textContent = race.name;
+
+                currentRaceName.style.animation = 'gentlePulse 0.8s ease-out';
+
+                selectedSlotIndicator.textContent = `Slot ${currentSlot + 1} Selected`;
+
+                perksList.innerHTML = '';
+                race.perks.forEach((perk, index) => {
+                    const perkElement = document.createElement('div');
+                    perkElement.className = 'perk-item';
+                    perkElement.style.animationDelay = `${index * 0.1}s`;
+                    perkElement.innerHTML = `
+                <div class="perk-content">
+                    <div class="perk-name"><i class="fas fa-star"></i> ${perk.split(':')[0]}</div>
+                    <div class="perk-description">${perk.split(':').slice(1).join(':')}</div>
+                </div>
+            `;
+                    perksList.appendChild(perkElement);
+                });
+            }
+        }
+
+        function renderChancesGridCompact() {
+            chancesGridCompact.innerHTML = '';
+
+            raceData.forEach(race => {
+                const chanceElement = document.createElement('div');
+                chanceElement.className = `chance-item-compact ${race.rarity}`;
+                chanceElement.dataset.race = race.name;
+
+                chanceElement.innerHTML = `
+                    <div class="chance-header-compact">
+                        <div class="chance-name-compact">${race.name}</div>
+                        <div class="chance-percentage-compact">${race.percentage}%</div>
+                    </div>
+                    <div class="chance-bar-compact">
+                        <div class="chance-fill-compact" style="width: ${race.percentage}%"></div>
+                    </div>
+                `;
+
+                chanceElement.addEventListener('mouseenter', (e) => {
+                    showRaceTooltip(race, e);
+                });
+
+                chanceElement.addEventListener('mouseleave', () => {
+                    setTimeout(() => {
+                        if (!raceTooltip.matches(':hover')) {
+                            raceTooltip.style.display = 'none';
+                        }
+                    }, 100);
+                });
+
+                chancesGridCompact.appendChild(chanceElement);
+            });
+        }
+
+        function showRaceTooltip(race, event) {
+            if (tooltipTimeout) {
+                clearTimeout(tooltipTimeout);
+            }
+
+            currentTooltipRace = race;
+
+            tooltipTimeout = setTimeout(() => {
+                if (currentTooltipRace !== race) return;
+
+                tooltipRaceName.textContent = race.name;
+                tooltipRaceName.style.color = getRarityColor(race.rarity);
+
+                let perksHTML = `<div class="tooltip-perks">`;
+                race.perks.forEach(perk => {
+                    const [perkName, ...perkDescParts] = perk.split(':');
+                    const perkDescription = perkDescParts.join(':');
+
+                    perksHTML += `
+                <div class="tooltip-perk">
+                    <div class="tooltip-perk-name">
+                        <i class="fas fa-star"></i>
+                        ${perkName.trim()}:
+                    </div>
+                    <div class="tooltip-perk-description">${perkDescription.trim()}</div>
+                </div>
+            `;
+                });
+                perksHTML += `</div>`;
+
+                tooltipContent.innerHTML = perksHTML;
+
+                raceTooltip.style.display = 'block';
+
+                raceTooltip.style.opacity = '0';
+                const tooltipRect = raceTooltip.getBoundingClientRect();
+
+                let left = event.clientX - 15;
+                let top = event.clientY - 15;
+
+                if (left + tooltipRect.width > window.innerWidth - 5) {
+                    left = event.clientX - tooltipRect.width - 5;
+                }
+
+                if (top + tooltipRect.height > window.innerHeight - 15) {
+                    top = event.clientY - tooltipRect.height - 20;
+                }
+
+                left = Math.max(15, Math.min(left, window.innerWidth - tooltipRect.width - 15));
+                top = Math.max(15, Math.min(top, window.innerHeight - tooltipRect.height - 15));
+
+                raceTooltip.style.position = 'fixed';
+                raceTooltip.style.left = `${left}px`;
+                raceTooltip.style.top = `${top}px`;
+                raceTooltip.style.opacity = '1';
+                raceTooltip.style.pointerEvents = 'auto';
+
+            }, 100);
+        }
+
+        function setupTooltip() {
+            tooltipClose.addEventListener('click', () => {
+                raceTooltip.style.display = 'none';
+                raceTooltip.style.pointerEvents = 'none';
+            });
+
+            document.addEventListener('mouseover', (e) => {
+                const isRaceItem = e.target.closest('.chance-item-compact');
+                const isInTooltip = e.target.closest('.tooltip');
+
+                if (!isRaceItem && !isInTooltip && raceTooltip.style.display === 'block') {
+                    raceTooltip.style.display = 'none';
+                    raceTooltip.style.pointerEvents = 'none';
+                    if (tooltipTimeout) {
+                        clearTimeout(tooltipTimeout);
+                        tooltipTimeout = null;
+                    }
+                }
+            });
+
+            raceTooltip.addEventListener('mouseenter', () => {
+                raceTooltip.style.display = 'block';
+                raceTooltip.style.pointerEvents = 'auto';
+            });
+
+            raceTooltip.addEventListener('mouseleave', () => {
+                raceTooltip.style.display = 'none';
+                raceTooltip.style.pointerEvents = 'none';
+            });
+        }
+
+        function performReroll() {
+            if (autoRollInterval) return;
+
+            if (animationEnabled) {
+                performRerollWithAnimation();
+            } else {
+                performInstantReroll();
+            }
+        }
+
+        function performInstantReroll() {
+            if (autoRollInterval) return;
+
+            const rollCost = 100;
+
+            rerollBtn.disabled = true;
+            rerollBtn.style.opacity = '0.7';
+            rerollBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Rolling...';
+
+            currentRaceImage.style.transition = 'opacity 0.2s ease';
+            currentRaceName.style.transition = 'opacity 0.2s ease';
+            currentRaceImage.style.opacity = '0.3';
+            currentRaceName.style.opacity = '0.5';
+
+            setTimeout(() => {
+                const random = Math.random() * 100;
+                let cumulative = 0;
+                let selectedRace = raceData[0];
+
+                for (const race of raceData) {
+                    cumulative += race.percentage;
+                    if (random <= cumulative) {
+                        selectedRace = race;
+                        break;
+                    }
+                }
+
+                slots[currentSlot].race = selectedRace.name;
+                slots[currentSlot].rerolls++;
+
+                totalRerolls++;
+                robuxSpent += rollCost;
+
+                updateDisplay();
+                renderRaceSlots();
+                updateStatistics();
+                saveToLocalStorage();
+
+                currentRaceName.style.opacity = '1';
+
+                setTimeout(() => {
+                    rerollBtn.disabled = false;
+                    rerollBtn.style.opacity = '1';
+                    rerollBtn.innerHTML = '<i class="fas fa-redo"></i> Reroll Slot (100 Star Shards)';
+                }, 300);
+
+            }, 200);
+        }
+
+        function performRerollWithAnimation() {
+            if (autoRollInterval) return;
+
+            const raceDisplay = document.getElementById('race-display');
+            const currentRaceNameElement = document.querySelector('.race-name-text');
+            const rollCost = 100;
+
+            rerollBtn.disabled = true;
+            rerollBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Rolling...';
+
+            const currentRace = slots[currentSlot].race;
+            const currentRaceData = raceData.find(r => r.name === currentRace);
+
+            const rollingOverlay = document.createElement('div');
+            rollingOverlay.className = 'rolling-overlay';
+            rollingOverlay.innerHTML = `
+        <div class="rolling-names-container" id="rolling-names"></div>
+    `;
+            raceDisplay.appendChild(rollingOverlay);
+
+            let rollCount = 0;
+            const maxRolls = 10;
+            const rollSpeed = 150;
+            let currentSpeed = rollSpeed;
+
+            function showRandomName() {
+                const randomRace = raceData[Math.floor(Math.random() * raceData.length)];
+                const namesContainer = document.getElementById('rolling-names');
+                const nameElement = document.createElement('div');
+                nameElement.className = 'rolling-name';
+                nameElement.textContent = randomRace.name;
+                nameElement.style.color = getRarityColor(randomRace.rarity);
+
+                namesContainer.appendChild(nameElement);
+
+                const allNames = namesContainer.querySelectorAll('.rolling-name');
+                if (allNames.length > 1) {
+                    allNames[0].remove();
+                }
+
+                allNames.forEach((name, index) => {
+                    name.style.opacity = (1 - (index * 0.3)).toString();
+                    name.style.transform = `translate(-50%, calc(-50% + ${index * 30}px))`;
+                });
+            }
+
+            const rollInterval = setInterval(() => {
+                showRandomName();
+                rollCount++;
+
+                if (rollCount > maxRolls * 0.6) {
+                    currentSpeed += 20;
+                }
+
+                if (rollCount >= maxRolls) {
+                    clearInterval(rollInterval);
+
+                    const random = Math.random() * 100;
+                    let cumulative = 0;
+                    let selectedRace = raceData[0];
+
+                    for (const race of raceData) {
+                        cumulative += race.percentage;
+                        if (random <= cumulative) {
+                            selectedRace = race;
+                            break;
+                        }
+                    }
+
+                    setTimeout(() => {
+
+                        const namesContainer = document.getElementById('rolling-names');
+                        namesContainer.innerHTML = '';
+
+                        const finalName = document.createElement('div');
+                        finalName.className = 'final-rolling-name';
+                        finalName.textContent = selectedRace.name;
+                        finalName.style.color = getRarityColor(selectedRace.rarity);
+                        namesContainer.appendChild(finalName);
+
+                        finalName.style.animation = 'finalReveal 0.8s ease-out forwards';
+
+                        setTimeout(() => {
+                            slots[currentSlot].race = selectedRace.name;
+                            slots[currentSlot].rerolls++;
+
+                            totalRerolls++;
+                            robuxSpent += rollCost;
+
+                            updateDisplay();
+                            renderRaceSlots();
+                            updateStatistics();
+                            saveToLocalStorage();
+
+                            rollingOverlay.style.opacity = '0';
+                            rollingOverlay.style.transition = 'opacity 0.3s ease';
+                            setTimeout(() => {
+                                rollingOverlay.remove();
+                            }, 300);
+
+                            rerollBtn.disabled = false;
+                            rerollBtn.innerHTML = '<i class="fas fa-redo"></i> Reroll Slot (100 Star Shards)';
+
+                            currentRaceImage.style.opacity = '0';
+                            setTimeout(() => {
+                                currentRaceImage.style.backgroundImage = `url('${selectedRace.image}')`;
+                                currentRaceImage.style.opacity = '1';
+                                currentRaceImage.style.transition = 'opacity 0.5s ease';
+                            }, 300);
+
+                        }, 800);
+
+                    }, 200);
+                }
+            }, currentSpeed);
+        }
+
+        function performLuckyReroll() {
+            if (autoRollInterval) return;
+
+            if (animationEnabled) {
+                performLuckyRerollWithAnimation();
+            } else {
+                performInstantLuckyReroll();
+            }
+        }
+
+        function performInstantLuckyReroll() {
+            if (autoRollInterval) return;
+
+            const rollCost = 450;
+
+            luckyRerollBtn.disabled = true;
+            luckyRerollBtn.style.opacity = '0.7';
+            luckyRerollBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Rolling Lucky...';
+
+            currentRaceImage.style.transition = 'opacity 0.2s ease';
+            currentRaceName.style.transition = 'opacity 0.2s ease';
+            currentRaceImage.style.opacity = '0.3';
+            currentRaceName.style.opacity = '0.5';
+
+            setTimeout(() => {
+                const random = Math.random() * 100;
+                let cumulative = 0;
+                let selectedRace = raceData[0];
+
+                for (const race of raceData) {
+                    cumulative += race.luckyPercentage;
+                    if (random <= cumulative) {
+                        selectedRace = race;
+                        break;
+                    }
+                }
+
+                slots[currentSlot].race = selectedRace.name;
+                slots[currentSlot].rerolls++;
+
+                totalRerolls++;
+                robuxSpent += rollCost;
+
+                updateDisplay();
+                renderRaceSlots();
+                updateStatistics();
+                saveToLocalStorage();
+
+                currentRaceImage.style.opacity = '1';
+                currentRaceName.style.opacity = '1';
+
+                setTimeout(() => {
+                    luckyRerollBtn.disabled = false;
+                    luckyRerollBtn.style.opacity = '1';
+                    luckyRerollBtn.innerHTML = '<i class="fas fa-clover"></i> Lucky Reroll (450 Star Shards)';
+                }, 300);
+
+            }, 200);
+        }
+
+        function performLuckyRerollWithAnimation() {
+            if (autoRollInterval) return;
+
+            const raceDisplay = document.getElementById('race-display');
+            const rollCost = 450;
+
+            luckyRerollBtn.disabled = true;
+            luckyRerollBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Rolling Lucky...';
+
+            const currentRace = slots[currentSlot].race;
+            const currentRaceData = raceData.find(r => r.name === currentRace);
+
+            const rollingOverlay = document.createElement('div');
+            rollingOverlay.className = 'rolling-overlay';
+            rollingOverlay.innerHTML = `
+                <div class="rolling-names-container" id="rolling-names-lucky"></div>
+            `;
+            raceDisplay.appendChild(rollingOverlay);
+
+            let rollCount = 0;
+            const maxRolls = 10;
+            const rollSpeed = 150;
+            let currentSpeed = rollSpeed;
+
+            function showRandomName() {
+                const randomRace = raceData[Math.floor(Math.random() * raceData.length)];
+                const namesContainer = document.getElementById('rolling-names-lucky');
+                const nameElement = document.createElement('div');
+                nameElement.className = 'rolling-name';
+                nameElement.textContent = randomRace.name;
+                nameElement.style.color = getRarityColor(randomRace.rarity);
+
+                namesContainer.appendChild(nameElement);
+
+                const allNames = namesContainer.querySelectorAll('.rolling-name');
+                if (allNames.length > 1) {
+                    allNames[0].remove();
+                }
+
+                allNames.forEach((name, index) => {
+                    name.style.opacity = (1 - (index * 0.3)).toString();
+                    name.style.transform = `translate(-50%, calc(-50% + ${index * 30}px))`;
+                });
+            }
+
+            const rollInterval = setInterval(() => {
+                showRandomName();
+                rollCount++;
+
+                if (rollCount > maxRolls * 0.6) {
+                    currentSpeed += 20;
+                }
+
+                if (rollCount >= maxRolls) {
+                    clearInterval(rollInterval);
+
+                    const random = Math.random() * 100;
+                    let cumulative = 0;
+                    let selectedRace = raceData[0];
+
+                    for (const race of raceData) {
+                        cumulative += race.luckyPercentage;
+                        if (random <= cumulative) {
+                            selectedRace = race;
+                            break;
+                        }
+                    }
+
+                    setTimeout(() => {
+                        const namesContainer = document.getElementById('rolling-names-lucky');
+                        namesContainer.innerHTML = '';
+
+                        const finalName = document.createElement('div');
+                        finalName.className = 'final-rolling-name';
+                        finalName.textContent = selectedRace.name;
+                        finalName.style.color = getRarityColor(selectedRace.rarity);
+                        namesContainer.appendChild(finalName);
+
+                        finalName.style.animation = 'finalReveal 0.8s ease-out forwards';
+
+                        setTimeout(() => {
+                            slots[currentSlot].race = selectedRace.name;
+                            slots[currentSlot].rerolls++;
+
+                            totalRerolls++;
+                            robuxSpent += rollCost;
+
+                            updateDisplay();
+                            renderRaceSlots();
+                            updateStatistics();
+                            saveToLocalStorage();
+
+                            rollingOverlay.style.opacity = '0';
+                            rollingOverlay.style.transition = 'opacity 0.3s ease';
+                            setTimeout(() => {
+                                rollingOverlay.remove();
+                            }, 300);
+
+                            luckyRerollBtn.disabled = false;
+                            luckyRerollBtn.innerHTML = '<i class="fas fa-clover"></i> Lucky Reroll (450 Star Shards)';
+
+                            currentRaceImage.style.opacity = '0';
+                            setTimeout(() => {
+                                currentRaceImage.style.backgroundImage = `url('${selectedRace.image}')`;
+                                currentRaceImage.style.opacity = '1';
+                                currentRaceImage.style.transition = 'opacity 0.5s ease';
+                            }, 300);
+
+                        }, 800);
+
+                    }, 200);
+                }
+            }, currentSpeed);
+        }
+
+        function startAutoRoll() {
+            if (!autoRollTarget) return;
+
+            autoRollModal.style.display = 'none';
+            autoRollModal.classList.remove('show');
+
+            const raceDisplay = document.getElementById('race-display');
+            autoRollCount = 0;
+            let found = false;
+
+            const rollCost = isLuckyAutoRoll ? 450 : 100;
+
+            function performSingleAutoRoll() {
+                if (!autoRollInterval) return;
+
+                if (autoRollCount === 1) {
+                    updateAutoRollButton();
+                }
+                autoRollCount++;
+
+                currentRaceImage.style.transition = 'opacity 0.15s ease';
+                currentRaceName.style.transition = 'opacity 0.15s ease';
+                currentRaceImage.style.opacity = '0.4';
+                currentRaceName.style.opacity = '0.6';
+
+                setTimeout(() => {
+                    if (!autoRollInterval) return;
+
+                    const random = Math.random() * 100;
+                    let cumulative = 0;
+                    let selectedRace = raceData[0];
+
+                    const percentageKey = isLuckyAutoRoll ? 'luckyPercentage' : 'percentage';
+
+                    for (const race of raceData) {
+                        cumulative += race[percentageKey];
+                        if (random <= cumulative) {
+                            selectedRace = race;
+                            break;
+                        }
+                    }
+
+                    const raceRarityColor = getRarityColor(selectedRace.rarity);
+                    currentRaceName.textContent = selectedRace.name;
+                    currentRaceName.style.backgroundColor = raceRarityColor;
+                    currentRaceName.style.borderColor = raceRarityColor;
+                    currentRaceName.style.color = raceRarityColor;
+                    currentRaceImage.style.backgroundImage = `url('${selectedRace.image}')`;
+                    currentRaceImage.style.opacity = '1';
+                    currentRaceName.style.opacity = '1';
+
+                    if (selectedRace.name === autoRollTarget) {
+                        found = true;
+                        clearInterval(autoRollInterval);
+                        autoRollInterval = null;
+                        isLuckyAutoRoll = false;
+                        updateAutoRollButton();
+
+                        slots[currentSlot].race = selectedRace.name;
+                        slots[currentSlot].rerolls += autoRollCount;
+
+                        totalRerolls += autoRollCount;
+                        robuxSpent += autoRollCount * rollCost;
+
+                        setTimeout(() => {
+                            updateDisplay();
+                            renderRaceSlots();
+                            updateStatistics();
+                            saveToLocalStorage();
+
+                            showAutoRollComplete(selectedRace, rollCost);
+                        }, 200);
+                    }
+
+                    if (autoRollCount > 1000 && !found) {
+                        clearInterval(autoRollInterval);
+                        autoRollInterval = null;
+                        isLuckyAutoRoll = false;
+                        updateAutoRollButton();
+                    }
+                }, 150);
+            }
+
+            autoRollInterval = setInterval(performSingleAutoRoll, 400);
+        }
+
+        function showAutoRollComplete(race, rollCost) {
+            autoRollRace.textContent = race.name;
+            autoRollCountDisplay.textContent = autoRollCount;
+            autoRollRobux.textContent = autoRollCount * rollCost;
+
+            const p = (rollCost === 450 ? race.luckyPercentage : race.percentage) / 100;
+            const expected = Math.ceil(1 / p);
+            autoRollExpected.textContent = expected;
+
+            const luck = ((expected - autoRollCount) / expected * 100).toFixed(1);
+            autoRollLuck.textContent = `${luck}%`;
+
+            autoRollCompleteModal.style.display = 'flex';
+            autoRollCompleteModal.classList.add('show');
+
+            isLuckyAutoRoll = false;
+        }
+
+        function updateStatistics() {
+            totalRerollsDisplay.textContent = totalRerolls;
+            robuxSpentDisplay.textContent = robuxSpent;
+        }
+
+        function renderAutoRollOptions() {
+            autoRollOptions.innerHTML = '';
+
+            raceData.forEach(race => {
+                const option = document.createElement('div');
+                option.className = 'modal-option';
+                option.dataset.race = race.name;
+
+                option.innerHTML = `
+                        <div class="modal-option-image" style="background-image: url('${race.image}')"></div>
+                        <div class="modal-option-name">${race.name}</div>
+                        <div style="font-size: 0.75rem; color: ${getRarityColor(race.rarity)}; font-weight: bold; margin-top: -5px;">
+                            <div>Regular: ${race.percentage}%</div>
+                            <div>Lucky: ${race.luckyPercentage}%</div>
+                        </div>
+                `;
+
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.modal-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    option.classList.add('selected');
+                    autoRollTarget = race.name;
+                });
+
+                autoRollOptions.appendChild(option);
+            });
+
+            if (autoRollOptions.firstChild) {
+                autoRollOptions.firstChild.classList.add('selected');
+                autoRollTarget = raceData[0].name;
+            }
+        }
+
+        function getRarityColor(rarity) {
+            switch (rarity) {
+                case 'common': return 'var(--common)';
+                case 'uncommon': return 'var(--uncommon)';
+                case 'rare': return 'var(--rare)';
+                case 'epic': return 'var(--epic)';
+                case 'legendary': return 'var(--legendary)';
+                case 'mythical': return 'var(--mythical)';
+                default: return 'var(--text)';
+            }
+        }
+
+        function saveToLocalStorage() {
+            const data = {
+                slots: slots,
+                totalRerolls: totalRerolls,
+                robuxSpent: robuxSpent,
+                currentSlot: currentSlot
+            };
+            localStorage.setItem('abyssRaceSimulator', JSON.stringify(data));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('abyssRaceSimulator');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    slots = data.slots || slots;
+                    totalRerolls = data.totalRerolls || 0;
+                    robuxSpent = data.robuxSpent || 0;
+                    currentSlot = data.currentSlot || 0;
+
+                    renderRaceSlots();
+                    updateDisplay();
+                    updateStatistics();
+                } catch (e) {
+                    console.error('Error loading saved data:', e);
+                }
+            }
+        }
+
+        function resetStatistics() {
+            totalRerolls = 0;
+            robuxSpent = 0;
+            currentSlot = 0;
+
+            renderRaceSlots();
+            updateDisplay();
+            updateStatistics();
+            saveToLocalStorage();
+        }
+
+        function stopAutoRoll() {
+            if (autoRollInterval) {
+                clearInterval(autoRollInterval);
+                autoRollInterval = null;
+                isLuckyAutoRoll = false;
+                updateAutoRollButton();
+
+                const raceDisplay = document.getElementById('race-display');
+                raceDisplay.classList.remove('rolling');
+                currentRaceName.style.opacity = '1';
+            }
+        }
+
+        function updateAutoRollButton() {
+            if (autoRollInterval) {
+                autoRollBtn.innerHTML = '<i class="fas fa-stop-circle"></i> Stop Auto Roll';
+                autoRollBtn.classList.remove('auto-roll-btn');
+                autoRollBtn.classList.add('stop-auto-roll-btn');
+            } else {
+                autoRollBtn.innerHTML = '<i class="fas fa-robot"></i> Auto Roll Until Target';
+                autoRollBtn.classList.remove('stop-auto-roll-btn');
+                autoRollBtn.classList.add('auto-roll-btn');
+            }
+        }
+
+        function loadAnimationPreference() {
+            const saved = localStorage.getItem('abyssRaceAnimation');
+            if (saved !== null) {
+                animationEnabled = saved === 'true';
+                animationToggle.checked = animationEnabled;
+            }
+        }
+
+        function setupEventListeners() {
+            rerollBtn.addEventListener('click', performReroll);
+
+            autoRollBtn.addEventListener('click', () => {
+                if (autoRollInterval) {
+                    stopAutoRoll();
+                } else {
+                    autoRollModal.style.display = 'flex';
+                    autoRollModal.classList.add('show');
+                }
+            });
+
+            resetStatsBtn.addEventListener('click', resetStatistics);
+
+            startAutoRollBtn.addEventListener('click', () => {
+                isLuckyAutoRoll = false;
+                startAutoRoll();
+            });
+
+            startAutoLuckyRollBtn.addEventListener('click', () => {
+                isLuckyAutoRoll = true;
+                startAutoRoll();
+            });
+
+            cancelAutoRollBtn.addEventListener('click', () => {
+                autoRollModal.style.display = 'none';
+                autoRollModal.classList.remove('show');
+                isLuckyAutoRoll = false;
+            });
+
+            autoRollClose.addEventListener('click', () => {
+                autoRollModal.style.display = 'none';
+                autoRollModal.classList.remove('show');
+                isLuckyAutoRoll = false;
+            });
+
+            autoRollCompleteClose.addEventListener('click', () => {
+                autoRollCompleteModal.style.display = 'none';
+                autoRollCompleteModal.classList.remove('show');
+            });
+
+            closeAutoRollComplete.addEventListener('click', () => {
+                autoRollCompleteModal.style.display = 'none';
+                autoRollCompleteModal.classList.remove('show');
+            });
+
+            luckyRerollBtn.addEventListener('click', performLuckyReroll);
+
+            [autoRollModal, autoRollCompleteModal].forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                        modal.classList.remove('show');
+                    }
+                });
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'r' || e.key === 'R') {
+                    if (!autoRollInterval) {
+                        performReroll();
+                    }
+                }
+
+                if (e.key === 'Escape') {
+                    if (autoRollModal.style.display === 'flex') {
+                        autoRollModal.style.display = 'none';
+                        autoRollModal.classList.remove('show');
+                    }
+
+                    if (autoRollCompleteModal.style.display === 'flex') {
+                        autoRollCompleteModal.style.display = 'none';
+                        autoRollCompleteModal.classList.remove('show');
+                    }
+
+                    if (raceTooltip.style.display === 'block') {
+                        raceTooltip.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>
