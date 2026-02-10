@@ -148,10 +148,10 @@
 
         .fish-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 15px;
             padding: 16px;
-            max-height: 220px;
+            max-height: 350px;
             overflow-y: auto;
         }
 
@@ -714,6 +714,24 @@
             margin-left: 8px;
             font-weight: 600;
         }
+
+        .no-fish-selected {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            width: 100%;
+            border-radius: 8px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #1a1f26;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            flex-direction: column;
+        }
     </style>
 </head>
 
@@ -746,7 +764,7 @@
             </div>
         </section>
 
-        <section id="appraisal-section" class="appraisal-section">
+        <section id="appraisal-section" class="appraisal-section active">
             <div class="fish-detail">
                 <div class="detail-rarity" id="detail-rarity"></div>
                 <div class="detail-image" id="detail-fish-image">
@@ -1391,6 +1409,18 @@
                     mutationDropdown.classList.remove('active');
                 }
             });
+
+            showNoFishSelected();
+        }
+
+        function showNoFishSelected() {
+            const fishDetail = document.querySelector('.fish-detail');
+            fishDetail.innerHTML += `
+    <div class="no-fish-selected">
+      <i class="fas fa-fish" style="font-size: 2rem; margin-bottom: 15px; display: block; opacity: 0.5;"></i>
+      <div>Select a fish from the collection above to see its details</div>
+    </div>
+  `;
         }
 
         function selectLocation(value, label) {
@@ -1449,6 +1479,8 @@
 
         function selectFish(fish) {
             currentFish = fish;
+
+            document.querySelectorAll('.no-fish-selected').forEach(el => el.remove());
 
             document.querySelectorAll('.fish-card').forEach(card => {
                 card.classList.remove('selected');
