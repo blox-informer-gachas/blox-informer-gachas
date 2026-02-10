@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abyss Fish Appraiser</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4a9ebf;
+            --primary-dark: #2a6b8a;
+            --primary-light: rgba(74, 158, 191, 0.2);
+            --primary-glow: rgba(74, 158, 191, 0.6);
+            --background: #0f1419;
+            --card-bg: linear-gradient(145deg, #1a1f26 0%, #252c36 100%);
+            --card-bg-light: linear-gradient(145deg, #252c36 0%, #2d3643 100%);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --text: #f0f0f0;
+            --text-secondary: #6eafc0;
+            --border: #3a4655;
+            --success: #4CAF50;
+            --warning: #ff9800;
+            --error: #f44336;
+            --glow: 0 0 12px rgba(74, 158, 191, 0.4);
+            --disabled: #4a5568;
+
+            --common: #8c8c8c;
+            --uncommon: #4CAF50;
+            --rare: #509CE7;
+            --epic: #9c66c9;
+            --legendary: #c38b38;
+            --mythical: #bc362d;
+
+            --animation-speed: 0.3s;
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            max-width: 840px;
+            margin: 0 auto;
+            padding: 10px;
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(42, 107, 138, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(42, 107, 138, 0.1) 0%, transparent 40%);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 15px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--border-radius);
+            box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .filters-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        label {
+            font-weight: 600;
+        }
+
+        select,
+        input[type="text"] {
+            width: 100%;
+            padding: 16px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all var(--animation-speed);
+        }
+
+        select:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .fish-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            padding: 16px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 550px) {
+            .fish-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+
+        .fish-card {
+            background: var(--card-bg-light);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .fish-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--glow);
+            border-color: var(--primary);
+        }
+
+        .fish-card.selected {
+            border-color: var(--primary);
+            box-shadow: var(--glow);
+        }
+
+        .fish-image {
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            margin: 15px 10px 0px 10px;
+            aspect-ratio: 1.75;
+        }
+
+        .fish-rarity {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10;
+        }
+
+        .fish-info {
+            padding: 0px 10px 15px 10px;
+        }
+
+        .fish-name {
+            font-weight: bold;
+            color: var(--text);
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .fish-price {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .appraisal-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .appraisal-section.active {
+            display: block;
+        }
+
+        .fish-detail {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 10px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+            position: relative;
+        }
+
+        @media (max-width: 700px) {
+            .fish-detail {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+
+        .detail-image {
+            max-width: 300px;
+            min-width: 200px;
+            aspect-ratio: 1.25;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        .detail-rarity {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .detail-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+
+        }
+
+        .stat-full {
+            grid-column: 1 / -1;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        #detail-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        #detail-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .appraisal-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 33%;
+        }
+
+        @media (max-width: 700px) {
+            .appraisal-controls {
+                padding: 15px;
+                flex-direction: column;
+            }
+
+            .control-group {
+                width: 100%;
+            }
+        }
+
+        .control-group label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .weight-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .weight-slider {
+            flex: 1;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            outline: none;
+            -webkit-appearance: none;
+            border: 1px solid var(--border);
+        }
+
+        input[type="range"]:disabled {
+            background: rgba(0, 0, 0, 0.2);
+            border-color: var(--disabled);
+            cursor: not-allowed;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        input[type="range"]:disabled::-webkit-slider-thumb {
+            background: var(--disabled);
+            cursor: not-allowed;
+        }
+
+        .weight-input {
+            width: 100px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            text-align: center;
+            font-weight: 600;
+            transition: all var(--animation-speed);
+            font-size: 0.95rem;
+        }
+
+        .weight-input:disabled {
+            background: rgba(0, 0, 0, 0.2);
+            border-color: var(--disabled);
+            color: var(--disabled);
+            cursor: not-allowed;
+        }
+
+        .weight-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .custom-select {
+            position: relative;
+        }
+
+        .custom-dropdown {
+            width: 100%;
+            max-height: 140px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 100;
+            display: none;
+        }
+
+        .custom-dropdown.active {
+            display: block;
+        }
+
+        .mutation-select {
+            position: relative;
+        }
+
+        .mutation-dropdown {
+            width: 100%;
+            max-height: 140px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 100;
+            display: none;
+        }
+
+        .mutation-dropdown.active {
+            display: block;
+        }
+
+        .mutation-option {
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mutation-option:hover {
+            background: rgba(74, 158, 191, 0.2);
+        }
+
+        .custom-option {
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            font-weight: 600;
+
+        }
+
+        .custom-option:hover {
+            background: rgba(74, 158, 191, 0.2);
+        }
+
+        .mutation-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .mutation-multiplier {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .current-mutation {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--animation-speed);
+        }
+
+        .current-mutation:disabled {
+            background: rgba(0, 0, 0, 0.2);
+            border-color: var(--disabled);
+            color: var(--disabled);
+            cursor: not-allowed;
+        }
+
+        .current-mutation:hover:not(:disabled) {
+            border-color: var(--primary);
+        }
+
+        .current-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--animation-speed);
+            font-size: 0.9rem;
+            font-weight: 600;
+
+        }
+
+        .current-select:hover {
+            border-color: var(--primary);
+        }
+
+        .result-display {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--glow);
+            margin-top: 10px;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .rarity-common {
+            color: var(--common);
+            border-color: var(--common);
+        }
+
+        .rarity-uncommon {
+            color: var(--uncommon);
+            border-color: var(--uncommon);
+        }
+
+        .rarity-rare {
+            color: var(--rare);
+            border-color: var(--rare);
+        }
+
+        .rarity-epic {
+            color: var(--epic);
+            border-color: var(--epic);
+        }
+
+        .rarity-legendary {
+            color: var(--legendary);
+            border-color: var(--legendary);
+        }
+
+        .rarity-mythical {
+            color: var(--mythical);
+            border-color: var(--mythical);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        }
+
+        .tba-value {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .disabled-controls {
+            opacity: 0.6;
+        }
+
+        .disabled-controls .current-mutation {
+            pointer-events: none;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .star-rating i {
+            font-size: 2.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.6;
+        }
+
+        .star-rating i.active {
+            color: #FFD700;
+            opacity: 1;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+        }
+
+        .star-rating i:hover:not(.disabled) {
+            transform: scale(1.2);
+        }
+
+        .star-rating.disabled i {
+            cursor: not-allowed;
+            opacity: 0.3;
+        }
+
+        .star-rating.disabled i.active {
+            opacity: 0.5;
+        }
+
+        .star-rating .star-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-left: 8px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Abyss Fish Appraiser</h1>
+            <p class="subtitle">Calculate the value of your fish based on weight and mutation</p>
+        </header>
+
+        <section class="filters-section">
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="location-filter"><i class="fas fa-map-marker-alt"></i> Filter by Location</label>
+                    <div class="custom-select" id="location-filter-container">
+                        <div class="current-select" id="current-location">
+                            <span>All Locations</span>
+                        </div>
+                        <div class="custom-dropdown" id="location-dropdown">
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="search-filter"><i class="fas fa-search"></i> Search Fish</label>
+                    <input type="text" id="search-filter" placeholder="Search fish by name...">
+                </div>
+            </div>
+            <h3 style="color: var(--text-secondary); margin-top: 10px;">Fish Collection</h3>
+            <div id="fish-grid" class="fish-grid">
+            </div>
+        </section>
+
+        <section id="appraisal-section" class="appraisal-section">
+            <div class="fish-detail">
+                <div class="detail-rarity" id="detail-rarity"></div>
+                <div class="detail-image" id="detail-fish-image">
+                </div>
+                <div class="detail-stats">
+
+                    <div class="stat-item stat-full">
+                        <div class="stat-value" id="detail-name">-</div>
+                        <div class="stat-value" id="detail-description">-</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Min Weight</div>
+                        <div class="stat-value" id="detail-min-weight">- kg</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Max Weight</div>
+                        <div class="stat-value" id="detail-max-weight">- kg</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Price per kg</div>
+                        <div class="stat-value" id="detail-price">-</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Behaviour</div>
+                        <div class="stat-value" id="detail-behaviour">-</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Locations</div>
+                        <div class="stat-value" id="detail-locations">-</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Added</div>
+                        <div class="stat-value" id="detail-added">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="appraisal-controls" id="appraisal-controls">
+                <div class="control-group">
+                    <label for="weight-slider">Fish Weight (kg)</label>
+                    <div class="weight-control">
+                        <input type="range" id="weight-slider" class="weight-slider" min="0.5" max="1000" step="0.1"
+                            value="1">
+                        <input type="number" id="weight-input" class="weight-input" min="0.5" max="1000" step="0.1"
+                            value="1">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Mutation Multiplier</label>
+                    <div class="mutation-select">
+                        <div class="current-mutation" id="current-mutation">
+                            <span class="mutation-name">None</span>
+                            <span class="mutation-multiplier">1×</span>
+                        </div>
+                        <div class="mutation-dropdown" id="mutation-dropdown">
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Quality Rating</label>
+                    <div class="star-rating" id="star-rating">
+                        <i class="fas fa-star" data-rating="1"></i>
+                        <i class="fas fa-star" data-rating="2"></i>
+                        <i class="fas fa-star" data-rating="3"></i>
+                    </div>
+                </div>
+
+            </div>
+            <div class="result-display">
+                <div class="result-label">Estimated Value</div>
+                <div class="result-value" id="result-value">0</div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const fishData = [
+            {
+                id: 1,
+                name: "Tang",
+                image: "https://abysswiki.org/w/img_auth.php/3/3a/Tang.png",
+                minWeight: 0.5,
+                maxWeight: 1,
+                pricePerKg: 12,
+                locations: ["Forgotten Deep"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A reef fish with bright color and sharp fins.",
+                rarity: "common"
+            },
+            {
+                id: 2,
+                name: "Clownfish",
+                image: "https://abysswiki.org/w/thumb_handler.php/c/ca/Clownfish.png/800px-Clownfish.png",
+                minWeight: 1,
+                maxWeight: 2,
+                pricePerKg: 12,
+                locations: ["Forgotten Deep", "Ocean"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A small orange fish that lives among sea anemones.",
+                rarity: "common"
+            },
+            {
+                id: 3,
+                name: "Blue Tang",
+                image: "https://abysswiki.org/w/img_auth.php/5/58/Blue_Tang.png",
+                minWeight: 0.5,
+                maxWeight: 1,
+                pricePerKg: 14,
+                locations: ["Forgotten Deep", "Ocean"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A bright blue reef fish that swims in groups.",
+                rarity: "common"
+            },
+            {
+                id: 4,
+                name: "Pufferfish",
+                image: "https://abysswiki.org/w/img_auth.php/b/ba/Pufferfish.png",
+                minWeight: 2,
+                maxWeight: 4,
+                pricePerKg: 13,
+                locations: ["Forgotten Deep", "Ocean"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A round fish that inflates to scare predators.",
+                rarity: "uncommon"
+            },
+            {
+                id: 5,
+                name: "Salmon",
+                image: "https://static.wikitide.net/deepspiritwiki/e/e0/Salmon.png",
+                minWeight: 4,
+                maxWeight: 8,
+                pricePerKg: 9,
+                locations: ["Forgotten Deep", "Ocean"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A strong fish that swims upstream to spawn.",
+                rarity: "uncommon"
+            },
+            {
+                id: 6,
+                name: "Lionfish",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/b/bb/Lionfish.png/800px-Lionfish.png",
+                minWeight: 2,
+                maxWeight: 6,
+                pricePerKg: 20,
+                locations: ["Forgotten Deep"],
+                behaviour: "Aggressive",
+                added: "Release",
+                description: "A striped reef fish with long venomous spines.",
+                rarity: "rare"
+            },
+            {
+                id: 7,
+                name: "Mahi Mahi",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/c/ce/MahiMahi.png/800px-MahiMahi.png",
+                minWeight: 8,
+                maxWeight: 20,
+                pricePerKg: 8,
+                locations: ["Forgotten Deep"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A fast colorful fish often found near the surface.",
+                rarity: "rare"
+            },
+            {
+                id: 8,
+                name: "Barracuda",
+                image: "https://static.wikitide.net/deepspiritwiki/6/62/Barracuda.png",
+                minWeight: 6,
+                maxWeight: 12,
+                pricePerKg: 20,
+                locations: ["Forgotten Deep"],
+                behaviour: "Aggressive",
+                added: "Release",
+                description: "A long predator fish known for its speed and sharp teeth.",
+                rarity: "epic"
+            },
+            {
+                id: 9,
+                name: "Sea Horse",
+                image: "https://static.wikitide.net/deepspiritwiki/e/e7/SeaHorse.png",
+                minWeight: 2,
+                maxWeight: 4,
+                pricePerKg: 12,
+                locations: ["Ocean"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A tiny fish with a horse-like shape.",
+                rarity: "common"
+            },
+            {
+                id: 10,
+                name: "Piranha",
+                image: "https://static.wikitide.net/deepspiritwiki/4/43/Piranha.png",
+                minWeight: 1,
+                maxWeight: 2,
+                pricePerKg: 24,
+                locations: ["Ocean", "Angler Cave"],
+                behaviour: "Aggressive",
+                added: "Release",
+                description: "A small but fierce fish with sharp teeth.",
+                rarity: "rare"
+            },
+            {
+                id: 11,
+                name: "Blobfish",
+                image: "https://abysswiki.org/w/thumb_handler.php/f/f8/BlobfishReal.png/800px-BlobfishReal.png",
+                minWeight: 10,
+                maxWeight: 13,
+                pricePerKg: 20,
+                locations: ["Ocean", "Angler Cave"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A deep-sea fish with a soft body and odd looks.",
+                rarity: "rare"
+            },
+            {
+                id: 12,
+                name: "Sailfish",
+                image: "https://abysswiki.org/w/img_auth.php/5/56/Sailfish.png",
+                minWeight: 16,
+                maxWeight: 24,
+                pricePerKg: 16,
+                locations: ["Ocean", "Spirit Roots"],
+                behaviour: "Aggressive",
+                added: "Release",
+                description: "Fastest fish alive, its tall sail fin cuts through the water.",
+                rarity: "epic"
+            },
+            {
+                id: 13,
+                name: "Shark",
+                image: "https://abysswiki.org/w/img_auth.php/1/14/Shark.png",
+                minWeight: 40,
+                maxWeight: 50,
+                pricePerKg: 10,
+                locations: ["Ocean", "Ancient Sands"],
+                behaviour: "Aggressive",
+                added: "Release",
+                description: "Ruthless predator of the sea, fast and deadly.",
+                rarity: "epic"
+            },
+            {
+                id: 14,
+                name: "Bluefin Tuna",
+                image: "https://abysswiki.org/w/thumb_handler.php/4/42/BluefinTuna.png/800px-BluefinTuna.png",
+                minWeight: 60,
+                maxWeight: 80,
+                pricePerKg: 10,
+                locations: ["Ocean"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A large and powerful tuna prized for its speed and strength.",
+                rarity: "legendary"
+            },
+            {
+                id: 15,
+                name: "Pompano",
+                image: "https://static.wikitide.net/deepspiritwiki/a/a6/Pompano.png",
+                minWeight: 3,
+                maxWeight: 5,
+                pricePerKg: 15,
+                locations: ["Ancient Sands"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "Chill beachside cruiser. Not too fast, not too slow, just right.",
+                rarity: "common"
+            },
+            {
+                id: 16,
+                name: "Cod",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/4/41/Cod.png/800px-Cod.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Ancient Sands"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A common white fish found in Ancient Sands.",
+                rarity: "uncommon"
+            },
+            {
+                id: 17,
+                name: "Blackfin Tuna",
+                image: "https://abysswiki.org/w/thumb_handler.php/f/f2/Blackfintuna.png/400px-Blackfintuna.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Ancient Sands"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A tuna with dark fins and great speed.",
+                rarity: "uncommon"
+            },
+            {
+                id: 18,
+                name: "Scorpionfish",
+                image: "https://abysswiki.org/w/thumb_handler.php/a/ab/Scorpion.png/400px-Scorpion.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Ancient Sands"],
+                behaviour: "Aggressive",
+                added: "Release",
+                description: "A long predator fish known for its speed and sharp teeth.",
+                rarity: "rare"
+            },
+            {
+                id: 19,
+                name: "Grouper",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/c/c4/Grouper.png/400px-Grouper.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Ancient Sands"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A heavy reef fish that hides in rocks and strikes with power.",
+                rarity: "rare"
+            },
+            {
+                id: 20,
+                name: "Cavefish",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/b/b3/Cavefish.png/400px-Cavefish.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Ancient Sands"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "Big, flat, and kinda derpy. Harmless, just confused.",
+                rarity: "epic"
+            },
+            {
+                id: 21,
+                name: "Bigmouthfish",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/6/6c/BigmouthFish.png/400px-BigmouthFish.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Ancient Sands"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "Too lazy to escape. He just floats without a care.",
+                rarity: "legendary"
+            },
+            {
+                id: 22,
+                name: "Ancient Shark",
+                image: "https://abysswiki.org/w/thumb_handler.php/6/63/AncientShark.png/400px-AncientShark.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Ancient Sands"],
+                behaviour: "Aggressive",
+                added: "Release",
+                description: "A massive shark said to have lived for centuries.",
+                rarity: "legendary"
+            },
+            {
+                id: 23,
+                name: "Pacific Fanfish",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/a/a6/Pacificfanfish.png/400px-Pacificfanfish.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Spirit Roots"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "Deep-sea fish with large fins shaped like fans to confuse predators.",
+                rarity: "common"
+            },
+            {
+                id: 24,
+                name: "Jellyfish",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/2/22/Jellyfish.png/400px-Jellyfish.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Spirit Roots"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "A softly glowing jellyfish drifting quietly through the water.",
+                rarity: "uncommon"
+            },
+            {
+                id: 25,
+                name: "Napoleon",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/1/10/Napoleon.png/400px-Napoleon.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Spirit Roots"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "Massive humphead wrasse, recognized by its size and forehead bump.",
+                rarity: "uncommon"
+            },
+            {
+                id: 26,
+                name: "Sunfish",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/5/56/Sunfish.png/400px-Sunfish.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Spirit Roots"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "Giant round fish that drifts near the surface like a floating boulder.",
+                rarity: "rare"
+            },
+            {
+                id: 27,
+                name: "Narwhal",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/e/ed/Narwhal.png/400px-Narwhal.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Spirit Roots"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "The ocean's unicorn. Strong, silent, sharp.",
+                rarity: "rare"
+            },
+            {
+                id: 28,
+                name: "Hammer Shark",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/6/6c/HammerheadShark.png/400px-HammerheadShark.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Spirit Roots"],
+                behaviour: "Aggressive",
+                added: "Release",
+                description: "Blunt-headed hunter, built for smashing and sensing.",
+                rarity: "epic"
+            },
+            {
+                id: 29,
+                name: "Eyefish",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/8/83/Eyefish.png/400px-Eyefish.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Spirit Roots"],
+                behaviour: "Passive",
+                added: "Release",
+                description: "Always watching. Scary but kinda cool.",
+                rarity: "legendary"
+            },
+            {
+                id: 30,
+                name: "Whale",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/8/83/Eyefish.png/400px-Eyefish.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Spirit Roots"],
+                behaviour: "Aggressive",
+                added: "Release",
+                description: "None.",
+                rarity: "legendary"
+            },
+            {
+                id: 31,
+                name: "Dragonfish",
+                image: "https://static.wikitide.net/deepspiritwiki/thumb/3/39/Dragonfish.png/400px-Dragonfish.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Spirit Roots"],
+                behaviour: "Aggressive",
+                added: "Release",
+                description: "None.",
+                rarity: "mythical"
+            },
+            {
+                id: 32,
+                name: "Anglerfish",
+                image: "https://abysswiki.org/w/thumb_handler.php/6/64/Anglerfish.png/400px-Anglerfish.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Angler Cave"],
+                behaviour: "Aggressive",
+                added: "Release",
+                description: "Deep-sea hunter that lures prey with a glowing bait.",
+                rarity: "rare"
+            },
+            {
+                id: 33,
+                name: "King Anglerfish",
+                image: "https://abysswiki.org/w/thumb_handler.php/9/91/KingAnglerfish.png/400px-KingAnglerfish.png",
+                minWeight: undefined,
+                maxWeight: undefined,
+                pricePerKg: undefined,
+                locations: ["Angler Cave"],
+                behaviour: "Aggressive",
+                added: "Release",
+                description: "None.",
+                rarity: "mythical"
+            }
+        ];
+
+        const mutations = [
+            { name: "None", multiplier: 1 },
+            { name: "Poop", multiplier: 0.33 },
+            { name: "Rock", multiplier: 1 },
+            { name: "Coral", multiplier: 1.1 },
+            { name: "Moss", multiplier: 1.1 },
+            { name: "Metal", multiplier: 1.2 },
+            { name: "Sand", multiplier: 1.25 },
+            { name: "Albino", multiplier: 1.3 },
+            { name: "Transparent", multiplier: 1.4 },
+            { name: "Cactus", multiplier: 1.45 },
+            { name: "Spirit", multiplier: 1.7 },
+            { name: "Fossil", multiplier: 1.8 },
+            { name: "Golden", multiplier: 2 },
+            { name: "Negative", multiplier: 2 },
+            { name: "Fairy", multiplier: 2.3 },
+            { name: "Invisible", multiplier: 2.5 },
+            { name: "Neon", multiplier: 2.8 },
+            { name: "Ultraviolet", multiplier: 3.6 },
+            { name: "Rooted", multiplier: 4.2 },
+            { name: "Shadow", multiplier: 6.66 },
+            { name: "Angelic", multiplier: 7.77 },
+            { name: "Abyssal", multiplier: 8.5 }
+        ];
+
+        const starMultipliers = {
+            1: 0.5,
+            2: 0.75,
+            3: 1
+        };
+
+        let currentFish = null;
+        let currentWeight = 1;
+        let currentMutation = mutations[0];
+        let allLocations = new Set();
+        let currentStarRating = 3;
+
+        const fishGrid = document.getElementById('fish-grid');
+        const locationFilterContainer = document.getElementById('location-filter-container');
+        const currentLocationElement = document.getElementById('current-location');
+        const locationDropdown = document.getElementById('location-dropdown');
+        const searchFilter = document.getElementById('search-filter');
+        const appraisalSection = document.getElementById('appraisal-section');
+        const mutationDropdown = document.getElementById('mutation-dropdown');
+        const currentMutationElement = document.getElementById('current-mutation');
+        const appraisalControls = document.getElementById('appraisal-controls');
+        const weightSlider = document.getElementById('weight-slider');
+        const weightInput = document.getElementById('weight-input');
+        const resultValue = document.getElementById('result-value');
+
+        let currentLocation = 'all';
+
+        function init() {
+            fishData.forEach(fish => {
+                if (fish.locations) {
+                    fish.locations.forEach(location => allLocations.add(location));
+                }
+            });
+
+            const allOption = document.createElement('div');
+            allOption.className = 'custom-option';
+            allOption.innerHTML = 'All Locations';
+            allOption.addEventListener('click', () => {
+                selectLocation('all', 'All Locations');
+                locationDropdown.classList.remove('active');
+            });
+            locationDropdown.appendChild(allOption);
+
+            allLocations.forEach(location => {
+                const option = document.createElement('div');
+                option.className = 'custom-option';
+                option.innerHTML = location;
+                option.addEventListener('click', () => {
+                    selectLocation(location, location);
+                    locationDropdown.classList.remove('active');
+                });
+                locationDropdown.appendChild(option);
+            });
+
+            mutations.forEach(mutation => {
+                const option = document.createElement('div');
+                option.className = 'mutation-option';
+                option.dataset.multiplier = mutation.multiplier;
+                option.innerHTML = `
+                    <span class="mutation-name">${mutation.name}</span>
+                    <span class="mutation-multiplier">${mutation.multiplier}×</span>
+                `;
+                option.addEventListener('click', () => {
+                    selectMutation(mutation);
+                    mutationDropdown.classList.remove('active');
+                });
+                mutationDropdown.appendChild(option);
+            });
+
+            initStarRating();
+
+            renderFishGrid(fishData);
+
+            currentLocationElement.addEventListener('click', () => {
+                locationDropdown.classList.toggle('active');
+            });
+
+            searchFilter.addEventListener('input', filterFish);
+
+            weightSlider.addEventListener('input', (e) => {
+                currentWeight = parseFloat(e.target.value);
+                weightInput.value = currentWeight;
+                calculateValue();
+            });
+
+            weightInput.addEventListener('input', (e) => {
+                let value = parseFloat(e.target.value);
+                if (isNaN(value)) value = 0.5;
+                if (value < 0.5) value = 0.5;
+                if (value > 1000) value = 1000;
+
+                currentWeight = value;
+                weightSlider.value = value;
+                weightInput.value = value;
+                calculateValue();
+            });
+
+            currentMutationElement.addEventListener('click', () => {
+                if (!currentMutationElement.disabled) {
+                    mutationDropdown.classList.toggle('active');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!currentLocationElement.contains(e.target) && !locationDropdown.contains(e.target)) {
+                    locationDropdown.classList.remove('active');
+                }
+                if (!currentMutationElement.contains(e.target) && !mutationDropdown.contains(e.target)) {
+                    mutationDropdown.classList.remove('active');
+                }
+            });
+        }
+
+        function selectLocation(value, label) {
+            currentLocation = value;
+            currentLocationElement.innerHTML = label;
+            filterFish();
+        }
+
+        function renderFishGrid(fishArray) {
+            fishGrid.innerHTML = '';
+
+            fishArray.forEach(fish => {
+                const card = document.createElement('div');
+                card.className = 'fish-card';
+                card.dataset.id = fish.id;
+
+                const hasCompleteData = fish.minWeight !== undefined &&
+                    fish.maxWeight !== undefined &&
+                    fish.pricePerKg !== undefined;
+
+                const priceDisplay = hasCompleteData ? `${fish.pricePerKg} / kg` : 'TBA';
+
+                card.innerHTML = `
+                    <div class="fish-rarity rarity-${fish.rarity}">${fish.rarity}</div>
+                    <div class="fish-image" style="background-image: url('${fish.image}')">
+                    </div>
+                    <div class="fish-info">
+                        <div class="fish-name">${fish.name}</div>
+                        <div class="fish-price">${priceDisplay}</div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => selectFish(fish));
+                fishGrid.appendChild(card);
+            });
+        }
+
+        function filterFish() {
+            const location = currentLocation;
+            const searchTerm = searchFilter.value.toLowerCase();
+
+            const filteredFish = fishData.filter(fish => {
+                if (location !== 'all' && (!fish.locations || !fish.locations.includes(location))) {
+                    return false;
+                }
+
+                if (searchTerm && !fish.name.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+
+                return true;
+            });
+
+            renderFishGrid(filteredFish);
+        }
+
+        function selectFish(fish) {
+            currentFish = fish;
+
+            document.querySelectorAll('.fish-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`.fish-card[data-id="${fish.id}"]`).classList.add('selected');
+
+            appraisalSection.classList.add('active');
+
+            document.getElementById('detail-name').textContent = fish.name;
+            document.getElementById('detail-description').textContent = fish.description;
+
+            const hasCompleteData = fish.minWeight !== undefined &&
+                fish.maxWeight !== undefined &&
+                fish.pricePerKg !== undefined;
+
+            if (hasCompleteData) {
+                document.getElementById('detail-min-weight').textContent = `${fish.minWeight} kg`;
+                document.getElementById('detail-max-weight').textContent = `${fish.maxWeight} kg`;
+                document.getElementById('detail-price').textContent = `${fish.pricePerKg}`;
+
+                weightSlider.disabled = false;
+                weightInput.disabled = false;
+
+                currentMutationElement.disabled = false;
+                currentMutationElement.style.opacity = '1';
+                currentMutationElement.style.cursor = 'pointer';
+
+                weightSlider.min = fish.minWeight;
+                weightSlider.max = fish.maxWeight;
+                weightInput.min = fish.minWeight;
+                weightInput.max = fish.maxWeight;
+
+                const initialWeight = Math.max(fish.minWeight, (fish.minWeight + fish.maxWeight) / 2);
+                currentWeight = initialWeight;
+                weightSlider.value = initialWeight;
+                weightInput.value = initialWeight;
+
+                const starRating = document.getElementById('star-rating');
+                starRating.classList.remove('disabled');
+
+                calculateValue();
+            } else {
+                document.getElementById('detail-min-weight').textContent = 'TBA';
+                document.getElementById('detail-max-weight').textContent = 'TBA';
+                document.getElementById('detail-price').textContent = 'TBA';
+
+                weightSlider.disabled = true;
+                weightInput.disabled = true;
+
+                currentMutationElement.disabled = true;
+                currentMutationElement.style.opacity = '0.6';
+                currentMutationElement.style.cursor = 'not-allowed';
+
+                mutationDropdown.classList.remove('active');
+
+                const starRating = document.getElementById('star-rating');
+                starRating.classList.add('disabled');
+
+                resultValue.textContent = 'TBA';
+                resultValue.classList.add('tba-value');
+            }
+
+            document.getElementById('detail-behaviour').textContent = fish.behaviour;
+            document.getElementById('detail-locations').textContent = fish.locations ? fish.locations.join(', ') : 'Unknown';
+            document.getElementById('detail-added').textContent = fish.added;
+
+            const detailImage = document.getElementById('detail-fish-image');
+            detailImage.style.backgroundImage = `url('${fish.image}')`;
+
+            const rarityBadge = document.getElementById('detail-rarity');
+            rarityBadge.textContent = fish.rarity;
+            rarityBadge.className = `detail-rarity rarity-${fish.rarity}`;
+        }
+
+        function selectMutation(mutation) {
+            currentMutation = mutation;
+            currentMutationElement.innerHTML = `
+                <span class="mutation-name">${mutation.name}</span>
+                <span class="mutation-multiplier">${mutation.multiplier}×</span>
+            `;
+            calculateValue();
+        }
+
+        function calculateValue() {
+            if (!currentFish) return;
+
+            const hasCompleteData = currentFish.minWeight !== undefined &&
+                currentFish.maxWeight !== undefined &&
+                currentFish.pricePerKg !== undefined;
+
+            if (!hasCompleteData) {
+                resultValue.textContent = 'TBA';
+                resultValue.classList.add('tba-value');
+                return;
+            }
+
+            resultValue.classList.remove('tba-value');
+
+            const pricePerKg = currentFish.pricePerKg;
+            const multiplier = currentMutation.multiplier;
+            const starMultiplier = starMultipliers[currentStarRating];
+            const value = Math.round(currentWeight * pricePerKg * multiplier * starMultiplier);
+
+            resultValue.textContent = '$' + value.toLocaleString();
+        }
+
+        function initStarRating() {
+            const stars = document.querySelectorAll('#star-rating i');
+
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    if (star.parentElement.classList.contains('disabled')) return;
+
+                    const rating = parseInt(star.getAttribute('data-rating'));
+                    setStarRating(rating);
+                });
+            });
+
+            setStarRating(3);
+        }
+
+        function setStarRating(rating) {
+            currentStarRating = rating;
+            const stars = document.querySelectorAll('#star-rating i');
+
+            stars.forEach(star => {
+                const starRating = parseInt(star.getAttribute('data-rating'));
+
+                if (starRating <= rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+
+            calculateValue();
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>
