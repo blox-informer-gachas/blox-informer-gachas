@@ -64,13 +64,13 @@
         .search-filter input:focus{outline:none; border-color: #4cc9f0;}
         .search-filter i{position:absolute; left:12px; top:12px; color:#94a3b8;}
         #filter-list{max-height:calc(80vh - 240px); overflow-y:auto; padding-right:4px;}
-        .filter-group-header{display:flex; align-items:center; justify-content:space-between; margin:10px 0 8px; padding-bottom:4px; border-bottom:1px solid #334155; color:#4cc9f0; font-weight:600;}
+        .filter-group-header{padding-right: 5px;display:flex; align-items:center; justify-content:space-between; margin:10px 0 8px; padding-bottom:4px; border-bottom:1px solid #334155; color:#4cc9f0; font-weight:600;}
         .filter-group-toggle{font-size: 0.9rem;display:flex; align-items:center; gap:6px; cursor:pointer; flex:1;}
         .group-toggle-switch{width:40px; height:18px; background:#2c3e50; border-radius:12px; position:relative; cursor:pointer; transition:0.2s;}
         .group-toggle-switch.on{background:#4cc9f0;}
         .group-toggle-switch .slider{width:14px; height:14px; background:white; border-radius:50%; position:absolute; top:2px; left:2px; transition:left 0.2s;}
         .group-toggle-switch.on .slider{left:24px;}
-        .filter-group-content{max-height:500px; overflow:hidden; transition:max-height 0.4s, opacity 0.4s;}
+        .filter-group-content{padding-right: 5px; max-height:500px; overflow:hidden; transition:max-height 0.4s, opacity 0.4s;}
         .filter-group-content.collapsed{max-height:0; opacity:0;}
         .filter-category-item{font-size: 0.85rem;display:flex; border: 1px solid transparent; align-items:center; justify-content:space-between; background:#0f172a; padding:8px 12px; margin-bottom:6px; border-radius:6px; cursor:pointer; transition:0.2s; opacity:0.5;}
         .filter-category-item:hover{background:#1c2635; border-color: #4cc9f0;}
@@ -104,6 +104,11 @@
         @keyframes tooltipFadeOut{from{opacity:1;} to{opacity:0;}}
         .tooltip.fade-in{animation:tooltipFadeIn 0.3s ease-out forwards;}
         .tooltip.fade-out{animation:tooltipFadeOut 0.3s ease-out forwards;}
+        #filter-list::-webkit-scrollbar{width:8px;}
+        #filter-list::-webkit-scrollbar-track{background:#0f172a;}
+        #filter-list::-webkit-scrollbar-thumb{background:#4cc9f0; border-radius:4px;}
+        #filter-list::-webkit-scrollbar-thumb:hover{background:#4cc9f0e6;}
+        #filter-list{scrollbar-color:#4cc9f0 #0f172a; scrollbar-width:thin;}
     </style>
 </head>
 <body>
