@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="robots" content="noindex, nofollow" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
     <title>Abyss (Roblox) Interactive Map</title>
@@ -182,7 +183,7 @@
             });
             setupTouchPan();
             centerMapOnLoad();
-            document.addEventListener('click', function(e) {
+            const closeTooltipHandler = function(e) {
                 const tooltip = document.getElementById('tooltip');
                 if (tooltip.style.display === 'block' && 
                     !tooltip.contains(e.target) && 
@@ -190,7 +191,9 @@
                     !e.target.closest('.map-zone')) {
                     closeTooltip();
                 }
-            });
+            };
+            document.addEventListener('click', closeTooltipHandler);
+            document.addEventListener('touchend', closeTooltipHandler);
         };
 
         function createMarker(el){
@@ -213,9 +216,11 @@
                 m.innerHTML = '<i class="fas fa-'+(el.icon||'map-marker-alt')+'" style="font-size:'+(size*0.6)+'px;"></i>';
             }
             m.title = el.name;
+            const markerClickHandler = (e)=> { e.preventDefault(); e.stopPropagation(); showTooltip(el, e.target); };
             m.addEventListener('mouseenter', (e) => showHoverTooltip(el.name, e.target));
             m.addEventListener('mouseleave', () => hideHoverTooltip());
-            m.addEventListener('click',(e)=> { e.preventDefault(); e.stopPropagation(); showTooltip(el, e.target); });
+            m.addEventListener('click', markerClickHandler);
+            m.addEventListener('touchend', markerClickHandler);
             document.getElementById('map').appendChild(m);
         }
         function createZone(el){
@@ -247,9 +252,11 @@
             if(el.shape==='circle'||el.shape==='ellipse') z.style.borderRadius='50%';
             if(el.shape==='polygon') z.style.clipPath='polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)';
             z.title = el.name;
+            const zoneClickHandler = (e)=> { e.preventDefault(); e.stopPropagation(); showTooltip(el, e.target); };
             z.addEventListener('mouseenter', (e) => showHoverTooltip(el.name, e.target));
             z.addEventListener('mouseleave', () => hideHoverTooltip());
-            z.addEventListener('click',(e)=> { e.preventDefault(); e.stopPropagation(); showTooltip(el, e.target); });
+            z.addEventListener('click', zoneClickHandler);
+            z.addEventListener('touchend', zoneClickHandler);
             document.getElementById('map').appendChild(z);
         }
 
@@ -483,7 +490,7 @@
                 else tooltipImage = '<i class="'+el.tooltipImage+'" style="font-size:48px; display:block; margin:10px auto; color:'+el.color+'"></i>';
             }
             t.innerHTML = `
-                <button class="tooltip-close" onclick="closeTooltip()">&times;</button>
+                <button class="tooltip-close" onclick="closeTooltip()" ontouchend="closeTooltip();event.preventDefault();">&times;</button>
                 <h3 style="color:${el.color};">${el.name}</h3>
                 ${tooltipImage}
                 <p>${el.description || 'No description'}</p>
