@@ -51,28 +51,28 @@
             width:44px; height:44px; background:#1e293b; border:2px solid #334155; border-radius:10px; color:#e6e6e6; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.2rem; transition:0.2s;
         }
         .control-btn:hover{background:#4cc9f0; color:#0f172a; transform:scale(1.05);}
-        .filter-panel{position:fixed; top:20px; left:20px; background:#1e293be0; backdrop-filter:blur(8px); width:300px; border-radius:12px; padding:16px; z-index:1000; border:2px solid #334155; max-height:80vh; overflow:hidden; transition:max-height 0.4s;}
+        .filter-panel{position:fixed; top:20px; left:20px; background:#1e293be0; backdrop-filter:blur(8px); width:240px; border-radius:12px; padding:16px; z-index:1000; border:2px solid #334155; max-height:80vh; overflow:hidden; transition:max-height 0.4s;}
         .filter-panel.collapsed{max-height:68px;}
         .filter-panel-content{opacity:1; transition:0.4s;}
         .filter-panel.collapsed .filter-panel-content{opacity:0; pointer-events:none;}
-        .quick-filter-buttons{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px;}
+        .quick-filter-buttons{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;}
         .quick-filter-btn{transition: all 0.2s; background:#0f172a; border:1px solid #334155; padding:8px; border-radius:6px; color:#e6e6e6; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;}
         .quick-filter-btn:hover{background:#1c2635; border-color: #4cc9f0; transition: all 0.2s;}
-        .search-filter{position:relative; margin-bottom:12px;}
+        .search-filter{position:relative; margin-bottom:5px;}
         .search-filter input:hover{ border-color: #4cc9f0; transition: all 0.2s;}
         .search-filter input{ transition: all 0.2s; width:100%; padding:10px 10px 10px 36px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#e6e6e6;}
         .search-filter input:focus{outline:none; border-color: #4cc9f0;}
         .search-filter i{position:absolute; left:12px; top:12px; color:#94a3b8;}
         #filter-list{max-height:calc(80vh - 240px); overflow-y:auto; padding-right:4px;}
         .filter-group-header{display:flex; align-items:center; justify-content:space-between; margin:10px 0 8px; padding-bottom:4px; border-bottom:1px solid #334155; color:#4cc9f0; font-weight:600;}
-        .filter-group-toggle{display:flex; align-items:center; gap:6px; cursor:pointer; flex:1;}
+        .filter-group-toggle{font-size: 0.9rem;display:flex; align-items:center; gap:6px; cursor:pointer; flex:1;}
         .group-toggle-switch{width:40px; height:18px; background:#2c3e50; border-radius:12px; position:relative; cursor:pointer; transition:0.2s;}
         .group-toggle-switch.on{background:#4cc9f0;}
         .group-toggle-switch .slider{width:14px; height:14px; background:white; border-radius:50%; position:absolute; top:2px; left:2px; transition:left 0.2s;}
         .group-toggle-switch.on .slider{left:24px;}
         .filter-group-content{max-height:500px; overflow:hidden; transition:max-height 0.4s, opacity 0.4s;}
         .filter-group-content.collapsed{max-height:0; opacity:0;}
-        .filter-category-item{display:flex; border: 1px solid transparent; align-items:center; justify-content:space-between; background:#0f172a; padding:8px 12px; margin-bottom:6px; border-radius:6px; cursor:pointer; transition:0.2s; opacity:0.5;}
+        .filter-category-item{font-size: 0.85rem;display:flex; border: 1px solid transparent; align-items:center; justify-content:space-between; background:#0f172a; padding:8px 12px; margin-bottom:6px; border-radius:6px; cursor:pointer; transition:0.2s; opacity:0.5;}
         .filter-category-item:hover{background:#1c2635; border-color: #4cc9f0;}
         .filter-category-item.active{opacity:1;}
         .filter-category-item.active:hover{background:#1c2635;}
@@ -119,13 +119,13 @@
                 </div>
                 <div class="filter-panel-content">
                     <div class="quick-filter-buttons">
-                        <button class="quick-filter-btn" onclick="showAllMarkers()"><i class="fas fa-map-marker-alt"></i> All markers</button>
-                        <button class="quick-filter-btn" onclick="hideAllMarkers()"><i class="fas fa-map-marker-alt"></i> Hide markers</button>
-                        <button class="quick-filter-btn" onclick="showAllZones()"><i class="fas fa-draw-polygon"></i> All zones</button>
-                        <button class="quick-filter-btn" onclick="hideAllZones()"><i class="fas fa-draw-polygon"></i> Hide zones</button>
+                        <button class="quick-filter-btn" onclick="showAllMarkers()">Show all markers</button>
+                        <button class="quick-filter-btn" onclick="hideAllMarkers()">Hide all markers</button>
+                        <button class="quick-filter-btn" onclick="showAllZones()">Show all zones</button>
+                        <button class="quick-filter-btn" onclick="hideAllZones()">Hide all zones</button>
                     </div>
                     <div class="search-filter">
-                        <input type="text" id="filter-search" placeholder="Search name, category, group..." oninput="searchElements()">
+                        <input type="text" id="filter-search" placeholder="Search name, category..." oninput="searchElements()">
                         <i class="fas fa-search"></i>
                     </div>
                     <div id="filter-list"><div class="filter-group-header" data-group="Hidden Areas">
