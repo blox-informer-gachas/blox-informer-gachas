@@ -1,146 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="robots" content="noindex, nofollow" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
     <title>Abyss (Roblox) Interactive Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        *{margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; color:#e6e6e6;}
+                *{margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; color:#e6e6e6;}
         body{background:#0f172a; overflow:hidden; display:flex; justify-content:center; align-items:center; min-height:100vh;}
-        body, #map-wrapper, #map-container, #map, .map-background, .map-marker, .map-zone {
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
+        body, #map-wrapper, #map-container, #map, .map-background, .map-marker, .map-zone { user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
         button { -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; touch-action:manipulation; }
-        #map-wrapper {
-            max-width: 100%;
-            overflow: hidden;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-        }
-        #map-container {
-            width: 2560px;
-            height: 2277px;
-            position: relative;
-            overflow: hidden;
-            background: #0f172a;
-        }
-        #map {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-origin: 0 0;
-            transition: transform 0.1s ease-out;
-            cursor: grab;
-        }
+        #map-wrapper { max-width: 100%; overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,0.6); }
+        #map-container { width: 2560px; height: 2277px; position: relative; overflow: hidden; background: #0f172a; }
+        #map { width: 100%; height: 100%; position: relative; transform-origin: 0 0; transition: transform 0.1s ease-out; cursor: grab; }
         #map:active { cursor: grabbing; }
         .map-background{position:absolute; top:0; left:0; width:100%; height:100%; object-fit:fill; pointer-events:none;}
-        .map-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 2000;
-        }
-        .control-btn{
-            width:44px; height:44px; background:#1e293b; border:2px solid #334155; border-radius:10px; color:#e6e6e6; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.2rem; transition:0.2s;
-        }
+        .map-controls { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 2000; }
+        .control-btn{ width:44px; height:44px; background:#1e293b; border:2px solid #334155; border-radius:10px; color:#e6e6e6; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.2rem; transition:0.2s; }
         .control-btn:hover{background:#4cc9f0; color:#0f172a; transform:scale(1.05);}
-        .filter-panel{position:fixed; top:20px; left:20px; background:#1e293be0; backdrop-filter:blur(8px); width:240px; border-radius:12px; padding:16px; z-index:1000; border:2px solid #334155; max-height:80vh; overflow:hidden; transition:max-height 0.4s;}
-        .filter-panel.collapsed{max-height:68px;}
-        .filter-panel-content{opacity:1; transition:0.4s;}
-        .filter-panel.collapsed .filter-panel-content{opacity:0; pointer-events:none;}
-        .quick-filter-buttons{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;}
-        .quick-filter-btn{transition: all 0.2s; background:#0f172a; border:1px solid #334155; padding:8px; border-radius:6px; color:#e6e6e6; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;}
-        .quick-filter-btn:hover{background:#1c2635; border-color: #4cc9f0; transition: all 0.2s;}
-        .search-filter{position:relative; margin-bottom:5px;}
-        .search-filter input:hover{ border-color: #4cc9f0; transition: all 0.2s;}
-        .search-filter input{ transition: all 0.2s; width:100%; padding:10px 10px 10px 36px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#e6e6e6;}
-        .search-filter input:focus{outline:none; border-color: #4cc9f0;}
-        .search-filter i{position:absolute; left:12px; top:12px; color:#94a3b8;}
-        #filter-list{max-height:calc(80vh - 240px); overflow-y:auto; padding-right:4px;}
-        .filter-group-header{padding-right: 5px;display:flex; align-items:center; justify-content:space-between; margin:10px 0 8px; padding-bottom:4px; border-bottom:1px solid #334155; color:#4cc9f0; font-weight:600;}
-        .filter-group-toggle{font-size: 0.9rem;display:flex; align-items:center; gap:6px; cursor:pointer; flex:1;}
-        .group-toggle-switch{width:40px; height:18px; background:#2c3e50; border-radius:12px; position:relative; cursor:pointer; transition:0.2s;}
-        .group-toggle-switch.on{background:#4cc9f0;}
-        .group-toggle-switch .slider{width:14px; height:14px; background:white; border-radius:50%; position:absolute; top:2px; left:2px; transition:left 0.2s;}
-        .group-toggle-switch.on .slider{left:24px;}
-        .filter-group-content{padding-right: 5px; max-height:500px; overflow:hidden; transition:max-height 0.4s, opacity 0.4s;}
-        .filter-group-content.collapsed{max-height:0; opacity:0;}
-        .filter-category-item{font-size: 0.85rem;display:flex; border: 1px solid transparent; align-items:center; justify-content:space-between; background:#0f172a; padding:8px 12px; margin-bottom:6px; border-radius:6px; cursor:pointer; transition:0.2s; opacity:0.5;}
-        .filter-category-item:hover{background:#1c2635; border-color: #4cc9f0;}
-        .filter-category-item.active{opacity:1;}
-        .filter-category-item.active:hover{background:#1c2635;}
-        .filter-category-left{display:flex; align-items:center; gap:10px;}
-        .filter-color{width:18px; height:18px; border-radius:4px;}
-        .filter-category-count{color:#94a3b8;}
-        .map-marker{position:absolute; transform:translate(-50%,-100%); cursor:pointer; transition:0.15s; z-index:10; max-width:80px; max-height:80px; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; touch-action:manipulation;}
-        .map-marker img{width:100%; height:100%; object-fit:contain; pointer-events:none;}
-        .map-marker:hover{transform:translate(-50%,-100%) scale(1.15); filter:drop-shadow(0 0 8px currentColor);}
-        .map-marker.completed{opacity:0.4}
-        .hover-tooltip{position:fixed; background:#1e293b; border:1px solid #4cc9f0; border-radius:8px; padding:6px 12px; color:#e6e6e6; font-size:0.85rem; pointer-events:none; z-index:999; white-space:nowrap; display:none; box-shadow:0 4px 12px rgba(0,0,0,0.5);}
-        .map-zone{position:absolute; border-width:2px; border-style:solid; cursor:pointer; transition:0.2s; z-index:5; background-size:cover; background-repeat:no-repeat; background-position:center; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; touch-action:manipulation;}
-        .map-zone:hover{opacity:0.9 !important; box-shadow:0 0 18px rgba(255,255,255,0.2);}
-        .tooltip{position:fixed; background:#0f172a; border:2px solid #4cc9f0; border-radius:16px; padding:20px; width:340px; max-width:90vw; max-height:80vh; overflow-y:auto; z-index:2000; display:none; box-shadow:0 20px 40px rgba(0,0,0,0.8); backdrop-filter:blur(4px); color:#e2e8f0; line-height:1.6;}
-        .tooltip h3{color:#4cc9f0; margin-bottom:10px; border-bottom:1px solid #334155; padding-bottom:8px;}
-        .tooltip p{color:#cbd5e1; font-size:0.95rem;}
-        .tooltip-img{max-width:100%; max-height:160px; object-fit:contain; border-radius:12px; margin:15px 0; display:block; margin-left:auto; margin-right:auto; border:2px solid #334155;}
-        .tooltip-close{position:absolute; top:12px; right:16px; background:none; border:none; color:#94a3b8; font-size:1.6rem; cursor:pointer; transition:0.2s;}
-        .tooltip-close:hover{color:#4cc9f0; transform:scale(1.2);}
-        .tooltip-close.closing{pointer-events:none;}
-        .completion-checkbox{transition: all 0.2s;border: 1px solid transparent; margin:16px 0 8px; display:flex; align-items:center; gap:10px; background:#1e293b; padding:10px 14px; border-radius:8px;}
-        .completion-checkbox:hover{transition: all 0.2s;border-color: #4cc9f0;}
-        .completion-checkbox input{width:18px; height:18px; accent-color:#4cc9f0;}
-        .search-match{opacity:1 !important;}
-        .search-mismatch{opacity:0.2 !important; pointer-events:none;}
-        .filter-hidden{display:none !important;}
-        .map-element-hidden{opacity: 0 !important; pointer-events: none !important;}
-        @keyframes tooltipFadeIn{from{opacity:0;} to{opacity:1;}}
-        @keyframes tooltipFadeOut{from{opacity:1;} to{opacity:0;}}
+        .filter-panel { position: fixed; top: 0; left: 0; width: 280px; height: 100vh; background: #1e293be0; backdrop-filter: blur(8px); border-right: 2px solid #334155; padding: 20px 15px 20px 20px; z-index: 1500; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(0); display: flex; flex-direction: column; }
+        .filter-panel.collapsed { transform: translateX(-100%); }
+        .filter-panel-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; margin-top: 12px; }
+        .filter-toggle-btn { position: absolute; right: -36px; top: 50%; transform: translateY(-50%); width: 36px; height: 80px; background: #1e293b; border: 2px solid #334155; border-left: none; border-radius: 0 12px 12px 0; color: #4cc9f0; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; transition: 0.2s; z-index: 10; box-shadow: 4px 0 10px rgba(0,0,0,0.3); }
+        .filter-toggle-btn:hover { background: #4cc9f0; color: #0f172a; }
+        .filter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .quick-filter-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; margin-right: 5px; }
+        .quick-filter-btn { transition: all 0.2s; background: #0f172a; border: 1px solid #334155; padding: 8px; border-radius: 6px; color: #e6e6e6; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .quick-filter-btn:hover { background: #1c2635; border-color: #4cc9f0; }
+        .search-filter { position: relative; margin-bottom: 5px; margin-right: 5px; }
+        .search-filter input { transition: all 0.2s; width: 100%; padding: 10px 10px 10px 36px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #e6e6e6; }
+        .search-filter input:focus { outline: none; border-color: #4cc9f0; }
+        .search-filter i { position: absolute; left: 12px; top: 12px; color: #94a3b8; }
+        #filter-list { flex: 1; overflow-y: auto; padding-right: 4px; margin-top: 10px; }
+        #filter-list::-webkit-scrollbar,
+        .tooltip::-webkit-scrollbar { width: 8px; height: 8px; }
+        #filter-list::-webkit-scrollbar-track,
+        .tooltip::-webkit-scrollbar-track { background: #0f172a; border-radius: 10px; margin: 6px 0px; }
+        #filter-list::-webkit-scrollbar-thumb,
+        .tooltip::-webkit-scrollbar-thumb { background: #4cc9f0; border-radius: 10px; }
+        #filter-list::-webkit-scrollbar-thumb:hover,
+        .tooltip::-webkit-scrollbar-thumb:hover { background: #4cc9f0e6; }
+        #filter-list::-webkit-scrollbar-corner,
+        .tooltip::-webkit-scrollbar-corner { background: transparent; }
+        #filter-list { scrollbar-color: #4cc9f0 #0f172a; scrollbar-width: thin; }
+        .filter-group-header { display: flex; align-items: center; justify-content: space-between; margin: 10px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #334155; color: #4cc9f0; font-weight: 600; margin-right: 5px; }
+        .filter-group-toggle { font-size: 0.9rem; display: flex; align-items: center; gap: 6px; cursor: pointer; flex: 1; }
+        .group-toggle-switch { width: 40px; height: 18px; background: #2c3e50; border-radius: 12px; position: relative; cursor: pointer; transition: 0.2s; }
+        .group-toggle-switch.on { background: #4cc9f0; }
+        .group-toggle-switch .slider { width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: left 0.2s; }
+        .group-toggle-switch.on .slider { left: 24px; }
+        .filter-group-content { margin-right: 5px; transition: max-height 0.4s, opacity 0.4s; }
+        .filter-group-content.collapsed { max-height: 0; opacity: 0; }
+        .filter-category-item { font-size: 0.85rem; display: flex; border: 1px solid transparent; align-items: center; justify-content: space-between; background: #0f172a; padding: 8px 12px; margin-bottom: 6px; border-radius: 6px; cursor: pointer; transition: 0.2s; opacity: 0.5; }
+        .filter-category-item.active { opacity: 1; }
+        .filter-category-item:hover { background: #1c2635; border-color: #4cc9f0; }
+        .filter-category-left { display: flex; align-items: center; gap: 10px; }
+        .filter-color { width: 18px; height: 18px; border-radius: 4px; }
+        .filter-category-count { color: #94a3b8; }
+        .map-marker { position: absolute; transform: translate(-50%,-100%); cursor: pointer; transition: 0.15s; z-index: 10; max-width: 80px; max-height: 80px; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; touch-action:manipulation; }
+        .map-marker img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+        .map-marker:hover { transform: translate(-50%,-100%) scale(1.15); filter: drop-shadow(0 0 8px currentColor); }
+        .map-marker.completed { opacity: 0.4; }
+        .hover-tooltip { position: fixed; background: #1e293b; border: 1px solid #4cc9f0; border-radius: 8px; padding: 6px 12px; color: #e6e6e6; font-size: 0.85rem; pointer-events: none; z-index: 9999; white-space: nowrap; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .map-zone { position: absolute; border-width: 2px; border-style: solid; cursor: pointer; transition: 0.2s; z-index: 5; background-size: cover; background-repeat: no-repeat; background-position: center; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; touch-action:manipulation; }
+        .map-zone:hover { opacity: 0.9 !important; box-shadow: 0 0 18px rgba(255,255,255,0.2); }
+        .tooltip { position: fixed; background: #0f172a; border: 2px solid #4cc9f0; border-radius: 16px; padding: 20px; max-width: 45vw; max-height: 40vh; overflow-y: auto; z-index: 2000; display: none; box-shadow: 0 20px 40px rgba(0,0,0,0.8); backdrop-filter: blur(4px); color: #e2e8f0; line-height: 1.6; min-width: 280px; }
+        .tooltip h3 { color: #4cc9f0; margin-bottom: 10px; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+        .tooltip p { color: #cbd5e1; font-size: 0.95rem; }
+        .tooltip-img { max-width: 100%; max-height: 160px; object-fit: contain; border-radius: 12px; margin: 15px 0; display: block; margin-left: auto; margin-right: auto; border: 2px solid #334155; }
+        .tooltip-close { position: absolute; top: 10px; right: 20px; background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
+        .tooltip-close:hover { color: #4cc9f0; transform: scale(1.2); }
+        .completion-checkbox { transition: all 0.2s; border: 1px solid transparent; margin: 16px 0 8px; display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 10px 14px; border-radius: 8px; }
+        .completion-checkbox:hover { border-color: #4cc9f0; }
+        .completion-checkbox input { width: 18px; height: 18px; accent-color: #4cc9f0; }
+        .search-match { opacity:1 !important; }
+        .search-mismatch { opacity:0.2 !important; pointer-events:none; }
+        .filter-hidden { display:none !important; }
+        .map-element-hidden { opacity: 0 !important; pointer-events: none !important; }
+        @keyframes tooltipFadeIn { from{opacity:0;} to{opacity:1;} }
+        @keyframes tooltipFadeOut { from{opacity:1;} to{opacity:0;} }
         .tooltip.fade-in{animation:tooltipFadeIn 0.3s ease-out forwards;}
-        .tooltip.fade-out{animation:tooltipFadeOut 0.3s ease-out forwards;}
-        #filter-list::-webkit-scrollbar{width:8px;}
-        #filter-list::-webkit-scrollbar-track{background:#0f172a;}
-        #filter-list::-webkit-scrollbar-thumb{background:#4cc9f0; border-radius:4px;}
-        #filter-list::-webkit-scrollbar-thumb:hover{background:#4cc9f0e6;}
-        #filter-list{scrollbar-color:#4cc9f0 #0f172a; scrollbar-width:thin;}
+        .tooltip.fade-out { animation: tooltipFadeOut 0.3s ease-out forwards; }
     </style>
 </head>
 <body>
-    <div id="map-wrapper">
-        <div id="map-container">
-            <div id="map">
-                <img src="https://bloxinformer.com/wp-content/uploads/2026/02/abyss-map-release-roblox-scaled.webp" class="map-background">
+    <div class="filter-panel" id="filterPanel">
+        <div class="filter-toggle-btn" onclick="toggleFilters()" id="filterToggleBtn">
+            <i class="fas fa-chevron-right" id="filterToggleIcon"></i>
+        </div>
+        <div class="filter-header">
+            <h3 style="color:#4cc9f0;"><i class="fas fa-filter"></i> Filters</h3>
+        </div>
+        <div class="filter-panel-content">
+            <div class="quick-filter-buttons">
+                <button class="quick-filter-btn" onclick="showAll()"><i class="fas fa-eye"></i> Show All</button>
+                <button class="quick-filter-btn" onclick="hideAll()"><i class="fas fa-eye-slash"></i> Hide All</button>
+                <button class="quick-filter-btn" onclick="markAllUncompleted()" style="grid-column: span 2;"><i class="fas fa-check-double"></i> Mark all uncompleted</button>
             </div>
-            <div class="filter-panel">
-                <div class="filter-header" style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                    <h3 style="color:#4cc9f0;"><i class="fas fa-filter"></i> Filters</h3>
-                    <button class="control-btn" style="width:32px;height:32px;" onclick="toggleFilters()"><i class="fas fa-chevron-up"></i></button>
-                </div>
-                <div class="filter-panel-content">
-                    <div class="quick-filter-buttons">
-                        <button class="quick-filter-btn" onclick="showAllMarkers()">Show all markers</button>
-                        <button class="quick-filter-btn" onclick="hideAllMarkers()">Hide all markers</button>
-                        <button class="quick-filter-btn" onclick="showAllZones()">Show all zones</button>
-                        <button class="quick-filter-btn" onclick="hideAllZones()">Hide all zones</button>
-                    </div>
-                    <div class="search-filter">
-                        <input type="text" id="filter-search" placeholder="Search name, category..." oninput="searchElements()">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <div id="filter-list"><div class="filter-group-header" data-group="Collectables">
+            <div class="search-filter">
+                <input type="text" id="filter-search" placeholder="Search name, category..." oninput="searchElements()">
+                <i class="fas fa-search"></i>
+            </div>
+            <div id="filter-list"><div class="filter-group-header" data-group="Collectables">
             <div class="filter-group-toggle" onclick="toggleGroup('Collectables')">
-                <i class="fas fa-gift" style="margin-right:6px;"></i> Collectables <span class="group-count">(7)</span>
+                <i class="fas fa-gift" style="margin-right:6px;"></i> Collectables <span class="group-count">(96)</span>
             </div>
             <div class="group-toggle-switch on" onclick="event.stopPropagation();toggleGroupVisibility('Collectables')"><span class="slider"></span></div>
         </div>
         <div class="filter-group-content" id="group-Collectables"><div class="filter-category-item" data-category="Chests" data-group="Collectables" onclick="toggleCategory('Chests')">
-                <div class="filter-category-left"><i class="fas fa-box" style="margin-right:8px;"></i> <span class="filter-category-name">Chests</span></div>
-                <div class="filter-category-right"><span class="filter-category-count">(7)</span></div>
+                <div class="filter-category-left"><img src="https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png" style="width:20px; height:20px; object-fit:contain; margin-right:8px;"> <span class="filter-category-name">Chests</span></div>
+                <div class="filter-category-right"><span class="filter-category-count">(81)</span></div>
+            </div><div class="filter-category-item" data-category="Ducks" data-group="Collectables" onclick="toggleCategory('Ducks')">
+                <div class="filter-category-left"><img src="https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png" style="width:20px; height:20px; object-fit:contain; margin-right:8px;"> <span class="filter-category-name">Ducks</span></div>
+                <div class="filter-category-right"><span class="filter-category-count">(15)</span></div>
             </div></div><div class="filter-group-header" data-group="Hidden Areas">
             <div class="filter-group-toggle" onclick="toggleGroup('Hidden Areas')">
                 <i class="fas fa-key" style="margin-right:6px;"></i> Hidden Areas <span class="group-count">(2)</span>
@@ -163,7 +136,13 @@
                 <div class="filter-category-left"><i class="fas fa-user" style="margin-right:8px;"></i> <span class="filter-category-name">NPCs</span></div>
                 <div class="filter-category-right"><span class="filter-category-count">(24)</span></div>
             </div></div></div>
-                </div>
+        </div>
+    </div>
+
+    <div id="map-wrapper">
+        <div id="map-container">
+            <div id="map">
+                <img src="https://bloxinformer.com/wp-content/uploads/2026/02/abyss-map-roblox-release-2-scaled.webp" class="map-background">
             </div>
         </div>
     </div>
@@ -175,10 +154,15 @@
     <div class="hover-tooltip" id="hover-tooltip"></div>
     <div class="tooltip" id="tooltip"></div>
     <script>
-        const mapElements = [{"id":1770820293339,"type":"marker","shape":"marker","x":1115.6420233463036,"y":1192.081181850158,"width":0,"height":0,"name":"Crab","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Crab-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Crab-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820367540,"type":"marker","shape":"marker","x":1124.2749675745786,"y":1198.488498065424,"width":0,"height":0,"name":"Henry","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Henry-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Henry-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820432392,"type":"marker","shape":"marker","x":1063.8443579766538,"y":1218.351178332747,"width":0,"height":0,"name":"David","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/David-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/David-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820473502,"type":"marker","shape":"marker","x":1073.473411154345,"y":1231.8065423848045,"width":0,"height":0,"name":"Virelia","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Virelia-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Virelia-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820520500,"type":"marker","shape":"marker","x":1118.2983138780805,"y":1215.788251846641,"width":0,"height":0,"name":"MrBlack","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/MrBlack.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"groupIcon":"fas fa-asterisk","categoryIcon":"fas fa-user","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/MrBlack.png","tooltipImage":""},{"id":1770820608736,"type":"marker","shape":"marker","x":1102.194552529183,"y":1231.9266795638412,"width":0,"height":0,"name":"Billy","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Billy-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Billy-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820649702,"type":"marker","shape":"marker","x":1113.483787289235,"y":1225.1989975378121,"width":0,"height":0,"name":"Scientist","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Scientist-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Scientist-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820684020,"type":"marker","shape":"marker","x":916.4202334630351,"y":1027.4131551178332,"width":0,"height":0,"name":"Diver","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Diver.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Diver.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820719722,"type":"marker","shape":"marker","x":1024.5523248305697,"y":814.4494217903389,"width":0,"height":0,"name":"Morveth","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Morveth-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Morveth-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820762160,"type":"marker","shape":"marker","x":526.1660079051385,"y":1196.8866690116074,"width":0,"height":0,"name":"Jeff","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Jeff-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Jeff-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820762880,"type":"marker","shape":"marker","x":597.4993514915693,"y":1199.2493668659865,"width":0,"height":0,"name":"Marcus","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Marcus-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Marcus-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820848332,"type":"marker","shape":"marker","x":293.3540856031128,"y":1359.1119064368625,"width":0,"height":0,"name":"Hank","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Grumpy-Hank-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Grumpy-Hank-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770892724196,"type":"marker","x":1543.6602316602316,"y":1205.8569117129794,"width":0,"height":0,"name":"Lost Captain","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Lost-Captain-1.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770892753346,"type":"marker","x":1617.7915057915059,"y":594.5989447766443,"width":0,"height":0,"name":"Lumi","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Lumi-1.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770892798729,"type":"marker","x":1644.4787644787643,"y":558.7179739711572,"width":0,"height":0,"name":"Isolde","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Isolde-1.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770892814808,"type":"marker","x":1614.3320463320465,"y":352.4023918396061,"width":0,"height":0,"name":"Golem","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Golemn-Icon.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770892817824,"type":"marker","x":1699.976520866586,"y":538.3107755964206,"width":0,"height":0,"name":"Victor","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Victor-1.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770892896636,"type":"marker","x":380.5405405405406,"y":1123.0601477312698,"width":0,"height":0,"name":"Suspicious Fisher","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Suspicious-Fisher-1.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770899344334,"type":"marker","x":1057.8532818532817,"y":1173.179599015125,"width":0,"height":0,"name":"Richard","description":"Allows you to view your Bestiary. Sells the Radar item for $450.","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Richard-1.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770901230928,"type":"zone","shape":"circle","x":875.9007162377475,"y":655.725672638465,"width":307.2,"height":182.16,"name":"Morveth's Cave","description":"Secluded area where Morveth NPC resides.","mapImage":"","tooltipImage":"","category":"Morveth's Cave","group":"Hidden Areas","categoryIcon":"fas fa-dungeon","groupIcon":"fas fa-key","color":"#6bb46a","opacity":75,"borderStyle":"solid","size":20},{"id":1770902290083,"type":"zone","shape":"circle","x":1433.6347716921694,"y":996.8723669926043,"width":307.2,"height":182.16,"name":"Angler Cave","description":"Secret area unlocked after completing Lost Captain's quests.","mapImage":"","tooltipImage":"","category":"Angler Cave","group":"Hidden Areas","categoryIcon":"fas fa-dungeon","groupIcon":"fas fa-key","color":"#6bb46a","opacity":75,"borderStyle":"solid","size":20},{"id":1770903461906,"type":"marker","x":1087.0489241416083,"y":1186.0051958105175,"width":0,"height":0,"name":"Kraken","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Kraken.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"","groupIcon":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770903653153,"type":"marker","x":988.4359921674793,"y":1294.437845656173,"width":0,"height":0,"name":"Bob","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/BOB.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"","groupIcon":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770903795609,"type":"marker","x":1581.7362829085691,"y":1142.2193129595946,"width":0,"height":0,"name":"Lightkeeper","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/LightKeeper.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"","groupIcon":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770903833567,"type":"marker","x":1755.8559433506118,"y":470.2816734604427,"width":0,"height":0,"name":"Isaac","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Isaac.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"","groupIcon":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770903874413,"type":"marker","x":1699.868125541274,"y":278.665566260345,"width":0,"height":0,"name":"King Cat","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/KingCat.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"","groupIcon":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770907316211,"type":"marker","x":1120.1235521235521,"y":1182.7905733380233,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-1.png","tooltipImage":"https://bloxinformer.com/wp-content/uploads/2026/02/ches1-forgotten-deep-abyss.png","category":"Chests","group":"Collectables","categoryIcon":"fas fa-box","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770907484931,"type":"marker","x":1061.250353128425,"y":1213.4745008499995,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-1.png","tooltipImage":"https://bloxinformer.com/wp-content/uploads/2026/02/chest2-forgotten-deep-abyss.png","category":"Chests","group":"Collectables","categoryIcon":"fas fa-box","groupIcon":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770908738414,"type":"marker","x":1119.6293436293436,"y":1209.060569820612,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-1.png","tooltipImage":"https://bloxinformer.com/wp-content/uploads/2026/02/chest3-forgotten-lands-abyss.png","category":"Chests","group":"Collectables","categoryIcon":"fas fa-box","groupIcon":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770908813473,"type":"marker","x":1037.096525096525,"y":1251.3488568413647,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-1.png","tooltipImage":"https://bloxinformer.com/wp-content/uploads/2026/02/chest4-forgotten-deep-abyss.png","category":"Chests","group":"Collectables","categoryIcon":"fas fa-box","groupIcon":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770908907252,"type":"marker","x":1045.31942752733,"y":1022.2538604444634,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-1.png","tooltipImage":"https://bloxinformer.com/wp-content/uploads/2026/02/chest5-forgotten-deep-abyss.png","category":"Chests","group":"Collectables","categoryIcon":"fas fa-box","groupIcon":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770908950291,"type":"marker","x":1261.352743079594,"y":1145.4228709133763,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-1.png","tooltipImage":"https://bloxinformer.com/wp-content/uploads/2026/02/chest6-forgotten-deep-abyss.png","category":"Chests","group":"Collectables","categoryIcon":"fas fa-box","groupIcon":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770909019728,"type":"marker","x":1022.2702702702702,"y":1165.4908195568064,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-1.png","tooltipImage":"https://bloxinformer.com/wp-content/uploads/2026/02/chest7-forgotten-deep-abyss.png","category":"Chests","group":"Collectables","categoryIcon":"fas fa-box","groupIcon":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100}];
+        let defaultHiddenCategories = []; // e.g. ["Fishing Zone", "Rare Fish"]
+        let defaultHiddenGroups = [];      // e.g. ["Rare Loot", "Dungeons"]
+        let lastTouchStart = {x: 0, y: 0};
+        const TAP_THRESHOLD = 5; // pixels
+
+        const mapElements = [{"id":1770901230928,"type":"zone","shape":"circle","x":882.0097426565343,"y":600.4681352091602,"width":307.2,"height":182.16,"name":"Morveth's Cave","description":"Secluded area where Morveth NPC resides.","mapImage":"","tooltipImage":"","category":"Morveth's Cave","group":"Hidden Areas","categoryIcon":"fas fa-dungeon","groupIcon":"fas fa-key","color":"#6bb46a","opacity":75,"borderStyle":"solid","size":20},{"id":1770902290083,"type":"zone","shape":"circle","x":1435.1708255597014,"y":974.7957134688527,"width":307.2,"height":182.16,"name":"Angler Cave","description":"Secret area unlocked after completing Lost Captain's quests.","mapImage":"","tooltipImage":"","category":"Angler Cave","group":"Hidden Areas","categoryIcon":"fas fa-dungeon","groupIcon":"fas fa-key","color":"#6bb46a","opacity":75,"borderStyle":"solid","size":20},{"id":1770994365827,"type":"marker","x":458.71973951855307,"y":1010.8681578947369,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994384822,"type":"marker","x":461.373139186878,"y":1037.2334210526317,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994392808,"type":"marker","x":450.22885450676307,"y":1131.9086842105262,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994400159,"type":"marker","x":348.86898515236317,"y":1134.3055263157896,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994400886,"type":"marker","x":352.58374468801827,"y":1140.8968421052632,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994402552,"type":"marker","x":345.1542256167081,"y":1149.2857894736842,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994425934,"type":"marker","x":313.6640153378737,"y":1346.892134817023,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994431982,"type":"marker","x":278.3703714708582,"y":1358.2105703233326,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994432860,"type":"marker","x":289.2897115302442,"y":1363.9643066170818,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994439600,"type":"marker","x":252.94058676375428,"y":1440.755282033858,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994446904,"type":"marker","x":289.40219229001013,"y":1445.1218144552197,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994454105,"type":"marker","x":314.2623778760938,"y":1428.9032654615912,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994457556,"type":"marker","x":325.8637978162661,"y":1435.141168920679,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994463499,"type":"marker","x":365.7250919459467,"y":1414.9259709331466,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994464711,"type":"marker","x":371.54873997761933,"y":1408.3502723117188,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994469677,"type":"marker","x":421.04974824683615,"y":1466.7095975768898,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994497672,"type":"marker","x":539.9137693692992,"y":1190.6313157894738,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994516569,"type":"marker","x":521.6476660904332,"y":1297.4118716591283,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994522452,"type":"marker","x":629.0679982250207,"y":1408.7439473684212,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994526606,"type":"marker","x":728.3051458203772,"y":1349.4221052631578,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994530839,"type":"marker","x":702.8325090044569,"y":1272.723157894737,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994535284,"type":"marker","x":742.6335040293326,"y":1116.3292105263158,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770994538852,"type":"marker","x":669.3996731835614,"y":1094.1584210526316,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770995779850,"type":"marker","x":2015.348000089194,"y":515.4693179614327,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770995786181,"type":"marker","x":1904.7025431980521,"y":315.1035833290718,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770995794748,"type":"marker","x":1872.6919078710553,"y":423.53680442423183,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998056003,"type":"marker","x":1741.8658330563712,"y":365.3914539818996,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998199200,"type":"marker","x":1723.076981886178,"y":316.6750792869726,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998213658,"type":"marker","x":1692.0225066284975,"y":261.2705088692216,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998216822,"type":"marker","x":1682.2801393550635,"y":247.91279435242677,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998225899,"type":"marker","x":1698.285457018562,"y":236.9123235738898,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998239744,"type":"marker","x":1657.9242211714788,"y":298.9864086813483,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998247061,"type":"marker","x":1611.300034934331,"y":318.6301065001643,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998262899,"type":"marker","x":1616.8671019477215,"y":378.3469478693648,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998273634,"type":"marker","x":1600.1659009075493,"y":439.6352850640707,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998277657,"type":"marker","x":1658.6201045481525,"y":456.9217391446288,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998287131,"type":"marker","x":1741.4302263723405,"y":466.3507140976604,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998293039,"type":"marker","x":1756.0437772824912,"y":509.56684929905555,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998309157,"type":"marker","x":1680.8883726017157,"y":529.2105471178716,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998312947,"type":"marker","x":1690.6307398751496,"y":537.8537741581506,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998329047,"type":"marker","x":1680.192489225042,"y":376.7754520438596,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998339202,"type":"marker","x":1658.6201045481525,"y":361.0604937888068,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998372631,"type":"marker","x":1513.7115205223881,"y":535.0949999999999,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998379214,"type":"marker","x":1482.9320843698176,"y":521.3131578947368,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998397047,"type":"marker","x":1632.053145729685,"y":560.2618421052631,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998412002,"type":"marker","x":1636.298585199005,"y":599.8097368421053,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998450283,"type":"marker","x":1698.8995779058387,"y":743.9289325914884,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998458999,"type":"marker","x":1644.223460844949,"y":703.9815641704358,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998462816,"type":"marker","x":1509.1412892827507,"y":722.7447220651727,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998586216,"type":"marker","x":1336.995037831675,"y":759.1997368421053,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998592434,"type":"marker","x":1280.7429648631842,"y":814.3271052631578,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998670216,"type":"marker","x":1049.8971937189053,"y":760.9973684210526,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998674505,"type":"marker","x":1024.424556902985,"y":777.7752631578948,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998682781,"type":"marker","x":1030.2620361733002,"y":829.9065789473686,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998690298,"type":"marker","x":963.3963645315093,"y":802.9421052631578,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998700332,"type":"marker","x":971.8872434701493,"y":925.7802631578948,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998706464,"type":"marker","x":914.5738106343283,"y":1018.0586842105263,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998712591,"type":"marker","x":940.0464474502487,"y":1009.6697368421051,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998720273,"type":"marker","x":1056.7960328565507,"y":1001.88,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998729072,"type":"marker","x":1047.7744739842453,"y":1049.8168421052633,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998748497,"type":"marker","x":1074.3084706674958,"y":1067.7931578947369,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998767258,"type":"marker","x":960.212284929519,"y":1337.437894736842,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998782466,"type":"marker","x":1127.3764640339966,"y":1199.0202631578948,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998791487,"type":"marker","x":1121.0083048300166,"y":1225.3855263157893,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998801734,"type":"marker","x":1047.2437940505804,"y":1216.9965789473683,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998812643,"type":"marker","x":1024.95523683665,"y":1186.4368421052632,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998831359,"type":"marker","x":1253.6782882462687,"y":1135.503947368421,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998837282,"type":"marker","x":1332.7495983623548,"y":1112.733947368421,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998841600,"type":"marker","x":1394.3084706674958,"y":1178.647105263158,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998847250,"type":"marker","x":1378.9187525912107,"y":1188.2344736842106,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998850969,"type":"marker","x":1387.9403114635159,"y":1205.0123684210525,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998867993,"type":"marker","x":1539.7147724917081,"y":1227.1831578947367,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998876173,"type":"marker","x":1593.8441257255388,"y":1240.9650000000001,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998940938,"type":"marker","x":1419.7811074834162,"y":1200.2186842105264,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998950378,"type":"marker","x":1355.0381555762851,"y":1317.0647368421053,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998957800,"type":"marker","x":1499.9137774668325,"y":1446.4942105263158,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998967955,"type":"marker","x":1240.9419698383085,"y":1566.9355263157895,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770998971950,"type":"marker","x":1414.4743081467661,"y":1600.4913157894737,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000857175,"type":"marker","x":1519.0182550787727,"y":1720.4532338995682,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000859315,"type":"marker","x":1514.2421356757877,"y":1726.4453391627258,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000864086,"type":"marker","x":1505.7512567371475,"y":1737.2311286364106,"width":0,"height":0,"name":"Treasure Chest","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","tooltipImage":"","category":"Chests","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/Chests-2.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000175395,"type":"marker","x":1969.2937974287552,"y":523.5152507989545,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000180144,"type":"marker","x":1707.187609468985,"y":543.615162691761,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000185286,"type":"marker","x":1605.2915270302926,"y":380.04346590892203,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000205783,"type":"marker","x":521.1775076071317,"y":1170.5415581810153,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000224748,"type":"marker","x":294.67442086989143,"y":1342.6282159469397,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000240976,"type":"marker","x":366.91210694574005,"y":1412.8186082056948,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000255736,"type":"marker","x":1048.3051539179105,"y":796.2309400538394,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000266722,"type":"marker","x":1032.9154358416254,"y":826.191466369629,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000275873,"type":"marker","x":896.0000129560531,"y":1004.7562397846423,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000283723,"type":"marker","x":975.0713230721394,"y":1106.6220292583264,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000298407,"type":"marker","x":1304.6235618781093,"y":1100.6299239951686,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000308889,"type":"marker","x":1121.0083048300166,"y":1221.0712397846423,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000317137,"type":"marker","x":1098.1890676824214,"y":1171.3367661004318,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771000325781,"type":"marker","x":967.6418040008292,"y":1340.9133450478,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1771001058250,"type":"marker","x":1536.000012956053,"y":1722.6104503109584,"width":0,"height":0,"name":"Duck","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","tooltipImage":"","category":"Ducks","group":"Collectables","categoryIcon":"https://bloxinformer.com/wp-content/uploads/2026/02/RubberDuckIcon.png","groupIcon":"fas fa-gift","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770903461906,"type":"marker","x":1089.167508810116,"y":1197.2226315789474,"width":0,"height":0,"name":"Kraken","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Kraken.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770899344334,"type":"marker","x":1062.1028321932006,"y":1173.2542105263158,"width":0,"height":0,"name":"Richard","description":"Allows you to view your Bestiary. Sells the Radar item for $450.","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Richard-1.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770820367540,"type":"marker","shape":"marker","x":1105.6185867537313,"y":1173.2542105263158,"width":0,"height":0,"name":"Henry","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Henry-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Henry-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820293339,"type":"marker","shape":"marker","x":1114.1094656923715,"y":1178.0478947368422,"width":0,"height":0,"name":"Crab","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Crab-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Crab-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820649702,"type":"marker","shape":"marker","x":1120.4776248963517,"y":1181.043947368421,"width":0,"height":0,"name":"Scientist","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Scientist-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Scientist-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820432392,"type":"marker","shape":"marker","x":1063.1641920605307,"y":1204.4131578947367,"width":0,"height":0,"name":"David","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/David-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/David-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820473502,"type":"marker","shape":"marker","x":1073.777790733831,"y":1218.794210526316,"width":0,"height":0,"name":"Virelia","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Virelia-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Virelia-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820608736,"type":"marker","shape":"marker","x":1113.5787857587065,"y":1206.8100000000002,"width":0,"height":0,"name":"Billy","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Billy-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Billy-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820520500,"type":"marker","shape":"marker","x":1101.3731472844113,"y":1216.3973684210525,"width":0,"height":0,"name":"MrBlack","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/MrBlack.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"groupIcon":"fas fa-asterisk","categoryIcon":"fas fa-user","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/MrBlack.png","tooltipImage":""},{"id":1770820684020,"type":"marker","shape":"marker","x":915.8696598245231,"y":1009.8611792494655,"width":0,"height":0,"name":"Diver","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Diver.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Diver.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820719722,"type":"marker","shape":"marker","x":1035.0381555762854,"y":774.1800000000001,"width":0,"height":0,"name":"Morveth","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Morveth-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Morveth-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820762160,"type":"marker","shape":"marker","x":527.2832801228358,"y":1181.6438788716237,"width":0,"height":0,"name":"Jeff","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Jeff-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Jeff-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820762880,"type":"marker","shape":"marker","x":596.4023308273629,"y":1181.6438788716237,"width":0,"height":0,"name":"Marcus","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Marcus-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Marcus-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770820848332,"type":"marker","shape":"marker","x":291.98438410742403,"y":1347.696868597146,"width":0,"height":0,"name":"Hank","description":"","image":"https://bloxinformer.com/wp-content/uploads/2026/02/Grumpy-Hank-1.png","category":"NPCs","group":"Misc","categoryImage":"","groupImage":"","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100,"mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Grumpy-Hank-1.png","tooltipImage":"","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk"},{"id":1770892724196,"type":"marker","x":1543.447738251562,"y":1215.5197521501832,"width":0,"height":0,"name":"Lost Captain","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Lost-Captain-1.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770892753346,"type":"marker","x":1618.2554674543949,"y":602.2065789473684,"width":0,"height":0,"name":"Lumi","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Lumi-1.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770892798729,"type":"marker","x":1639.6398417587088,"y":563.78972838579,"width":0,"height":0,"name":"Isolde","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Isolde-1.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770892814808,"type":"marker","x":1613.4793480514097,"y":355.93105263157895,"width":0,"height":0,"name":"Golem","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Golemn-Icon.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770892817824,"type":"marker","x":1691.8801896831203,"y":539.7030517199122,"width":0,"height":0,"name":"Victor","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Victor-1.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770892896636,"type":"marker","x":380.2214701132034,"y":1126.0161273135734,"width":0,"height":0,"name":"Suspicious Fisher","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Suspicious-Fisher-1.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770903653153,"type":"marker","x":988.4359921674793,"y":1294.437845656173,"width":0,"height":0,"name":"Bob","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/BOB.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770903795609,"type":"marker","x":1584.2918869195687,"y":1144.971502942537,"width":0,"height":0,"name":"Lightkeeper","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/LightKeeper.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770903833567,"type":"marker","x":1754.3722121920134,"y":466.4157810645214,"width":0,"height":0,"name":"Isaac","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/Isaac.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100},{"id":1770903874413,"type":"marker","x":1681.0016857364253,"y":241.80935159602478,"width":0,"height":0,"name":"King Cat","description":"","mapImage":"https://bloxinformer.com/wp-content/uploads/2026/02/KingCat.png","tooltipImage":"","category":"NPCs","group":"Misc","categoryIcon":"fas fa-user","groupIcon":"fas fa-asterisk","color":"#4cc9f0","opacity":100,"borderStyle":"solid","icon":"map-marker-alt","size":100}];
         const bgWidth = 2560, bgHeight = 2277;
         const minZoom = 0.4, maxZoom = 2.5;
-        let zoom = 0.4, offsetX = 0, offsetY = 0, isDragging = false, dragStart = {x:0,y:0};
+        let zoom = 0.5, offsetX = 200, offsetY = 50, isDragging = false, dragStart = {x:0,y:0};
         let completedMarkers = JSON.parse(localStorage.getItem('mapforge_completed_markers')||'{}');
         let groupVisibility = {};
 
@@ -191,36 +175,59 @@
                 let g = h.dataset.group;
                 groupVisibility[g] = true;
             });
+            applyDefaultHidden();
             document.querySelectorAll('.filter-category-item').forEach(item => {
                 item.classList.add('active');
             });
             setupTouchPan();
             centerMapOnLoad();
-            const closeTooltipHandler = function(e) {
+            document.addEventListener('click', function(e) {
                 const tooltip = document.getElementById('tooltip');
-                if (tooltip.style.display === 'block' && 
-                    !tooltip.contains(e.target) && 
-                    !e.target.closest('.map-marker') && 
+                if (tooltip.style.display === 'block' &&
+                    !tooltip.contains(e.target) &&
+                    !e.target.closest('.map-marker') &&
                     !e.target.closest('.map-zone')) {
                     closeTooltip();
                 }
-            };
-            document.addEventListener('click', closeTooltipHandler);
-            document.addEventListener('touchend', closeTooltipHandler);
+            });
+            document.addEventListener('touchstart', function(e) {
+                const tooltip = document.getElementById('tooltip');
+                if (tooltip.style.display === 'block' &&
+                    !tooltip.contains(e.target) &&
+                    !e.target.closest('.map-marker') &&
+                    !e.target.closest('.map-zone')) {
+                    closeTooltip();
+                }
+            });
         };
+
+        function applyDefaultHidden() {
+            defaultHiddenCategories.forEach(cat => {
+                document.querySelectorAll(`.map-marker[data-category="${cat}"], .map-zone[data-category="${cat}"]`).forEach(el => el.classList.add('map-element-hidden'));
+                document.querySelectorAll(`.filter-category-item[data-category="${cat}"]`).forEach(item => item.classList.remove('active'));
+            });
+            defaultHiddenGroups.forEach(group => {
+                document.querySelectorAll(`.map-marker[data-group="${group}"], .map-zone[data-group="${group}"]`).forEach(el => el.classList.add('map-element-hidden'));
+                document.querySelectorAll(`.filter-category-item[data-group="${group}"]`).forEach(item => item.classList.remove('active'));
+                let sw = document.querySelector(`.filter-group-header[data-group="${group}"] .group-toggle-switch`);
+                if(sw) { sw.classList.remove('on'); sw.classList.add('off'); }
+                groupVisibility[group] = false;
+            });
+        }
 
         function createMarker(el){
             let m = document.createElement('div');
             m.className = 'map-marker filter-'+el.category;
             if(completedMarkers[el.id]) m.classList.add('completed');
-            m.dataset.category = el.category; 
-            m.dataset.group = el.group || ''; 
+            m.dataset.category = el.category;
+            m.dataset.group = el.group || '';
             m.dataset.name = (el.name||'').toLowerCase();
             m.dataset.id = el.id;
             m.style.left = (el.x / bgWidth * 100) + '%';
             m.style.top = (el.y / bgHeight * 100) + '%';
             m.style.color = el.color;
             let base = 40, size = Math.min(80, base * (el.size/100));
+            m.dataset.baseSize = size;
             m.style.width = size+'px'; m.style.height = size+'px';
             if(el.mapImage) {
                 if (el.mapImage.startsWith('http')) m.innerHTML = '<img src="'+el.mapImage+'">';
@@ -229,18 +236,27 @@
                 m.innerHTML = '<i class="fas fa-'+(el.icon||'map-marker-alt')+'" style="font-size:'+(size*0.6)+'px;"></i>';
             }
             m.title = el.name;
-            const markerClickHandler = (e)=> { e.preventDefault(); e.stopPropagation(); showTooltip(el, e.target); };
             m.addEventListener('mouseenter', (e) => showHoverTooltip(el.name, e.target));
             m.addEventListener('mouseleave', () => hideHoverTooltip());
-            m.addEventListener('click', markerClickHandler);
-            m.addEventListener('touchend', markerClickHandler);
+            m.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); showTooltip(el, e.target); });
+            m.addEventListener('touchstart', (e) => { lastTouchStart = {x: e.touches[0].clientX, y: e.touches[0].clientY}; });
+            m.addEventListener('touchend', (e) => {
+                const touchMove = Math.hypot(
+                    e.changedTouches[0].clientX - lastTouchStart.x,
+                    e.changedTouches[0].clientY - lastTouchStart.y
+                );
+                if (touchMove < TAP_THRESHOLD) {
+                    e.stopPropagation();
+                    showTooltip(el, e.target);
+                }
+            });
             document.getElementById('map').appendChild(m);
         }
         function createZone(el){
             let z = document.createElement('div');
             z.className = 'map-zone filter-'+el.category;
-            z.dataset.category = el.category; 
-            z.dataset.group = el.group||''; 
+            z.dataset.category = el.category;
+            z.dataset.group = el.group||'';
             z.dataset.name = (el.name||'').toLowerCase();
             z.style.left = (el.x / bgWidth * 100) + '%';
             z.style.top = (el.y / bgHeight * 100) + '%';
@@ -265,14 +281,34 @@
             if(el.shape==='circle'||el.shape==='ellipse') z.style.borderRadius='50%';
             if(el.shape==='polygon') z.style.clipPath='polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)';
             z.title = el.name;
-            const zoneClickHandler = (e)=> { e.preventDefault(); e.stopPropagation(); showTooltip(el, e.target); };
             z.addEventListener('mouseenter', (e) => showHoverTooltip(el.name, e.target));
             z.addEventListener('mouseleave', () => hideHoverTooltip());
-            z.addEventListener('click', zoneClickHandler);
-            z.addEventListener('touchend', zoneClickHandler);
+            z.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); showTooltip(el, e.target); });
+            z.addEventListener('touchstart', (e) => { lastTouchStart = {x: e.touches[0].clientX, y: e.touches[0].clientY}; });
+            z.addEventListener('touchend', (e) => {
+                const touchMove = Math.hypot(
+                    e.changedTouches[0].clientX - lastTouchStart.x,
+                    e.changedTouches[0].clientY - lastTouchStart.y
+                );
+                if (touchMove < TAP_THRESHOLD) {
+                    e.stopPropagation();
+                    showTooltip(el, e.target);
+                }
+            });
             document.getElementById('map').appendChild(z);
         }
 
+        function zoomIn() {
+            let zoomCenterX = window.innerWidth / 2;
+            let zoomCenterY = window.innerHeight / 2;
+            zoomAtPoint(zoom * 1.1, zoomCenterX, zoomCenterY);
+
+        }
+        function zoomOut() {
+            let zoomCenterX = window.innerWidth / 2;
+            let zoomCenterY = window.innerHeight / 2;
+            zoomAtPoint(zoom * 0.9, zoomCenterX, zoomCenterY);
+        }
         function zoomAtPoint(newZoom, clientX, clientY) {
             const container = document.getElementById('map-container');
             const rect = container.getBoundingClientRect();
@@ -286,46 +322,38 @@
             zoom = newZoom;
             setMapTransform(zoom, offsetX, offsetY);
         }
-
-                function zoomIn() {
-            const container = document.getElementById('map-container');
-            const rect = container.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            zoomAtPoint(zoom * 1.1, centerX, centerY);
-        }
-
-        function zoomOut() {
-            const container = document.getElementById('map-container');
-            const rect = container.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            zoomAtPoint(zoom * 0.9, centerX, centerY);
-        }
-
         function setMapTransform(zoom, offsetX, offsetY) {
             const map = document.getElementById('map');
-            map.style.transition = 'none';               
+            map.style.transition = 'none';
             map.style.transform = `scale(${zoom}) translate(${offsetX}px, ${offsetY}px)`;
-            map.offsetHeight;                           
+            map.offsetHeight;
             map.style.transition = 'transform 0.1s ease-out';
+            updateMarkerSizes(zoom);
+        }
+
+        function updateMarkerSizes(zoomLevel) {
+            const markers = document.querySelectorAll('.map-marker');
+            const minZoom = 0.4, maxZoom = 2.5;
+            const scaleFactor = 0.6 + (maxZoom - zoomLevel) / (maxZoom - minZoom) * 1.2;
+            markers.forEach(m => {
+                const baseSize = parseFloat(m.dataset.baseSize);
+                const newSize = baseSize * scaleFactor;
+                m.style.width = newSize + 'px';
+                m.style.height = newSize + 'px';
+            });
         }
 
         function shouldStartPan(e) {
-            return !e.target.closest('.map-marker, .map-zone, .control-btn, .filter-panel, .filter-panel *');
+            return !e.target.closest('.control-btn, .filter-panel, .filter-panel *, .tooltip, .tooltip *');
         }
 
         const PAN_BOOST_FACTOR = 2.5;
         function getPanSpeedFactor(zoomLevel) {
-            if (zoomLevel <= 1) {
-                return 1 + PAN_BOOST_FACTOR * (1 - zoomLevel);
-            }
-            return 1;
+            return zoomLevel <= 1 ? 1 + PAN_BOOST_FACTOR * (1 - zoomLevel) : 1;
         }
 
         function setupTouchPan() {
             const map = document.getElementById('map');
-
             document.addEventListener('mousedown', (e) => {
                 if (shouldStartPan(e)) {
                     isDragging = true;
@@ -339,7 +367,6 @@
                     e.preventDefault();
                 }
             });
-
             document.addEventListener('mousemove', (e) => {
                 if (isDragging) {
                     const factor = getPanSpeedFactor(zoom);
@@ -350,20 +377,16 @@
                     map.style.transform = `scale(${zoom}) translate(${offsetX}px, ${offsetY}px)`;
                 }
             });
-
             document.addEventListener('mouseup', () => {
                 isDragging = false;
                 map.style.cursor = 'grab';
             });
-
             map.addEventListener('wheel', (e) => {
                 e.preventDefault();
                 const delta = e.deltaY > 0 ? 0.9 : 1.1;
                 zoomAtPoint(zoom * delta, e.clientX, e.clientY);
             });
-
             let touchDist = 0, startZoom = 1;
-
             document.addEventListener('touchstart', (e) => {
                 if (e.touches.length === 2) {
                     touchDist = Math.hypot(
@@ -382,7 +405,6 @@
                     e.preventDefault();
                 }
             }, { passive: false });
-
             document.addEventListener('touchmove', (e) => {
                 if (e.touches.length === 2) {
                     e.preventDefault();
@@ -404,16 +426,12 @@
                     map.style.transform = `scale(${zoom}) translate(${offsetX}px, ${offsetY}px)`;
                 }
             }, { passive: false });
-
-            document.addEventListener('touchend', () => {
-                isDragging = false;
-            });
+            document.addEventListener('touchend', () => { isDragging = false; });
         }
 
         function searchElements(){
             let term = document.getElementById('filter-search').value.toLowerCase().trim();
             let allMapItems = document.querySelectorAll('.map-marker, .map-zone');
-            
             allMapItems.forEach(el => {
                 let name = el.dataset.name || '';
                 let cat = el.dataset.category || '';
@@ -423,7 +441,6 @@
                 el.classList.toggle('search-mismatch', !match && term!=='');
                 el.classList.toggle('map-element-hidden', !match && term!=='');
             });
-
             let categoryItems = document.querySelectorAll('.filter-category-item');
             categoryItems.forEach(catItem => {
                 let catName = catItem.dataset.category;
@@ -431,13 +448,9 @@
                 allMapItems.forEach(el => {
                     if (el.dataset.category === catName && el.classList.contains('search-match')) visibleCount++;
                 });
-                if (term !== '' && visibleCount === 0) {
-                    catItem.classList.add('filter-hidden');
-                } else {
-                    catItem.classList.remove('filter-hidden');
-                }
+                if (term !== '' && visibleCount === 0) catItem.classList.add('filter-hidden');
+                else catItem.classList.remove('filter-hidden');
             });
-
             let groupHeaders = document.querySelectorAll('.filter-group-header');
             groupHeaders.forEach(header => {
                 let group = header.dataset.group;
@@ -457,22 +470,23 @@
         }
 
         function toggleGroupVisibility(group){
-            let sw = document.querySelector(`[data-group="${group}"] .group-toggle-switch`);
+            let sw = document.querySelector(`.filter-group-header[data-group="${group}"] .group-toggle-switch`);
             let isOn = sw.classList.contains('on');
             groupVisibility[group] = !isOn;
             let elements = document.querySelectorAll(`.map-marker[data-group="${group}"], .map-zone[data-group="${group}"]`);
             let categoryItems = document.querySelectorAll(`.filter-category-item[data-group="${group}"]`);
             if(groupVisibility[group]) {
                 sw.classList.add('on');
+                sw.classList.remove('off');
                 elements.forEach(el => el.classList.remove('map-element-hidden'));
                 categoryItems.forEach(item => item.classList.add('active'));
             } else {
                 sw.classList.remove('on');
+                sw.classList.add('off');
                 elements.forEach(el => el.classList.add('map-element-hidden'));
                 categoryItems.forEach(item => item.classList.remove('active'));
             }
         }
-
         function toggleGroup(group){
             let c = document.getElementById('group-'+group.replace(/\s+/g,'-'));
             c.classList.toggle('collapsed');
@@ -484,42 +498,43 @@
                 item.classList.toggle('active', !vis);
             });
         }
-        function showAllMarkers(){
-            document.querySelectorAll('.map-marker').forEach(m=>m.classList.remove('map-element-hidden'));
-            document.querySelectorAll('.filter-category-item').forEach(item => {
-                let cat = item.dataset.category;
-                let hasMarkers = document.querySelectorAll(`.map-marker[data-category="${cat}"]`).length > 0;
-                if (hasMarkers) item.classList.add('active');
+
+        function showAll() {
+            document.querySelectorAll('.map-marker, .map-zone').forEach(el => el.classList.remove('map-element-hidden'));
+            document.querySelectorAll('.filter-category-item').forEach(item => item.classList.add('active'));
+            document.querySelectorAll('.group-toggle-switch').forEach(sw => {
+                sw.classList.add('on');
+                sw.classList.remove('off');
             });
+            Object.keys(groupVisibility).forEach(g => groupVisibility[g] = true);
         }
-        function hideAllMarkers(){
-            document.querySelectorAll('.map-marker').forEach(m=>m.classList.add('map-element-hidden'));
-            document.querySelectorAll('.filter-category-item').forEach(item => {
-                let cat = item.dataset.category;
-                let hasZones = document.querySelectorAll(`.map-zone[data-category="${cat}"]`).length > 0;
-                if (!hasZones) item.classList.remove('active');
+        function hideAll() {
+            document.querySelectorAll('.map-marker, .map-zone').forEach(el => el.classList.add('map-element-hidden'));
+            document.querySelectorAll('.filter-category-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.group-toggle-switch').forEach(sw => {
+                sw.classList.remove('on');
+                sw.classList.add('off');
             });
+            Object.keys(groupVisibility).forEach(g => groupVisibility[g] = false);
         }
-        function showAllZones(){
-            document.querySelectorAll('.map-zone').forEach(z=>z.classList.remove('map-element-hidden'));
-            document.querySelectorAll('.filter-category-item').forEach(item => {
-                let cat = item.dataset.category;
-                let hasZones = document.querySelectorAll(`.map-zone[data-category="${cat}"]`).length > 0;
-                if (hasZones) item.classList.add('active');
-            });
+
+        function markAllUncompleted() {
+            completedMarkers = {};
+            localStorage.setItem('mapforge_completed_markers', JSON.stringify(completedMarkers));
+            document.querySelectorAll('.map-marker').forEach(m => m.classList.remove('completed'));
         }
-        function hideAllZones(){
-            document.querySelectorAll('.map-zone').forEach(z=>z.classList.add('map-element-hidden'));
-            document.querySelectorAll('.filter-category-item').forEach(item => {
-                let cat = item.dataset.category;
-                let hasMarkers = document.querySelectorAll(`.map-marker[data-category="${cat}"]`).length > 0;
-                if (!hasMarkers) item.classList.remove('active');
-            });
-        }
-        function toggleFilters(){ 
-            let p = document.querySelector('.filter-panel');
-            p.classList.toggle('collapsed');
-            p.querySelector('.control-btn i').className = p.classList.contains('collapsed') ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+
+        function toggleFilters() {
+            let panel = document.getElementById('filterPanel');
+            let icon = document.getElementById('filterToggleIcon');
+            panel.classList.toggle('collapsed');
+            if (panel.classList.contains('collapsed')) {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+            } else {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+            }
         }
 
         function showTooltip(el, target){
@@ -535,64 +550,75 @@
                 <button class="tooltip-close" onclick="closeTooltip()" ontouchend="closeTooltip();event.preventDefault();">&times;</button>
                 <h3 style="color:${el.color};">${el.name}</h3>
                 ${tooltipImage}
-                ${'<p>' + el.description + '</p>' || ''}
+                ${el.description ? '<p>' + el.description + '</p>' : ''}
                 ${compHtml}
                 <div style="margin-top:10px; color:#94a3b8;">Category: ${el.category} ${el.group?'· Group: '+el.group:''}</div>
             `;
-            
             t.style.display = 'block';
-            t.style.opacity = '0';
             t.classList.remove('fade-out');
             t.classList.add('fade-in');
-            t.style.left = '0px';
-            t.style.top = '0px';
-            t.style.transform = 'translate(0, 0)';
-            
-            let targetRect = target.getBoundingClientRect();
-            let tooltipRect = t.getBoundingClientRect();
-            let winWidth = window.innerWidth;
-            let winHeight = window.innerHeight;
-            let padding = 15;
-            let tooltip = { width: tooltipRect.width || 340, height: tooltipRect.height || 200 };
-            
-            let spaceAbove = targetRect.top - padding;
-            let spaceBelow = winHeight - targetRect.bottom - padding;
-            let spaceLeft = targetRect.left - padding;
-            let spaceRight = winWidth - targetRect.right - padding;
-            
-            let posY, transformY;
-            if (tooltip.height < spaceAbove) {
-                posY = targetRect.top - 15;
-                transformY = '-100%';
-            } else if (tooltip.height < spaceBelow) {
-                posY = targetRect.bottom + 15;
-                transformY = '0%';
+
+            const isMobile = window.innerWidth <= 450;
+            if (isMobile) {
+                t.style.left = '5%';
+                t.style.width = '90%';
+                t.style.bottom = '20px';
+                t.style.top = 'auto';
+                t.style.transform = 'none';
+                t.style.maxWidth = '90vw';
+                t.style.maxHeight = '50vh';
+                t.style.overflowY = 'auto';
             } else {
-                posY = (winHeight - tooltip.height) / 2;
-                transformY = '0%';
+                t.style.width = 'auto';
+                t.style.maxHeight = '40vh';
+                t.style.overflowY = 'auto';
+                t.style.bottom = 'auto';
+                let targetRect = target.getBoundingClientRect();
+                let tooltipRect = t.getBoundingClientRect();
+                let winWidth = window.innerWidth;
+                let winHeight = window.innerHeight;
+                let padding = 15;
+                let tooltip = { width: tooltipRect.width || 340, height: tooltipRect.height || 200 };
+
+                let spaceAbove = targetRect.top - padding;
+                let spaceBelow = winHeight - targetRect.bottom - padding;
+                let spaceLeft = targetRect.left - padding;
+                let spaceRight = winWidth - targetRect.right - padding;
+
+                let posY, transformY;
+                if (tooltip.height < spaceAbove) {
+                    posY = targetRect.top - 15;
+                    transformY = '-100%';
+                } else if (tooltip.height < spaceBelow) {
+                    posY = targetRect.bottom + 15;
+                    transformY = '0%';
+                } else {
+                    posY = (winHeight - tooltip.height) / 2;
+                    transformY = '0%';
+                }
+
+                let targetCenterX = targetRect.left + targetRect.width / 2;
+                let posX = targetCenterX;
+                let transformX = '-50%';
+
+                let estimatedLeft = targetCenterX - (tooltip.width / 2);
+                let estimatedRight = targetCenterX + (tooltip.width / 2);
+
+                if (estimatedLeft < padding) {
+                    posX = padding + (tooltip.width / 2);
+                    transformX = '-50%';
+                } else if (estimatedRight > winWidth - padding) {
+                    posX = winWidth - padding - (tooltip.width / 2);
+                    transformX = '-50%';
+                }
+
+                t.style.left = posX + 'px';
+                t.style.top = posY + 'px';
+                t.style.transform = `translate(${transformX}, ${transformY})`;
             }
-            
-            let targetCenterX = targetRect.left + targetRect.width / 2;
-            let posX = targetCenterX;
-            let transformX = '-50%';
-            
-            let estimatedLeft = targetCenterX - (tooltip.width / 2);
-            let estimatedRight = targetCenterX + (tooltip.width / 2);
-            
-            if (estimatedLeft < padding) {
-                posX = padding + (tooltip.width / 2);
-                transformX = '-50%';
-            } else if (estimatedRight > winWidth - padding) {
-                posX = winWidth - padding - (tooltip.width / 2);
-                transformX = '-50%';
-            }
-            
-            t.style.left = posX + 'px';
-            t.style.top = posY + 'px';
-            t.style.transform = `translate(${transformX}, ${transformY})`;
             hideHoverTooltip();
         }
-            
+
         function closeTooltip(){
             let t = document.getElementById('tooltip');
             t.classList.add('fade-out');
@@ -602,7 +628,6 @@
                 t.classList.remove('fade-out');
             }, 300);
         }
-
         function showHoverTooltip(name, target){
             let ht = document.getElementById('hover-tooltip');
             ht.textContent = name;
@@ -614,17 +639,14 @@
             ht.style.top = top + 'px';
             ht.style.transform = 'translate(-50%, -100%)';
         }
-
         function hideHoverTooltip(){
             document.getElementById('hover-tooltip').style.display = 'none';
         }
-
         function toggleMarkerCompletion(id, checked){
             completedMarkers[id] = checked;
             localStorage.setItem('mapforge_completed_markers', JSON.stringify(completedMarkers));
             document.querySelector('[data-id="'+id+'"]')?.classList.toggle('completed', checked);
         }
-
         function resetView(){
             centerMapOnLoad();
         }
@@ -632,13 +654,10 @@
             const container = document.getElementById('map-wrapper');
             const map = document.getElementById('map');
             zoom = 0.5;
-            const containerWidth = container.clientWidth;
-            const containerHeight = container.clientHeight;
-            const mapWidth = bgWidth * zoom;
-            const mapHeight = bgHeight * zoom;
             offsetX = 200;
             offsetY = 50;
             map.style.transform = `scale(${zoom}) translate(${offsetX}px, ${offsetY}px)`;
+            updateMarkerSizes(zoom);
         }
     </script>
 </body>
