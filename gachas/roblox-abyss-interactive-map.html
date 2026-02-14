@@ -65,10 +65,10 @@
         .hover-tooltip { position: fixed; background: #1e293b; border: 1px solid #4cc9f0; border-radius: 8px; padding: 6px 12px; color: #e6e6e6; font-size: 0.85rem; pointer-events: none; z-index: 9999; white-space: nowrap; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
         .map-zone { position: absolute; border-width: 2px; border-style: solid; cursor: pointer; transition: 0.2s; z-index: 5; background-size: cover; background-repeat: no-repeat; background-position: center; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; touch-action:manipulation; }
         .map-zone:hover { opacity: 0.9 !important; box-shadow: 0 0 18px rgba(255,255,255,0.2); }
-        .tooltip { position: fixed; background: #0f172a; border: 2px solid #4cc9f0; border-radius: 16px; padding: 20px; max-width: 400px; max-height: 30vh; overflow-y: auto; z-index: 2000; display: none; box-shadow: 0 20px 40px rgba(0,0,0,0.8); backdrop-filter: blur(4px); color: #e2e8f0; line-height: 1.6; min-width: 280px; }
+        .tooltip { position: fixed; background: #0f172a; border: 2px solid #4cc9f0; border-radius: 16px; padding: 20px; max-width: 400px; max-height: 40vh; overflow-y: auto; z-index: 2000; display: none; box-shadow: 0 20px 40px rgba(0,0,0,0.8); backdrop-filter: blur(4px); color: #e2e8f0; line-height: 1.6; min-width: 280px; }
         .tooltip h3 { color: #4cc9f0; margin-bottom: 10px; border-bottom: 1px solid #334155; padding-bottom: 8px; }
         .tooltip p { color: #cbd5e1; font-size: 0.95rem; }
-        .tooltip-img { max-width: 260px; object-fit: contain; border-radius: 12px; margin: 15px 0; display: block; margin-left: auto; margin-right: auto; border: 2px solid #334155; }
+        .tooltip-img { max-width: 240px; width: 100%; object-fit: contain; border-radius: 12px; margin: 15px 0; display: block; margin-left: auto; margin-right: auto; border: 2px solid #334155; }
         .tooltip-close { position: absolute; top: 10px; right: 20px; background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
         .tooltip-close:hover { color: #4cc9f0; transform: scale(1.2); }
         .completion-checkbox { transition: all 0.2s; border: 1px solid transparent; margin: 16px 0 8px; display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 10px 14px; border-radius: 8px; }
@@ -575,7 +575,7 @@
             } else {
                 t.style.width = 'auto';
                 t.style.maxWidth = '400px';
-                t.style.maxHeight = '30vh';
+                t.style.maxHeight = '40vh';
                 t.style.overflowY = 'auto';
                 t.style.bottom = 'auto';
                 let targetRect = target.getBoundingClientRect();
@@ -659,8 +659,8 @@
             const container = document.getElementById('map-wrapper');
             const map = document.getElementById('map');
             zoom = 0.4;
-            offsetX = 50;
-            offsetY = 50;
+            offsetX = 0;
+            offsetY = 0;
             map.style.transform = `scale(${zoom}) translate(${offsetX}px, ${offsetY}px)`;
             updateMarkerSizes(zoom);
         }
