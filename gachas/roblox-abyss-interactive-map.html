@@ -421,6 +421,10 @@
                     const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
                     zoomAtPoint(startZoom * scale, centerX, centerY);
                 } else if (e.touches.length === 1 && isDragging) {
+                    if (e.target.closest('.tooltip')) {
+                        isDragging = false;
+                        return;
+                    }
                     e.preventDefault();
                     const factor = getPanSpeedFactor(zoom);
                     const deltaX = e.touches[0].clientX - dragStart.mouseX;
