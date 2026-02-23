@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hunty Zombie Pet Simulator</title>
     <style>
-        /* ===== CORE VARIABLES ===== */
         :root {
             --bg-primary: #0f0f0f;
             --bg-secondary: #1a1a1a;
@@ -28,7 +28,6 @@
             --item-small-height: 70px;
         }
 
-        /* ===== BASE STYLES ===== */
         * {
             margin: 0;
             padding: 0;
@@ -47,7 +46,6 @@
             min-height: 100vh;
         }
 
-        /* ===== GACHA SIMULATOR STYLES ===== */
         .gacha-container {
             max-width: 800px;
             width: 100%;
@@ -155,7 +153,6 @@
             min-width: 0px;
             flex: 1 1 0px;
             max-width: 33%;
-            
         }
 
         .stat-value {
@@ -185,7 +182,6 @@
             position: relative;
         }
 
-        /* Scrollbar styling */
         .results-section::-webkit-scrollbar,
         .inventory-container::-webkit-scrollbar,
         .auto-roll-targets::-webkit-scrollbar,
@@ -209,7 +205,6 @@
             border-radius: 4px;
         }
 
-        /* ===== ITEM STYLING ===== */
         .item-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(var(--item-width), 1fr));
@@ -303,7 +298,6 @@
             z-index: 2;
         }
 
-        /* ===== AUTO ROLL STYLING ===== */
         .controls-section,
         .stats-section-container {
             transition: opacity 0.3s ease, max-height 0.3s ease;
@@ -322,7 +316,7 @@
             transform: translateY(-10px);
             transition: all 0.3s ease;
             z-index: 10;
-            max-height: 400px; /* Increased from 220px */
+            max-height: 400px;
             display: flex;
             flex-direction: column;
         }
@@ -376,7 +370,7 @@
             font-size: 0.9rem;
             color: var(--text-secondary);
         }
-        
+
         .auto-roll-active {
             background-color: var(--danger) !important;
             background: var(--danger) !important;
@@ -388,7 +382,6 @@
             border-color: #e53935 !important;
         }
 
-        /* ===== INDEX STYLING ===== */
         .index-container {
             display: flex;
             flex-direction: column;
@@ -413,7 +406,6 @@
             gap: 12px;
         }
 
-        /* ===== PITY SYSTEM ===== */
         .pity-counters {
             background: var(--bg-tertiary);
             border-radius: var(--border-radius);
@@ -430,40 +422,96 @@
             margin-bottom: 0;
         }
 
-        /* ===== ANIMATIONS ===== */
         .result-card {
             animation: fadeInUp 0.5s ease forwards;
             opacity: 0;
         }
 
-        .result-card:nth-child(1) { animation-delay: 0.05s; }
-        .result-card:nth-child(2) { animation-delay: 0.1s; }
-        .result-card:nth-child(3) { animation-delay: 0.15s; }
-        .result-card:nth-child(4) { animation-delay: 0.2s; }
-        .result-card:nth-child(5) { animation-delay: 0.25s; }
-        .result-card:nth-child(6) { animation-delay: 0.3s; }
-        .result-card:nth-child(7) { animation-delay: 0.35s; }
-        .result-card:nth-child(8) { animation-delay: 0.4s; }
-        .result-card:nth-child(9) { animation-delay: 0.45s; }
-        .result-card:nth-child(10) { animation-delay: 0.5s; }
+        .result-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .result-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .result-card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .result-card:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        .result-card:nth-child(5) {
+            animation-delay: 0.25s;
+        }
+
+        .result-card:nth-child(6) {
+            animation-delay: 0.3s;
+        }
+
+        .result-card:nth-child(7) {
+            animation-delay: 0.35s;
+        }
+
+        .result-card:nth-child(8) {
+            animation-delay: 0.4s;
+        }
+
+        .result-card:nth-child(9) {
+            animation-delay: 0.45s;
+        }
+
+        .result-card:nth-child(10) {
+            animation-delay: 0.5s;
+        }
 
         .index-item {
             animation: fadeInUp 0.4s ease forwards;
             opacity: 0;
         }
 
-        .rarity-group .index-item:nth-child(1) { animation-delay: 0.05s; }
-        .rarity-group .index-item:nth-child(2) { animation-delay: 0.1s; }
-        .rarity-group .index-item:nth-child(3) { animation-delay: 0.15s; }
-        .rarity-group .index-item:nth-child(4) { animation-delay: 0.2s; }
-        .rarity-group .index-item:nth-child(5) { animation-delay: 0.25s; }
-        .rarity-group .index-item:nth-child(6) { animation-delay: 0.3s; }
-        .rarity-group .index-item:nth-child(7) { animation-delay: 0.35s; }
-        .rarity-group .index-item:nth-child(8) { animation-delay: 0.4s; }
-        .rarity-group .index-item:nth-child(9) { animation-delay: 0.45s; }
-        .rarity-group .index-item:nth-child(10) { animation-delay: 0.5s; }
+        .rarity-group .index-item:nth-child(1) {
+            animation-delay: 0.05s;
+        }
 
-        /* Single roll styling */
+        .rarity-group .index-item:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .rarity-group .index-item:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .rarity-group .index-item:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        .rarity-group .index-item:nth-child(5) {
+            animation-delay: 0.25s;
+        }
+
+        .rarity-group .index-item:nth-child(6) {
+            animation-delay: 0.3s;
+        }
+
+        .rarity-group .index-item:nth-child(7) {
+            animation-delay: 0.35s;
+        }
+
+        .rarity-group .index-item:nth-child(8) {
+            animation-delay: 0.4s;
+        }
+
+        .rarity-group .index-item:nth-child(9) {
+            animation-delay: 0.45s;
+        }
+
+        .rarity-group .index-item:nth-child(10) {
+            animation-delay: 0.5s;
+        }
+
         .results-single {
             display: flex;
             justify-content: center;
@@ -485,12 +533,12 @@
             height: 100%;
         }
 
-        /* Keyframes */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -502,13 +550,13 @@
                 opacity: 0;
                 transform: scale(0.8);
             }
+
             to {
                 opacity: 1;
                 transform: scale(1);
             }
         }
 
-        /* Button variants */
         .button-secondary {
             background-color: #3a3a3a;
             color: var(--text-primary);
@@ -529,7 +577,6 @@
             box-shadow: 0 6px 20px rgba(244, 67, 54, 0.3);
         }
 
-        /* Currency stats */
         .currency-stat {
             display: flex;
             align-items: center;
@@ -540,7 +587,7 @@
             justify-content: center;
         }
 
-        .currency-stat > div {
+        .currency-stat>div {
             min-width: 0;
         }
 
@@ -551,7 +598,6 @@
             object-fit: cover;
         }
 
-        /* Responsive design */
         @media (max-width: 768px) {
             .gacha-container {
                 padding: 15px;
@@ -565,13 +611,14 @@
                 left: 15px;
                 right: 15px;
             }
-                
+
             .currency-icon {
                 display: none;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="gacha-container">
         <div class="top-accent-line"></div>
@@ -585,7 +632,6 @@
 
         <div id="autoRollOptions" class="auto-roll-options">
             <div id="autoRollTargets" class="auto-roll-targets">
-                <!-- Target items will be populated dynamically -->
             </div>
             <div class="auto-roll-controls">
                 <button id="startAutoRollBtn" class="flex-1">Start Auto Roll</button>
@@ -607,7 +653,7 @@
                     <span class="stat-label">Unique Pets</span>
                 </div>
                 <div class="stat-item currency-stat" id="currencyStat">
-                    
+
                     <div style="display: flex; flex-direction: column; align-items: center;">
                         <div class="stat-value" id="currencySpent">0</div>
                         <div class="stat-label">Cash Spent</div>
@@ -616,16 +662,14 @@
             </div>
             <div class="pity-counters" id="pityCounters" style="display: none;">
                 <div id="pityCountersList">
-                    <!-- Pity counters will be populated here -->
                 </div>
             </div>
         </div>
 
-        
+
 
         <div class="results-section">
             <div id="resultsContainer" class="item-grid">
-                <!-- Roll results will appear here -->
             </div>
         </div>
 
@@ -636,947 +680,712 @@
         </div>
     </div>
 
-    <div id="indexModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="modal-content" style="background-color: var(--bg-secondary); padding: 20px; border-radius: var(--border-radius); width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
-            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <div id="indexModal" class="modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content"
+            style="background-color: var(--bg-secondary); padding: 20px; border-radius: var(--border-radius); width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3>Item Index</h3>
-                <button class="close-modal" style="background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; width: auto;">&times;</button>
+                <button class="close-modal"
+                    style="background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; width: auto;">&times;</button>
             </div>
             <div id="indexContainer" class="index-container">
-                <!-- Index content will be populated dynamically -->
             </div>
         </div>
     </div>
 
-    <div id="notification" class="notification" style="position: fixed; top: 20px; right: 20px; padding: 15px 20px; background-color: var(--success); color: white; border-radius: var(--border-radius); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); z-index: 1000; transform: translateX(150%); transition: transform 0.3s ease;"></div>
+    <div id="notification" class="notification"
+        style="position: fixed; top: 20px; right: 20px; padding: 15px 20px; background-color: var(--success); color: white; border-radius: var(--border-radius); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); z-index: 1000; transform: translateX(150%); transition: transform 0.3s ease;">
+    </div>
 
     <script>
-        // ===== GACHA SIMULATOR EXPORT =====
-        class GachaSimulatorExported {
-            constructor(data) {
-                this.data = data;
-                this.autoRollInterval = null;
-                this.autoRollCountValue = 0;
-                this.autoRollTargetItems = [];
-                this.isInventoryView = false;
-                this.isIndexView = false;
-                this.lastResultsState = null;
-                this.lastResultsClass = null;
-                
-                this.data.rollHistory = [];
-                this.data.uniqueItemsObtained = new Set();
-                this.data.rarityCounts = {};
-                this.data.totalRollsCount = 0;
-                this.data.currencySpent = 0;
-                this.data.inventory = {};
-                this.data.itemCounts = {};
-                this.data.currentPityCounters = {};
-                
-                this.data.rarities.forEach(rarity => {
-                    this.data.rarityCounts[rarity.id] = 0;
-                    this.data.currentPityCounters[rarity.id] = 0;
+        const config = {
+            title: "Hunty Zombie Pet Simulator",
+            multiRollCount: 10,
+            allowDuplicates: true,
+            useIndividualRates: false,
+            currencyName: "Rolls",
+            currencyIcon: "",
+            costPerRoll: 1,
+            items: [
+                { id: "1762335831140", name: "Worm", image: "https://bloxinformer.com/wp-content/uploads/2025/08/WORM.png", rarity: "epic", dropRate: 25, weight: 25 },
+                { id: "1762335882052", name: "Hamster", image: "https://bloxinformer.com/wp-content/uploads/2025/08/Hamster.png", rarity: "epic", dropRate: 25, weight: 25 },
+                { id: "1762335909076", name: "Porcupine", image: "https://bloxinformer.com/wp-content/uploads/2025/08/PORCUPINE.png", rarity: "epic", dropRate: 25, weight: 25 },
+                { id: "1762335923181", name: "Phoenix", image: "https://bloxinformer.com/wp-content/uploads/2025/08/Phoenix.png", rarity: "legendary", dropRate: 3, weight: 3 },
+                { id: "1762335979214", name: "Deer", image: "https://bloxinformer.com/wp-content/uploads/2025/08/DEER.png", rarity: "legendary", dropRate: 3, weight: 3 },
+                { id: "1762335995710", name: "Bat", image: "https://bloxinformer.com/wp-content/uploads/2025/08/Screenshot-2025-10-11-010556.jpg", rarity: "mythic", dropRate: 1, weight: 1 },
+                { id: "1762336014640", name: "Octupus", image: "https://bloxinformer.com/wp-content/uploads/2025/08/Octopus.png", rarity: "mythic", dropRate: 1, weight: 1 },
+                { id: "1762336042447", name: "Crocodile", image: "https://bloxinformer.com/wp-content/uploads/2025/08/CROCODILE.jpg", rarity: "rare", dropRate: 60, weight: 60 },
+                { id: "1762336062600", name: "Pig", image: "https://bloxinformer.com/wp-content/uploads/2025/08/PIG.jpg", rarity: "rare", dropRate: 60, weight: 60 },
+                { id: "1762336078008", name: "Goat", image: "https://bloxinformer.com/wp-content/uploads/2025/08/GOAT.jpg", rarity: "epic", dropRate: 25, weight: 25 },
+                { id: "1762336104690", name: "Tiger", image: "https://bloxinformer.com/wp-content/uploads/2025/08/TIGER.jpg", rarity: "epic", dropRate: 25, weight: 25 },
+                { id: "1762336130682", name: "Shark", image: "https://bloxinformer.com/wp-content/uploads/2025/08/SHARK.jpg", rarity: "legendary", dropRate: 3, weight: 3 },
+                { id: "1762336145826", name: "Dragon", image: "https://bloxinformer.com/wp-content/uploads/2025/08/DRAGON.jpg", rarity: "mythic", dropRate: 1, weight: 1 },
+                { id: "1762336163770", name: "Dog", image: "https://bloxinformer.com/wp-content/uploads/2025/08/DOG.png", rarity: "rare", dropRate: 60, weight: 60 },
+                { id: "1762336185075", name: "Cat", image: "https://bloxinformer.com/wp-content/uploads/2025/08/CAT.jpg", rarity: "rare", dropRate: 60, weight: 60 },
+                { id: "1762336221883", name: "Rabbit", image: "https://bloxinformer.com/wp-content/uploads/2025/08/RABBIT.jpg", rarity: "legendary", dropRate: 3, weight: 3 },
+                { id: "1762336253525", name: "Raven", image: "https://bloxinformer.com/wp-content/uploads/2025/08/RAVEN.jpg", rarity: "mythic", dropRate: 1, weight: 1 },
+                { id: "1762336274773", name: "White Pigeon", image: "https://bloxinformer.com/wp-content/uploads/2025/08/PIGEON.jpg", rarity: "mythic", dropRate: 1, weight: 1 },
+                { id: "1762336290789", name: "Spooky Cat", image: "https://bloxinformer.com/wp-content/uploads/2025/08/SPOOKY-CAT.png", rarity: "mythic", dropRate: 1, weight: 1 },
+                { id: "1762336308094", name: "Reaper", image: "https://bloxinformer.com/wp-content/uploads/2025/08/REAPER-PET-HUNTY-ZOMBIE.png", rarity: "mythic", dropRate: 1, weight: 1 }
+            ],
+            rarities: [
+                { id: "legendary", name: "Legendary", color: "#FF9800", rate: 3 },
+                { id: "mythic", name: "Mythic", color: "#ea1a1a", rate: 1 },
+                { id: "rare", name: "Rare", color: "#5458c9", rate: 60 },
+                { id: "epic", name: "Epic", color: "#ae40c4", rate: 25 }
+            ],
+            pitySettings: {
+                common: { enabled: false, pityCount: 50 },
+                uncommon: { enabled: false, pityCount: 50 },
+                rare: { enabled: false, pityCount: 50 },
+                epic: { enabled: false, pityCount: 50 },
+                legendary: { enabled: false, pityCount: 50 },
+                mythic: { enabled: false, pityCount: 50 }
+            }
+        };
+
+        const state = {
+            rollHistory: [],
+            uniqueItemsObtained: new Set(),
+            rarityCounts: {},
+            totalRollsCount: 0,
+            currencySpent: 0,
+            inventory: {},
+            itemCounts: {},
+            currentPityCounters: {},
+            autoRollInterval: null,
+            autoRollCountValue: 0,
+            autoRollTargetItems: [],
+            isInventoryView: false,
+            isIndexView: false,
+            lastResultsState: null,
+            lastResultsClass: null
+        };
+
+        config.rarities.forEach(rarity => {
+            state.rarityCounts[rarity.id] = 0;
+            state.currentPityCounters[rarity.id] = 0;
+        });
+
+        function createItemElement(item, additionalClass = '') {
+            const itemElement = document.createElement('div');
+            itemElement.className = `item-container ${additionalClass}`;
+
+            const rarity = config.rarities.find(r => r.id === item.rarity);
+            const rarityColor = rarity ? rarity.color : '#b0b0b0';
+
+            itemElement.style.borderColor = rarityColor;
+
+            if (item.image) {
+                const img = document.createElement('img');
+                img.src = item.image;
+                img.alt = item.name;
+                img.className = 'item-image';
+                itemElement.appendChild(img);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'item-image-placeholder';
+                placeholder.textContent = 'No Image';
+                itemElement.appendChild(placeholder);
+            }
+
+            const nameOverlay = document.createElement('div');
+            nameOverlay.className = 'item-name-overlay';
+            nameOverlay.textContent = item.name;
+            itemElement.appendChild(nameOverlay);
+
+            return itemElement;
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.transform = 'translateX(0)';
+            setTimeout(() => {
+                notification.style.transform = 'translateX(150%)';
+            }, 3000);
+        }
+
+        function getSortedItemsByRarity(items) {
+            const sortedItems = [...items];
+            if (config.useIndividualRates) {
+                return sortedItems.sort((a, b) => b.dropRate - a.dropRate);
+            } else {
+                return sortedItems.sort((a, b) => {
+                    const rarityA = config.rarities.find(r => r.id === a.rarity);
+                    const rarityB = config.rarities.find(r => r.id === b.rarity);
+                    const rateA = rarityA ? rarityA.rate : 0;
+                    const rateB = rarityB ? rarityB.rate : 0;
+                    return rateB - rateA;
                 });
-                
-                this.init();
             }
+        }
 
-            init() {
-                this.setupEventListeners();
-                this.updateUI();
-                this.updatePityUI();
-                this.updateAutoRollTargets();
-            }
+        function animateExistingResults() {
+            const resultCards = document.querySelectorAll('.result-card');
+            resultCards.forEach((card, index) => {
+                card.style.animation = 'none';
+                card.offsetHeight;
+                card.style.animation = `fadeInUp 0.5s ease ${index * 0.05}s forwards`;
+            });
+        }
 
-            // ===== GACHA MECHANICS =====
-            performRoll(count) {
-                const results = [];
-                const rolledInThisMulti = new Set();
-                if (this.isIndexView || this.isInventoryView) {
-                    this.closeAllViews();
-                }
-
-                for (let i = 0; i < count; i++) {
-                    let item;
-                    let attempts = 0;
-
-                    const pityItem = this.checkPitySystem();
-                    if (pityItem) {
-                        item = pityItem;
-                    } else {
-                        do {
-                            item = this.data.useIndividualRates ?
-                                this.rollWithIndividualRates() :
-                                this.rollWithRarityRates();
-                            attempts++;
-
-                            if (attempts > 100) break;
-                        } while (!this.data.allowDuplicates && rolledInThisMulti.has(item.id) && attempts <= 100);
+        function checkPitySystem() {
+            for (const rarity of config.rarities) {
+                const pitySetting = config.pitySettings[rarity.id];
+                if (pitySetting && pitySetting.enabled &&
+                    state.currentPityCounters[rarity.id] >= pitySetting.pityCount) {
+                    const rarityItems = config.items.filter(item => item.rarity === rarity.id);
+                    if (rarityItems.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * rarityItems.length);
+                        return rarityItems[randomIndex];
                     }
-
-                    rolledInThisMulti.add(item.id);
-                    results.push(item);
-                    
-                    this.updatePityCounters(item);
-                    this.updateInventory([item]);
                 }
+            }
+            return null;
+        }
 
-                this.data.totalRollsCount += count;
-                this.data.currencySpent += count * this.data.costPerRoll;
+        function updatePityCounters(item) {
+            for (const rarity of config.rarities) {
+                const pitySetting = config.pitySettings[rarity.id];
+                if (pitySetting && pitySetting.enabled) {
+                    state.currentPityCounters[rarity.id]++;
+                }
+            }
+            const itemRarity = item.rarity;
+            if (itemRarity && config.pitySettings[itemRarity]?.enabled) {
+                state.currentPityCounters[itemRarity] = 0;
+            }
+        }
 
-                this.displayResults(results);
-                this.updateStats(results);
+        function updatePityUI() {
+            const pityCounters = document.getElementById('pityCounters');
+            const pityCountersList = document.getElementById('pityCountersList');
 
-                this.data.rollHistory.push({
-                    timestamp: new Date().toISOString(),
-                    results: results,
-                    count: results.length
+            const enabledPitySystems = config.rarities.filter(rarity =>
+                config.pitySettings[rarity.id]?.enabled
+            );
+
+            if (enabledPitySystems.length > 0) {
+                pityCounters.style.display = 'block';
+                pityCountersList.innerHTML = '';
+
+                enabledPitySystems.forEach(rarity => {
+                    const pitySetting = config.pitySettings[rarity.id];
+                    const currentCount = state.currentPityCounters[rarity.id];
+                    const pityCounter = document.createElement('div');
+                    pityCounter.className = 'pity-counter-item';
+                    pityCounter.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span style="color: ${rarity.color}; font-weight: bold; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${rarity.name} Pity</span>
+                            <span>${currentCount}/${pitySetting.pityCount}</span>
+                        </div>
+                        <div style="background: var(--bg-secondary); height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="background: ${rarity.color}; height: 100%; width: ${Math.min(100, (currentCount / pitySetting.pityCount) * 100)}%; transition: width 0.3s ease;"></div>
+                        </div>
+                    `;
+                    pityCountersList.appendChild(pityCounter);
                 });
+            } else {
+                pityCounters.style.display = 'none';
+            }
+        }
 
-                this.updateRollStats();
-                this.updatePityUI();
+        function rollWithRarityRates() {
+            const totalRate = config.rarities.reduce((sum, rarity) => sum + rarity.rate, 0);
+            const random = Math.random() * totalRate;
+
+            let cumulativeRate = 0;
+            let selectedRarity = null;
+
+            for (const rarity of config.rarities) {
+                cumulativeRate += rarity.rate;
+                if (random <= cumulativeRate) {
+                    selectedRarity = rarity;
+                    break;
+                }
             }
 
-            checkPitySystem() {
-                for (const rarity of this.data.rarities) {
-                    const pitySetting = this.data.pitySettings[rarity.id];
-                    if (pitySetting && pitySetting.enabled && 
-                        this.data.currentPityCounters[rarity.id] >= pitySetting.pityCount) {
-                        
-                        const rarityItems = this.data.items.filter(item => item.rarity === rarity.id);
-                        if (rarityItems.length > 0) {
-                            const randomIndex = Math.floor(Math.random() * rarityItems.length);
-                            return rarityItems[randomIndex];
-                        }
+            if (!selectedRarity) {
+                selectedRarity = config.rarities[0];
+            }
+
+            const rarityItems = config.items.filter(item => item.rarity === selectedRarity.id);
+            if (rarityItems.length === 0) {
+                return {
+                    id: 'placeholder',
+                    name: `No ${selectedRarity.name} items`,
+                    image: null,
+                    rarity: selectedRarity.id
+                };
+            }
+
+            const randomIndex = Math.floor(Math.random() * rarityItems.length);
+            return rarityItems[randomIndex];
+        }
+
+        function rollWithIndividualRates() {
+            const totalRate = config.items.reduce((sum, item) => sum + item.dropRate, 0);
+            if (config.items.length === 0 || totalRate === 0) {
+                return {
+                    id: 'placeholder',
+                    name: 'No items in pool',
+                    image: null,
+                    rarity: 'common'
+                };
+            }
+
+            const normalizationFactor = totalRate !== 100 ? 100 / totalRate : 1;
+            const random = Math.random() * 100;
+            let cumulativeRate = 0;
+
+            for (const item of config.items) {
+                cumulativeRate += item.dropRate * normalizationFactor;
+                if (random <= cumulativeRate) {
+                    return item;
+                }
+            }
+            return config.items[0];
+        }
+
+        function updateInventory(results) {
+            results.forEach(item => {
+                if (item.id && item.id !== 'placeholder') {
+                    if (!state.inventory[item.id]) {
+                        state.inventory[item.id] = item;
+                        state.itemCounts[item.id] = 0;
                     }
+                    state.itemCounts[item.id]++;
                 }
-                return null;
-            }
+            });
+        }
 
-            updatePityCounters(item) {
-                for (const rarity of this.data.rarities) {
-                    const pitySetting = this.data.pitySettings[rarity.id];
-                    if (pitySetting && pitySetting.enabled) {
-                        this.data.currentPityCounters[rarity.id]++;
+        function updateStats(results) {
+            results.forEach(item => {
+                if (item.id && item.id !== 'placeholder') {
+                    state.uniqueItemsObtained.add(item.id);
+                }
+                if (item.rarity) {
+                    if (!state.rarityCounts[item.rarity]) {
+                        state.rarityCounts[item.rarity] = 0;
                     }
+                    state.rarityCounts[item.rarity]++;
                 }
-                
-                const itemRarity = item.rarity;
-                if (itemRarity && this.data.pitySettings[itemRarity]?.enabled) {
-                    this.data.currentPityCounters[itemRarity] = 0;
-                }
-            }
+            });
 
-            rollWithRarityRates() {
-                const totalRate = this.data.rarities.reduce((sum, rarity) => sum + rarity.rate, 0);
+            document.getElementById('totalRolls').textContent = state.totalRollsCount;
+            document.getElementById('uniqueItems').textContent = `${state.uniqueItemsObtained.size}/${config.items.length}`;
+            document.getElementById('currencySpent').textContent = state.currencySpent;
+        }
 
-                const random = Math.random() * totalRate;
+        function displayResults(results) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = '';
 
-                let cumulativeRate = 0;
-                let selectedRarity = null;
-
-                for (const rarity of this.data.rarities) {
-                    cumulativeRate += rarity.rate;
-                    if (random <= cumulativeRate) {
-                        selectedRarity = rarity;
-                        break;
-                    }
-                }
-
-                if (!selectedRarity) {
-                    selectedRarity = this.data.rarities[0];
-                }
-
-                const rarityItems = this.data.items.filter(item => item.rarity === selectedRarity.id);
-
-                if (rarityItems.length === 0) {
-                    return {
-                        id: 'placeholder',
-                        name: `No ${selectedRarity.name} items`,
-                        image: null,
-                        rarity: selectedRarity.id
-                    };
-                }
-
-                const randomIndex = Math.floor(Math.random() * rarityItems.length);
-                return rarityItems[randomIndex];
-            }
-
-            rollWithIndividualRates() {
-                const totalRate = this.data.items.reduce((sum, item) => sum + item.dropRate, 0);
-
-                if (this.data.items.length === 0 || totalRate === 0) {
-                    return {
-                        id: 'placeholder',
-                        name: 'No items in pool',
-                        image: null,
-                        rarity: 'common'
-                    };
-                }
-
-                const normalizationFactor = totalRate !== 100 ? 100 / totalRate : 1;
-
-                const random = Math.random() * 100;
-                let cumulativeRate = 0;
-
-                for (const item of this.data.items) {
-                    cumulativeRate += item.dropRate * normalizationFactor;
-                    if (random <= cumulativeRate) {
-                        return item;
-                    }
-                }
-
-                return this.data.items[0];
-            }
-
-            // ===== UI UPDATES =====
-            updateUI() {
-                document.getElementById('previewTitle').textContent = this.data.title;
-                document.getElementById('multiRollBtn').textContent = `${this.data.multiRollCount}-Roll`;
-            }
-
-            displayResults(results) {
-                const resultsContainer = document.getElementById('resultsContainer');
-                resultsContainer.innerHTML = '';
-                
-                if (results.length === 1) {
-                    resultsContainer.className = 'results-single';
-                    const resultCard = this.createItemElement(results[0], 'result-card result-single-item');
+            if (results.length === 1) {
+                resultsContainer.className = 'results-single';
+                const resultCard = createItemElement(results[0], 'result-card result-single-item');
+                resultsContainer.appendChild(resultCard);
+            } else {
+                resultsContainer.className = 'item-grid';
+                results.forEach((item, index) => {
+                    const resultCard = createItemElement(item, 'result-card');
+                    resultCard.style.animationDelay = `${index * 0.05}s`;
                     resultsContainer.appendChild(resultCard);
-                } else {
-                    resultsContainer.className = 'item-grid';
-                    results.forEach((item, index) => {
-                        const resultCard = this.createItemElement(item, 'result-card');
-                        resultCard.style.animationDelay = `${index * 0.05}s`;
-                        resultsContainer.appendChild(resultCard);
-                    });
-                }
-            }
-
-            updateInventory(results) {
-                results.forEach(item => {
-                    if (item.id && item.id !== 'placeholder') {
-                        if (!this.data.inventory[item.id]) {
-                            this.data.inventory[item.id] = item;
-                            this.data.itemCounts[item.id] = 0;
-                        }
-                        this.data.itemCounts[item.id]++;
-                    }
                 });
             }
+        }
 
-            updateStats(results) {
-                results.forEach(item => {
-                    if (item.id && item.id !== 'placeholder') {
-                        this.data.uniqueItemsObtained.add(item.id);
-                    }
-                    if (item.rarity) {
-                        if (!this.data.rarityCounts[item.rarity]) {
-                            this.data.rarityCounts[item.rarity] = 0;
+        function performRoll(count) {
+            const results = [];
+            const rolledInThisMulti = new Set();
+
+            if (state.isIndexView || state.isInventoryView) {
+                closeAllViews();
+            }
+
+            for (let i = 0; i < count; i++) {
+                let item;
+                let attempts = 0;
+
+                const pityItem = checkPitySystem();
+                if (pityItem) {
+                    item = pityItem;
+                } else {
+                    do {
+                        item = config.useIndividualRates ? rollWithIndividualRates() : rollWithRarityRates();
+                        attempts++;
+                        if (attempts > 100) break;
+                    } while (!config.allowDuplicates && rolledInThisMulti.has(item.id) && attempts <= 100);
+                }
+
+                rolledInThisMulti.add(item.id);
+                results.push(item);
+
+                updatePityCounters(item);
+                updateInventory([item]);
+            }
+
+            state.totalRollsCount += count;
+            state.currencySpent += count * config.costPerRoll;
+
+            displayResults(results);
+            updateStats(results);
+
+            state.rollHistory.push({
+                timestamp: new Date().toISOString(),
+                results: results,
+                count: results.length
+            });
+
+            updatePityUI();
+        }
+
+        function updateAutoRollTargets() {
+            const autoRollTargets = document.getElementById('autoRollTargets');
+            autoRollTargets.innerHTML = '';
+
+            if (config.items.length === 0) {
+                autoRollTargets.innerHTML = '<p>No items available.</p>';
+                return;
+            }
+
+            const sortedItems = getSortedItemsByRarity(config.items);
+            const grid = document.createElement('div');
+            grid.className = 'item-grid-small';
+
+            sortedItems.forEach(item => {
+                const targetItem = createItemElement(item, 'auto-roll-target-item');
+                targetItem.setAttribute('data-id', item.id);
+
+                if (state.autoRollTargetItems.includes(item.id)) {
+                    targetItem.classList.add('selected');
+                }
+
+                targetItem.addEventListener('click', () => {
+                    targetItem.classList.toggle('selected');
+                    if (targetItem.classList.contains('selected')) {
+                        if (!state.autoRollTargetItems.includes(item.id)) {
+                            state.autoRollTargetItems.push(item.id);
                         }
-                        this.data.rarityCounts[item.rarity]++;
+                    } else {
+                        state.autoRollTargetItems = state.autoRollTargetItems.filter(id => id !== item.id);
                     }
                 });
-                
-                this.updateRollStats();
+
+                grid.appendChild(targetItem);
+            });
+
+            autoRollTargets.appendChild(grid);
+        }
+
+        function startAutoRoll() {
+            if (state.autoRollTargetItems.length === 0) {
+                alert("Please select at least one target item");
+                return;
             }
 
-            updateRollStats() {
-                document.getElementById('totalRolls').textContent = this.data.totalRollsCount;
-                document.getElementById('uniqueItems').textContent = `${this.data.uniqueItemsObtained.size}/${this.data.items.length}`;
-                document.getElementById('currencySpent').textContent = this.data.currencySpent;
-            }
+            closeAutoRollSettings();
 
-            updatePityUI() {
-                const pityCounters = document.getElementById('pityCounters');
-                const pityCountersList = document.getElementById('pityCountersList');
-                
-                const enabledPitySystems = this.data.rarities.filter(rarity => 
-                    this.data.pitySettings[rarity.id]?.enabled
-                );
-                
-                if (enabledPitySystems.length > 0) {
-                    pityCounters.style.display = 'block';
-                    pityCountersList.innerHTML = '';
-                    
-                    enabledPitySystems.forEach(rarity => {
-                        const pitySetting = this.data.pitySettings[rarity.id];
-                        const currentCount = this.data.currentPityCounters[rarity.id];
-                        const pityCounter = document.createElement('div');
-                        pityCounter.className = 'pity-counter-item';
-                        pityCounter.innerHTML = `
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                                <span style="color: ${rarity.color}; font-weight: bold; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${rarity.name} Pity</span>
-                                <span>${currentCount}/${pitySetting.pityCount}</span>
-                            </div>
-                            <div style="background: var(--bg-secondary); height: 8px; border-radius: 4px; overflow: hidden;">
-                                <div style="background: ${rarity.color}; height: 100%; width: ${Math.min(100, (currentCount / pitySetting.pityCount) * 100)}%; transition: width 0.3s ease;"></div>
-                            </div>
-                        `;
-                        pityCountersList.appendChild(pityCounter);
-                    });
-                } else {
-                    pityCounters.style.display = 'none';
-                }
-            }
+            const autoRollBtn = document.getElementById('autoRollBtn');
+            autoRollBtn.textContent = 'Stop Auto Roll';
+            autoRollBtn.classList.add('auto-roll-active');
 
-            // ===== AUTO ROLL =====
-            updateAutoRollTargets() {
-                const autoRollTargets = document.getElementById('autoRollTargets');
-                autoRollTargets.innerHTML = '';
+            state.autoRollCountValue = 0;
+            document.getElementById('autoRollCount').textContent = state.autoRollCountValue;
 
-                if (this.data.items.length === 0) {
-                    autoRollTargets.innerHTML = '<p>No items available.</p>';
-                    return;
-                }
+            state.autoRollInterval = setInterval(() => {
+                performRoll(1);
+                state.autoRollCountValue++;
+                document.getElementById('autoRollCount').textContent = state.autoRollCountValue;
 
-                const sortedItems = this.getSortedItemsByRarity(this.data.items);
-
-                const grid = document.createElement('div');
-                grid.className = 'item-grid-small';
-
-                sortedItems.forEach(item => {
-                    const targetItem = this.createItemElement(item, 'auto-roll-target-item');
-                    targetItem.setAttribute('data-id', item.id);
-
-                    if (this.autoRollTargetItems.includes(item.id)) {
-                        targetItem.classList.add('selected');
+                const lastRoll = state.rollHistory[state.rollHistory.length - 1];
+                if (lastRoll && lastRoll.results.length > 0) {
+                    const lastItem = lastRoll.results[0];
+                    if (state.autoRollTargetItems.includes(lastItem.id)) {
+                        stopAutoRoll();
+                        showNotification(`Auto-roll stopped! Obtained target item: ${lastItem.name}`);
                     }
+                }
+            }, 500);
+        }
 
-                    targetItem.addEventListener('click', () => {
-                        this.handleAutoRollTargetClick(targetItem, item.id);
-                    });
-
-                    grid.appendChild(targetItem);
-                });
-
-                autoRollTargets.appendChild(grid);
+        function stopAutoRoll() {
+            if (state.autoRollInterval) {
+                clearInterval(state.autoRollInterval);
+                state.autoRollInterval = null;
             }
 
-            handleAutoRollTargetClick(targetElement, itemId) {
-                targetElement.classList.toggle('selected');
-                
-                if (targetElement.classList.contains('selected')) {
-                    if (!this.autoRollTargetItems.includes(itemId)) {
-                        this.autoRollTargetItems.push(itemId);
-                    }
-                } else {
-                    this.autoRollTargetItems = this.autoRollTargetItems.filter(id => id !== itemId);
-                }
+            const autoRollBtn = document.getElementById('autoRollBtn');
+            autoRollBtn.textContent = 'Auto Roll';
+            autoRollBtn.classList.remove('auto-roll-active');
+        }
+
+        function toggleAutoRollOptions() {
+            if (state.autoRollInterval) {
+                stopAutoRoll();
+                showNotification('Auto-roll stopped!');
+                return;
             }
 
-            // ===== AUTO ROLL METHODS =====
-            startAutoRoll() {
-                if (this.autoRollTargetItems.length === 0) {
-                    alert("Please select at least one target item");
-                    return;
-                }
+            const autoRollOptions = document.getElementById('autoRollOptions');
+            const controlsSection = document.querySelector('.controls');
+            const statsContainer = document.querySelector('.stats-container');
 
-                this.closeAutoRollSettings();
-
-                const autoRollBtn = document.getElementById('autoRollBtn');
-                autoRollBtn.textContent = 'Stop Auto Roll';
-                autoRollBtn.classList.add('auto-roll-active');
-
-                this.autoRollCountValue = 0;
-                document.getElementById('autoRollCount').textContent = this.autoRollCountValue;
-
-                this.autoRollInterval = setInterval(() => {
-                    this.performRoll(1);
-                    this.autoRollCountValue++;
-                    document.getElementById('autoRollCount').textContent = this.autoRollCountValue;
-
-                    const lastRoll = this.data.rollHistory[this.data.rollHistory.length - 1];
-                    if (lastRoll && lastRoll.results.length > 0) {
-                        const lastItem = lastRoll.results[0];
-                        if (this.autoRollTargetItems.includes(lastItem.id)) {
-                            this.stopAutoRoll();
-                            this.showNotification(`Auto-roll stopped! Obtained target item: ${lastItem.name}`);
-                        }
-                    }
-                }, 500);
-            }
-
-            stopAutoRoll() {
-                if (this.autoRollInterval) {
-                    clearInterval(this.autoRollInterval);
-                    this.autoRollInterval = null;
-                }
-
-                const autoRollBtn = document.getElementById('autoRollBtn');
-                autoRollBtn.textContent = 'Auto Roll';
-                autoRollBtn.classList.remove('auto-roll-active');
-            }
-
-            toggleAutoRollOptions() {
-                if (this.autoRollInterval) {
-                    this.stopAutoRoll();
-                    this.showNotification('Auto-roll stopped!');
-                    return;
-                }
-
-                const autoRollOptions = document.getElementById('autoRollOptions');
-                const controlsSection = document.querySelector('.controls');
-                const statsContainer = document.querySelector('.stats-container');
-
-                if (autoRollOptions.classList.contains('open')) {
-                    autoRollOptions.classList.remove('open');
-                    controlsSection.classList.remove('hidden');
-                    statsContainer.classList.remove('hidden');
-                } else {
-                    autoRollOptions.classList.add('open');
-                    controlsSection.classList.add('hidden');
-                    statsContainer.classList.add('hidden');
-                    this.updateAutoRollTargets();
-                }
-            }
-
-            closeAutoRollSettings() {
-                const autoRollOptions = document.getElementById('autoRollOptions');
-                const controlsSection = document.querySelector('.controls');
-                const statsContainer = document.querySelector('.stats-container');
-
+            if (autoRollOptions.classList.contains('open')) {
                 autoRollOptions.classList.remove('open');
                 controlsSection.classList.remove('hidden');
                 statsContainer.classList.remove('hidden');
+            } else {
+                autoRollOptions.classList.add('open');
+                controlsSection.classList.add('hidden');
+                statsContainer.classList.add('hidden');
+                updateAutoRollTargets();
+            }
+        }
+
+        function closeAutoRollSettings() {
+            const autoRollOptions = document.getElementById('autoRollOptions');
+            const controlsSection = document.querySelector('.controls');
+            const statsContainer = document.querySelector('.stats-container');
+
+            autoRollOptions.classList.remove('open');
+            controlsSection.classList.remove('hidden');
+            statsContainer.classList.remove('hidden');
+        }
+
+        function closeAllViews() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const indexBtn = document.getElementById('indexBtn');
+            const inventoryBtn = document.getElementById('inventoryBtn');
+
+            if (state.isIndexView) {
+                resultsContainer.innerHTML = state.lastResultsState || '';
+                resultsContainer.className = state.lastResultsClass || 'item-grid';
+                state.isIndexView = false;
+                indexBtn.textContent = 'Index';
             }
 
-            // ===== INVENTORY & INDEX =====
-            animateExistingResults() {
-                const resultCards = document.querySelectorAll('.result-card');
-                resultCards.forEach((card, index) => {
-                    card.style.animation = 'none';
-                    card.offsetHeight;
-                    card.style.animation = `fadeInUp 0.5s ease ${index * 0.05}s forwards`;
-                });
+            if (state.isInventoryView) {
+                resultsContainer.innerHTML = state.lastResultsState || '';
+                resultsContainer.className = state.lastResultsClass || 'item-grid';
+                state.isInventoryView = false;
+                inventoryBtn.textContent = 'Inventory';
             }
 
-            toggleInventory() {
-                const resultsContainer = document.getElementById('resultsContainer');
-                const inventoryBtn = document.getElementById('inventoryBtn');
-                
-                if (!this.isInventoryView) {
-                    if (this.isIndexView) {
-                        this.toggleIndex();
-                    }
-                    
-                    this.lastResultsState = resultsContainer.innerHTML;
-                    this.lastResultsClass = resultsContainer.className;
-                    this.showInventory();
-                    this.isInventoryView = true;
-                    inventoryBtn.textContent = 'Results';
-                } else {
-                    resultsContainer.innerHTML = this.lastResultsState || '';
-                    resultsContainer.className = this.lastResultsClass || 'item-grid';
-                    this.isInventoryView = false;
-                    inventoryBtn.textContent = 'Inventory';
-                    
-                    this.animateExistingResults();
+            animateExistingResults();
+        }
+
+        function showInventory() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = '';
+            resultsContainer.className = 'index-container';
+
+            const inventoryItems = Object.values(state.inventory);
+
+            if (inventoryItems.length === 0) {
+                resultsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 20px;">No items in inventory yet</p>';
+                return;
+            }
+
+            const sortedInventory = getSortedItemsByRarity(inventoryItems);
+            const rarityGroups = {};
+
+            sortedInventory.forEach(item => {
+                if (!rarityGroups[item.rarity]) {
+                    rarityGroups[item.rarity] = [];
                 }
-            }
+                rarityGroups[item.rarity].push(item);
+            });
 
-            showInventory() {
-                const resultsContainer = document.getElementById('resultsContainer');
-                resultsContainer.innerHTML = '';
-                resultsContainer.className = 'index-container';
-                
-                const inventoryItems = Object.values(this.data.inventory);
-                
-                if (inventoryItems.length === 0) {
-                    resultsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 20px;">No items in inventory yet</p>';
-                    return;
-                }
-                
-                const sortedInventory = this.getSortedItemsByRarity(inventoryItems);
-                
-                const rarityGroups = {};
-                
-                sortedInventory.forEach(item => {
-                    if (!rarityGroups[item.rarity]) {
-                        rarityGroups[item.rarity] = [];
-                    }
-                    rarityGroups[item.rarity].push(item);
+            const sortedRarities = [...config.rarities].sort((a, b) => a.rate - b.rate);
+
+            sortedRarities.forEach((rarity, rarityIndex) => {
+                const itemsInRarity = rarityGroups[rarity.id];
+                if (!itemsInRarity || itemsInRarity.length === 0) return;
+
+                const rarityGroup = document.createElement('div');
+                rarityGroup.className = 'rarity-group';
+
+                const rarityHeader = document.createElement('div');
+                rarityHeader.className = 'rarity-header';
+                rarityHeader.style.color = rarity.color;
+                rarityHeader.textContent = `${rarity.name}`;
+
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'rarity-items';
+
+                itemsInRarity.forEach((item, itemIndex) => {
+                    const inventoryItem = createItemElement(item, 'index-item result-card');
+                    inventoryItem.style.borderColor = rarity.color;
+                    inventoryItem.style.animationDelay = `${(rarityIndex * 0.1) + (itemIndex * 0.05)}s`;
+
+                    const count = state.itemCounts[item.id] || 0;
+                    const countBadge = document.createElement('div');
+                    countBadge.className = 'drop-rate';
+                    countBadge.textContent = count;
+                    inventoryItem.appendChild(countBadge);
+
+                    itemsContainer.appendChild(inventoryItem);
                 });
-                
-                const sortedRarities = [...this.data.rarities].sort((a, b) => a.rate - b.rate);
-                
+
+                rarityGroup.appendChild(rarityHeader);
+                rarityGroup.appendChild(itemsContainer);
+                resultsContainer.appendChild(rarityGroup);
+            });
+        }
+
+        function toggleInventory() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const inventoryBtn = document.getElementById('inventoryBtn');
+
+            if (!state.isInventoryView) {
+                if (state.isIndexView) {
+                    toggleIndex();
+                }
+
+                state.lastResultsState = resultsContainer.innerHTML;
+                state.lastResultsClass = resultsContainer.className;
+                showInventory();
+                state.isInventoryView = true;
+                inventoryBtn.textContent = 'Results';
+            } else {
+                resultsContainer.innerHTML = state.lastResultsState || '';
+                resultsContainer.className = state.lastResultsClass || 'item-grid';
+                state.isInventoryView = false;
+                inventoryBtn.textContent = 'Inventory';
+                animateExistingResults();
+            }
+        }
+
+        function showIndex() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = '';
+            resultsContainer.className = 'index-container';
+
+            if (config.useIndividualRates) {
+                const sortedItems = [...config.items].sort((a, b) => a.dropRate - b.dropRate);
+                const gridContainer = document.createElement('div');
+                gridContainer.className = 'item-grid';
+                sortedItems.forEach((item, index) => {
+                    const indexItem = createItemElement(item, 'index-item result-card');
+                    indexItem.style.animationDelay = `${index * 0.05}s`;
+
+                    const dropRate = document.createElement('div');
+                    dropRate.className = 'drop-rate';
+                    dropRate.textContent = `${item.dropRate}%`;
+                    indexItem.appendChild(dropRate);
+
+                    gridContainer.appendChild(indexItem);
+                });
+                resultsContainer.appendChild(gridContainer);
+            } else {
+                const sortedRarities = [...config.rarities].sort((a, b) => a.rate - b.rate);
                 sortedRarities.forEach((rarity, rarityIndex) => {
-                    const itemsInRarity = rarityGroups[rarity.id];
-                    if (!itemsInRarity || itemsInRarity.length === 0) return;
-                    
+                    const rarityItems = config.items.filter(item => item.rarity === rarity.id);
+                    if (rarityItems.length === 0) return;
+
                     const rarityGroup = document.createElement('div');
                     rarityGroup.className = 'rarity-group';
-                    
+
                     const rarityHeader = document.createElement('div');
                     rarityHeader.className = 'rarity-header';
                     rarityHeader.style.color = rarity.color;
-                    rarityHeader.textContent = `${rarity.name}`;
-                    
+                    rarityHeader.textContent = `${rarity.name} (${rarity.rate}%)`;
+
                     const itemsContainer = document.createElement('div');
                     itemsContainer.className = 'rarity-items';
-                    
-                    itemsInRarity.forEach((item, itemIndex) => {
-                        const inventoryItem = this.createItemElement(item, 'index-item result-card');
-                        inventoryItem.style.borderColor = rarity.color;
-                        inventoryItem.style.animationDelay = `${(rarityIndex * 0.1) + (itemIndex * 0.05)}s`;
-                        
-                        const count = this.data.itemCounts[item.id] || 0;
-                        const countBadge = document.createElement('div');
-                        countBadge.className = 'drop-rate';
-                        countBadge.textContent = count;
-                        inventoryItem.appendChild(countBadge);
-                        
-                        itemsContainer.appendChild(inventoryItem);
+
+                    rarityItems.forEach((item, itemIndex) => {
+                        const indexItem = createItemElement(item, 'index-item result-card');
+                        indexItem.style.borderColor = rarity.color;
+                        indexItem.style.animationDelay = `${(rarityIndex * 0.1) + (itemIndex * 0.05)}s`;
+                        itemsContainer.appendChild(indexItem);
                     });
-                    
+
                     rarityGroup.appendChild(rarityHeader);
                     rarityGroup.appendChild(itemsContainer);
                     resultsContainer.appendChild(rarityGroup);
                 });
             }
+        }
 
-            toggleIndex() {
-                const resultsContainer = document.getElementById('resultsContainer');
-                const indexBtn = document.getElementById('indexBtn');
-                
-                if (!this.isIndexView) {
-                    if (this.isInventoryView) {
-                        this.toggleInventory();
-                    }
-                    
-                    this.lastResultsState = resultsContainer.innerHTML;
-                    this.lastResultsClass = resultsContainer.className;
-                    this.showIndex();
-                    this.isIndexView = true;
-                    indexBtn.textContent = 'Results';
-                } else {
-                    resultsContainer.innerHTML = this.lastResultsState || '';
-                    resultsContainer.className = this.lastResultsClass || 'item-grid';
-                    this.isIndexView = false;
-                    indexBtn.textContent = 'Index';
-                    
-                    this.animateExistingResults();
+        function toggleIndex() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const indexBtn = document.getElementById('indexBtn');
+
+            if (!state.isIndexView) {
+                if (state.isInventoryView) {
+                    toggleInventory();
                 }
-            }
 
-            showIndex() {
-                const resultsContainer = document.getElementById('resultsContainer');
-                resultsContainer.innerHTML = '';
-                resultsContainer.className = 'index-container';
-                
-                if (this.data.useIndividualRates) {
-                    this.showIndividualRatesIndex(resultsContainer);
-                } else {
-                    this.showRarityBasedIndex(resultsContainer);
-                }
-            }
-
-            showIndividualRatesIndex(container) {
-                const sortedItems = [...this.data.items].sort((a, b) => a.dropRate - b.dropRate);
-                
-                const gridContainer = document.createElement('div');
-                gridContainer.className = 'item-grid';
-                
-                sortedItems.forEach((item, index) => {
-                    const indexItem = this.createItemElement(item, 'index-item result-card');
-                    indexItem.style.animationDelay = `${index * 0.05}s`;
-                    
-                    const dropRate = document.createElement('div');
-                    dropRate.className = 'drop-rate';
-                    dropRate.textContent = `${item.dropRate}%`;
-                    indexItem.appendChild(dropRate);
-                    
-                    gridContainer.appendChild(indexItem);
-                });
-                
-                container.appendChild(gridContainer);
-            }
-
-            showRarityBasedIndex(container) {
-                const sortedRarities = [...this.data.rarities].sort((a, b) => a.rate - b.rate);
-                
-                sortedRarities.forEach((rarity, rarityIndex) => {
-                    const rarityItems = this.data.items.filter(item => item.rarity === rarity.id);
-                    if (rarityItems.length === 0) return;
-                    
-                    const rarityGroup = document.createElement('div');
-                    rarityGroup.className = 'rarity-group';
-                    
-                    const rarityHeader = document.createElement('div');
-                    rarityHeader.className = 'rarity-header';
-                    rarityHeader.style.color = rarity.color;
-                    rarityHeader.textContent = `${rarity.name} (${rarity.rate}%)`;
-                    
-                    const itemsContainer = document.createElement('div');
-                    itemsContainer.className = 'rarity-items';
-                    
-                    rarityItems.forEach((item, itemIndex) => {
-                        const indexItem = this.createItemElement(item, 'index-item result-card');
-                        indexItem.style.borderColor = rarity.color;
-                        indexItem.style.animationDelay = `${(rarityIndex * 0.1) + (itemIndex * 0.05)}s`;
-                        itemsContainer.appendChild(indexItem);
-                    });
-                    
-                    rarityGroup.appendChild(rarityHeader);
-                    rarityGroup.appendChild(itemsContainer);
-                    container.appendChild(rarityGroup);
-                });
-            }
-
-            closeAllViews() {
-                const resultsContainer = document.getElementById('resultsContainer');
-                const indexBtn = document.getElementById('indexBtn');
-                const inventoryBtn = document.getElementById('inventoryBtn');
-                
-                if (this.isIndexView) {
-                    resultsContainer.innerHTML = this.lastResultsState || '';
-                    resultsContainer.className = this.lastResultsClass || 'item-grid';
-                    this.isIndexView = false;
-                    indexBtn.textContent = 'Index';
-                }
-                
-                if (this.isInventoryView) {
-                    resultsContainer.innerHTML = this.lastResultsState || '';
-                    resultsContainer.className = this.lastResultsClass || 'item-grid';
-                    this.isInventoryView = false;
-                    inventoryBtn.textContent = 'Inventory';
-                }
-                
-                this.animateExistingResults();
-            }
-
-            // ===== UTILITIES =====
-            createItemElement(item, additionalClass = '') {
-                const itemElement = document.createElement('div');
-                itemElement.className = `item-container ${additionalClass}`;
-                
-                const rarity = this.data.rarities.find(r => r.id === item.rarity);
-                const rarityColor = rarity ? rarity.color : '#b0b0b0';
-                
-                itemElement.style.borderColor = rarityColor;
-                
-                if (item.image) {
-                    const img = document.createElement('img');
-                    img.src = item.image;
-                    img.alt = item.name;
-                    img.className = 'item-image';
-                    itemElement.appendChild(img);
-                } else {
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'item-image-placeholder';
-                    placeholder.textContent = 'No Image';
-                    itemElement.appendChild(placeholder);
-                }
-                
-                const nameOverlay = document.createElement('div');
-                nameOverlay.className = 'item-name-overlay';
-                nameOverlay.textContent = item.name;
-                itemElement.appendChild(nameOverlay);
-                
-                return itemElement;
-            }
-
-            getSortedItemsByRarity(items) {
-                const sortedItems = [...items];
-                
-                if (this.data.useIndividualRates) {
-                    return sortedItems.sort((a, b) => b.dropRate - a.dropRate);
-                } else {
-                    return sortedItems.sort((a, b) => {
-                        const rarityA = this.data.rarities.find(r => r.id === a.rarity);
-                        const rarityB = this.data.rarities.find(r => r.id === b.rarity);
-                        
-                        const rateA = rarityA ? rarityA.rate : 0;
-                        const rateB = rarityB ? rarityB.rate : 0;
-                        
-                        return rateB - rateA;
-                    });
-                }
-            }
-
-            resetStats() {
-                this.data.rollHistory = [];
-                this.data.uniqueItemsObtained = new Set();
-                this.data.rarityCounts = {};
-                this.data.totalRollsCount = 0;
-                this.data.currencySpent = 0;
-                this.data.inventory = {};
-                this.data.itemCounts = {};
-                
-                this.data.rarities.forEach(rarity => {
-                    this.data.rarityCounts[rarity.id] = 0;
-                });
-
-                for (const rarity of this.data.rarities) {
-                    this.data.currentPityCounters[rarity.id] = 0;
-                }
-                
-                this.updateRollStats();
-                this.updatePityUI();
-                this.closeAllViews();
-                document.getElementById('resultsContainer').innerHTML = '';
-                
-                this.showNotification('Statistics reset successfully!');
-            }
-
-            setupEventListeners() {
-                document.getElementById('singleRollBtn').addEventListener('click', () => this.performRoll(1));
-                document.getElementById('multiRollBtn').addEventListener('click', () => this.performRoll(this.data.multiRollCount));
-                document.getElementById('autoRollBtn').addEventListener('click', () => this.toggleAutoRollOptions());
-                document.getElementById('startAutoRollBtn').addEventListener('click', () => this.startAutoRoll());
-                document.getElementById('closeAutoRollBtn').addEventListener('click', () => this.closeAutoRollSettings());
-                
-                document.getElementById('indexBtn').addEventListener('click', () => this.toggleIndex());
-                document.getElementById('inventoryBtn').addEventListener('click', () => this.toggleInventory());
-                document.getElementById('resetStatsBtn').addEventListener('click', () => this.resetStats());
-
-                document.querySelector('.close-modal').addEventListener('click', () => {
-                    document.getElementById('indexModal').style.display = 'none';
-                });
-
-                window.addEventListener('click', (e) => {
-                    if (e.target === document.getElementById('indexModal')) {
-                        document.getElementById('indexModal').style.display = 'none';
-                    }
-                });
-            }
-
-            showNotification(message) {
-                const notification = document.getElementById('notification');
-                notification.textContent = message;
-                notification.classList.add('show');
-
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
+                state.lastResultsState = resultsContainer.innerHTML;
+                state.lastResultsClass = resultsContainer.className;
+                showIndex();
+                state.isIndexView = true;
+                indexBtn.textContent = 'Results';
+            } else {
+                resultsContainer.innerHTML = state.lastResultsState || '';
+                resultsContainer.className = state.lastResultsClass || 'item-grid';
+                state.isIndexView = false;
+                indexBtn.textContent = 'Index';
+                animateExistingResults();
             }
         }
 
+        function resetStats() {
+            state.rollHistory = [];
+            state.uniqueItemsObtained = new Set();
+            state.rarityCounts = {};
+            state.totalRollsCount = 0;
+            state.currencySpent = 0;
+            state.inventory = {};
+            state.itemCounts = {};
+
+            config.rarities.forEach(rarity => {
+                state.rarityCounts[rarity.id] = 0;
+            });
+
+            for (const rarity of config.rarities) {
+                state.currentPityCounters[rarity.id] = 0;
+            }
+
+            document.getElementById('totalRolls').textContent = '0';
+            document.getElementById('uniqueItems').textContent = `0/${config.items.length}`;
+            document.getElementById('currencySpent').textContent = '0';
+            updatePityUI();
+            closeAllViews();
+            document.getElementById('resultsContainer').innerHTML = '';
+
+            showNotification('Statistics reset successfully!');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            const exportData = {
-  "title": "Hunty Zombie Pet Simulator",
-  "multiRollCount": 10,
-  "allowDuplicates": true,
-  "useIndividualRates": false,
-  "currencyName": "Rolls",
-  "currencyIcon": "",
-  "costPerRoll": 1,
-  "items": [
-    {
-      "id": "1762335831140",
-      "name": "Worm",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/WORM.png",
-      "rarity": "epic",
-      "dropRate": 25,
-      "weight": 25
-    },
-    {
-      "id": "1762335882052",
-      "name": "Hamster",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/Hamster.png",
-      "rarity": "epic",
-      "dropRate": 25,
-      "weight": 25
-    },
-    {
-      "id": "1762335909076",
-      "name": "Porcupine",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/PORCUPINE.png",
-      "rarity": "epic",
-      "dropRate": 25,
-      "weight": 25
-    },
-    {
-      "id": "1762335923181",
-      "name": "Phoenix",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/Phoenix.png",
-      "rarity": "legendary",
-      "dropRate": 3,
-      "weight": 3
-    },
-    {
-      "id": "1762335979214",
-      "name": "Deer",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/DEER.png",
-      "rarity": "legendary",
-      "dropRate": 3,
-      "weight": 3
-    },
-    {
-      "id": "1762335995710",
-      "name": "Bat",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/Screenshot-2025-10-11-010556.jpg",
-      "rarity": "mythic",
-      "dropRate": 1,
-      "weight": 1
-    },
-    {
-      "id": "1762336014640",
-      "name": "Octupus",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/Octopus.png",
-      "rarity": "mythic",
-      "dropRate": 1,
-      "weight": 1
-    },
-    {
-      "id": "1762336042447",
-      "name": "Crocodile",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/CROCODILE.jpg",
-      "rarity": "rare",
-      "dropRate": 60,
-      "weight": 60
-    },
-    {
-      "id": "1762336062600",
-      "name": "Pig",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/PIG.jpg",
-      "rarity": "rare",
-      "dropRate": 60,
-      "weight": 60
-    },
-    {
-      "id": "1762336078008",
-      "name": "Goat",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/GOAT.jpg",
-      "rarity": "epic",
-      "dropRate": 25,
-      "weight": 25
-    },
-    {
-      "id": "1762336104690",
-      "name": "Tiger",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/TIGER.jpg",
-      "rarity": "epic",
-      "dropRate": 25,
-      "weight": 25
-    },
-    {
-      "id": "1762336130682",
-      "name": "Shark",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/SHARK.jpg",
-      "rarity": "legendary",
-      "dropRate": 3,
-      "weight": 3
-    },
-    {
-      "id": "1762336145826",
-      "name": "Dragon",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/DRAGON.jpg",
-      "rarity": "mythic",
-      "dropRate": 1,
-      "weight": 1
-    },
-    {
-      "id": "1762336163770",
-      "name": "Dog",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/DOG.png",
-      "rarity": "rare",
-      "dropRate": 60,
-      "weight": 60
-    },
-    {
-      "id": "1762336185075",
-      "name": "Cat",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/CAT.jpg",
-      "rarity": "rare",
-      "dropRate": 60,
-      "weight": 60
-    },
-    {
-      "id": "1762336221883",
-      "name": "Rabbit",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/RABBIT.jpg",
-      "rarity": "legendary",
-      "dropRate": 3,
-      "weight": 3
-    },
-    {
-      "id": "1762336253525",
-      "name": "Raven",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/RAVEN.jpg",
-      "rarity": "mythic",
-      "dropRate": 1,
-      "weight": 1
-    },
-    {
-      "id": "1762336274773",
-      "name": "White Pigeon",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/PIGEON.jpg",
-      "rarity": "mythic",
-      "dropRate": 1,
-      "weight": 1
-    },
-    {
-      "id": "1762336290789",
-      "name": "Spooky Cat",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/SPOOKY-CAT.png",
-      "rarity": "mythic",
-      "dropRate": 1,
-      "weight": 1
-    },
-    {
-      "id": "1762336308094",
-      "name": "Reaper",
-      "image": "https://bloxinformer-cdn.b-cdn.net/wp-content/uploads/2025/08/REAPER-PET-HUNTY-ZOMBIE.png",
-      "rarity": "mythic",
-      "dropRate": 1,
-      "weight": 1
-    }
-  ],
-  "rarities": [
-    {
-      "id": "legendary",
-      "name": "Legendary",
-      "color": "#FF9800",
-      "rate": 3
-    },
-    {
-      "id": "mythic",
-      "name": "Mythic",
-      "color": "#ea1a1a",
-      "rate": 1
-    },
-    {
-      "id": "rare",
-      "name": "Rare",
-      "color": "#5458c9",
-      "rate": 60
-    },
-    {
-      "id": "epic",
-      "name": "Epic",
-      "color": "#ae40c4",
-      "rate": 25
-    }
-  ],
-  "pitySettings": {
-    "common": {
-      "enabled": false,
-      "pityCount": 50
-    },
-    "uncommon": {
-      "enabled": false,
-      "pityCount": 50
-    },
-    "rare": {
-      "enabled": false,
-      "pityCount": 50
-    },
-    "epic": {
-      "enabled": false,
-      "pityCount": 50
-    },
-    "legendary": {
-      "enabled": false,
-      "pityCount": 50
-    },
-    "mythic": {
-      "enabled": false,
-      "pityCount": 50
-    }
-  }
-};
-            window.gachaSimulator = new GachaSimulatorExported(exportData);
+            document.getElementById('previewTitle').textContent = config.title;
+            document.getElementById('multiRollBtn').textContent = `${config.multiRollCount}-Roll`;
+
+            document.getElementById('singleRollBtn').addEventListener('click', () => performRoll(1));
+            document.getElementById('multiRollBtn').addEventListener('click', () => performRoll(config.multiRollCount));
+            document.getElementById('autoRollBtn').addEventListener('click', toggleAutoRollOptions);
+            document.getElementById('startAutoRollBtn').addEventListener('click', startAutoRoll);
+            document.getElementById('closeAutoRollBtn').addEventListener('click', closeAutoRollSettings);
+            document.getElementById('indexBtn').addEventListener('click', toggleIndex);
+            document.getElementById('inventoryBtn').addEventListener('click', toggleInventory);
+            document.getElementById('resetStatsBtn').addEventListener('click', resetStats);
+
+            document.querySelector('.close-modal').addEventListener('click', () => {
+                document.getElementById('indexModal').style.display = 'none';
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('indexModal')) {
+                    document.getElementById('indexModal').style.display = 'none';
+                }
+            });
         });
     </script>
 </body>
+
 </html>
