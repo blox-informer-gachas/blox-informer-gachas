@@ -581,7 +581,6 @@
             left: 0;
             right: 0;
             text-align: center;
-            font-size: 0.95rem;
             font-weight: bold;
             padding: 5px 5px;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8),
@@ -738,11 +737,10 @@
 
         .slot-ore-name {
             position: absolute;
-            top: 10px;
             left: 0;
             right: 0;
             text-align: center;
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: bold;
             padding: 3px 5px;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8),
@@ -1018,11 +1016,9 @@
             border-color: var(--primary);
         }
 
-        /* Forge Result Modal */
-
         /* Area Toggle */
         #area-toggle-btn {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             padding: 5px 12px;
             border-radius: 15px;
             color: var(--text);
@@ -1489,42 +1485,6 @@
         .exotic {
             border-color: var(--exotic);
             border-image: var(--exotic) 1;
-        }
-
-        .divine .ore-name {
-            color: var(--divine);
-        }
-
-        .exotic .ore-name {
-            color: var(--exotic);
-        }
-
-        .common .ore-name {
-            color: var(--common);
-        }
-
-        .uncommon .ore-name {
-            color: var(--uncommon);
-        }
-
-        .rare .ore-name {
-            color: var(--rare);
-        }
-
-        .epic .ore-name {
-            color: var(--epic);
-        }
-
-        .legendary .ore-name {
-            color: var(--legendary);
-        }
-
-        .mythical .ore-name {
-            color: var(--mythical);
-        }
-
-        .relic .ore-name {
-            color: var(--relic);
         }
 
         #logo-background {
@@ -2100,7 +2060,7 @@
             max-width: 220px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             top: 100%;
-            left: 0;
+            left: -50px;
             max-height: 300px;
             overflow-y: auto;
             z-index: 1001;
@@ -2387,7 +2347,7 @@
 
         <section class="inventory-section">
             <div class="section-title">
-                <span><i class="fas fa-gem"></i> Ore List / Select Ores</span>
+                <span><i class="fas fa-gem"></i> Ore List</span>
                 <button class="quick-craft-btn" id="quick-craft-btn">
                     <i class="fas fa-bolt"></i> Quick Craft
                 </button>
@@ -3851,7 +3811,7 @@
                     { description: "Deals {damage}% of weapon damage as fire per second for {duration}s. {chance}% chance on hit.", scaling: { damage: { min: 3.5, max: 35 }, duration: { min: 0.5, max: 5 }, chance: { min: 3.5, max: 35 } }, type: "weapon" }
                 ]
             },
-            { id: 108, name: "Roosite", multiplier: 14.0, rarity: "legendary", area: "holytree", color: "#ede81a", traitType: null, traits: [] },
+            { id: 108, name: "Roosite", multiplier: 14.0, rarity: "legendary", area: "holytree", color: "#98514d", traitType: null, traits: [] },
             {
                 id: 109, name: "Meteorite", multiplier: 14.44, rarity: "mythical", area: "holytree", color: "#e89c00", traitType: "weapon", traits: [
                     { description: "Cause an explosion on hit, dealing {damage}% of weapon damage as AoE damage. {chance}% chance on hit.", scaling: { damage: { min: 6, max: 60 }, chance: { min: 2.5, max: 25 } }, type: "weapon" }
