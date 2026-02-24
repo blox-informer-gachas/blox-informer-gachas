@@ -6098,6 +6098,13 @@
                         hasRareOrRarerFrostspireOrPeak = true;
                     }
                 }
+
+                if (ore.area === 'crimsonsakuraisles') {
+                    const crimsonSakuraIslesHighRarities = ['rare', 'epic', 'legendary', 'mythical', 'relic', 'divine', 'exotic'];
+                    if (crimsonSakuraIslesHighRarities.includes(ore.rarity)) {
+                        hasLegendaryOrRarerKingdom = true;
+                    }
+                }
             });
 
             return hasLegendaryOrRarerKingdom || hasRareOrRarerFrostspireOrPeak;
@@ -6664,4 +6671,5 @@
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
+
 </html>
