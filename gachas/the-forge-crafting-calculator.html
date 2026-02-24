@@ -2,8 +2,8 @@
 <html lang="en">
 
 <head>
+    <meta name="robots" content="noindex, nofollow">
     <meta charset="UTF-8">
-    <meta name="robots" content="noindex">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Forge Crafting Calculator & Simulator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1082,6 +1082,11 @@
         .stonewake-active {
             background: linear-gradient(135deg, var(--stonewake-teal), #084e4e) !important;
             border-color: var(--stonewake-teal) !important;
+        }
+
+        .crimsonsakuraisles-active {
+            background: linear-gradient(135deg, #ff4d4d, #b32424) !important;
+            border-color: #ff4d4d !important;
         }
 
         /* Tooltip */
@@ -2403,6 +2408,8 @@
                         <div class="filter-option" data-filter="peak">The Peak</div>
                         <div class="filter-option" data-filter="goblin">Goblin Cave</div>
                         <div class="filter-option" data-filter="enemy">Enemy Drops</div>
+                        <div class="filter-option" data-filter="bamboo">Bamboo Cave</div>
+                        <div class="filter-option" data-filter="holytree">Holy Tree</div>
                         <div class="dropdown-divider"></div>
                         <div class="filter-option" data-filter="has-trait">With Traits</div>
                         <div class="filter-option" data-filter="has-weapon-trait">With Weapon Traits</div>
@@ -2428,10 +2435,13 @@
                     <div class="filters-dropdown" style="position: relative;">
                         <button class="filter-btn dropdown-toggle" id="area-toggle-btn">
                             <i class="fas fa-map-marker-alt"></i> <span style="font-weight: 600;"
-                                id="area-label">Frostspire Expanse</span>
+                                id="area-label">Crimson Sakura Isles</span>
                             <i class="fas fa-chevron-down" style="font-size: 0.8rem; margin-left: 5px;"></i>
                         </button>
                         <div class="dropdown-menu" id="area-dropdown" style="min-width: 180px;">
+                            <div class="area-option" data-area="crimsonsakuraisles">
+                                <i class="fas fa-snowflake"></i> Crimson Sakura Isles
+                            </div>
                             <div class="area-option" data-area="frostspire">
                                 <i class="fas fa-snowflake"></i> Frostspire Expanse
                             </div>
@@ -2659,7 +2669,20 @@
             "Duranite": "https://bloxinformer.com/wp-content/uploads/2025/10/duranite-ore-the-forge.jpg",
             "Evil Eye": "https://bloxinformer.com/wp-content/uploads/2025/10/evil-eye-ore-the-forge.jpg",
             "Stolen Heart": "https://bloxinformer.com/wp-content/uploads/2025/10/stolen-heart-ore-the-forge.jpg",
-            "Heart Of The Island": "https://bloxinformer.com/wp-content/uploads/2025/10/heart-of-the-island-ore-the-forge.jpg"
+            "Heart Of The Island": "https://bloxinformer.com/wp-content/uploads/2025/10/heart-of-the-island-ore-the-forge.jpg",
+
+            // Bamboo Cave
+            "Bamboo": "https://bloxinformer.com/wp-content/uploads/2025/10/the-forge-bamboo-ore.png",
+            "Root Spire": "https://bloxinformer.com/wp-content/uploads/2025/10/root-spire-ore-the-forge.jpg",
+            "Water Stone": "https://bloxinformer.com/wp-content/uploads/2025/10/water-stone-ore-the-forge.jpg",
+            "Earthite": "https://bloxinformer.com/wp-content/uploads/2025/10/earthite-ore-the-forge.jpg",
+            "Rock Seed": "https://bloxinformer.com/wp-content/uploads/2025/10/rock-seed-ore-the-forge.jpg",
+            "Wraith": "https://bloxinformer.com/wp-content/uploads/2025/10/wraith-ore-the-forge.jpg",
+            "Tiger Eye": "https://bloxinformer.com/wp-content/uploads/2025/10/tigers-eye-ore-the-forge.jpg",
+            "Cyanite Jade": "https://bloxinformer.com/wp-content/uploads/2025/10/cyanite-jade-ore-the-forge.jpg",
+            "Magit": "https://bloxinformer.com/wp-content/uploads/2025/10/magit-ore-the-forge.jpg",
+            // Duquack
+            "Onyx": "https://bloxinformer.com/wp-content/uploads/2026/02/onyx-ore-the-forge.png",
         };
 
         const itemImages = {
@@ -2671,6 +2694,10 @@
             "Shark Fang": "https://bloxinformer.com/wp-content/uploads/2026/01/sharks-fang-the-forge-calculator.png",
             "Cultist Dagger": "https://bloxinformer.com/wp-content/uploads/2025/04/dagger-the-forge-calculator.png",
             "Curved Dagger": "https://bloxinformer.com/wp-content/uploads/2025/04/dagger-the-forge-calculator.png",
+            "Kunai": "https://bloxinformer.com/wp-content/uploads/2025/11/kunai-weapon-the-forge.jpg",
+            "Jitte": "https://bloxinformer.com/wp-content/uploads/2025/11/jitte-weapon-the-forge.jpg",
+            "Damascus Dagger": "https://bloxinformer.com/wp-content/uploads/2025/11/damascus-dagger-weapon-the-forge.jpg",
+            "Tanto": "https://bloxinformer.com/wp-content/uploads/2025/11/tanto-weapon-the-forge.jpg",
 
             // Straight Swords
             "Falchion": "https://bloxinformer.com/wp-content/uploads/2025/04/falchion-the-forge-calculator.png",
@@ -2682,6 +2709,9 @@
             "Hell Slayer": "https://bloxinformer.com/wp-content/uploads/2025/12/hell-slayer-the-forge-calculator.png",
             "Crystalized Broadsword": "https://bloxinformer.com/wp-content/uploads/2026/01/crystalized-broadsword-the-forge-calculator.png",
             "Hook Blade": "https://bloxinformer.com/wp-content/uploads/2025/04/falchion-the-forge-calculator.png",
+            "Hachiwari": "https://bloxinformer.com/wp-content/uploads/2025/11/hachiwari-weapon-the-forge.jpg",
+            "Chokuto": "https://bloxinformer.com/wp-content/uploads/2025/11/chokuto-weapon-the-forge.jpg",
+            "Dragon Blade": "https://bloxinformer.com/wp-content/uploads/2025/04/falchion-the-forge-calculator.png",
 
             // Gauntlets
             "Ironhand": "https://bloxinformer.com/wp-content/uploads/2025/04/ironhand-the-forge-calculator.png",
@@ -2694,11 +2724,16 @@
             "Uchigatana": "https://bloxinformer.com/wp-content/uploads/2025/04/uchigatana-the-forge-calculator.png",
             "Tachi": "https://bloxinformer.com/wp-content/uploads/2025/04/tachi-the-forge-calculator.png",
             "Straight Edge Katana": "https://bloxinformer.com/wp-content/uploads/2025/04/tachi-the-forge-calculator.png",
+            "Juto Katana": "https://bloxinformer.com/wp-content/uploads/2025/11/juto-weapon-the-forge.jpg",
+            "Kurokiba-gatana": "https://bloxinformer.com/wp-content/uploads/2025/11/kurokibagatana-weapon-the-forge.jpg",
+            "Washi-maru": "https://bloxinformer.com/wp-content/uploads/2025/11/washimaru-weapon-the-forge.jpg",
 
             // Great Swords
             "Crusader Sword": "https://bloxinformer.com/wp-content/uploads/2025/04/crusader-sword-the-forge-calculator.png",
             "Long Sword": "https://bloxinformer.com/wp-content/uploads/2025/04/long-sword-the-forge-calculator.png",
             "Dark Knight Greatsword": "https://bloxinformer.com/wp-content/uploads/2025/04/crusader-sword-the-forge-calculator.png",
+            "Anchored Greatsword": "https://bloxinformer.com/wp-content/uploads/2025/04/crusader-sword-the-forge-calculator.png",
+            "Zweihander": "https://bloxinformer.com/wp-content/uploads/2025/04/crusader-sword-the-forge-calculator.png",
 
             //Maces
             "Mace": "https://bloxinformer.com/wp-content/uploads/2025/12/mace-the-forge-calculator.png",
@@ -2706,6 +2741,8 @@
             "Spiked Mace": "https://bloxinformer.com/wp-content/uploads/2025/12/spiked-mace-the-forge-calculator.png",
             "Hammerhead Mace": "https://bloxinformer.com/wp-content/uploads/2025/12/hammerhead-mace-the-forge-calculator.png",
             "Grave Maker": "https://bloxinformer.com/wp-content/uploads/2025/12/grave-maker-the-forge-calculator.png",
+            "Kanabo": "https://bloxinformer.com/wp-content/uploads/2025/11/kanabo-weapon-the-forge.jpg",
+            "Tetsubo": "https://bloxinformer.com/wp-content/uploads/2025/11/tetsubo-weapon-the-forge.jpg",
 
             // Axes
             "Axe": "https://bloxinformer.com/wp-content/uploads/2025/12/axe-the-forge-calculator.png",
@@ -2721,6 +2758,10 @@
             "Demonic Spear": "https://bloxinformer.com/wp-content/uploads/2025/12/demonic-spear-the-forge-calculator.png",
             "Knight Spear": "https://bloxinformer.com/wp-content/uploads/2025/12/spear-the-forge-calculator.png",
             "Compass Spear": "https://bloxinformer.com/wp-content/uploads/2025/12/spear-the-forge-calculator.png",
+            "Shakujo": "https://bloxinformer.com/wp-content/uploads/2025/11/shakujo-weapon-the-forge.jpg",
+            "Sodegarami": "https://bloxinformer.com/wp-content/uploads/2026/02/sodegarami-spear-the-forge.png",
+            "Bo Staff": "https://bloxinformer.com/wp-content/uploads/2025/11/bo-weapon-the-forge.jpg",
+            "Naginata": "https://bloxinformer.com/wp-content/uploads/2025/11/naginata-weapon-the-forge.jpg",
 
             // Great Axes
             "Scythe": "https://bloxinformer.com/wp-content/uploads/2025/04/scythe-the-forge-calculator.png",
@@ -2729,6 +2770,7 @@
             "Wyvern Axe": "https://bloxinformer.com/wp-content/uploads/2025/12/wyvern-axe-the-forge-calculator.png",
             "Executioner Greataxe": "https://bloxinformer.com/wp-content/uploads/2026/01/executioners-greataxe-the-forge-calculator.png",
             "Anchored Straight Blade": "https://bloxinformer.com/wp-content/uploads/2026/01/anchored-straight-blade-the-forge-calculator.png",
+            "Sun Great Axe": "https://bloxinformer.com/wp-content/uploads/2025/04/double-battle-axe-the-forge-calculator.png",
 
             // Colossal Swords
             "Great Sword": "https://bloxinformer.com/wp-content/uploads/2025/04/great-sword-the-forge-calculator.png",
@@ -2739,22 +2781,31 @@
             "Excalibur": "https://bloxinformer.com/wp-content/uploads/2025/12/excalibur-the-forge-calculator.png",
             "Colossal Terrorblade": "https://bloxinformer.com/wp-content/uploads/2026/01/colossal-terrorblade-the-forge-calculator.png",
             "Colossal Gemblade": "https://bloxinformer.com/wp-content/uploads/2026/01/colossal-gemblade-the-forge-calculator.png",
+            "Otsuchi": "https://bloxinformer.com/wp-content/uploads/2025/04/great-sword-the-forge-calculator.png",
+            "Kinmon Kamagatana": "https://bloxinformer.com/wp-content/uploads/2025/04/great-sword-the-forge-calculator.png",
+            "Sharktooth Odachi": "https://bloxinformer.com/wp-content/uploads/2025/04/great-sword-the-forge-calculator.png",
 
             // Light Armor
             "Light Helmet": "https://bloxinformer.com/wp-content/uploads/2025/04/light-helmet-the-forge-calculator.png",
+            "Ninja Headgear": "https://bloxinformer.com/wp-content/uploads/2026/02/ninja-headgear-the-forge.png",
             "Light Leggings": "https://bloxinformer.com/wp-content/uploads/2025/04/light-leggings-the-forge-calculator.png",
+            "Ninja Leggings": "https://bloxinformer.com/wp-content/uploads/2026/02/ninja-leggings-the-forge.png",
             "Light Chestplate": "https://bloxinformer.com/wp-content/uploads/2025/04/light-chestplate-the-forge-calculator.png",
+            "Ninja Armor": "https://bloxinformer.com/wp-content/uploads/2026/02/ninja-armor-the-forge.png",
 
             // Medium Armor
             "Medium Helmet": "https://bloxinformer.com/wp-content/uploads/2025/04/medium-helmet-the-forge-calculator.png",
             "Samurai Helmet": "https://bloxinformer.com/wp-content/uploads/2025/04/samurai-helmet-the-forge-calculator.png",
             "Viking Helmet": "https://bloxinformer.com/wp-content/uploads/2026/01/viking-helmet-the-forge-calculator.png",
+            "Rootguard Helmet": "https://bloxinformer.com/wp-content/uploads/2026/02/rootguard-helmet-the-forge.png",
             "Medium Leggings": "https://bloxinformer.com/wp-content/uploads/2025/04/medium-leggings-the-forge-calculator.png",
             "Samurai Leggings": "https://bloxinformer.com/wp-content/uploads/2025/04/samurai-leggings-the-forge-calculator.png",
             "Viking Leggings": "https://bloxinformer.com/wp-content/uploads/2026/01/viking-leggings-the-forge-calculator.png",
+            "Rootguard Leggings": "https://bloxinformer.com/wp-content/uploads/2026/02/rootguard-leggings-the-forge.png",
             "Medium Chestplate": "https://bloxinformer.com/wp-content/uploads/2025/04/medium-chestplate-the-forge-calculator.png",
             "Samurai Chestplate": "https://bloxinformer.com/wp-content/uploads/2025/04/samurai-chestplate-the-forge-calculator.png",
             "Viking Chestplate": "https://bloxinformer.com/wp-content/uploads/2026/01/viking-chestplate-the-forge-calculator.png",
+            "Rootguard Chestplate": "https://bloxinformer.com/wp-content/uploads/2026/02/rootguard-chestplate-the-forge.png",
 
             // Heavy Armor
             "Knight Helmet": "https://bloxinformer.com/wp-content/uploads/2025/04/knight-helmet-the-forge-calculator.png",
@@ -2762,16 +2813,19 @@
             "Wolf Helmet": "https://bloxinformer.com/wp-content/uploads/2026/01/wolf-helmet-the-forge-calculator.png",
             "Raven Helmet": "https://bloxinformer.com/wp-content/uploads/2026/01/ravens-helmet-the-forge-calculator.png",
             "Goblin Crown": "https://bloxinformer.com/wp-content/uploads/2026/01/goblin-crown-helmet-the-forge-calculator.png",
+            "Vanguard Helmet": "https://bloxinformer.com/wp-content/uploads/2025/04/dark-knight-helmet-the-forge-calculator.png",
 
             "Knight Leggings": "https://bloxinformer.com/wp-content/uploads/2025/04/knight-leggings-the-forge-calculator.png",
             "Dark Knight Leggings": "https://bloxinformer.com/wp-content/uploads/2025/04/dark-knight-leggings-the-forge-calculator.png",
             "Wolf Leggings": "https://bloxinformer.com/wp-content/uploads/2026/01/wolf-leggings-the-forge-calculator.png",
             "Raven Leggings": "https://bloxinformer.com/wp-content/uploads/2025/04/dark-knight-leggings-the-forge-calculator.png",
+            "Vanguard Leggings": "https://bloxinformer.com/wp-content/uploads/2025/04/dark-knight-leggings-the-forge-calculator.png",
 
             "Knight Chestplate": "https://bloxinformer.com/wp-content/uploads/2025/04/knight-chestplate-the-forge-calculator.png",
             "Dark Knight Chestplate": "https://bloxinformer.com/wp-content/uploads/2025/04/dark-knight-chestplate-the-forge-calculator.png",
             "Wolf Chestplate": "https://bloxinformer.com/wp-content/uploads/2026/01/wolf-chestplate-the-forge-calculator.png",
             "Raven Chestplate": "https://bloxinformer.com/wp-content/uploads/2026/01/ravens-chestplate-the-forge-calculator.png",
+            "Vanguard Chestplate": "https://bloxinformer.com/wp-content/uploads/2025/04/dark-knight-chestplate-the-forge-calculator.png",
         };
 
         const baseItemStats = {
@@ -2783,6 +2837,10 @@
                 "Shark Fang": { damage: 7.74, atkSpeed: 0.27, realSpeed: 0.36, range: 6, price: 74.8, type: "Dagger" },
                 "Cultist Dagger": { damage: 10.5, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 74.8, type: "Dagger" },
                 "Curved Dagger": { damage: 9.9, atkSpeed: 0.30, realSpeed: 0.41, range: 6, price: 74.8, type: "Dagger" },
+                "Kunai": { damage: 7.74, atkSpeed: 0.29, realSpeed: 0.39, range: 6, price: 71.4, type: "Dagger" },
+                "Jitte": { damage: 9.9, atkSpeed: 0.36, realSpeed: 0.49, range: 6, price: 74.8, type: "Dagger" },
+                "Damascus Dagger": { damage: 9.46, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 78.8, type: "Dagger" },
+                "Tanto": { damage: 9.9, atkSpeed: 0.29, realSpeed: 0.39, range: 6, price: 81.6, type: "Dagger" },
 
                 "Gladius": { damage: 15.75, atkSpeed: 0.62, realSpeed: 0.70, range: 8, price: 120, type: "Straight Sword" },
                 "Falchion": { damage: 15, atkSpeed: 0.59, realSpeed: 0.74, range: 8, price: 126, type: "Straight Sword" },
@@ -2793,6 +2851,9 @@
                 "Hell Slayer": { damage: 20.25, atkSpeed: 0.59, realSpeed: 0.70, range: 8, price: 144, type: "Straight Sword" },
                 "Crystalized Broadsword": { damage: 19.96, atkSpeed: 0.62, realSpeed: 0.74, range: 8, price: 138, type: "Straight Sword" },
                 "Hook Blade": { damage: 16.5, atkSpeed: 0.44, realSpeed: 0.52, range: 8, price: 138, type: "Straight Sword" },
+                "Hachiwari": { damage: 16.5, atkSpeed: 0.59, realSpeed: 0.7, range: 8, price: 132, type: "Straight Sword" },
+                "Chokuto": { damage: 15.0, atkSpeed: 0.56, realSpeed: 0.64, range: 8, price: 138, type: "Straight Sword" },
+                "Dragon Blade": { damage: 21.0, atkSpeed: 0.59, realSpeed: 0.7, range: 8, price: 144, type: "Straight Sword" },
 
                 "Ironhand": { damage: 15.2, atkSpeed: 0.51, realSpeed: 0.55, range: 6, price: 205, type: "Gauntlet" },
                 "Boxing Gloves": { damage: 16, atkSpeed: 0.59, realSpeed: 0.63, range: 6, price: 225.5, type: "Gauntlet" },
@@ -2805,6 +2866,8 @@
                 "Winged Mace": { damage: 13.2, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 225.5, type: "Mace" },
                 "Hammerhead Mace": { damage: 13.8, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 235.75, type: "Mace" },
                 "Grave Maker": { damage: 15.6, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 246, type: "Mace" },
+                "Kanabo": { damage: 14.4, atkSpeed: 0.46, realSpeed: 1.30, range: 8, price: 235.75, type: "Mace" },
+                "Tetsubo": { damage: 13.44, atkSpeed: 0.46, realSpeed: 1.11, range: 8, price: 246, type: "Mace" },
 
                 "Axe": { damage: 14, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 205, type: "Axe" },
                 "Battleaxe": { damage: 14.7, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 215.25, type: "Axe" },
@@ -2818,14 +2881,23 @@
                 "Angelic Spear": { damage: 19.5, atkSpeed: 0.41, realSpeed: 0.66, range: 11, price: 138, type: "Spear" },
                 "Compass Spear": { damage: 21.0, atkSpeed: 0.47, realSpeed: 0.76, range: 11, price: 132, type: "Spear" },
                 "Knight Spear": { damage: 20.26, atkSpeed: 0.38, realSpeed: 0.60, range: 11, price: 132, type: "Spear" },
+                "Shakujo": { damage: 15.0, atkSpeed: 0.45, realSpeed: 0.73, range: 11, price: 126, type: "Spear" },
+                "Sodegarami": { damage: 20.26, atkSpeed: 0.41, realSpeed: 0.66, range: 11, price: 132, type: "Spear" },
+                "Bo Staff": { damage: 21.0, atkSpeed: 0.41, realSpeed: 0.66, range: 11, price: 138, type: "Spear" },
+                "Naginata": { damage: 21.76, atkSpeed: 0.45, realSpeed: 0.73, range: 11, price: 144, type: "Spear" },
 
                 "Uchigatana": { damage: 17, atkSpeed: 0.6, realSpeed: 0.69, range: 9, price: 324, type: "Katana" },
                 "Tachi": { damage: 17.85, atkSpeed: 0.63, realSpeed: 0.73, range: 9, price: 356.4, type: "Katana" },
                 "Straight Edge Katana": { damage: 18.7, atkSpeed: 0.6, realSpeed: 0.69, range: 9, price: 388.8, type: "Katana" },
+                "Juto Katana": { damage: 17.0, atkSpeed: 0.6, realSpeed: 0.69, range: 9, price: 356.4, type: "Katana" },
+                "Kurokiba-gatana": { damage: 18.7, atkSpeed: 0.54, realSpeed: 0.63, range: 9, price: 388.8, type: "Katana" },
+                "Washi-maru": { damage: 20.4, atkSpeed: 0.5, realSpeed: 0.58, range: 9, price: 405, type: "Katana" },
 
                 "Crusader Sword": { damage: 24, atkSpeed: 1.0, realSpeed: 1.19, range: 9, price: 485, type: "Great Sword" },
                 "Long Sword": { damage: 24, atkSpeed: 1.11, realSpeed: 1.32, range: 9, price: 509.25, type: "Great Sword" },
                 "Dark Knight Greatsword": { damage: 30, atkSpeed: 1.11, realSpeed: 1.32, range: 9, price: 533.5, type: "Great Sword" },
+                "Anchored Greatsword": { damage: 27.6, atkSpeed: 0.92, realSpeed: 1.09, range: 9, price: 533.5, type: "Great Sword" },
+                "Zweihander": { damage: 28.8, atkSpeed: 1.06, realSpeed: 1.26, range: 9, price: 533.5, type: "Great Sword" },
 
                 "Double Battle Axe": { damage: 31.5, atkSpeed: 1.05, realSpeed: 1.70, range: 9, price: 850, type: "Great Axe" },
                 "Scythe": { damage: 28.5, atkSpeed: 0.95, realSpeed: 1.54, range: 9, price: 935, type: "Great Axe" },
@@ -2833,6 +2905,7 @@
                 "Wyvern Axe": { damage: 37.5, atkSpeed: 0.91, realSpeed: 1.47, range: 9, price: 1020, type: "Great Axe" },
                 "Anchored Straight Blade": { damage: 36, atkSpeed: 1, realSpeed: 1.62, range: 9, price: 1085, type: "Great Axe" },
                 "Executioner Greataxe": { damage: 39, atkSpeed: 1.05, realSpeed: 1.70, range: 9, price: 1085, type: "Great Axe" },
+                "Sun Great Axe": { damage: 39, atkSpeed: 0.82, realSpeed: 1.35, range: 9, price: 1150, type: "Great Axe" },
 
                 "Great Sword": { damage: 40, atkSpeed: 1.12, realSpeed: 1.40, range: 10, price: 1355, type: "Colossal Sword" },
                 "Hammer": { damage: 44, atkSpeed: 1.24, realSpeed: 1.56, range: 10, price: 1490.5, type: "Colossal Sword" },
@@ -2841,40 +2914,53 @@
                 "Dragon Slayer": { damage: 44, atkSpeed: 1.12, realSpeed: 1.40, range: 10, price: 1626, type: "Colossal Sword" },
                 "Colossal Gemblade": { damage: 46, atkSpeed: 1.12, realSpeed: 1.40, range: 10, price: 1558.25, type: "Colossal Sword" },
                 "Colossal Terrorblade": { damage: 44, atkSpeed: 1.02, realSpeed: 1.28, range: 10, price: 1558.25, type: "Colossal Sword" },
-                "Excalibur": { damage: 52, atkSpeed: 1.12, realSpeed: 1.40, range: 10, price: 2710, type: "Colossal Sword" }
+                "Excalibur": { damage: 52, atkSpeed: 1.12, realSpeed: 1.40, range: 10, price: 2710, type: "Colossal Sword" },
+                "Otsuchi": { damage: 50, atkSpeed: 1.24, realSpeed: 1.56, range: 10, price: 1558.25, type: "Colossal Sword" },
+                "Kinmon Kamagatana": { damage: 46.8, atkSpeed: 1.12, realSpeed: 1.40, range: 10, price: 1626, type: "Colossal Sword" },
+                "Sharktooth Odachi": { damage: 52, atkSpeed: 1.12, realSpeed: 1.40, range: 10, price: 1761, type: "Colossal Sword" }
             },
             armor: {
                 "Light Helmet": { health: 3.75, price: 65, def: 8, type: "Light Helmet" },
                 "Light Leggings": { health: 4.375, price: 112.5, def: 9, type: "Light Leggings" },
                 "Light Chestplate": { health: 5, price: 225, def: 10, type: "Light Chestplate" },
 
+                "Ninja Headgear": { health: 9, price: 86, def: 18, type: "Light Helmet" },
+                "Ninja Leggings": { health: 10, price: 148.75, def: 20, type: "Light Leggings" },
+                "Ninja Armor": { health: 13.5, price: 297.5, def: 27, type: "Light Chestplate" },
+
                 "Medium Helmet": { health: 6.25, price: 335, def: 12, type: "Medium Helmet" },
                 "Samurai Helmet": { health: 8, price: 368.5, def: 16, type: "Medium Helmet" },
                 "Viking Helmet": { health: 10.5, price: 402, def: 20, type: "Medium Helmet" },
+                "Rootguard Helmet": { health: 15, price: 483, def: 30, type: "Medium Helmet" },
 
                 "Medium Leggings": { health: 7.5, price: 485, def: 15, type: "Medium Leggings" },
                 "Samurai Leggings": { health: 9, price: 533.5, def: 20, type: "Medium Leggings" },
                 "Viking Leggings": { health: 11, price: 582, def: 25, type: "Medium Leggings" },
+                "Rootguard Leggings": { health: 17, price: 784, def: 34, type: "Medium Leggings" },
 
                 "Medium Chestplate": { health: 8.75, price: 850, def: 18, type: "Medium Chestplate" },
                 "Samurai Chestplate": { health: 12.75, price: 935, def: 24, type: "Medium Chestplate" },
                 "Viking Chestplate": { health: 15, price: 1020, def: 30, type: "Medium Chestplate" },
+                "Rootguard Chestplate": { health: 21, price: 1388, def: 42, type: "Medium Chestplate" },
 
                 "Knight Helmet": { health: 12.5, price: 1020, def: 24, type: "Heavy Helmet" },
                 "Dark Knight Helmet": { health: 18.75, price: 1224, def: 38, type: "Heavy Helmet" },
                 "Wolf Helmet": { health: 25, price: 1326, def: 50, type: "Heavy Helmet" },
                 "Raven Helmet": { health: 26.5, price: 1377, def: 54, type: "Heavy Helmet" },
                 "Goblin Crown": { health: 26, price: 1350, def: 52, type: "Heavy Helmet" },
+                "Vanguard Helmet": { health: 28, price: 1713, def: 58, type: "Heavy Helmet" },
 
                 "Knight Leggings": { health: 13.75, price: 1200, def: 28, type: "Heavy Leggings" },
                 "Dark Knight Leggings": { health: 21.875, price: 1440, def: 44, type: "Heavy Leggings" },
                 "Wolf Leggings": { health: 28, price: 1560, def: 56, type: "Heavy Leggings" },
                 "Raven Leggings": { health: 29.75, price: 1620, def: 60, type: "Heavy Leggings" },
+                "Vanguard Leggings": { health: 32, price: 2016, def: 64, type: "Heavy Leggings" },
 
                 "Knight Chestplate": { health: 16.25, price: 1355, def: 32, type: "Heavy Chestplate" },
                 "Dark Knight Chestplate": { health: 25, price: 1626, def: 50, type: "Heavy Chestplate" },
                 "Wolf Chestplate": { health: 35, price: 1761.5, def: 70, type: "Heavy Chestplate" },
-                "Raven Chestplate": { health: 37, price: 1830, def: 74, type: "Heavy Chestplate" }
+                "Raven Chestplate": { health: 37, price: 1830, def: 74, type: "Heavy Chestplate" },
+                "Vanguard Chestplate": { health: 40, price: 2276, def: 80, type: "Heavy Chestplate" }
             }
         };
 
@@ -2992,6 +3078,62 @@
             55: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Axe": 0, "Spear": 0.02, "Great Axe": 0.26, "Colossal Sword": 0.72 }
         };
 
+        const weaponProbabilitiesCrimsonSakuraIsles = {
+            3: { "Dagger": 1.0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            4: { "Dagger": 0.86, "Straight Sword": 0.14, "Mace": 0, "Katana": 0, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            5: { "Dagger": 0.35, "Straight Sword": 0.65, "Mace": 0, "Katana": 0, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            6: { "Dagger": 0.14, "Straight Sword": 0.86, "Mace": 0, "Katana": 0, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            7: { "Dagger": 0.06, "Straight Sword": 0.74, "Mace": 0.2, "Katana": 0, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            8: { "Dagger": 0.02, "Straight Sword": 0.44, "Mace": 0.54, "Katana": 0.12, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            9: { "Dagger": 0.01, "Straight Sword": 0.24, "Mace": 0.65, "Katana": 0.1, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            10: { "Dagger": 0, "Straight Sword": 0.11, "Mace": 0.47, "Katana": 0.42, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            11: { "Dagger": 0, "Straight Sword": 0.05, "Mace": 0.32, "Katana": 0.63, "Spear": 0, "Great Axe": 0, "Colossal Sword": 0 },
+            12: { "Dagger": 0, "Straight Sword": 0.03, "Mace": 0.22, "Katana": 0.72, "Spear": 0.03, "Great Axe": 0, "Colossal Sword": 0 },
+            13: { "Dagger": 0, "Straight Sword": 0.01, "Mace": 0.15, "Katana": 0.62, "Spear": 0.22, "Great Axe": 0, "Colossal Sword": 0 },
+            14: { "Dagger": 0, "Straight Sword": 0.01, "Mace": 0.08, "Katana": 0.46, "Spear": 0.45, "Great Axe": 0, "Colossal Sword": 0 },
+            15: { "Dagger": 0, "Straight Sword": 0, "Mace": 0.05, "Katana": 0.35, "Spear": 0.6, "Great Axe": 0, "Colossal Sword": 0 },
+            16: { "Dagger": 0, "Straight Sword": 0, "Mace": 0.03, "Katana": 0.26, "Spear": 0.70, "Great Axe": 0.01, "Colossal Sword": 0 },
+            17: { "Dagger": 0, "Straight Sword": 0, "Mace": 0.02, "Katana": 0.19, "Spear": 0.68, "Great Axe": 0.11, "Colossal Sword": 0 },
+            18: { "Dagger": 0, "Straight Sword": 0, "Mace": 0.02, "Katana": 0.13, "Spear": 0.57, "Great Axe": 0.28, "Colossal Sword": 0 },
+            19: { "Dagger": 0, "Straight Sword": 0, "Mace": 0.01, "Katana": 0.08, "Spear": 0.46, "Great Axe": 0.45, "Colossal Sword": 0 },
+            20: { "Dagger": 0, "Straight Sword": 0, "Mace": 0.01, "Katana": 0.06, "Spear": 0.36, "Great Axe": 0.57, "Colossal Sword": 0 },
+            21: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0.04, "Spear": 0.29, "Great Axe": 0.65, "Colossal Sword": 0.02 },
+            22: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0.03, "Spear": 0.23, "Great Axe": 0.67, "Colossal Sword": 0.07 },
+            23: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0.02, "Spear": 0.19, "Great Axe": 0.66, "Colossal Sword": 0.13 },
+            24: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0.02, "Spear": 0.15, "Great Axe": 0.63, "Colossal Sword": 0.2 },
+            25: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0.01, "Spear": 0.12, "Great Axe": 0.6, "Colossal Sword": 0.27 },
+            26: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0.01, "Spear": 0.1, "Great Axe": 0.56, "Colossal Sword": 0.32 },
+            27: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0.01, "Spear": 0.09, "Great Axe": 0.53, "Colossal Sword": 0.37 },
+            28: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0.01, "Spear": 0.07, "Great Axe": 0.5, "Colossal Sword": 0.42 },
+            29: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0.01, "Spear": 0.07, "Great Axe": 0.47, "Colossal Sword": 0.46 },
+            30: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0.01, "Spear": 0.06, "Great Axe": 0.45, "Colossal Sword": 0.49 },
+            31: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.05, "Great Axe": 0.44, "Colossal Sword": 0.51 },
+            32: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.05, "Great Axe": 0.41, "Colossal Sword": 0.54 },
+            33: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.04, "Great Axe": 0.39, "Colossal Sword": 0.57 },
+            34: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.04, "Great Axe": 0.38, "Colossal Sword": 0.58 },
+            35: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.04, "Great Axe": 0.37, "Colossal Sword": 0.59 },
+            36: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.03, "Great Axe": 0.36, "Colossal Sword": 0.61 },
+            37: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.03, "Great Axe": 0.35, "Colossal Sword": 0.62 },
+            38: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.03, "Great Axe": 0.34, "Colossal Sword": 0.63 },
+            39: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.03, "Great Axe": 0.33, "Colossal Sword": 0.64 },
+            40: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.03, "Great Axe": 0.32, "Colossal Sword": 0.65 },
+            41: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.03, "Great Axe": 0.32, "Colossal Sword": 0.65 },
+            42: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.03, "Great Axe": 0.31, "Colossal Sword": 0.66 },
+            43: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.31, "Colossal Sword": 0.67 },
+            44: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.3, "Colossal Sword": 0.68 },
+            45: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.3, "Colossal Sword": 0.68 },
+            46: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.29, "Colossal Sword": 0.69 },
+            47: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.29, "Colossal Sword": 0.69 },
+            48: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
+            49: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
+            50: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.28, "Colossal Sword": 0.7 },
+            51: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.27, "Colossal Sword": 0.71 },
+            52: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.27, "Colossal Sword": 0.71 },
+            53: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.27, "Colossal Sword": 0.71 },
+            54: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.26, "Colossal Sword": 0.72 },
+            55: { "Dagger": 0, "Straight Sword": 0, "Mace": 0, "Katana": 0, "Spear": 0.02, "Great Axe": 0.26, "Colossal Sword": 0.72 }
+        };
+
         // Armor probability data
         const armorProbabilities = {
             3: { "Light Helmet": 1.0, "Light Leggings": 0, "Light Chestplate": 0, "Medium Helmet": 0, "Medium Leggings": 0, "Medium Chestplate": 0, "Heavy Helmet": 0, "Heavy Leggings": 0, "Heavy Chestplate": 0 },
@@ -3069,6 +3211,12 @@
                         { name: "Shark Fang", chance: "1/8", probability: 0.125 },
                         { name: "Cultist Dagger", chance: "1/8", probability: 0.125 },
                         { name: "Curved Dagger", chance: "1/8", probability: 0.125 }
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Kunai", chance: "1/1", probability: 1.0 },
+                        { name: "Jitte", chance: "1/2", probability: 0.5 },
+                        { name: "Damascus Dagger", chance: "1/3", probability: 0.3333 },
+                        { name: "Tanto", chance: "1/4", probability: 0.25 }
                     ]
                 },
                 "Straight Sword": {
@@ -3092,6 +3240,12 @@
                         { name: "Hell Slayer", chance: "1/10", probability: 0.1 },
                         { name: "Crystalized Broadsword", chance: "1/8", probability: 0.125 },
                         { name: "Hook Blade", chance: "1/8", probability: 0.125 }
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Chokuto", chance: "1/1", probability: 1.0 },
+                        { name: "Hachiwari", chance: "1/2", probability: 0.5 },
+                        { name: "Dragon Blade", chance: "1/16", probability: 0.0625 },
+                        { name: "Hell Slayer", chance: "1/10", probability: 0.1 }
                     ]
                 },
                 "Gauntlet": {
@@ -3114,6 +3268,13 @@
                         { name: "Uchigatana", chance: "1/1", probability: 1.0 },
                         { name: "Tachi", chance: "1/4", probability: 0.25 },
                         { name: "Straight Edge Katana", chance: "1/8", probability: 0.125 }
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Uchigatana", chance: "1/1", probability: 1.0 },
+                        { name: "Tachi", chance: "1/4", probability: 0.25 },
+                        { name: "Juto Katana", chance: "1/2", probability: 0.5 },
+                        { name: "Kurokiba-gatana", chance: "1/8", probability: 0.125 },
+                        { name: "Washi-maru", chance: "1/16", probability: 0.0625 }
                     ]
                 },
                 "Great Sword": {
@@ -3123,7 +3284,9 @@
                     "kingdom": [
                         { name: "Crusader Sword", chance: "1/1", probability: 1.0 },
                         { name: "Long Sword", chance: "1/2", probability: 0.5 },
-                        { name: "Dark Knight Greatsword", chance: "1/8", probability: 0.125 }
+                        { name: "Dark Knight Greatsword", chance: "1/8", probability: 0.125 },
+                        { name: "Anchored Greatsword", chance: "1/8", probability: 0.125 },
+                        { name: "Zweihander", chance: "1/16", probability: 0.0625 }
                     ]
                 },
                 "Mace": {
@@ -3133,6 +3296,11 @@
                         { name: "Winged Mace", chance: "1/4", probability: 0.25 },
                         { name: "Hammerhead Mace", chance: "1/8", probability: 0.125 },
                         { name: "Grave Maker", chance: "1/16", probability: 0.0625 }
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Mace", chance: "1/1", probability: 1.0 },
+                        { name: "Tetsubo", chance: "1/4", probability: 0.25 },
+                        { name: "Kanabo", chance: "1/8", probability: 0.125 }
                     ]
                 },
                 "Axe": {
@@ -3152,6 +3320,13 @@
                         { name: "Angelic Spear", chance: "1/8", probability: 0.125 },
                         { name: "Compass Spear", chance: "1/8", probability: 0.125 },
                         { name: "Knight Spear", chance: "1/8", probability: 0.125 }
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Spear", chance: "1/1", probability: 1.0 },
+                        { name: "Shakujo", chance: "1/2", probability: 0.5 },
+                        { name: "Sodegarami", chance: "1/4", probability: 0.25 },
+                        { name: "Bo Staff", chance: "1/8", probability: 0.125 },
+                        { name: "Naginata", chance: "1/16", probability: 0.0625 }
                     ]
                 },
                 "Great Axe": {
@@ -3169,7 +3344,13 @@
                         { name: "Wyvern Axe", chance: "1/4", probability: 0.0625 },
                         { name: "Anchored Straight Blade", chance: "1/8", probability: 0.125 },
                         { name: "Executioner Greataxe", chance: "1/8", probability: 0.125 }
-
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Double Battle Axe", chance: "1/1", probability: 1.0 },
+                        { name: "Scythe", chance: "1/4", probability: 0.25 },
+                        { name: "Greater Battle Axe", chance: "1/4", probability: 0.0625 },
+                        { name: "Wyvern Axe", chance: "1/4", probability: 0.0625 },
+                        { name: "Sun Great Axe", chance: "1/8", probability: 0.125 }
                     ]
                 },
                 "Colossal Sword": {
@@ -3192,6 +3373,13 @@
                         { name: "Colossal Gemblade", chance: "1/8", probability: 0.125 },
                         { name: "Colossal Terrorblade", chance: "1/8", probability: 0.125 },
                         { name: "Excalibur", chance: "1/1000", probability: 0.001 }
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Dragon Slayer", chance: "1/1", probability: 1.0 },
+                        { name: "Kinmon Kamagatana", chance: "1/3", probability: 0.3333 },
+                        { name: "Otsuchi", chance: "1/6", probability: 0.1667 },
+                        { name: "Sharktooth Odachi", chance: "1/12", probability: 0.0833 },
+                        { name: "Excalibur", chance: "1/1000", probability: 0.001 }
                     ]
                 }
             },
@@ -3199,17 +3387,20 @@
                 "Light Helmet": {
                     "stonewake": [{ name: "Light Helmet", chance: "1/1", probability: 1.0 }],
                     "kingdom": [{ name: "Light Helmet", chance: "1/1", probability: 1.0 }],
-                    "frostspire": [{ name: "Light Helmet", chance: "1/1", probability: 1.0 }]
+                    "frostspire": [{ name: "Light Helmet", chance: "1/1", probability: 1.0 }],
+                    "crimsonsakuraisles": [{ name: "Ninja Headgear", chance: "1/1", probability: 1.0 }]
                 },
                 "Light Leggings": {
                     "stonewake": [{ name: "Light Leggings", chance: "1/1", probability: 1.0 }],
                     "kingdom": [{ name: "Light Leggings", chance: "1/1", probability: 1.0 }],
-                    "frostspire": [{ name: "Light Leggings", chance: "1/1", probability: 1.0 }]
+                    "frostspire": [{ name: "Light Leggings", chance: "1/1", probability: 1.0 }],
+                    "crimsonsakuraisles": [{ name: "Ninja Leggings", chance: "1/1", probability: 1.0 }]
                 },
                 "Light Chestplate": {
                     "stonewake": [{ name: "Light Chestplate", chance: "1/1", probability: 1.0 }],
                     "kingdom": [{ name: "Light Chestplate", chance: "1/1", probability: 1.0 }],
-                    "frostspire": [{ name: "Light Chestplate", chance: "1/1", probability: 1.0 }]
+                    "frostspire": [{ name: "Light Chestplate", chance: "1/1", probability: 1.0 }],
+                    "crimsonsakuraisles": [{ name: "Ninja Armor", chance: "1/1", probability: 1.0 }]
                 },
                 "Medium Helmet": {
                     "stonewake": [{ name: "Medium Helmet", chance: "1/1", probability: 1.0 }],
@@ -3221,6 +3412,10 @@
                         { name: "Medium Helmet", chance: "1/1", probability: 1.0 },
                         { name: "Samurai Helmet", chance: "1/2", probability: 0.5 },
                         { name: "Viking Helmet", chance: "1/4", probability: 0.25 }
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Samurai Helmet", chance: "1/1", probability: 1.0 },
+                        { name: "Rootguard Helmet", chance: "1/2", probability: 0.5 }
                     ]
                 },
                 "Medium Leggings": {
@@ -3233,6 +3428,10 @@
                         { name: "Medium Leggings", chance: "1/1", probability: 1.0 },
                         { name: "Samurai Leggings", chance: "1/2", probability: 0.5 },
                         { name: "Viking Leggings", chance: "1/4", probability: 0.25 }
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Samurai Leggings", chance: "1/1", probability: 1.0 },
+                        { name: "Rootguard Leggings", chance: "1/2", probability: 0.5 }
                     ]
                 },
                 "Medium Chestplate": {
@@ -3245,6 +3444,10 @@
                         { name: "Medium Chestplate", chance: "1/1", probability: 1.0 },
                         { name: "Samurai Chestplate", chance: "1/2", probability: 0.5 },
                         { name: "Viking Chestplate", chance: "1/4", probability: 0.25 }
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Samurai Chestplate", chance: "1/1", probability: 1.0 },
+                        { name: "Rootguard Chestplate", chance: "1/2", probability: 0.5 }
                     ]
                 },
                 "Heavy Helmet": {
@@ -3259,6 +3462,10 @@
                         { name: "Wolf Helmet", chance: "1/4", probability: 0.25 },
                         { name: "Raven Helmet", chance: "1/8", probability: 0.125 },
                         { name: "Goblin Crown", chance: "1/6", probability: 0.1667 }
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Dark Knight Helmet", chance: "1/1", probability: 1.0 },
+                        { name: "Vanguard Helmet", chance: "1/4", probability: 0.25 }
                     ]
                 },
                 "Heavy Leggings": {
@@ -3272,6 +3479,10 @@
                         { name: "Dark Knight Leggings", chance: "1/2", probability: 0.5 },
                         { name: "Wolf Leggings", chance: "1/4", probability: 0.25 },
                         { name: "Raven Leggings", chance: "1/8", probability: 0.125 }
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Dark Knight Leggings", chance: "1/1", probability: 1.0 },
+                        { name: "Vanguard Leggings", chance: "1/4", probability: 0.25 }
                     ]
                 },
                 "Heavy Chestplate": {
@@ -3285,6 +3496,10 @@
                         { name: "Dark Knight Chestplate", chance: "1/2", probability: 0.5 },
                         { name: "Wolf Chestplate", chance: "1/4", probability: 0.25 },
                         { name: "Raven Chestplate", chance: "1/8", probability: 0.125 }
+                    ],
+                    "crimsonsakuraisles": [
+                        { name: "Dark Knight Chestplate", chance: "1/1", probability: 1.0 },
+                        { name: "Vanguard Chestplate", chance: "1/4", probability: 0.25 }
                     ]
                 }
             }
@@ -3409,141 +3624,224 @@
 
             // Fichillium is defined above with id 46
             // Frostspire Expanse
-            { id: 47, name: "Tungsten", multiplier: 2.6, rarity: "common", area: "frostspire", color: "#a5b1c9", traitType: null, traits: [] },
-            { id: 48, name: "Sulfur", multiplier: 2.75, rarity: "uncommon", area: "frostspire", color: "#e0dbb3", traitType: null, traits: [] },
+            { id: 47, name: "Tungsten", multiplier: 1.95, rarity: "common", area: "frostspire", color: "#a5b1c9", traitType: null, traits: [] },
+            { id: 48, name: "Sulfur", multiplier: 2.1, rarity: "uncommon", area: "frostspire", color: "#e0dbb3", traitType: null, traits: [] },
             {
-                id: 49, name: "Pumice", multiplier: 2.9, rarity: "rare", area: "frostspire", color: "#d6cedd", traitType: "armor", traits: [
+                id: 49, name: "Pumice", multiplier: 2.2, rarity: "rare", area: "frostspire", color: "#d6cedd", traitType: "armor", traits: [
                     { description: "+{health}% extra health.", scaling: { health: { min: 0.5, max: 5 } }, type: "armor" }
                 ]
             },
             {
-                id: 50, name: "Graphite", multiplier: 3.1, rarity: "rare", area: "frostspire", color: "#656b7b", traitType: "armor", traits: [
+                id: 50, name: "Graphite", multiplier: 2.33, rarity: "rare", area: "frostspire", color: "#656b7b", traitType: "armor", traits: [
                     { description: "Reduce incoming physical damage by {damage}%. Has {chance}% chance per hit.", scaling: { damage: { min: 1.2, max: 12 }, chance: { min: 2, max: 20 } }, type: "armor" }
                 ]
             },
             {
-                id: 51, name: "Aetherit", multiplier: 3.4, rarity: "rare", area: "frostspire", color: "#e2f0ff", traitType: "armor", traits: [
+                id: 51, name: "Aetherit", multiplier: 2.55, rarity: "rare", area: "frostspire", color: "#e2f0ff", traitType: "armor", traits: [
                     { description: "+{speed}% extra movement speed.", scaling: { speed: { min: 0.5, max: 5 } }, type: "armor" }
                 ]
             },
-            { id: 52, name: "Scheelite", multiplier: 3.3, rarity: "rare", area: "frostspire", color: "#f5c4a3", traitType: null, traits: [] },
-            { id: 53, name: "Larimar", multiplier: 4.1, rarity: "epic", area: "frostspire", color: "#aac3e1", traitType: null, traits: [] },
-            { id: 54, name: "Neurotite", multiplier: 4.3, rarity: "epic", area: "frostspire", color: "#65809b", traitType: null, traits: [] },
+            { id: 52, name: "Scheelite", multiplier: 2.8, rarity: "rare", area: "frostspire", color: "#f5c4a3", traitType: null, traits: [] },
+            { id: 53, name: "Larimar", multiplier: 3.1, rarity: "epic", area: "frostspire", color: "#aac3e1", traitType: null, traits: [] },
+            { id: 54, name: "Neurotite", multiplier: 3.2, rarity: "epic", area: "frostspire", color: "#65809b", traitType: null, traits: [] },
             {
-                id: 55, name: "Frost Fossil", multiplier: 4.5, rarity: "epic", area: "frostspire", color: "#5d7a7e", traitType: "all", traits: [
+                id: 55, name: "Frost Fossil", multiplier: 3.34, rarity: "epic", area: "frostspire", color: "#5d7a7e", traitType: "all", traits: [
                     { description: "Increase physical damage by +{damage}% and decrease movement speed by -{speed}%.", scaling: { damage: { min: 1.75, max: 17.5 }, speed: { min: 0.5, max: 5 } }, type: "all" }
                 ]
             },
-            { id: 56, name: "Tide Carve", multiplier: 4.7, rarity: "epic", area: "frostspire", color: "#3d3c66", traitType: null, traits: [] },
+            { id: 56, name: "Tide Carve", multiplier: 3.5, rarity: "epic", area: "frostspire", color: "#3d3c66", traitType: null, traits: [] },
             {
-                id: 57, name: "Velchire", multiplier: 5.5, rarity: "legendary", area: "frostspire", color: "#f0fdb8", traitType: "armor", traits: [
+                id: 57, name: "Velchire", multiplier: 4.7, rarity: "legendary", area: "frostspire", color: "#f0fdb8", traitType: "armor", traits: [
                     { description: "+{speed}% extra movement speed.", scaling: { speed: { min: 2, max: 20 } }, type: "armor" }
                 ]
             },
             {
-                id: 58, name: "Sanctis", multiplier: 6.0, rarity: "legendary", area: "frostspire", color: "#b6b9c8", traitType: "armor", traits: [
+                id: 58, name: "Sanctis", multiplier: 5.0, rarity: "legendary", area: "frostspire", color: "#b6b9c8", traitType: "armor", traits: [
                     { description: "+{stamina}% more stamina.", scaling: { stamina: { min: 1.8, max: 18 } }, type: "armor" }
                 ]
             },
             {
-                id: 59, name: "Snowite", multiplier: 8.0, rarity: "legendary", area: "frostspire", color: "#dcd9d4", traitType: "weapon", traits: [
+                id: 59, name: "Snowite", multiplier: 6.0, rarity: "legendary", area: "frostspire", color: "#dcd9d4", traitType: "weapon", traits: [
                     { description: "Applies {slow}% attack speed and movement speed slow for {duration}s. {chance}% chance on hit.", scaling: { slow: { min: 1.5, max: 15 }, duration: { min: 0.3, max: 3 }, chance: { min: 3, max: 30 } }, type: "weapon" }
                 ]
             },
             {
-                id: 60, name: "Iceite", multiplier: 10.5, rarity: "mythical", area: "frostspire", color: "#6591c0", traitType: "weapon", traits: [
+                id: 60, name: "Iceite", multiplier: 8.0, rarity: "mythical", area: "frostspire", color: "#6591c0", traitType: "weapon", traits: [
                     { description: "Freeze enemies for {duration}s. {chance}% chance on hit. Has a cooldown of {cooldown}s.", scaling: { duration: { min: 0.2, max: 2 }, chance: { min: 2.5, max: 25 }, cooldown: { min: 1.2, max: 12 } }, type: "weapon" }
                 ]
             },
             {
-                id: 61, name: "Mosasaursit", multiplier: 7.0, rarity: "exotic", area: "frostspire", color: "#687196", traitType: "armor", traits: [
+                id: 61, name: "Mosasaursit", multiplier: 7.5, rarity: "exotic", area: "frostspire", color: "#687196", traitType: "armor", traits: [
                     { description: "Increases health by +{health}%, but lowers movement speed by -{speed}%.", scaling: { health: { min: 3.5, max: 35 }, speed: { min: 2.5, max: 25 } }, type: "armor" }
                 ]
             },
 
 
             // Peak
-            { id: 62, name: "Mistvein", multiplier: 7.2, rarity: "rare", area: "peak", color: "#adb8f5", traitType: null, traits: [] },
-            { id: 63, name: "Lgarite", multiplier: 7.5, rarity: "rare", area: "peak", color: "#f57d60", traitType: null, traits: [] },
-            { id: 64, name: "Voidfractal", multiplier: 8.0, rarity: "rare", area: "peak", color: "#aca0ee", traitType: null, traits: [] },
-            { id: 65, name: "Moltenfrost", multiplier: 8.3, rarity: "epic", area: "peak", color: "#adcae5", traitType: null, traits: [] },
+            { id: 62, name: "Mistvein", multiplier: 5.4, rarity: "rare", area: "peak", color: "#adb8f5", traitType: null, traits: [] },
+            { id: 63, name: "Lgarite", multiplier: 5.7, rarity: "rare", area: "peak", color: "#f57d60", traitType: null, traits: [] },
+            { id: 64, name: "Voidfractal", multiplier: 6.0, rarity: "rare", area: "peak", color: "#aca0ee", traitType: null, traits: [] },
+            { id: 65, name: "Moltenfrost", multiplier: 6.2, rarity: "epic", area: "peak", color: "#adcae5", traitType: null, traits: [] },
             {
-                id: 66, name: "Crimsonite", multiplier: 8.5, rarity: "epic", area: "peak", color: "#c26073", traitType: "weapon", traits: [
+                id: 66, name: "Crimsonite", multiplier: 5.8, rarity: "epic", area: "peak", color: "#c26073", traitType: "weapon", traits: [
                     { description: "Increase physical damage by +{damage}%.", scaling: { damage: { min: 2, max: 20 } }, type: "weapon" }
                 ]
             },
             {
-                id: 67, name: "Malachite", multiplier: 8.8, rarity: "epic", area: "peak", color: "#a89be4", traitType: "weapon", traits: [
+                id: 67, name: "Malachite", multiplier: 6.4, rarity: "epic", area: "peak", color: "#a89be4", traitType: "weapon", traits: [
                     { description: "Deals {damage}% of your weapon damage per second as poison for {duration}s. {chance}% chance to hit.", scaling: { damage: { min: 1, max: 10 }, duration: { min: 0.3, max: 3 }, chance: { min: 3.3, max: 33 } }, type: "weapon" }
                 ]
             },
-            { id: 68, name: "Aquajade", multiplier: 9.0, rarity: "epic", area: "peak", color: "#7fdce4", traitType: null, traits: [] },
-            { id: 69, name: "Cryptex", multiplier: 9.3, rarity: "epic", area: "peak", color: "#5ec9da", traitType: null, traits: [] },
-            { id: 70, name: "Galestor", multiplier: 9.5, rarity: "epic", area: "peak", color: "#495d77", traitType: null, traits: [] },
+            { id: 68, name: "Aquajade", multiplier: 6.75, rarity: "epic", area: "peak", color: "#7fdce4", traitType: null, traits: [] },
+            { id: 69, name: "Cryptex", multiplier: 7.0, rarity: "epic", area: "peak", color: "#5ec9da", traitType: null, traits: [] },
+            { id: 70, name: "Galestor", multiplier: 7.2, rarity: "epic", area: "peak", color: "#495d77", traitType: null, traits: [] },
             {
-                id: 71, name: "Voidstar", multiplier: 10.0, rarity: "legendary", area: "peak", color: "#c393f7", traitType: "weapon", traits: [
+                id: 71, name: "Voidstar", multiplier: 7.5, rarity: "legendary", area: "peak", color: "#c393f7", traitType: "weapon", traits: [
                     { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%, but lowers health by -{health}%.", scaling: { crit: { min: 3.3, max: 33 }, critDamage: { min: 1.5, max: 15 }, health: { min: 1.5, max: 15 } }, type: "weapon" }
                 ]
             },
             {
-                id: 72, name: "Etherealite", multiplier: 11.1, rarity: "mythical", area: "peak", color: "#e8b9e1", traitType: "armor", traits: [
+                id: 72, name: "Etherealite", multiplier: 8.5, rarity: "mythical", area: "peak", color: "#e8b9e1", traitType: "armor", traits: [
                     { description: "+{health}% extra health.", scaling: { health: { min: 3.5, max: 35 } }, type: "armor" }
                 ]
             },
-            { id: 73, name: "Suryafal", multiplier: 15.0, rarity: "relic", area: "peak", color: "#f69e40", traitType: null, traits: [] },
+            { id: 73, name: "Suryafal", multiplier: 11.5, rarity: "relic", area: "peak", color: "#f69e40", traitType: null, traits: [] },
             {
-                id: 74, name: "Heavenite", multiplier: 20.0, rarity: "divine", area: "peak", color: "#fff4c0", traitType: "weapon", traits: [
+                id: 74, name: "Heavenite", multiplier: 13.7, rarity: "divine", area: "peak", color: "#fff4c0", traitType: "weapon", traits: [
                     { description: "{chance}% to smite the enemy on hit, dealing {damage} flat damage.", scaling: { damage: { min: 2.5, max: 25 }, chance: { min: 4, max: 40 } }, type: "weapon" }
                 ]
             },
             {
-                id: 75, name: "Gargantuan", multiplier: 25.0, rarity: "divine", area: "peak", color: "#ffde65", traitType: "weapon", traits: [
+                id: 75, name: "Gargantuan", multiplier: 15.0, rarity: "divine", area: "peak", color: "#ffde65", traitType: "weapon", traits: [
                     { description: "Deals {damage}% of your weapon damage as explosion damage and burn the enemy for {dotdamage}% of your weapon damage per second for {duration}s. {chance}% chance to hit.", scaling: { damage: { min: 5, max: 50 }, duration: { min: 0.2, max: 2 }, chance: { min: 3, max: 30 }, dotdamage: { min: 2, max: 20 } }, type: "weapon" }
                 ]
             },
 
             // New boss ores and Raven Cave ores
             {
-                id: 76, name: "Prismatic Heart", multiplier: 5.5, rarity: "legendary", area: "enemy", color: "#ddeefb", traitType: "weapon", traits: [
+                id: 76, name: "Prismatic Heart", multiplier: 4.3, rarity: "legendary", area: "enemy", color: "#ddeefb", traitType: "weapon", traits: [
                     { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%. {chance}% chance to slow enemies for {duration}s on-hit.", scaling: { crit: { min: 2, max: 20 }, critDamage: { min: 0.5, max: 5 }, chance: { min: 1.5, max: 15 }, duration: { min: 0.2, max: 2 } }, type: "weapon" }
                 ]
             },
             {
-                id: 77, name: "Yeti Heart", multiplier: 7.7, rarity: "mythical", area: "enemy", color: "#adafb9", traitType: "weapon", traits: [
+                id: 77, name: "Yeti Heart", multiplier: 6.0, rarity: "mythical", area: "enemy", color: "#adafb9", traitType: "weapon", traits: [
                     { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%. +{speed}% increased attack speed.", scaling: { crit: { min: 3, max: 30 }, critDamage: { min: 1, max: 10 }, speed: { min: 1, max: 10 } }, type: "weapon" }
                 ]
             },
             {
-                id: 78, name: "Golem Heart", multiplier: 10.0, rarity: "divine", area: "enemy", color: "#88c2e3", traitType: "weapon", traits: [
+                id: 78, name: "Golem Heart", multiplier: 8.5, rarity: "divine", area: "enemy", color: "#88c2e3", traitType: "weapon", traits: [
                     { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%. {chance}% chance to slow enemies for {duration}s on-hit.", scaling: { crit: { min: 4, max: 40 }, critDamage: { min: 1.5, max: 15 }, chance: { min: 2.5, max: 25 }, duration: { min: 0.3, max: 3 } }, type: "weapon" }
                 ]
             },
             {
-                id: 79, name: "Frogite", multiplier: 8.5, rarity: "epic", area: "frostspire", color: "#b4ff88", traitType: "armor", traits: [
+                id: 79, name: "Frogite", multiplier: 6.2, rarity: "epic", area: "frostspire", color: "#b4ff88", traitType: "armor", traits: [
                     { description: "Increases jump height by +{height}% and dash distance by +{dash}.", scaling: { height: { min: 1.25, max: 12.5 }, dash: { min: 0.75, max: 7.5 } }, type: "armor" }
                 ]
             },
             {
-                id: 80, name: "Moon Stone", multiplier: 9.5, rarity: "legendary", area: "frostspire", color: "#8efdff", traitType: "weapon", traits: [
+                id: 80, name: "Moon Stone", multiplier: 7.2, rarity: "legendary", area: "frostspire", color: "#8efdff", traitType: "weapon", traits: [
                     { description: "Increases physical damage by +{damage}% during the night.", scaling: { damage: { min: 2.5, max: 25 } }, type: "weapon" }
                 ]
             },
-            { id: 81, name: "Gulabite", multiplier: 9.99, rarity: "legendary", area: "frostspire", color: "#ff58df", traitType: null, traits: [] },
+            { id: 81, name: "Gulabite", multiplier: 7.77, rarity: "legendary", area: "frostspire", color: "#ff58df", traitType: null, traits: [] },
             { id: 82, name: "Coinite", multiplier: 1.0, rarity: "legendary", area: "frostspire", color: "#ad8764", traitType: null, traits: [] },
             {
-                id: 83, name: "Duranite", multiplier: 12.0, rarity: "mythical", area: "frostspire", color: "#e1a44d", traitType: "armor", traits: [
+                id: 83, name: "Duranite", multiplier: 9.0, rarity: "mythical", area: "frostspire", color: "#e1a44d", traitType: "armor", traits: [
                     { description: "Increases health by +{health}%. {chance}% chance to reduce incoming damage by {damage}%.", scaling: { health: { min: 2, max: 20 }, chance: { min: 2.5, max: 25 }, damage: { min: 2.5, max: 25 } }, type: "armor" }
                 ]
             },
-            { id: 84, name: "Evil Eye", multiplier: 13.3, rarity: "mythical", area: "frostspire", color: "#495d77", traitType: null, traits: [] },
+            { id: 84, name: "Evil Eye", multiplier: 9.5, rarity: "mythical", area: "frostspire", color: "#495d77", traitType: null, traits: [] },
             {
-                id: 85, name: "Stolen Heart", multiplier: 15.4, rarity: "divine", area: "frostspire", color: "#e45768", traitType: "weapon", traits: [
+                id: 85, name: "Stolen Heart", multiplier: 12.5, rarity: "divine", area: "frostspire", color: "#e45768", traitType: "weapon", traits: [
                     { description: "Heal {damage}% of physical damage dealt on-hit.", scaling: { damage: { min: 0.7, max: 7 } }, type: "weapon" }
                 ]
             },
             {
-                id: 86, name: "Heart Of The Island", multiplier: 18.5, rarity: "relic", area: "frostspire", color: "#f9696d", traitType: "armor", traits: [
+                id: 86, name: "Heart Of The Island", multiplier: 13.0, rarity: "relic", area: "frostspire", color: "#f9696d", traitType: "armor", traits: [
                     { description: "Increases your health by +{health}%, and your physical damage and movement speed by +{damage}% for 8 seconds when your health drops below 35%.", scaling: { health: { min: 1.5, max: 15 }, damage: { min: 2.5, max: 25 } }, type: "armor" }
+                ]
+            },
+
+            // Bamboo Cave
+            { id: 87, name: "Bamboo", multiplier: 4.0, rarity: "uncommon", area: "bamboo", color: "#77a768", traitType: null, traits: [] },
+            { id: 88, name: "Root Spire", multiplier: 4.44, rarity: "uncommon", area: "bamboo", color: "#726a4f", traitType: null, traits: [] },
+            { id: 89, name: "Water Stone", multiplier: 4.7, rarity: "rare", area: "bamboo", color: "#7ae4fb", traitType: null, traits: [] },
+            {
+                id: 90, name: "Earthite", multiplier: 5.0, rarity: "rare", area: "bamboo", color: "#4f6d60", traitType: "armor", traits: [
+                    { description: "Increases health by +{health}%. Reduces movement speed by -{speed}%.", scaling: { health: { min: 1, max: 10 }, speed: { min: 0.5, max: 5 } }, type: "armor" }
+                ]
+            },
+            { id: 91, name: "Melonite", multiplier: 5.2, rarity: "rare", area: "bamboo", color: "#d5ffca", traitType: null, traits: [] },
+            { id: 92, name: "Rock Seed", multiplier: 5.5, rarity: "rare", area: "bamboo", color: "#fcda88", traitType: null, traits: [] },
+            { id: 93, name: "Wraith", multiplier: 5.75, rarity: "epic", area: "bamboo", color: "#778a77", traitType: null, traits: [] },
+            {
+                id: 94, name: "Tiger Eye", multiplier: 6.0, rarity: "epic", area: "bamboo", color: "#eda04c", traitType: "weapon", traits: [
+                    { description: "Increases physical damage by +{damage}%, movement speed by +{speed}%, and attack speed by +{as}%. Reduces health by -{health}%.", scaling: { damage: { min: 1, max: 10 }, speed: { min: 0.5, max: 5 }, as: { min: 0.75, max: 7.5 }, health: { min: 1, max: 10 } }, type: "weapon" }
+                ]
+            },
+            {
+                id: 95, name: "Cyanite Jade", multiplier: 6.5, rarity: "epic", area: "bamboo", color: "#78e5ff", traitType: "armor", traits: [
+                    { description: "Increases health by +{health}%. Reduces stamina by -{stamina}%.", scaling: { health: { min: 2, max: 20 }, stamina: { min: 1, max: 10 } }, type: "armor" }
+                ]
+            },
+            { id: 96, name: "Magit", multiplier: 6.8, rarity: "epic", area: "bamboo", color: "#e8fc88", traitType: null, traits: [] },
+            {
+                id: 97, name: "Duquack", multiplier: 8.0, rarity: "legendary", area: "bamboo", color: "#fcda88", traitType: "armor", traits: [
+                    { description: "Increases jump height by +{height}%, dash distance by +{distance}%, and dash invincibility duration by +{duration}%.", scaling: { height: { min: 0.75, max: 7.5 }, distance: { min: 0.75, max: 7.5 }, duration: { min: 0.75, max: 7.5 } }, type: "armor" }
+                ]
+            },
+            {
+                id: 98, name: "Onyx", multiplier: 10.0, rarity: "legendary", area: "bamboo", color: "#808ab4", traitType: "weapon", traits: [
+                    { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%.", scaling: { crit: { min: 3.5, max: 35 }, critDamage: { min: 1.75, max: 17.5 } }, type: "weapon" }
+                ]
+            },
+
+            // Holy Tree
+            { id: 112, name: "Onite", multiplier: 9.8, rarity: "legendary", area: "enemy", color: "#f0b209", traitType: null, traits: [] },
+            { id: 99, name: "Aurelia-No-Ki", multiplier: 9.5, rarity: "rare", area: "holytree", color: "#2196F3", traitType: null, traits: [] },
+            { id: 100, name: "Sakuranite", multiplier: 10.1, rarity: "rare", area: "holytree", color: "#2196F3", traitType: null, traits: [] },
+            { id: 101, name: "Fruite", multiplier: 10.33, rarity: "rare", area: "holytree", color: "#2196F3", traitType: null, traits: [] },
+            {
+                id: 102, name: "Blue Gem Quill", multiplier: 11.0, rarity: "epic", area: "holytree", color: "#9c27b0", traitType: "armor", traits: [
+                    { description: "Increases jump height by +{height}%, dash distance by +{distance}%, and dash invincibility duration by +{duration}%. Reduces dash cooldown by -{cooldown}%", scaling: { height: { min: 0.5, max: 5 }, distance: { min: 1, max: 10 }, cooldown: { min: 1.2, max: 12 }, duration: { min: 0.8, max: 8 } }, type: "armor" }
+                ]
+            },
+            { id: 103, name: "Heat Steel", multiplier: 11.5, rarity: "epic", area: "holytree", color: "#9c27b0", traitType: null, traits: [] },
+            {
+                id: 104, name: "Sealed Curse", multiplier: 12.0, rarity: "epic", area: "holytree", color: "#9c27b0", traitType: "all", traits: [
+                    { description: "Increases damage by +{damage}%. Decreases health by -{health}%, stamina by -{stamina}%, and movement speed by -{speed}%.", scaling: { damage: { min: 3, max: 30 }, health: { min: 2, max: 20 }, stamina: { min: 1, max: 10 }, speed: { min: 1.5, max: 15 } }, type: "all" }
+                ]
+            },
+            {
+                id: 111, name: "Lucky Cat", multiplier: 11.1, rarity: "epic", area: "holytree", color: "#9c27b0", traitType: "armor", traits: [
+                    { description: "+{luck}% luck. {chance}% chance to obtain 1 extra ore from an ore node.", scaling: { luck: { min: 0.5, max: 5 }, chance: { min: 0.5, max: 5 } }, type: "armor" }
+                ]
+            },
+            { id: 105, name: "Zenstone", multiplier: 12.21, rarity: "legendary", area: "holytree", color: "#f0b209", traitType: null, traits: [] },
+            {
+                id: 106, name: "Azuryxite", multiplier: 13.0, rarity: "legendary", area: "holytree", color: "#f0b209", traitType: "armor", traits: [
+                    { description: "Increases health by +{health}%. {chance}% chance to reduce incoming physical damage by {reduced}%. Reduces stamina by -{stamina}% and movement speed by -{speed}%.", scaling: { health: { min: 1.5, max: 15 }, chance: { min: 4, max: 40 }, reduced: { min: 3, max: 30 }, speed: { min: 1.5, max: 15 }, stamina: { min: 1, max: 10 } }, type: "armor" }
+                ]
+            },
+            {
+                id: 107, name: "Sun Stone", multiplier: 13.39, rarity: "legendary", area: "holytree", color: "#f0b209", traitType: "weapon", traits: [
+                    { description: "Deals {damage}% of weapon damage as fire per second for {duration}s. {chance}% chance on hit.", scaling: { damage: { min: 3.5, max: 35 }, duration: { min: 0.5, max: 5 }, chance: { min: 3.5, max: 35 } }, type: "weapon" }
+                ]
+            },
+            { id: 108, name: "Roosite", multiplier: 14.0, rarity: "legendary", area: "holytree", color: "#f0b209", traitType: null, traits: [] },
+            {
+                id: 109, name: "Meteorite", multiplier: 14.44, rarity: "mythical", area: "holytree", color: "#d13429", traitType: "weapon", traits: [
+                    { description: "Cause an explosion on hit, dealing {damage}% of weapon damage as AoE damage. {chance}% chance on hit.", scaling: { damage: { min: 6, max: 60 }, chance: { min: 2.5, max: 25 } }, type: "weapon" }
+                ]
+            },
+            {
+                id: 110, name: "Heavenly Orb", multiplier: 15.15, rarity: "mythical", area: "holytree", color: "#d13429", traitType: "armor", traits: [
+                    { description: "Increases health by +{health}%. Regenerate {regen} health per second. {chance}% chance to reduce incoming physical damage by {reduced}%.", scaling: { health: { min: 0.5, max: 5 }, regen: { min: 1.5, max: 15 }, chance: { min: 4.5, max: 45 }, reduced: { min: 3, max: 30 } }, type: "armor" }
+                ]
+            },
+            {
+                id: 113, name: "Kyubite", multiplier: 17.0, rarity: "divine", area: "holytree", color: "#885ec6", traitType: "weapon", traits: [
+                    { description: "Increases critical chance by +{crit}% and critical damage by +{critDamage}%. Deals {damage}% of weapon damage as fire per second for {duration}s. {chance}% chance on hit.", scaling: { crit: { min: 4, max: 40 }, critDamage: { min: 1.8, max: 18 }, damage: { min: 4.5, max: 45 }, duration: { min: 0.5, max: 5 }, chance: { min: 4, max: 40 } }, type: "weapon" }
                 ]
             }
         ];
@@ -3591,8 +3889,24 @@
             80: { icon: 'fas fa-fan', color: '#8efdff' }, // Moon Stone
             83: { icon: 'fas fa-heart', color: '#e1a44d' },  // Duranite
             85: { icon: 'fas fa-heartbeat', color: '#e45768' }, // Stolen Heart
-            86: { icon: 'fas fa-heart', color: '#f9696d' }  // Heart Of The Island
+            86: { icon: 'fas fa-heart', color: '#f9696d' },  // Heart Of The Island
 
+            // Bamboo Cave
+            90: { icon: 'fas fa-heart', color: '#4f6d60' }, // Earthite
+            94: { icon: 'fas fa-fan', color: '#eda04c' }, // Tiger Eye
+            95: { icon: 'fas fa-heart', color: '#78e5ff' }, // Cyanite Jade
+            97: { icon: 'fas fa-running', color: '#f0b209' }, // Duquack
+            98: { icon: 'fas fa-crosshairs', color: '#808ab4' }, // Onyx
+
+            // Holy Tree
+            102: { icon: 'fas fa-running', color: '#9c27b0' }, // Blue Gem Quill
+            104: { icon: 'fas fa-fan', color: '#9c27b0' }, // Sealed Curse
+            106: { icon: 'fas fa-heart', color: '#f0b209' }, // Azuryxite
+            107: { icon: 'fas fa-fire', color: '#f0b209' }, // Sun Stone
+            109: { icon: 'fas fa-bomb', color: '#d13429' }, // Meteorite
+            110: { icon: 'fas fa-heart', color: '#d13429' }, // Heavenly Orb
+            111: { icon: 'fas fa-dice', color: '#9c27b0' }, // Lucky Cat
+            113: { icon: 'fas fa-crosshairs', color: '#885ec6' } // Kyubite
         };
 
         // Optimal ore counts for each item type
@@ -3625,6 +3939,19 @@
                 "Straight Sword": 6,
                 "Mace": 9,
                 "Axe": 12,
+                "Spear": 16,
+                "Great Axe": 22,
+                "Colossal Sword": 36
+            },
+            armor: optimalCounts.armor
+        };
+
+        const optimalCountsCrimsonSakuraIsles = {
+            weapon: {
+                "Dagger": 3,
+                "Straight Sword": 6,
+                "Mace": 9,
+                "Katana": 12,
                 "Spear": 16,
                 "Great Axe": 22,
                 "Colossal Sword": 36
@@ -3668,6 +3995,19 @@
             armor: optimalCounts.armor
         };
 
+        const lockReqsCrimsonSakuraIsles = {
+            weapon: {
+                "Dagger": 3,
+                "Straight Sword": 9,
+                "Mace": 14,
+                "Katana": 18,
+                "Spear": 24,
+                "Great Axe": 31,
+                "Colossal Sword": 50
+            },
+            armor: optimalCounts.armor
+        };
+
         let currentMode = 'weapon';
         let oreMix = [];
         let activeFilter = 'all';
@@ -3679,7 +4019,7 @@
         let quickCraftItem = null;
         let selectedTraits = [];
         let currentStep = 0;
-        let currentArea = 'frostspire';
+        let currentArea = 'crimsonsakuraisles';
         let highestProbabilityItem = null;
         let forgedItems = JSON.parse(localStorage.getItem('forgedItems') || '[]');
         const MAX_INVENTORY_SIZE = 20;
@@ -3763,7 +4103,13 @@
             if (currentMode === 'weapon') {
                 if (currentArea === 'frostspire') {
                     return lockReqsFrostspire.weapon[itemType] || lockReqs.weapon[itemType] || 999;
-                } else {
+                }
+
+                else if (currentArea === 'crimsonsakuraisles') {
+                    return lockReqsCrimsonSakuraIsles.weapon[itemType] || lockReqs.weapon[itemType] || 999;
+                }
+
+                else {
                     return lockReqs.weapon[itemType] || 999;
                 }
             } else {
@@ -4025,6 +4371,14 @@
             return { statsMultiplier, priceMultiplier };
         }
 
+        function getFirstAreaVariant(itemType) {
+            const variants = specificItemVariants[currentMode]?.[itemType]?.[currentArea];
+            if (variants && variants.length > 0) {
+                return variants[0].name.replace(/\s*\[.*?\]\s*/g, '');
+            }
+            return null;
+        }
+
         function updateItemPreview() {
             const previewContainer = document.getElementById('item-preview-container');
             const previewPlaceholder = document.getElementById('forge-preview-placeholder');
@@ -4043,7 +4397,7 @@
 
             let probabilities;
             if (currentMode === 'weapon') {
-                probabilities = currentArea === 'frostspire' ? weaponProbabilitiesFrostspire : weaponProbabilities;
+                probabilities = currentArea === 'frostspire' ? weaponProbabilitiesFrostspire : currentArea === 'crimsonsakuraisles' ? weaponProbabilitiesCrimsonSakuraIsles : weaponProbabilities;
             } else {
                 probabilities = armorProbabilities;
             }
@@ -4084,16 +4438,22 @@
             if (selectedPreviewVariant.baseItemType === highestItem && selectedPreviewVariant.variantName) {
                 baseItemName = selectedPreviewVariant.variantName;
             } else {
-                baseItemName = Object.keys(baseItemStats[currentMode]).find(name => {
-                    const itemData = baseItemStats[currentMode][name];
-                    return itemData.type === highestItem;
-                });
-
-                if (!baseItemName && currentMode === 'armor') {
-                    baseItemName = Object.keys(baseItemStats.armor).find(name => {
-                        const itemData = baseItemStats.armor[name];
+                const firstVariant = getFirstAreaVariant(highestItem);
+                if (firstVariant) {
+                    baseItemName = firstVariant;
+                    selectedPreviewVariant = { baseItemType: highestItem, variantName: firstVariant };
+                } else {
+                    baseItemName = Object.keys(baseItemStats[currentMode]).find(name => {
+                        const itemData = baseItemStats[currentMode][name];
                         return itemData.type === highestItem;
                     });
+
+                    if (!baseItemName && currentMode === 'armor') {
+                        baseItemName = Object.keys(baseItemStats.armor).find(name => {
+                            const itemData = baseItemStats.armor[name];
+                            return itemData.type === highestItem;
+                        });
+                    }
                 }
             }
 
@@ -4438,6 +4798,13 @@
                         icon: 'fas fa-snowflake',
                         name: 'Frostspire Expanse'
                     };
+                case 'crimsonsakuraisles':
+                    return {
+                        bg: 'rgba(255, 56, 56, 0.2)',
+                        color: '#ff3838',
+                        icon: 'fas fa-torii-gate',
+                        name: 'Crimson Sakura Isles'
+                    };
                 default:
                     return {
                         bg: 'var(--primary-light)',
@@ -4535,6 +4902,7 @@
                 case 'kingdom': return 'Forgotten Kingdom';
                 case 'stonewake': return 'Stonewake\'s Cross';
                 case 'frostspire': return 'Frostspire Expanse';
+                case 'crimsonsakuraisles': return 'Crimson Sakura Isles';
                 default: return 'Unknown Area';
             }
         }
@@ -4637,13 +5005,14 @@
 
             function applyAreaClasses() {
                 const areaNames = {
+                    'crimsonsakuraisles': 'Crimson Sakura Isles',
                     'frostspire': 'Frostspire Expanse',
                     'kingdom': 'Forgotten Kingdom',
                     'stonewake': 'Stonewake\'s Cross'
                 };
                 areaLabel.textContent = areaNames[currentArea];
 
-                areaToggle.classList.remove('frostspire-active', 'kingdom-active', 'stonewake-active');
+                areaToggle.classList.remove('frostspire-active', 'kingdom-active', 'stonewake-active', 'crimsonsakuraisles-active');
                 areaToggle.classList.add(`${currentArea}-active`);
 
                 document.querySelectorAll('#area-dropdown .area-option').forEach(option => {
@@ -4857,7 +5226,7 @@
 
                 slot.innerHTML = `
     <div class="slot-ore" ${backgroundStyle} data-id="${ore.id}">
-        ${!oreImages[ore.name] ? `<i class="fas fa-gem" style="color: ${ore.color}; font-size: 30px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>` : ''}
+        ${!oreImages[ore.name] ? `<i class="fas fa-gem" style="color: ${ore.color}; opacity: 0.7; font-size: 40px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>` : ''}
         <div class="slot-ore-name">
             <span style="color: ${ore.color}; font-weight: bold;">${ore.name}</span>
         </div>
@@ -4970,7 +5339,7 @@
 
             let probabilities;
             if (currentMode === 'weapon') {
-                probabilities = currentArea === 'frostspire' ? weaponProbabilitiesFrostspire : weaponProbabilities;
+                probabilities = currentArea === 'crimsonsakuraisles' ? weaponProbabilitiesCrimsonSakuraIsles : currentArea === 'frostspire' ? weaponProbabilitiesFrostspire : weaponProbabilities;
             } else {
                 probabilities = armorProbabilities;
             }
@@ -5293,7 +5662,7 @@
             itemOptions.innerHTML = '';
             let items;
             if (quickCraftType === 'weapon') {
-                items = currentArea === 'frostspire' ? optimalCountsFrostspire.weapon : optimalCounts.weapon;
+                items = currentArea === 'frostspire' ? optimalCountsFrostspire.weapon : currentArea === 'crimsonsakuraisles' ? optimalCountsCrimsonSakuraIsles.weapon : optimalCounts.weapon;
             } else {
                 items = optimalCounts.armor;
             }
@@ -5854,7 +6223,7 @@
                 } else {
                     let probabilities;
                     if (currentMode === 'weapon') {
-                        probabilities = currentArea === 'frostspire' ? weaponProbabilitiesFrostspire : weaponProbabilities;
+                        probabilities = currentArea === 'frostspire' ? weaponProbabilitiesFrostspire : currentArea === 'crimsonsakuraisles' ? weaponProbabilitiesCrimsonSakuraIsles : weaponProbabilities;
                     } else {
                         probabilities = armorProbabilities;
                     }
@@ -6294,5 +6663,4 @@
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
-
 </html>
