@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Skill Tree Viewer - Nexus Forge</title>
+    <style>
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: radial-gradient(circle at 20% 30%, #0a0f1e, #03060c); font-family: 'Share Tech Mono', monospace; color: #e0e5f0; overflow: hidden; height: 100vh; }
+        .canvas-scroll-wrapper { flex: 1; position: relative; overflow: auto; cursor: grab; background: #03080e; scrollbar-width: none; -ms-overflow-style: none; touch-action: none; height: 100vh; }
+        .canvas-scroll-wrapper::-webkit-scrollbar { display: none; }
+        .canvas-scroll-wrapper:active { cursor: grabbing; }
+        canvas { display: block; transform-origin: 0 0; will-change: transform; pointer-events: auto; }
+        .zoom-panel { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 8px; background: rgba(8, 18, 26, 0.8); backdrop-filter: blur(8px); padding: 8px 12px; border-radius: 40px; border: 1px solid #2f7088; z-index: 200; }
+        .zoom-panel button { background: #0f212e; border: none; color: white; font-weight: bold; font-size: 1.2rem; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; }
+        .tooltip-node { position: fixed; background: #0b121fe6; backdrop-filter: blur(8px); border-left: 4px solid #5ad0ff; border-radius: 12px; padding: 12px 16px; max-width: 280px; pointer-events: none; z-index: 1000; font-family: 'Share Tech Mono', monospace; box-shadow: 0 6px 18px black; font-size: 0.8rem; }
+        .tooltip-node .node-name { font-weight: bold; color: white; font-size: 1.1rem; }
+        .tooltip-node .level-req { color: #ffcc66; }
+        .tooltip-node .desc { color: #b0b8c5; }
+        .standalone-search { position: fixed; top: 16px; left: 16px; z-index: 210; background: rgba(8, 18, 26, 0.85); backdrop-filter: blur(8px); border-radius: 40px; border: 1px solid #2f7088; padding: 6px 16px; display: flex; gap: 8px; align-items: center; }
+        .standalone-search input { background: #071217; border: 1px solid #2f6f8a; border-radius: 20px; padding: 5px 12px; color: white; font-family: monospace; width: 200px; outline: none; }
+    </style>
+</head>
+<body>
+<div class="canvas-scroll-wrapper" id="scrollWrapper">
+    <canvas id="treeCanvas"></canvas>
+</div>
+<div class="zoom-panel"><button id="zoomOutBtn">−</button><button id="zoomInBtn">+</button><button id="resetViewBtn">⌗</button></div>
+<div class="standalone-search"><span>🔍</span><input type="text" id="searchInputViewer" placeholder="search node names..."></div>
+<script>
+    const nodesData = [{"id":1,"name":"Neural Spark","levelReq":1,"description":"Initiate neural pathways","detailedHTML":"<strong>Passive:</strong> Increases cognitive processing by 12%.","x":452.43865444682467,"y":236.09787637148239,"radius":30,"fillColor":"#3f7e9c","lineColor":"#aaaaaa","leadsTo":[2,3,6]},{"id":2,"name":"Phase Dash","levelReq":3,"description":"Short-range blink","detailedHTML":"<em>Active ability:</em> <font color=\"#5b76e1\">Dash forward</font> 5 meters, passing through enemies.","x":245.03025945546193,"y":281.54240923211387,"radius":30,"fillColor":"#589a6e","lineColor":"#ffaa66","leadsTo":[4]},{"id":3,"name":"Charged Core","levelReq":3,"description":"Energy generation","detailedHTML":"<span style=\"color:#ffaa55\">+25%</span> shield recharge rate.","x":677.5306524045,"y":214.93869519100005,"radius":30,"fillColor":"#b56a3c","lineColor":"#18fb86","leadsTo":[5]},{"id":4,"name":"Quantum Stride","levelReq":7,"description":"Enhanced mobility","detailedHTML":"<font color=\"#ffaa66\"><b>Phase Dash</b></font> now leaves a damaging rift.<div><br></div><div><b><font color=\"#88ccff\">Unlock Requirements:</font></b><br><b><font color=\"#77ffaa\">Gay Uncle</font></b></div>","x":198.3635927887953,"y":498.1792763879908,"radius":30,"fillColor":"#7960c7","lineColor":"#f5a97f","leadsTo":[]},{"id":5,"name":"Arc Overload","levelReq":8,"description":"Chain lightning","detailedHTML":"Discharges electricity to 3 nearby foes.","x":782.8208338802714,"y":445.6887349527837,"radius":32,"fillColor":"#c7505a","lineColor":"#d0f0c0","leadsTo":[]},{"id":6,"name":"New Node 6","levelReq":1,"description":"Skill description","detailedHTML":"Add detailed info with formatting.","x":510.0945015755956,"y":476.4786289532069,"radius":30,"fillColor":"#e91616","lineColor":"#2aa242","leadsTo":[]}];
+    let nodes = nodesData;
+    let currentZoom = 1.0;
+    let isDraggingCanvas = false;
+    let dragStartScroll = { x: 0, y: 0 };
+    let dragStartMouse = { x: 0, y: 0 };
+    let activeTooltipNode = null;
+    let tooltipElement = null;
+    let searchTerm = "";
+    let canvas, ctx, scrollWrapper;
+    let initialPinchDistance = 0, initialZoom = 1;
+    let dragOccurred = false;
+    let inputState = {
+        isTouch: false,
+        isPanning: false,
+        panStartX: 0,
+        panStartY: 0,
+        panStartScrollX: 0,
+        panStartScrollY: 0,
+        isPinching: false,
+        pinchStartDistance: 0,
+        pinchStartZoom: 1,
+        touchCount: 0,
+        lastTouchTime: 0
+    };
+    
+    function screenToWorld(clientX, clientY) {
+        const rect = scrollWrapper.getBoundingClientRect();
+        const scrollLeft = scrollWrapper.scrollLeft;
+        const scrollTop = scrollWrapper.scrollTop;
+        return { x: (clientX - rect.left + scrollLeft) / currentZoom, y: (clientY - rect.top + scrollTop) / currentZoom };
+    }
+    function getBoundingBox() {
+        if (!nodes.length) return { minX: 0, minY: 0, maxX: 800, maxY: 600 };
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        nodes.forEach(n => { minX = Math.min(minX, n.x - n.radius - 50); minY = Math.min(minY, n.y - n.radius - 50); maxX = Math.max(maxX, n.x + n.radius + 50); maxY = Math.max(maxY, n.y + n.radius + 50); });
+        return { minX, minY, maxX, maxY };
+    }
+    function updateCanvasSize() {
+        const bbox = getBoundingBox();
+        const width = Math.max(bbox.maxX + 200, 1200);
+        const height = Math.max(bbox.maxY + 200, 800);
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = width * dpr; 
+        canvas.height = height * dpr;
+        canvas.style.width = width + "px"; 
+        canvas.style.height = height + "px";
+        canvas.style.transform = `scale(${currentZoom})`;
+        canvas.style.transformOrigin = "0 0";
+        ctx.scale(dpr, dpr);
+        applyBoundaries();
+    }
+    function applyBoundaries() {
+        const scaledW = canvas.width * currentZoom, scaledH = canvas.height * currentZoom;
+        const maxX = Math.max(0, scaledW - scrollWrapper.clientWidth);
+        const maxY = Math.max(0, scaledH - scrollWrapper.clientHeight);
+        scrollWrapper.scrollLeft = Math.min(maxX, Math.max(0, scrollWrapper.scrollLeft));
+        scrollWrapper.scrollTop = Math.min(maxY, Math.max(0, scrollWrapper.scrollTop));
+    }
+    function draw() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.setLineDash([8,6]);
+        nodes.forEach(parent => { if(parent.leadsTo) parent.leadsTo.forEach(cid => { const child = nodes.find(n=>n.id===cid); if(child) { ctx.beginPath(); ctx.moveTo(parent.x,parent.y); ctx.lineTo(child.x,child.y); ctx.strokeStyle = child.lineColor || "#aaaaff"; ctx.lineWidth = 2.5; ctx.stroke(); } }); });
+        ctx.setLineDash([]);
+        const term = searchTerm.toLowerCase();
+        const now = performance.now() / 1500;
+        const pulse = 0.5 + Math.sin(now * Math.PI * 2) * 0.3;
+        for(let node of nodes) {
+            const matches = term !== "" && node.name.toLowerCase().includes(term);
+            ctx.save();
+            ctx.shadowColor = "rgba(0,0,0,0.6)"; ctx.shadowBlur = 8;
+            ctx.beginPath(); ctx.arc(node.x, node.y, node.radius, 0, Math.PI*2);
+            const grad = ctx.createRadialGradient(node.x-5, node.y-5, 5, node.x, node.y, node.radius);
+            grad.addColorStop(0, node.fillColor); grad.addColorStop(1, "#1e3a4a");
+            ctx.fillStyle = grad; ctx.fill();
+            ctx.beginPath(); ctx.arc(node.x, node.y, node.radius, 0, Math.PI*2);
+            ctx.strokeStyle = "#c0f0ff"; ctx.lineWidth = 2; ctx.stroke();
+            if (matches) {
+                const intensity = 0.5 + pulse * 0.5;
+                const glowWidth = 3 + pulse * 2;
+                ctx.beginPath(); ctx.arc(node.x, node.y, node.radius + 3 + pulse * 1.5, 0, Math.PI*2);
+                ctx.strokeStyle = `rgba(255, 215, 100, ${0.7 + pulse * 0.3})`; ctx.lineWidth = glowWidth; ctx.stroke();
+                ctx.beginPath(); ctx.arc(node.x, node.y, node.radius + 1, 0, Math.PI*2);
+                ctx.strokeStyle = `rgba(255, 180, 80, 0.9)`; ctx.lineWidth = 2; ctx.stroke();
+            }
+            ctx.restore();
+            ctx.font = "bold 14px 'Share Tech Mono', monospace";
+            ctx.fillStyle = "#f0faff"; ctx.textAlign = "center";
+            ctx.fillText(node.name, node.x, node.y + node.radius + 14);
+        }
+        if (searchTerm !== "") requestAnimationFrame(() => draw());
+    }
+    function showTooltip(node, x, y) {
+        if(activeTooltipNode === node && tooltipElement) return;
+        if(tooltipElement) tooltipElement.remove();
+        const div = document.createElement("div"); div.className = "tooltip-node";
+        div.innerHTML = `<div class="node-name">${escapeHtml(node.name)}</div><div class="level-req">⚡ LEVEL ${node.levelReq}</div><div class="desc">${escapeHtml(node.description)}</div><hr/><div>${node.detailedHTML || "—"}</div>`;
+        document.body.appendChild(div);
+        let left = x+15, top = y-40;
+        const rect = div.getBoundingClientRect();
+        if(top<0) top = y+20;
+        if(top+rect.height>window.innerHeight) top = y-rect.height-10;
+        if(left+rect.width>window.innerWidth) left = x-rect.width-10;
+        if(left<0) left=10;
+        div.style.left = left+"px"; div.style.top = top+"px";
+        activeTooltipNode = node; tooltipElement = div;
+    }
+    function hideTooltip() { if(tooltipElement) { tooltipElement.remove(); tooltipElement=null; } activeTooltipNode=null; }
+    function escapeHtml(s) { return String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    function zoomAtPoint(delta, cx, cy) {
+        const oldZoom = currentZoom;
+        let newZoom = currentZoom * delta; newZoom = Math.min(3.0, Math.max(0.3, newZoom));
+        if(newZoom === currentZoom) return;
+        hideTooltip();
+        const rect = scrollWrapper.getBoundingClientRect();
+        const beforeX = (scrollWrapper.scrollLeft + cx - rect.left)/oldZoom;
+        const beforeY = (scrollWrapper.scrollTop + cy - rect.top)/oldZoom;
+        currentZoom = newZoom;
+        updateCanvasSize();
+        scrollWrapper.scrollLeft = Math.max(0, beforeX*currentZoom - (cx - rect.left));
+        scrollWrapper.scrollTop = Math.max(0, beforeY*currentZoom - (cy - rect.top));
+        applyBoundaries(); draw();
+    }
+    function resetView() {
+        const bbox = getBoundingBox();
+        const contentW = bbox.maxX - bbox.minX + 100, contentH = bbox.maxY - bbox.minY + 100;
+        const viewW = scrollWrapper.clientWidth, viewH = scrollWrapper.clientHeight;
+        let fitZoom = Math.min(viewW/contentW, viewH/contentH, 1.5);
+        fitZoom = Math.min(2.0, Math.max(0.4, fitZoom));
+        currentZoom = fitZoom;
+        updateCanvasSize();
+        const cx = (bbox.minX+bbox.maxX)/2, cy = (bbox.minY+bbox.maxY)/2;
+        scrollWrapper.scrollLeft = Math.max(0, cx*currentZoom - viewW/2);
+        scrollWrapper.scrollTop = Math.max(0, cy*currentZoom - viewH/2);
+        applyBoundaries(); draw();
+    }
+    function handleNodeHover(clientX, clientY) {
+        if (inputState.isTouch) return;
+        const world = screenToWorld(clientX, clientY);
+        let hit = null;
+        for(let n of nodes) if(Math.hypot(n.x-world.x, n.y-world.y) <= n.radius) { hit = n; break; }
+        if(hit && hit !== activeTooltipNode) {
+            showTooltip(hit, clientX, clientY);
+        } else if(!hit) {
+            hideTooltip();
+        }
+    }
+    function handleNodeClick(clientX, clientY) {
+        if (dragOccurred) { dragOccurred = false; return; }
+        const world = screenToWorld(clientX, clientY);
+        let hit = null;
+        for(let n of nodes) if(Math.hypot(n.x-world.x, n.y-world.y) <= n.radius) { hit = n; break; }
+        if(hit) {
+            if(inputState.isTouch) {
+                showTooltip(hit, clientX, clientY);
+            }
+        } else {
+            hideTooltip();
+        }
+    }
+    window.onload = () => {
+        canvas = document.getElementById("treeCanvas"); ctx = canvas.getContext("2d"); scrollWrapper = document.getElementById("scrollWrapper");
+        updateCanvasSize(); resetView();
+        const searchInput = document.getElementById("searchInputViewer");
+        searchInput.addEventListener("input", (e) => { searchTerm = e.target.value; draw(); });
+        
+        // Detect input method
+        document.addEventListener('touchstart', () => { inputState.isTouch = true; }, { once: false });
+        window.addEventListener('mousemove', () => { inputState.isTouch = false; });
+        
+        // Mouse events
+        canvas.addEventListener("mousedown", (e) => {
+            dragOccurred = false;
+            inputState.isPanning = true;
+            inputState.panStartX = e.clientX;
+            inputState.panStartY = e.clientY;
+            inputState.panStartScrollX = scrollWrapper.scrollLeft;
+            inputState.panStartScrollY = scrollWrapper.scrollTop;
+            scrollWrapper.style.cursor = "grabbing";
+            e.preventDefault();
+        });
+        
+        document.addEventListener("mousemove", (e) => {
+            if (inputState.isPanning) {
+                const dx = e.clientX - inputState.panStartX;
+                const dy = e.clientY - inputState.panStartY;
+                scrollWrapper.scrollLeft = inputState.panStartScrollX - dx;
+                scrollWrapper.scrollTop = inputState.panStartScrollY - dy;
+                applyBoundaries();
+                draw();
+                dragOccurred = true;
+            } else {
+                handleNodeHover(e.clientX, e.clientY);
+            }
+        });
+        
+        document.addEventListener("mouseup", () => {
+            if (inputState.isPanning) {
+                inputState.isPanning = false;
+                scrollWrapper.style.cursor = "grab";
+            }
+        });
+        
+        canvas.addEventListener("mouseleave", () => {
+            if (!inputState.isTouch) hideTooltip();
+        });
+        
+        // Wheel zoom
+        scrollWrapper.addEventListener("wheel", e => { e.preventDefault(); zoomAtPoint(e.deltaY>0?0.92:1.08, e.clientX, e.clientY); }, {passive:false});
+        
+        // Touch events
+        canvas.addEventListener("touchstart", (e) => {
+            inputState.isTouch = true;
+            dragOccurred = false;
+            inputState.touchCount = e.touches.length;
+            inputState.lastTouchTime = Date.now();
+            
+            if (e.touches.length === 1) {
+                inputState.isPanning = true;
+                const t = e.touches[0];
+                inputState.panStartX = t.clientX;
+                inputState.panStartY = t.clientY;
+                inputState.panStartScrollX = scrollWrapper.scrollLeft;
+                inputState.panStartScrollY = scrollWrapper.scrollTop;
+            } else if (e.touches.length === 2) {
+                inputState.isPanning = false;
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                inputState.pinchStartDistance = Math.hypot(dx, dy);
+                inputState.pinchStartZoom = currentZoom;
+                inputState.isPinching = true;
+                hideTooltip();
+            }
+            e.preventDefault();
+        });
+        
+        canvas.addEventListener("touchmove", (e) => {
+            if (e.touches.length === 1) {
+                const t = e.touches[0];
+                if (inputState.isPanning) {
+                    const dx = t.clientX - inputState.panStartX;
+                    const dy = t.clientY - inputState.panStartY;
+                    scrollWrapper.scrollLeft = inputState.panStartScrollX - dx;
+                    scrollWrapper.scrollTop = inputState.panStartScrollY - dy;
+                    applyBoundaries();
+                    draw();
+                    dragOccurred = true;
+                }
+            } else if (e.touches.length === 2 && inputState.isPinching) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const currentDistance = Math.hypot(dx, dy);
+                const scale = currentDistance / inputState.pinchStartDistance;
+                const newZoom = Math.min(3.0, Math.max(0.3, inputState.pinchStartZoom * scale));
+                if (newZoom !== currentZoom) {
+                    const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                    const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                    zoomAtPoint(newZoom / currentZoom, centerX, centerY);
+                }
+            }
+            e.preventDefault();
+        });
+        
+        canvas.addEventListener("touchend", (e) => {
+            inputState.touchCount = e.touches.length;
+            if (e.touches.length === 0) {
+                inputState.isPanning = false;
+                inputState.isPinching = false;
+                if (!dragOccurred && Date.now() - inputState.lastTouchTime < 200) {
+                    const touch = e.changedTouches[0];
+                    if (touch) {
+                        setTimeout(() => {
+                            handleNodeClick(touch.clientX, touch.clientY);
+                        }, 10);
+                    }
+                }
+            }
+            e.preventDefault();
+        });
+        
+        canvas.addEventListener("touchcancel", () => {
+            inputState.isPanning = false;
+            inputState.isPinching = false;
+        });
+        
+        canvas.addEventListener("click", (e) => { handleNodeClick(e.clientX, e.clientY); });
+        document.getElementById("zoomInBtn").onclick = () => zoomAtPoint(1.2, scrollWrapper.clientWidth/2, scrollWrapper.clientHeight/2);
+        document.getElementById("zoomOutBtn").onclick = () => zoomAtPoint(0.8, scrollWrapper.clientWidth/2, scrollWrapper.clientHeight/2);
+        document.getElementById("resetViewBtn").onclick = resetView;
+        document.body.addEventListener("click", (e) => { if(!e.target.closest('.tooltip-node') && !e.target.closest('canvas')) hideTooltip(); });
+    };
+</script>
+</body>
+</html>
