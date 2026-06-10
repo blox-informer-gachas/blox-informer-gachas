@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>VV: Ultimatum Interactive Skill Tree</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            transition: 0.25s;
+        }
+        body {
+            margin: 0;
+            background: radial-gradient(circle at 20% 30%, #0a0f1e, #03060c);
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            touch-action: none;
+        }
+        .viewer-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        canvas:active {
+            cursor: grabbing;
+        }
+        .zoom-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            background: rgba(8, 18, 26, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 8px 12px;
+            border-radius: 40px;
+            border: 1px solid #2f7088;
+            z-index: 200;
+        }
+        .zoom-panel button {
+            background: #0f212e;
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .zoom-panel button:hover {
+            background: #1e5a72;
+            box-shadow: 0 0 6px cyan;
+        }
+        .tooltip-node {
+            position: fixed;
+            background: #0b121fe6;
+            backdrop-filter: blur(12px);
+            border-left: 4px solid #5ad0ff;
+            border-radius: 12px;
+            padding: 12px 16px;
+            max-width: 280px;
+            pointer-events: none;
+            z-index: 1000;
+            font-family: 'Share Tech Mono', monospace;
+            box-shadow: 0 6px 18px black;
+            font-size: 0.85rem;
+            transition: opacity 0.1s;
+            color: #f0faff;
+        }
+        .tooltip-node .node-name {
+            font-weight: bold;
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+        .tooltip-node .level-req {
+            color: #ffcc66;
+            font-size: 0.8rem;
+        }
+        .tooltip-node .desc {
+            color: #b0b8c5;
+            margin: 8px 0;
+        }
+        .tooltip-node hr {
+            margin: 6px 0;
+            border-color: #5e8ea0;
+        }
+        .standalone-search {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 210;
+            background: rgba(8, 18, 26, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 40px;
+            border: 1px solid #2f7088;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-family: 'Orbitron', monospace;
+        }
+        .standalone-search input {
+            background: #071217;
+            border: 1px solid #2f6f8a;
+            border-radius: 20px;
+            padding: 8px 14px;
+            color: white;
+            font-family: monospace;
+            width: 200px;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .standalone-search input:focus {
+            border-color: #77aadd;
+            box-shadow: 0 0 6px #77aadd;
+        }
+        @media (max-width: 600px) {
+            .standalone-search { top: 10px; left: 10px; }
+            .standalone-search input { width: 140px; }
+            .zoom-panel { bottom: 12px; right: 12px; padding: 6px 10px; }
+            .zoom-panel button { width: 32px; height: 32px; font-size: 1rem; }
+            .tooltip-node { max-width: 220px; font-size: 0.75rem; padding: 8px 12px; }
+        }
+    </style>
+</head>
+<body>
+<div class="viewer-container">
+    <canvas id="treeCanvas"></canvas>
+</div>
+<div class="zoom-panel">
+    <button id="zoomOutBtn" title="Zoom Out">−</button>
+    <button id="zoomInBtn" title="Zoom In">+</button>
+    <button id="resetViewBtn" title="Reset View">⌗</button>
+</div>
+<div class="standalone-search">
+    <input type="text" id="searchInputViewer" placeholder="Search nodes...">
+</div>
+<script>
+    const rawNodes = [{"id":1,"name":"Heavy Kick","levelReq":1,"patternType":"hex","description":"Kick the target away, inflicting descent posture damage.","detailedHTML":"<b style=\"\"><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b style=\"\"><font color=\"#ffaa66\">6 Skill Points</font></b></div><div><b style=\"\"><font color=\"#ff8888\">24 Strength</font></b></div><div><b style=\"\"><font color=\"#ff8888\"><br></font></b></div><div><b style=\"\"><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><b style=\"\"><font color=\"#77ffaa\">Level 3: Apply concussion prone to enemies.<br></font></b><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b style=\"\"><font color=\"#88ccff\">Reiatsu Costs: 24</font></b></div><div><b style=\"\"><font color=\"#e6c700\">Cooldown: 22</font></b></div><div><b style=\"\"><font color=\"#ff8888\">Damage: 16<br></font><font color=\"#ffaa66\">Posture Damage: 29</font></b></div>","x":2104,"y":2181,"radius":30,"fillColor":"#c70014","lineColor":"#d11010","leadsTo":[3]},{"id":2,"name":"Tenran","levelReq":1,"patternType":"dots","description":"Send out a short ranged whirlwind.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b><font color=\"#ff8888\">85 Strength</font></b></div><div><b><font color=\"#dd99ff\">35 Kido</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><b><font color=\"#77ffaa\">Level 3: Tenran sucks people in when blocked.<br></font></b><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 28</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 30</font></b></div><div><b><font color=\"#ff8888\">Damage: 29<br></font><font color=\"#ffaa66\">Posture Damage: 26</font></b></div>","x":2578.4042894330196,"y":2367.0274353629316,"radius":30,"fillColor":"#f72b73","lineColor":"#ae65a8","leadsTo":[4,6]},{"id":3,"name":"Thrust","levelReq":1,"patternType":"hex","description":"Lunge forward dealing light posture damage,the speed you travel increases with time.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b><font color=\"#ff8888\">40 Strength</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><b><font color=\"#77ffaa\">Level 6: You can rotate your thrust.<br></font></b><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 29</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 31</font></b></div><div><b><font color=\"#ff8888\">Damage: 20<br></font><font color=\"#ffaa66\">Posture Damage: 18</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":2391,"y":2174,"radius":30,"fillColor":"#be0014","lineColor":"#d11010","leadsTo":[2,5]},{"id":4,"name":"Melee-Kido Specialist","levelReq":0,"patternType":"dots","description":"Landing a basic attack shortly before using a kido move will buff its damage.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">3 Skill Points</font></b></div><div><b><font color=\"#ff8888\">90 Strength</font></b></div><div><b><font color=\"#dd99ff\">40 Kido</font></b></div><div><br></div><div><b style=\"\"><font color=\"#716f6f\">Passive</font></b></div>","x":2513.466889642514,"y":2632.543833940035,"radius":20,"fillColor":"#fe0bbd","lineColor":"#bb72ab","leadsTo":[]},{"id":5,"name":"Strength Node","levelReq":0,"patternType":"hex","description":"Increased Strength Scaling","detailedHTML":"<b style=\"\"><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b style=\"\"><font color=\"#7e7272\">Passive</font></b></div>","x":2586.20679239374,"y":2034.2454576808382,"radius":32,"fillColor":"#be0014","lineColor":"#cf071b","leadsTo":[10]},{"id":6,"name":"Kido Node","levelReq":0,"patternType":"dots","description":"Increases Kido Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">2 Skill Points</font></b></div><div><br></div><div><b><font color=\"#716f6f\">Passive</font></b></div>","x":2885.7704199205587,"y":2413.9803994204367,"radius":30,"fillColor":"#ec3282","lineColor":"#ae65a8","leadsTo":[7]},{"id":7,"name":"Kinetic Force","levelReq":1,"patternType":"dots","description":"Strike a pose, in which you gather Reiatsu, and activate kido enhancement for your next basic attack,","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">5 Skill Points</font></b></div><div><b><font color=\"#ff8888\">140 Strength</font></b></div><div><b><font color=\"#dd99ff\">50 Kido</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 3: </b>Gain extra Reitsu when completed.</font></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 4: </b>Gain enhanced Reiatsu for 2.5 seconds after completion.</font></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 5: </b>Recasting Kinetic Force very quickly after a completed pose will send out 2 energy slices.<br></font><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 15</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 30.8</font></b></div><div><b><font color=\"#ff8888\">Damage: 22<br></font><br></b></div><div><b><font color=\"#ff0000\">Requires a weapon equipped</font></b></div>","x":2982.521760368377,"y":2692.557551621501,"radius":30,"fillColor":"#ec3282","lineColor":"#ae65a8","leadsTo":[8]},{"id":8,"name":"Kido Node","levelReq":1,"patternType":"dots","description":"Increases Kido Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">2 Skill Points</font></b></div><div><br></div><div><b><font color=\"#716f6f\">Passive</font></b></div>","x":3292,"y":2756.3333333333335,"radius":30,"fillColor":"#ec3282","lineColor":"#ae65a8","leadsTo":[9]},{"id":9,"name":"Blood Tax","levelReq":1,"patternType":"radialLines","description":"Strengthen a powerful slash with impressive range using your own blood. This move does not require ultimate bar, if you cast it with ultimate bar you will send out 2 slashes.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">11 Skill Points</font></b></div><div><b><font color=\"#ff8888\">275 Strength</font></b></div><div><b><font color=\"#dd99ff\">100 Kido</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 5: </b>Landing the move on an enemy with low health will execute them.</font></div><div><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 45</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 90</font></b></div><div><b><font color=\"#ff8888\">Damage: 42</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 70<br></font><br></b></div><div><font color=\"#b60ac2\" style=\"\">Ultimate Skill</font></div><div><font color=\"#ff0000\" style=\"\">Requires Weapon Equipped</font></div>","x":3582,"y":2761.666666666666,"radius":40,"fillColor":"#fa1edd","lineColor":"#ae6b9c","leadsTo":[]},{"id":10,"name":"Cyclone","levelReq":1,"patternType":"hex","description":"A single AOE slash.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">7 Skill Points</font></b></div><div><b><font color=\"#ff8888\">88 Strength</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 3: </b>Hitting someone with the edge of the slash will deal more damage and cause them to bleed.</font></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 4: </b>You can dash during the startup of \"Cyclone\".<br></font><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 29</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 32</font></b></div><div><b><font color=\"#ff8888\">Damage: 29<br></font><font color=\"#ffaa66\">Posture Damage: 29</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><font color=\"#e00000\" style=\"\">Requires weapon equipped.</font></div>","x":2744.61394127517,"y":1863.1195108873933,"radius":30,"fillColor":"#be0014","lineColor":"#cf071b","leadsTo":[11]},{"id":11,"name":"Vault Slash","levelReq":1,"patternType":"hex","description":"Roll into an overhead slash.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b><font color=\"#ff8888\">156 Strength</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 6: </b>You can know feint the slash.</font></div><div><font color=\"#88ccff\" style=\"\"><b>Level 7: </b>Vault Slash gives dodge frames at the start of the move.</font></div><div><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 30</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 31</font></b></div><div><b><font color=\"#ff8888\">Damage: 23<br></font><font color=\"#ffaa66\">Posture Damage: 23</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><span style=\"color: rgb(224, 0, 0); font-size: 0.85rem;\">Requires weapon equipped</span>","x":2975.3333333333335,"y":1746.6666666666665,"radius":30,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[12,16]},{"id":12,"name":"Fell Crescent","levelReq":1,"patternType":"hex","description":"Leap backwards and attack your previous position.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b><font color=\"#ff8888\">160 Strength</font></b></div><div><b><font color=\"#88ccff\">20 Speed</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Gain riposte frames on startup.</font></div><div><font color=\"#88ccff\"><b>Level 7:&nbsp;</b>Execute low health enemies.</font></div><div><font color=\"#77ffaa\"><b><br></b></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 34</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 37</font></b></div><div><b><font color=\"#ff8888\">Damage: 30<br></font><font color=\"#ffaa66\">Posture Damage: 20</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><span style=\"font-size: 0.85rem; color: rgb(224, 0, 0);\">Requires weapon equipped</span>","x":3206.333333333333,"y":1886.6666666666665,"radius":30,"fillColor":"#a47560","lineColor":"#4393d0","leadsTo":[13,14]},{"id":13,"name":"Speed Node","levelReq":1,"patternType":"hex","description":"Increase Speed Scaling","detailedHTML":"<b>Unlock Requirements:</b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><font color=\"#746767\">Passive</font></div>","x":3379.9483835385254,"y":1840.691095430317,"radius":30,"fillColor":"#5c8aa6","lineColor":"#4393d0","leadsTo":[]},{"id":14,"name":"Speed Node","levelReq":1,"patternType":"hex","description":"Increase Speed Scaling","detailedHTML":"<b>Unlock Requirements:</b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><font color=\"#746767\">Passive</font></div>","x":3284.959159948359,"y":2036.903196154374,"radius":30,"fillColor":"#a47560","lineColor":"#4393d0","leadsTo":[15]},{"id":15,"name":"Open MInd","levelReq":1,"patternType":"dots","description":"An onslaught of relentless slashes, with a powerful strike at the end.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">10 Skill Points</font></b></div><div><b><font color=\"#ff8888\">265 Strength</font></b></div><div><b><font color=\"#88ccff\">95 Speed</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Gain riposte frames on startup.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 36</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 42</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><span style=\"font-size: 0.85rem; color: rgb(224, 0, 0);\">Requires weapon equipped</span>","x":3430.10323292295,"y":2177.5462282565577,"radius":30,"fillColor":"#5c8aa6","lineColor":"#4393d0","leadsTo":[]},{"id":16,"name":"Strength Node","levelReq":0,"patternType":"hex","description":"Increased Strength Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":3207.6666666666665,"y":1590,"radius":30,"fillColor":"#be0014","lineColor":"#cf071b","leadsTo":[17,18]},{"id":17,"name":"Overwhelming Strength","levelReq":1,"patternType":"hex","description":"Guardbreaking an opponent will wound them. While wounded they take more poture damage.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><b style=\"\"><font color=\"#ff8888\">195 Strength</font></b></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":3113.3333333333335,"y":1418.6666666666667,"radius":20,"fillColor":"#be0014","lineColor":"#cf071b","leadsTo":[]},{"id":18,"name":"Overhead Strike","levelReq":1,"patternType":"hex","description":"An overhead strike with low damage, but extremely high posture damage.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b><font color=\"#ff8888\">196 Strength</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Overhead Strike restores posture regardless of being blocked or parried.</font></div><div><font color=\"#77ffaa\"><b>Level 5: </b>Gain hyperamor for the first .75 second of startup.</font></div><div><font color=\"#77ffaa\"><b>Level 6</b>: Overhead strike inflicts bleed.</font></div><div><font color=\"#88ccff\"><b>Level 7</b>: Overhead strike deals x2 more posture damage to enemies under 30% HP.<br></font><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 35</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 35</font></b></div><div><b><font color=\"#ff8888\">Damage: 29<br></font><font color=\"#ffaa66\">Posture Damage: 44</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><font color=\"#e00000\">Requires weapon equipped.</font></div>","x":3435.3333333333335,"y":1588.3333333333335,"radius":30,"fillColor":"#be0014","lineColor":"#cf071b","leadsTo":[19,20]},{"id":19,"name":"Trained Body","levelReq":1,"patternType":"hex","description":"Actions that cancel posture regen will reduce the cancelation time.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>4 Skill Points</b></font></div><div><b style=\"\"><font color=\"#ff8888\">230 Strength</font></b></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":3619.6666666666665,"y":1472.6666666666667,"radius":20,"fillColor":"#be0014","lineColor":"#cf071b","leadsTo":[21]},{"id":20,"name":"Strength Node","levelReq":0,"patternType":"hex","description":"Increased Strength Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":3595.6666666666665,"y":1730.3333333333335,"radius":30,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[27]},{"id":21,"name":"Blade Catch","levelReq":1,"patternType":"hex","description":"Your unlockable counter is more posture effective. Additionally disrupt the aura of those weaker than you.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>3 Skill Points</b></font></div><div><b><font color=\"#ff8888\">270 Strength</font></b></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":3783.6173007020807,"y":1364.5146595575598,"radius":20,"fillColor":"#be0014","lineColor":"#cf071b","leadsTo":[22,23]},{"id":22,"name":"Wall Specialist","levelReq":1,"patternType":"hex","description":"Pressing counter while facing a wallbanged enemy will grab them and slam them into the wall.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">6 Skill Points</font></b></div><div><b><font color=\"#ff8888\">315 Strength</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 4: </b>Make enemies prone to concussion.</font></div><div><br></div><div><font color=\"#7b7474\">Passive</font></div>","x":3933.1271963775666,"y":1523.7081030520667,"radius":20,"fillColor":"#be0014","lineColor":"#cf071b","leadsTo":[]},{"id":23,"name":"Piercing Draw","levelReq":1,"patternType":"hex","description":"Use your strength to cause a ripple effect via shockwave erupting from the ground when you strike it. Can hit ragdolled and crumpled enemies.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">9 Skill Points</font></b></div><div><b><font color=\"#ff8888\">310 Strength</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Your super armor from Piercing Draw lingers making it very difficult to whiff/punish.</font></div><div><font color=\"#77ffaa\"><b>Level 6: </b>You can rush down ragdolled opponents.</font></div><div><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 38</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 30</font></b></div><div><b><font color=\"#ff8888\">Damage: 27<br></font><font color=\"#ffaa66\">Posture Damage: 27</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><font color=\"#e00000\">Requires weapon equipped.</font></div>","x":4041.820628383448,"y":1313.3963815516415,"radius":30,"fillColor":"#be0014","lineColor":"#cf071b","leadsTo":[24,25]},{"id":24,"name":"Trained Body Mastery","levelReq":1,"patternType":"hex","description":"Deflecting projectiles now sends them back to the caster.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>6 Skill Points</b></font></div><div><b><font color=\"#ff8888\">350 Strength</font></b></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":4135.546434053073,"y":1122.9012680708283,"radius":20,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[]},{"id":25,"name":"Strength Node","levelReq":0,"patternType":"hex","description":"Increased Strength Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":4271.264421292001,"y":1248.104595752196,"radius":30,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[26]},{"id":26,"name":"Brute Force","levelReq":1,"patternType":"hex","description":"Guard your body with your blade, reducing all incoming damage by 90% then reflecting all damage back in a spinning hurl.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">9 Skill Points</font></b></div><div><b><font color=\"#ff8888\">375 Strength</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Your return damage bypasses riposte frames.</font></div><div><font color=\"#88ccff\"><b style=\"\">Level 8: </b>Slice off low hp opponents heads if you absorb any damage.</font></div><div><font color=\"#77ffaa\"><b><br></b></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 30</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 32</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><font color=\"#e00000\">Requires weapon equipped.</font></div>","x":4498.542524837724,"y":1298.767353203513,"radius":30,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[]},{"id":27,"name":"Heavy Hitter","levelReq":1,"patternType":"hex","description":"Hitting someones block reduces your posture slightly.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>3 Skill Points</b></font></div><div><b><font color=\"#ff8888\">235 Strength</font></b></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":3776.2781035457238,"y":1811.9447702123903,"radius":20,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[28]},{"id":28,"name":"Poise","levelReq":1,"patternType":"hex","description":"Increase penetration through armor and armor like techniques.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>3 Skill Points</b></font></div><div><b><font color=\"#ff8888\">268 Strength</font></b></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":3944,"y":1945.6666666666667,"radius":20,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[29]},{"id":29,"name":"Skyscraper","levelReq":1,"patternType":"hex","description":"Strong attack grants hyperarmor, has a lengthy wind up.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">9 Skill Points</font></b></div><div><b><font color=\"#ff8888\">280 Strength</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 4:&nbsp;</b>Gain riposte frames on startup.</font></div><div><font color=\"#77ffaa\"><b>Level 5: </b>Followed up attack by using shunpo after landing the move.</font></div><div><font color=\"#77ffaa\"><b>Level 6</b>: The followed up attack becomes amped on-hit if the opponent is below 40% HP.</font></div><div><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 35</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 45</font></b></div><div><b><font color=\"#ff8888\">Damage: 30<br></font><font color=\"#ffaa66\">Posture Damage: 33</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><font color=\"#e00000\">Requires weapon equipped.</font></div>","x":4149.333333333334,"y":2008.0000000000002,"radius":30,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[30,31]},{"id":30,"name":"Berserker","levelReq":1,"patternType":"hex","description":"Enter a state of rage caused by anguish when entering low HP. Increase melee damage delt by 15%-30% based on missing HP.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>6 Skill Points</b></font></div><div><b><font color=\"#ff8888\">345 Strength</font></b></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":4417.333333333333,"y":1888,"radius":20,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[33,34]},{"id":31,"name":"Impale","levelReq":1,"patternType":"dots","description":"Impale an opponent and slam them back on the ground, inflicting bleed.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">11 Skill Points</font></b></div><div><b><font color=\"#ff8888\">324 Strength</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 6</b>: Your Impale can now execute low HP opponents.</font></div><div><font color=\"#77ffaa\"><b><br></b></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 40</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 39</font></b></div><div><b><font color=\"#ff8888\">Damage: 35<br></font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><font color=\"#e00000\">Requires weapon equipped.</font></div>","x":4318.666666666666,"y":2243.333333333333,"radius":40,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[32]},{"id":32,"name":"Strength Node","levelReq":0,"patternType":"hex","description":"Increased Strength Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":4619.000000000001,"y":2432.666666666667,"radius":30,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[]},{"id":33,"name":"Guillotine Drop","levelReq":1,"patternType":"dots","description":"Jump High towards your opponent before attacking them with an impactful slam.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">11 Skill Points</font></b></div><div><b><font color=\"#ff8888\">380 Strength</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b><br></b></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 36</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 40</font></b></div><div><b><font color=\"#ff8888\">Damage: 30<br></font><font color=\"#ffaa66\">Posture Damage: 31</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><font color=\"#e00000\">Requires weapon equipped.</font></div>","x":4515.1715531858545,"y":1648.453565946926,"radius":40,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[]},{"id":34,"name":"Bloolust","levelReq":1,"patternType":"hex","description":"Posture executing an enemy can trigger Berserker","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><b><font color=\"#ff8888\">360 Strength</font></b></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":4663.666666666667,"y":1901.6666666666667,"radius":20,"fillColor":"#be0014","lineColor":"#be0014","leadsTo":[]},{"id":35,"name":"Sensory 1","levelReq":0,"patternType":"dots","description":"Decrease the minimum range needed to sense someone.","detailedHTML":"<b>Unlock Requirements:</b><div><font color=\"#00ff2a\"><b>200 Soul Tokens</b></font></div><div><font color=\"#00ff2a\"><b><br></b></font></div><div><font color=\"#818d83\" style=\"\">Passive</font></div>","x":2069.8089544410927,"y":2075.3549523629254,"radius":20,"fillColor":"#ece37e","lineColor":"#ccccaa","leadsTo":[36]},{"id":36,"name":"Sensory 2","levelReq":0,"patternType":"dots","description":"View the Reiatsu grade of entities that you sense.","detailedHTML":"<b>Unlock Requirements:</b><div><b><font color=\"#ffaa66\">1 Skill Point<br></font></b><div><font color=\"#00ff2a\"><b>100 Soul Tokens</b></font></div><div><b style=\"\"><font color=\"#fff82e\">Level 15</font></b></div><div><font color=\"#00ff2a\"><b><br></b></font></div><div><font color=\"#818d83\">Passive</font></div></div>","x":2210.3524208134118,"y":1943.6699862284195,"radius":20,"fillColor":"#ece37e","lineColor":"#ccccaa","leadsTo":[37]},{"id":37,"name":"Sensory 3","levelReq":0,"patternType":"dots","description":"View the factions of the entities that you sense.","detailedHTML":"<b>Unlock Requirements:</b><div><b style=\"color: rgb(0, 255, 42); font-size: 0.85rem;\">300 Soul Tokens</b><div><div><b><font color=\"#fff82e\">Level 40</font></b></div><div><font color=\"#00ff2a\"><b><br></b></font></div><div><font color=\"#818d83\">Passive</font></div></div></div>","x":2353.2738189469837,"y":1862.756305093594,"radius":20,"fillColor":"#ece37e","lineColor":"#ccccaa","leadsTo":[38]},{"id":38,"name":"Sensory 4","levelReq":0,"patternType":"dots","description":"View an approximate power level of the entities that you sens.","detailedHTML":"<b>Unlock Requirements:</b><div><b><font color=\"#ffaa66\">1 Skill Point<br></font></b><div><b style=\"font-size: 0.85rem;\"><font color=\"#fff82e\">Level 70</font></b></div><div><font color=\"#00ff2a\"><b><br></b></font></div><div><font color=\"#818d83\">Passive</font></div></div>","x":2492,"y":1744,"radius":20,"fillColor":"#ece37e","lineColor":"#ccccaa","leadsTo":[]},{"id":39,"name":"Hakuda Basics","levelReq":0,"patternType":"hex","description":"Gain the ability to fight with your fists.","detailedHTML":"<b>Unlock Requirement:</b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#fb7923\"><b>12 Hakuda<br></b></font><div><br></div></div><div><font color=\"#958a83\">Passive</font></div>","x":1933,"y":2043,"radius":20,"fillColor":"#fb7923","lineColor":"#fb7923","leadsTo":[40]},{"id":40,"name":"Round Kick","levelReq":1,"patternType":"hex","description":"Powerful Sweeping Kick","detailedHTML":"<b>Unlock Requirement:</b><div><font color=\"#ffaa66\"><b>5 Skill Points</b></font></div><div><font color=\"#fb7923\"><b>32 Hakuda<br></b></font><div><br></div></div><div><div><b><font color=\"#88ccff\">Reiatsu Costs: 28.5</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 28</font></b></div><div><b><font color=\"#ff8888\">Damage: 22<br></font><font color=\"#ffaa66\">Posture Damage: 20</font></b></div></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><font color=\"#ff0000\">Requires Hakuda Equipped</font></div>","x":1930,"y":1854,"radius":30,"fillColor":"#fb7923","lineColor":"#fb7923","leadsTo":[41,42]},{"id":41,"name":"Hakuda Node","levelReq":0,"patternType":"hex","description":"Increase Hakuda Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1906,"y":1679,"radius":30,"fillColor":"#f03c0f","lineColor":"#fb7923","leadsTo":[44,45]},{"id":42,"name":"Iron Guard","levelReq":0,"patternType":"dots","description":"You no longer take chip damage from blocking.","detailedHTML":"<b>Unlock Requirement:</b><div><b style=\"color: rgb(251, 121, 35); font-size: 0.85rem;\">70 Hakuda</b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#0aff3b\">100 Souls Taken</font></b></div><div><div><br></div></div><div><font color=\"#958a83\">Passive</font></div>","x":2092,"y":1810,"radius":20,"fillColor":"#fb7923","lineColor":"#fb7923","leadsTo":[43]},{"id":43,"name":"Node 43","levelReq":1,"patternType":"hex","description":"New skill","detailedHTML":"<b>Unlock Requirement:</b><div><font color=\"#ffaa66\"><b>3 Skill Points</b></font></div><div><font color=\"#fb7923\"><b>90 Hakuda<br></b></font><div><br></div></div><div><font color=\"#958a83\">Passive</font></div>","x":2190.6666666666665,"y":1737.3333333333333,"radius":20,"fillColor":"#fb7923","lineColor":"#fb7923","leadsTo":[]},{"id":44,"name":"Dragonslash","levelReq":1,"patternType":"hex","description":"A mid ranged, high-stun aerial attack.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">10 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">56 Hakuda</b></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 33</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 30</font></b></div><div><b><font color=\"#ff8888\">Damage: 20</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 20</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1949,"y":1469,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[57,58,59]},{"id":45,"name":"Kido Node","levelReq":0,"patternType":"hex","description":" Increase Kido Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1729,"y":1587,"radius":30,"fillColor":"#f330e3","lineColor":"#f330e3","leadsTo":[46]},{"id":46,"name":"Surge Fist","levelReq":1,"patternType":"hex","description":"Concentrate your reiatsu into a small pressurized blast projectile and release it.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">32 Hakuda</b><b><font color=\"#ffaa66\"></font></b></div><div><b style=\"\"><font color=\"#dd99ff\">20 Kido</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 4: </b>Unlock an air variant of Surge Fist when holding jump and casting the ability.35% faster aimed at only one direction.</font></div><div><font color=\"#77ffaa\"><b>Level 6: </b>Air variant hits crumpled opponents.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 34</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 37</font></b></div><div><b><font color=\"#ff8888\">Damage: 26.5<br></font><font color=\"#ffaa66\">Posture Damage: 23</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1573,"y":1533,"radius":30,"fillColor":"#f330e3","lineColor":"#f330e3","leadsTo":[47,48]},{"id":47,"name":"Reiatsu Blast","levelReq":1,"patternType":"hex","description":"Summon homing blasts of reiatsu from the ground","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">90 Hakuda</b><b><font color=\"#ffaa66\"></font></b></div><div><b><font color=\"#dd99ff\">50 Kido</font></b></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 30</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 35</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1401,"y":1670,"radius":30,"fillColor":"#f330e3","lineColor":"#f330e3","leadsTo":[]},{"id":48,"name":"Stagger Kicks","levelReq":1,"patternType":"hex","description":"Perform three advancing kicks.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">65 Hakuda</b><b><font color=\"#ffaa66\"></font></b></div><div><b><font color=\"#dd99ff\">45 Kido</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Landing all 3 kicks will apply Concussions on the third kick.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 37</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 42</font></b></div><div><b><font color=\"#ff8888\">Damage: 26<br></font><font color=\"#ffaa66\">Posture Damage: 25</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1455.2475924563755,"y":1440,"radius":30,"fillColor":"#f330e3","lineColor":"#f330e3","leadsTo":[49,50]},{"id":49,"name":"Kido Node","levelReq":0,"patternType":"hex","description":"Increased Kido Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1292,"y":1345,"radius":30,"fillColor":"#f330e3","lineColor":"#f330e3","leadsTo":[52]},{"id":50,"name":"Hakuda Kai","levelReq":0,"patternType":"hex","description":"Every 3rd basic attack deals bonus Kido scaling damage","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">4 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">73 Hakuda</b><b><font color=\"#ffaa66\"></font></b></div><div><b><font color=\"#dd99ff\">55 Kido</font></b></div><div><br></div><div><font color=\"#5d5656\">Passive</font></div>","x":1221,"y":1517,"radius":30,"fillColor":"#f330e3","lineColor":"#f330e3","leadsTo":[51]},{"id":51,"name":"Blast Punisher","levelReq":1,"patternType":"hex","description":"Shoot energy blasts from your hands. Lock onto an enemy if hit","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">9 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">100 Hakuda</b><b><font color=\"#ffaa66\"></font></b></div><div><b><font color=\"#dd99ff\">70 Kido</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Landing all 3 kicks will apply Concussions on the third kick.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 34</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 31</font></b></div><div><b><font color=\"#ff8888\">Damage: 48<br></font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1032.618981140939,"y":1520.1237962281878,"radius":30,"fillColor":"#f330e3","lineColor":"#f330e3","leadsTo":[]},{"id":52,"name":"Dragon Fists","levelReq":1,"patternType":"hex","description":"Perform a reiatsu-infused uppercut that ragdolls the opponent on the second hit","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">9 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">136 Hakuda</b><b><font color=\"#ffaa66\"></font></b></div><div><b><font color=\"#dd99ff\">76 Kido</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Gain super armor during the end-log of the attack.</font></div><div><font color=\"#77ffaa\"><b>Level 5</b>: Perform \"Demon Flash\" during the 2nd hit of the attack.</font></div><div><font color=\"#88ccff\"><b style=\"\">Level 7</b>: \"Demon Flash\" can execute.</font><br></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 36</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 39</font></b></div><div><b><font color=\"#ff8888\">Damage: 26<br></font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1140,"y":1251,"radius":30,"fillColor":"#f330e3","lineColor":"#f330e3","leadsTo":[53,54]},{"id":53,"name":"Kido Node","levelReq":1,"patternType":"hex","description":"Increase Kido Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1021.11416605369,"y":1125.4951849127513,"radius":30,"fillColor":"#f330e3","lineColor":"#f330e3","leadsTo":[56]},{"id":54,"name":"Kido Node","levelReq":0,"patternType":"hex","description":"Increase Kido Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":906,"y":1238,"radius":30,"fillColor":"#f330e3","lineColor":"#f330e3","leadsTo":[55]},{"id":55,"name":"Burst Rush","levelReq":0,"patternType":"hex","description":"YOU'RE THROUGH!","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">10 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">200 Hakuda</b><b><font color=\"#ffaa66\"></font></b></div><div><b><font color=\"#dd99ff\">80 Kido</font></b></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 36</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 43</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":719,"y":1177,"radius":30,"fillColor":"#f330e3","lineColor":"#f330e3","leadsTo":[]},{"id":56,"name":"God Fists","levelReq":1,"patternType":"radialLines","description":"I've been saving this. God Fist!","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">13 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">315 Hakuda</b><b><font color=\"#ffaa66\"></font></b></div><div><b><font color=\"#dd99ff\">85 Kido</font></b></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 34</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 120</font></b></div><div><br></div><div><b style=\"\"><font color=\"#a60bb1\">Ultimate Skill</font></b></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":930.9807396510047,"y":989.6093509664413,"radius":40,"fillColor":"#f330e3","lineColor":"#f330e3","leadsTo":[]},{"id":57,"name":"Aerial Flip","levelReq":1,"patternType":"hex","description":"Flip towards an airborne opponent, grab them out of the air and slam them to the ground with you.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">7 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">100 Hakuda</b></div><div><b style=\"\"><font color=\"#88ccff\">15 Speed</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 5</b>: Apply concussion prone to enemies.</font></div><div><font color=\"#77ffaa\"><b>Level 8</b>: Aerial flip is now unblockable.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 30</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 38</font></b></div><div><b><font color=\"#ff8888\">Damage: 24</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 12.5</font></b></div><div><b><font color=\"#e6c700\"><br></font></b></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1993,"y":1336,"radius":30,"fillColor":"#c89846","lineColor":"#5c8aa6","leadsTo":[74]},{"id":58,"name":"Hand Pressure","levelReq":0,"patternType":"dots","description":"Landing a blunt attack off a flash step will increase the posture damage.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">3 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">76 Hakuda</b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1778.7064471879287,"y":1375.1422039323274,"radius":20,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[60]},{"id":59,"name":"Executioner","levelReq":1,"patternType":"hex","description":"Temporarily gain a 20% output boost after executing someone.","detailedHTML":"<b>Upgrade Requirements:</b><div><b><font color=\"#ffaa66\">3 Skill Points</font></b></div><div><b><font color=\"#ff8614\">115 Hakuda</font></b></div><div><b><font color=\"#ff1414\">5 Strength</font></b></div>","x":2136,"y":1423,"radius":20,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[85]},{"id":60,"name":"Hakuda Node","levelReq":1,"patternType":"dots","description":"Increased Hakuda Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1622.8440786465478,"y":1276.1422039323274,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[61,62]},{"id":61,"name":"Dust Kick","levelReq":1,"patternType":"dots","description":"Cloud your opponent's vision, landing this attack at close range will deal the damage of your kick itself.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">112 Hakuda</b></div><div><br></div><div><b style=\"\"><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 3: </b>Dust Kick ignores ragdoll.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 26</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 18</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1431,"y":1245,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[63]},{"id":62,"name":"Drop Kick","levelReq":1,"patternType":"dots","description":"Lunge forward dealing light posture mage.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">144 Hakuda</b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Drop kick is fully rotatable.</font></div><div><font color=\"#77ffaa\"><b>Level 4</b>: Apply concussion on landed hits.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 30</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 28</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1576.3626111549213,"y":1093.054370467563,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[64]},{"id":63,"name":"Boxer's Footwork","levelReq":1,"patternType":"dots","description":"Enter a state in which you dodge attacks instead of parrying for 12s after perfect parrying 3 times in quick succession, with no neutral parries. Dodges have 35% increased posture loss vs parries.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">3 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">168 Hakuda</b></div><div><br></div><div><b><font color=\"#6b6161\">Passive</font></b></div>","x":1253.692729766804,"y":1147.275262917238,"radius":20,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[]},{"id":64,"name":"Breaker Fist","levelReq":1,"patternType":"dots","description":"Rupture the ground, then cause it to burst — transfers up to 25% of your posture to your opponent if landed.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">200 Hakuda</b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 4</b>: The second strike of Breaker Fist hits ragdolled/crumpled opponents</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 34</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 30</font></b></div><div><b><font color=\"#ff8888\">Damage: 26</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 19</font></b></div><div><b><font color=\"#e6c700\"><br></font></b></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1536.1798719854626,"y":904.018040286365,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[65,66]},{"id":65,"name":"Hakuda Node","levelReq":0,"patternType":"dots","description":"Increase Hakuda Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1466.4690711619935,"y":750.031582388825,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[67,68]},{"id":66,"name":"Shoulder Throw","levelReq":1,"patternType":"dots","description":"Pressing Counter while near a opponent who is posture broken will cause you to flip them over your shoulder, ragdolling them. This also replaces your default Red Counter. (30s CD)","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">6 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">240 Hakuda</b></div><div><b><font color=\"#e6c700\"><br></font></b></div><div><b><font color=\"#6b6161\">Passive</font></b></div>","x":1268.5505258344765,"y":858.559670781893,"radius":20,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[]},{"id":67,"name":"Sweep Kick","levelReq":1,"patternType":"dots","description":"Sweep kick which stuns the target in place.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">9 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">260 Hakuda</b></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 35</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 43</font></b></div><div><b><font color=\"#ff8888\">Damage: 24</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1332.408321902149,"y":644.2844078646548,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[69]},{"id":68,"name":"Fighter's Tempo","levelReq":1,"patternType":"dots","description":"Strike a pose, reducing your posture and making all of your melee attacks reduce your posture.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">7 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">240 Hakuda</b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 4</b>: Cannot be canceled.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 15</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 50</font></b></div><div><b><font color=\"#e6c700\"><br></font></b></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1677.7201646090534,"y":643.8440786465478,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[]},{"id":69,"name":"Tempest Combo","levelReq":1,"patternType":"dots","description":"Enter a state of ferocity and unleash a barrage of strong left and rights. Once hit, the enemy cannot escape.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">10 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">300 Hakuda</b></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 40</font></b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#e6c700\">Cooldown: 42</font></b></div><div><b><font color=\"#ff8888\">Damage: 35</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 31.5</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1554,"y":493,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[70,71]},{"id":70,"name":"Hakuda Node","levelReq":0,"patternType":"hex","description":"Increase Hakuda Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1353.062421412176,"y":443.1875037422774,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[72]},{"id":71,"name":"Spirit Breaker","levelReq":1,"patternType":"dots","description":"Pressing Counter while facing a wallbanged enemy will grab them and slam them into the ground.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">6 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">340 Hakuda</b></div><div><b style=\"color: rgb(251, 121, 35);\"><br></b></div><div><b style=\"\"><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 4: </b>Apply concussion to enemies.</font></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1648.3126459488155,"y":368.0625411650505,"radius":20,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[73]},{"id":72,"name":"Ground Slam","levelReq":1,"patternType":"dots","description":"An aerial slam attack. Gain bonus damage based on landing height, ignores crumple.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">10 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">375 Hakuda</b></div><div><br></div><div><b style=\"\"><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 4: </b>Your max height multiplier is changed from 1.2x to 1.3x.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 33</font></b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#e6c700\">Cooldown: 28</font></b></div><div><b><font color=\"#ff8888\">Damage: 25</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 23</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1140,"y":411,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[]},{"id":73,"name":"Spirit Breaking Cannon","levelReq":1,"patternType":"radialLines","description":"Grab your opponent then drag them through the floor, if you meet a wall, perform a 2nd attack combo, failing to meet a wall allows an alternate combo route. Unblockable.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">12 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">400 Hakuda</b></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 30</font></b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#e6c700\">Cooldown: 45</font></b></div><div><br></div><div><font color=\"#4d086e\">Ultimate Skill</font></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1817.4455253044152,"y":234.27860722190252,"radius":40,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[]},{"id":74,"name":"Speed Node","levelReq":0,"patternType":"hex","description":"Increases Speed Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2020,"y":1142,"radius":30,"fillColor":"#c89846","lineColor":"#5c8aa6","leadsTo":[75]},{"id":75,"name":"Flash Kick","levelReq":1,"patternType":"hex","description":"Spin around and launch your opponent into the air with a powerful kick.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">3 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">130 Hakuda</b></div><div><b style=\"\"><font color=\"#88ccff\">20 Speed</font></b></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 34</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 34</font></b></div><div><b><font color=\"#ff8888\">Damage: 26</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 21</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":2022.3104709647916,"y":993.4128943758574,"radius":30,"fillColor":"#c89846","lineColor":"#5c8aa6","leadsTo":[76,77]},{"id":76,"name":"Speed Node","levelReq":0,"patternType":"hex","description":"Increase Speed Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1879.8532235939642,"y":845.692729766804,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[78]},{"id":77,"name":"Flash Strike","levelReq":1,"patternType":"hex","description":"Focus and warp your enemies perception of you, then teleport to them and deliver a strong kick.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">9 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">155 Hakuda</b></div><div><b style=\"\"><font color=\"#88ccff\">65 Speed</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 6: </b>Deal additional damage/posture damage when used right up close.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 35</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 40</font></b></div><div><b><font color=\"#ff8888\">Damage: 26</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":2232,"y":966,"radius":30,"fillColor":"#c89846","lineColor":"#5c8aa6","leadsTo":[79,80]},{"id":78,"name":"Punisher Drive","levelReq":1,"patternType":"hex","description":"Think you can keep up? After a short startup turn briefly invisible and barrage your opponent with a flurry of attacks.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">185 Hakuda</b></div><div><b><font color=\"#88ccff\">50 Speed</font></b></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 42</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 42</font></b></div><div><b><font color=\"#ff8888\">Damage: 28</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 24</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":1862.9954275262917,"y":670.6973022405122,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[]},{"id":79,"name":"Speed Node","levelReq":0,"patternType":"hex","description":"Increase Speed Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2242,"y":811.9954275262918,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[81]},{"id":80,"name":"Blur","levelReq":1,"patternType":"hex","description":"Dealing basic hakuda damage will refill your shunpo stamina.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">4 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">180 Hakuda</b></div><div><b><font color=\"#88ccff\">90 Speed</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":2439.7247370827617,"y":972.1467764060358,"radius":20,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[]},{"id":81,"name":"Fight Back","levelReq":1,"patternType":"hex","description":"Landing 3 consecutive hits will empower your 4th.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">4 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">195 Hakuda</b></div><div><b><font color=\"#88ccff\">65 Speed</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":2243.4266117969823,"y":656.1376314586191,"radius":20,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[82,83]},{"id":82,"name":"Speed Node","levelReq":1,"patternType":"hex","description":"Increase Speed Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2437.440329218107,"y":615.711019661637,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[84]},{"id":83,"name":"Flash Counter","levelReq":1,"patternType":"hex","description":"Enter a counter pose where you negate all incoming melee damage and retaliate with a spinning kick.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b style=\"font-size: 0.85rem;\"><font color=\"#ffaa66\">8 Skill Points</font></b><div><b style=\"color: rgb(251, 121, 35);\">250 Hakuda</b></div><div><b><font color=\"#88ccff\">100 Speed</font></b></div><div><b><font color=\"#88ccff\"><br></font></b></div><div><b><font color=\"#88ccff\">Reiatsu Cost: 25</font></b></div><div><b><font color=\"#dbd41f\">Cooldown: 44</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div></div>","x":2124.7018747142206,"y":475.40832190214905,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[]},{"id":84,"name":"Incinerator","levelReq":1,"patternType":"hex","description":"Do a rushing knee, on contact connect into a barrage of flaming kicks.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">9 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">250 Hakuda</b></div><div><font color=\"#88ccff\"><b>100 Speed&nbsp;</b></font></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 4</b>: Perform a flip instead of the traditional spinning kicks, increasing air time.</font></div><div><font color=\"#77ffaa\"><b>Level 6</b>: Scorch your opponents on the final hi, causing tick damage.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 36</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 35</font></b></div><div><b><font color=\"#ff8888\">Damage: 26</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":2499.5688157293093,"y":444.6973022405121,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[]},{"id":85,"name":"Strength Node","levelReq":0,"patternType":"hex","description":"Increase Strength Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2332.5825331504343,"y":1367.5688157293096,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[86]},{"id":86,"name":"Suplex","levelReq":1,"patternType":"hex","description":"Lunge a short distance forward, then attempt to perform a stylish suplex. Concusses opponents that are hit by the slam.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">144 Hakuda</b></div><div><b><font color=\"#ff1414\">5 Strength</font></b><b style=\"color: rgb(251, 121, 35);\"></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Landing the grab on the first frame will cause your throw to do an additional 2% max health dmg, signified by blue sparks.</font></div><div><font color=\"#77ffaa\"><b>Level 4</b>: After knocking an opponent with their theme active using Suplex, automatically cancel their theme and pop yours.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 30</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 28</font></b></div><div><font color=\"#ff8888\"><b>Damage: 27.5</b></font></div><div><font color=\"#ffaa66\"><b>Posture Damage: 24</b></font></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":2502.7201646090534,"y":1204.5550983081848,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[87]},{"id":87,"name":"The Underdog","levelReq":1,"patternType":"hex","description":"If there is a 30% HP gap between you and your opponent, your next basic attack deals +5 enemy health percent bonus damage (25s CD).","detailedHTML":"<b>Upgrade Requirements:</b><div><b><font color=\"#ffaa66\">3 Skill Points</font></b></div><div><b><font color=\"#ff8614\">115 Hakuda</font></b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#ff1414\">28 Strength</font></b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#ff1414\"><br></font></b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#605757\">Passive</font></b></div>","x":2663.5825331504343,"y":1095.8486511202561,"radius":20,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[88,89]},{"id":88,"name":"Swinging Throw","levelReq":1,"patternType":"hex","description":"Grab your opponent by the waist and violently swing them around, then throw them at full force to finish.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">120 Hakuda</b></div><div><b><font color=\"#ff1414\">54 Strength</font></b><b style=\"color: rgb(251, 121, 35);\"></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Landing the grab on the first frame will cause your throw to do an additional 2% enemy max health dmg, signified by blue sparks.</font></div><div><font color=\"#77ffaa\"><b>Level 6: </b>You can pick up ragdlled opponents.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 36</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 38</font></b></div><div><font color=\"#ff8888\"><b>Damage: 29</b></font></div><div><font color=\"#ffaa66\"><b>Posture Damage: 25</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":2878,"y":1122,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[95,96]},{"id":89,"name":"Strength Node","levelReq":0,"patternType":"hex","description":"Increase Strength Node","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2663,"y":932,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[90]},{"id":90,"name":"Muscle Up","levelReq":1,"patternType":"hex","description":"Flex your muscle and gain 90% damage reduction. If you take more than 10 of pre-mitigation damage you gain an HP pack relative to damage taken, reduces 10% of posture.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">7 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">160 Hakuda</b></div><div><font color=\"#e81111\"><b>60 Strength</b></font></div><div><br></div><div><b style=\"\"><font color=\"#88ccff\">Reiatsu Cost: 15</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 50</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":2687,"y":756.5688157293096,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[91,92]},{"id":91,"name":"Grappler's Gambit","levelReq":1,"patternType":"hex","description":"Pressing Counter while near a ragdolled will mount you on top of opponent and beat them down (40s CD).","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">188 Hakuda</b></div><div><b><font color=\"#ff1414\">60 Strength</font></b></div><div><br></div><div><b style=\"\"><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#88ccff\" style=\"\"><b>Level 4: </b>Grappler's Gambit now works on crumpled opponents.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><font color=\"#554e4e\" style=\"\">Passive</font></div>","x":3013.6008230452676,"y":727.1376314586191,"radius":20,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[]},{"id":92,"name":"Jaguar Rush","levelReq":1,"patternType":"hex","description":"Enter a sprint stance; once your dash is completed, if nearby an opponent, attempt a RKO.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">10 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">200 Hakuda</b></div><div><font color=\"#e81111\"><b>80 Strength</b></font></div><div><br></div><div><font color=\"#77ffaa\"><b>Upgrade Effects:</b></font></div><div><font color=\"#77ffaa\"><b>Level 8: </b>Concusses enemies<b>.</b></font></div><div><br></div><div><b><font color=\"#88ccff\">Reiatsu Cost: 30</font></b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#e6c700\">Cooldown: 40</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":2732.1422039323274,"y":559.2752629172383,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[93]},{"id":93,"name":"Strength Node","levelReq":0,"patternType":"hex","description":"Increase Strength Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2853.9439065986003,"y":413.3815663450882,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[94]},{"id":94,"name":"Screwdriver","levelReq":1,"patternType":"radialLines","description":"Thrash around your opponents.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">13 Skill Points</font></b></div><div><b style=\"color: rgb(251, 121, 35);\">300 Hakuda</b></div><div><font color=\"#e81111\"><b>100 Strength</b></font></div><div><br></div><div><b><font color=\"#88ccff\">Reiatsu Cost: 35</font></b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#e6c700\">Cooldown: 80</font></b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#e6c700\"><br></font></b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#8e03a0\">Ultimate Skill</font></b></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":3074.743026977595,"y":311.1239140374943,"radius":40,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[]},{"id":95,"name":"Death First","levelReq":1,"patternType":"radialLines","description":"Secret technique of Death Kwon Do...","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">11 Skill Points</font></b></div><div><font color=\"#d76519\"><b style=\"font-size: 0.85rem;\">200</b><b style=\"font-size: 0.85rem;\"> Hakuda</b></font></div><div><b><font color=\"#ff1414\">100 Strength</font></b><b style=\"color: rgb(251, 121, 35);\"></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#88ccff\" style=\"\"><b>Level 8: </b>Landing the move on an enemy with low health will auto execute them.</font></div><div><font color=\"#77ffaa\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 41</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 34</font></b></div><div><b style=\"color: rgb(255, 136, 136); font-size: 0.85rem;\">Damage: 35</b></div><div><font color=\"#ffaa66\"><b>Posture Damage: 35</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#e00000\">Requires hakuda equipped.</font></b></div>","x":3076.6666666666665,"y":912,"radius":40,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[]},{"id":96,"name":"Strength Node","levelReq":0,"patternType":"hex","description":"Increase Strength Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":3178,"y":1112.6666666666667,"radius":30,"fillColor":"#f33057","lineColor":"#f33057","leadsTo":[]},{"id":97,"name":"Aerial Ace","levelReq":1,"patternType":"dots","description":"Counter mid air opponents with a fast shunpo attack.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">2 Skill Points</font></b></div><div><b style=\"\"><font color=\"#88ccff\">10 Speed</font></b></div><div><b style=\"\"><font color=\"#07bb0a\">75 Soul Token</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><b><font color=\"#77ffaa\">Level 6: You can rotate your thrust.<br></font></b><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 27</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 31</font></b></div><div><b><font color=\"#ff8888\">Damage: 20<br></font><font color=\"#ffaa66\">Posture Damage: 0</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":1926,"y":2317,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[98]},{"id":98,"name":"Clone Strike","levelReq":1,"patternType":"hex","description":"Knockback an opponent in an afterimage slash.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">7 Skill Points</font></b></div><div><b><font color=\"#88ccff\">44 Speed</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><b><font color=\"#77ffaa\">Level 3:Clone Strike can hit ragolled enemies.<br></font></b><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 24</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 22</font></b></div><div><b><font color=\"#ff8888\">Damage: 26.8<br></font><font color=\"#ffaa66\">Posture Damage: 21</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":1929.2105284786717,"y":2551.368455658749,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[99]},{"id":99,"name":"Speed Node","levelReq":1,"patternType":"hex","description":"Increase Speed Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1949,"y":2767,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[100,101]},{"id":100,"name":"Hyperspeed","levelReq":1,"patternType":"hex","description":"Your dashes invincibility frames cooldowns are reduced.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><div><b><font color=\"#88ccff\">108 Speed</font></b></div></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2229,"y":3079,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[102]},{"id":101,"name":"Flash Surprise","levelReq":1,"patternType":"hex","description":"Teleport behind your opponent for a slash attack.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b><font color=\"#88ccff\">99 Speed</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Gain riposte frames after the initial startup.</font></div><div><font color=\"#77ffaa\"><b>Level 6</b>: Knockback on hit and black.<br></font><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 34</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 38</font></b></div><div><b><font color=\"#ff8888\">Damage: 23.5</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 18.5</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":1703,"y":3089,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[112,113]},{"id":102,"name":"Afterimage Slash","levelReq":1,"patternType":"hex","description":"Leave a clone to attack in your place.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b><font color=\"#88ccff\">124 Speed</font></b></div><div><b><font color=\"#c90d0d\">10 Strength</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 3: </b>Your afterimage's strike i no longer able to be advanced countered.<br></font><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 30</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 30</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":2371,"y":3300,"radius":30,"fillColor":"#b99341","lineColor":"#5c8aa6","leadsTo":[103]},{"id":103,"name":"Speed Node","levelReq":0,"patternType":"hex","description":"Increase Speed Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2441.473699350703,"y":3608.894797402811,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[104]},{"id":104,"name":"Judgement Cut","levelReq":1,"patternType":"hex","description":"Flash forward in a straight line before attacking, tracks onto moving enemies.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b><font color=\"#88ccff\">165 Speed</font></b></div><div><b><font color=\"#e22828\">30 Strength</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#88ccff\" style=\"\"><b>Level 7: </b>Landing this move on low HP opponents will dismember their arm.</font><br><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 36</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 30</font></b></div><div><b><font color=\"#ff8888\">Damage: 26<br></font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":2702,"y":3797,"radius":30,"fillColor":"#dd3131","lineColor":"#dd3131","leadsTo":[105]},{"id":105,"name":"Strength Node","levelReq":0,"patternType":"hex","description":"Increase Strength Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2881,"y":4045,"radius":30,"fillColor":"#dd3131","lineColor":"#dd3131","leadsTo":[106,107]},{"id":106,"name":"Strength Node","levelReq":0,"patternType":"hex","description":"Increase Strength Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2849,"y":4294,"radius":30,"fillColor":"#dd3131","lineColor":"#dd3131","leadsTo":[108,109]},{"id":107,"name":"Swift Fakeout","levelReq":1,"patternType":"hex","description":"Cancelling your Shunpo quickly with a dash will make it take you further, and apply damage reduction for the duration of your dash.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>3 Skill Points</b></font></div><div><b><font color=\"#88ccff\">210 Speed</font></b></div><div><b><font color=\"#d71d1d\">40 Strength</font></b></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":3252,"y":4144,"radius":20,"fillColor":"#dd3131","lineColor":"#dd3131","leadsTo":[]},{"id":108,"name":"Whirlwind Cutter","levelReq":1,"patternType":"hex","description":"Perform three soaring strikes; the third strike teleports you to the nearest opponent.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">10 Skill Points</font></b></div><div><b><font color=\"#88ccff\">220 Speed</font></b></div><div><b><font color=\"#e22828\">50 Strength</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 3: </b>Gain riposte frames after the first slash.</font></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 4: </b>The second slash is true, provided you landed the first one.</font><br><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 33</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 37</font></b></div><div><b><font color=\"#ff8888\">Damage: 36<br></font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 55</font></b></div><div><b><font color=\"#ff8888\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":2715,"y":4617,"radius":30,"fillColor":"#dd3131","lineColor":"#dd3131","leadsTo":[110]},{"id":109,"name":"Agile Body","levelReq":1,"patternType":"hex","description":"If you are about to be parry-executed mid battle, avoid the execution and regenerate posture.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>4 Skill Points</b></font></div><div><b><font color=\"#88ccff\">260 Speed</font></b></div><div><b><font color=\"#d71d1d\">65 Strength</font></b></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":3091,"y":4569,"radius":20,"fillColor":"#dd3131","lineColor":"#dd3131","leadsTo":[111]},{"id":110,"name":"Final Breath","levelReq":1,"patternType":"radialLines","description":"Ashes to ashes.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">12 Skill Points</font></b></div><div><b><font color=\"#88ccff\">330 Speed</font></b></div><div><b><font color=\"#e22828\">70 Strength</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Auto execute low health opponents in your wake.</font></div><div><font color=\"#77ffaa\"><b>Level 4: </b>Refresh a random cooldown of a speed-strength skill when landed, fully rebuild ultimate bar&nbsp; well.</font><br><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 35</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 70</font></b></div><div><b><font color=\"#ff8888\">Damage: 40<br></font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 70</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#8e2895\">Ultimate Skill</font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":2671,"y":4952,"radius":40,"fillColor":"#dd3131","lineColor":"#dd3131","leadsTo":[]},{"id":111,"name":"Double Stirke","levelReq":1,"patternType":"hex","description":"Advance forwards, awaiting enemy contact.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">9 Skill Points</font></b></div><div><b><font color=\"#88ccff\">290 Speed</font></b></div><div><b><font color=\"#e22828\">70 Strength</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#88ccff\"><b>Level 7: </b>Landing this move on low HP opponents will dismember their arm.</font><br><div><font color=\"#77ffaa\"><b><br></b></font></div></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 33</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 42</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":3327,"y":4864,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[]},{"id":112,"name":"Kumo Kiri","levelReq":1,"patternType":"hex","description":"Enter a stance where you counter ANY incoming attacks, then perform a kick if landed flash step infront of them and do a massive slash","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">7 Skill Points</font></b></div><div><b><font color=\"#88ccff\">100 Speed</font></b></div><div><b><font color=\"#df26ad\">32 Kido</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#88ccff\"><b style=\"\">Level 3: </b>Countering a ranged attack will skip the kick portion, teleport you infront of them and slash.</font></div><div><font color=\"#88ccff\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 35</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 38</font></b></div><div><b><font color=\"#ff8888\">Damage: 30</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 30</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":1389,"y":3239,"radius":30,"fillColor":"#dd3af2","lineColor":"#dd3af2","leadsTo":[114]},{"id":113,"name":"Vortex Edge","levelReq":1,"patternType":"hex","description":"Retreat before flashing forwards with a slash of your weapon.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">7 Skill Points</font></b></div><div><b><font color=\"#88ccff\">148 Speed</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#88ccff\"><b>Level 5:</b> Pressing parry during startup will cause you to strike from above, this variant deals slightly less mage.</font></div><div><font color=\"#88ccff\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 30</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 39</font></b></div><div><b><font color=\"#ff8888\">Damage: 26</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":1928,"y":3394,"radius":30,"fillColor":"#b99341","lineColor":"#5c8aa6","leadsTo":[120]},{"id":114,"name":"Kido Nod","levelReq":0,"patternType":"hex","description":"Increase Kido Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1136,"y":3449.6666666666665,"radius":30,"fillColor":"#dd3af2","lineColor":"#dd3af2","leadsTo":[115]},{"id":115,"name":"Rapid Recovery","levelReq":1,"patternType":"hex","description":"Your reiatsu regeneration speed slightly scales with the speed stat.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">2 Skill Points</font></b></div><div><b><font color=\"#88ccff\">140 Speed</font></b></div><div><b><font color=\"#df26ad\">40 Kido</font></b></div><div><br></div><div><font color=\"#867979\" style=\"\">Passive</font></div>","x":1071,"y":3795,"radius":20,"fillColor":"#dd3af2","lineColor":"#dd3af2","leadsTo":[116,117]},{"id":116,"name":"Dragon Cleaver","levelReq":1,"patternType":"dots","description":"Commit to 2 wide area slashes, before kicking the opponent away.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">11 Skill Points</font></b></div><div><b><font color=\"#88ccff\">210 Speed</font></b></div><div><b><font color=\"#df26ad\">50 Kido</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#88ccff\"><b>Level 7: </b>The attack becomes supercharged, draining reiatsu on connected hit.</font></div><div><font color=\"#88ccff\"><br></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 40</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 38</font></b></div><div><b><font color=\"#ff8888\">Damage: 36</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 39</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":667,"y":3747,"radius":40,"fillColor":"#dd3af2","lineColor":"#dd3af2","leadsTo":[]},{"id":117,"name":"Firework","levelReq":1,"patternType":"hex","description":"Ignite flammable dust for a blinding attack.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b><font color=\"#88ccff\">205 Speed</font></b></div><div><b><font color=\"#df26ad\">60 Kido</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\" style=\"\"><b>Level 4: </b>Fireworks cancels enemy ragdolls.</font></div><div><font color=\"#88ccff\"><b><br></b></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 30</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 32</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":1021,"y":4208,"radius":30,"fillColor":"#dd3af2","lineColor":"#dd3af2","leadsTo":[118,119]},{"id":118,"name":"Flying Cyclone","levelReq":1,"patternType":"hex","description":"A whirlwind projectile which shreds through enemies in its wake.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">7 Skill Points</font></b></div><div><b><font color=\"#88ccff\">220 Speed</font></b></div><div><b><font color=\"#df26ad\">85 Kido</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>You can rushdown to hi enemies when they are launched in the air.</font></div><div><font color=\"#77ffaa\"><b>Level 4: </b>Refreshes ushdown cooldown.</font></div><div><font color=\"#88ccff\"><b><br></b></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 37.5</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 40</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":1039,"y":4635,"radius":30,"fillColor":"#dd3af2","lineColor":"#dd3af2","leadsTo":[]},{"id":119,"name":"Kido Node","levelReq":0,"patternType":"hex","description":"Increase Kido Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":720,"y":4456,"radius":30,"fillColor":"#dd3af2","lineColor":"#dd3af2","leadsTo":[]},{"id":120,"name":"Speed Node","levelReq":0,"patternType":"hex","description":"Increase Speed Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1825,"y":3768,"radius":30,"fillColor":"#b99341","lineColor":"#5c8aa6","leadsTo":[121]},{"id":121,"name":"False Cutter","levelReq":1,"patternType":"hex","description":"Focus your blade forward, leading into a sliding thrust.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b><font color=\"#88ccff\">208 Speed</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 3: </b>Pressing \"Counter\" before the thrust will do a high ranged slash, which deals less damage but leads into rushdown options.</font></div><div><font color=\"#88ccff\"><b><br></b></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 32</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 29</font></b></div><div><b><font color=\"#ff8888\">Damage: 29</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 24</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":1949,"y":4117,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[122,123]},{"id":122,"name":"Launcher","levelReq":1,"patternType":"hex","description":"Launch an enemy into the air","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b><font color=\"#88ccff\">250 Speed</font></b></div><div><br></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#88ccff\">Reiatsu Costs: 31</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 31</font></b></div><div><b><font color=\"#ff8888\">Damage: 22</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 20</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":1747,"y":4402,"radius":30,"fillColor":"#b99341","lineColor":"#5c8aa6","leadsTo":[124,125]},{"id":123,"name":"Afterimage Clones","levelReq":1,"patternType":"hex","description":"While stunned, use Shunpo to create afterimages around you that let you escape stun.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>6 Skill Points</b></font></div><div><b><font color=\"#88ccff\">225 Speed</font></b></div><div><b><font color=\"#88ccff\"><br></font></b></div><div><div><b><font color=\"#88ccff\">Reiatsu Costs: 20</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 61</font></b></div></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2136,"y":4495,"radius":30,"fillColor":"#b99341","lineColor":"#5c8aa6","leadsTo":[127]},{"id":124,"name":"Flash Execute","levelReq":1,"patternType":"hex","description":"Auto-execute enemies will low hp.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">9 Skill Points</font></b></div><div><b><font color=\"#88ccff\">310 Speed</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 5: </b>Using on a guardbroken opponent has a much higher kill threshold.</font></div><div><font color=\"#77ffaa\"><b>Level 7: </b>Flash execute is useable on knocked people.</font></div><div><font color=\"#88ccff\"><b><br></b></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 30</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 50</font></b></div><div><b><font color=\"#ff8888\">Damage: 20</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":1599.3333333333335,"y":4743,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[126]},{"id":125,"name":"Reiatsu Conservation","levelReq":0,"patternType":"hex","description":"Hitting someone directly after a flash step restores 75% of the shunpo bar spent.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">3 Skill Points</font></b></div><div><b><font color=\"#88ccff\">290 Speed</font></b></div><div><br></div><div><font color=\"#867979\">Passive</font></div>","x":1393,"y":4400,"radius":20,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[]},{"id":126,"name":"Light Feet","levelReq":1,"patternType":"dots","description":"Enter a state in which you dodge attacks instead of parrying for 12s after perfect parrying 3 times in quick succession, with no neutral parries. Dodges have 35% increased posture loss vs parries.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><b style=\"\"><font color=\"#88ccff\">360 Speed</font></b></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1543,"y":5020,"radius":20,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[]},{"id":127,"name":"Speed Node","levelReq":1,"patternType":"hex","description":"Increase Speed Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2344,"y":4825,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[128]},{"id":128,"name":"Compound Rush","levelReq":1,"patternType":"hex","description":"Lunge towards an opponent. If the hit lands, kick off them and fall backwards.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">8 Skill Points</font></b></div><div><b><font color=\"#88ccff\">295 Speed</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 4: </b>Press Counter after hitting an enemy to do a 2 part attack.</font></div><div><font color=\"#88ccff\"><b><br></b></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 32.5</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 26</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":2221,"y":5143,"radius":30,"fillColor":"#b99341","lineColor":"#5c8aa6","leadsTo":[129,130]},{"id":129,"name":"Blade Flow","levelReq":1,"patternType":"hex","description":"Your 'unblockable counter' is more posture-effective. Additionally, disrupt the aura of those weaker than you, or those at low HP.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">11 Skill Points</font></b></div><div><b><font color=\"#88ccff\">355 Speed</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 4:&nbsp;</b>Inflict bleed.</font></div><div><font color=\"#88ccff\"><b><br></b></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 36</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 40</font></b></div><div><b><font color=\"#ff8888\">Damage: 28</font></b></div><div><b><font color=\"#ffaa66\">Posture Damage: 24</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":2053,"y":5476,"radius":30,"fillColor":"#b99341","lineColor":"#5c8aa6","leadsTo":[133]},{"id":130,"name":"Flash Skewer","levelReq":1,"patternType":"hex","description":"Disappear briefly before reappearing to surprise your opponent with a lethal strike.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">9 Skill Points</font></b></div><div><b><font color=\"#88ccff\">365 Speed</font></b></div><div><br></div><div><b><font color=\"#77ffaa\">Upgrade Effects:</font></b></div><div><font color=\"#77ffaa\"><b>Level 4:&nbsp;</b>Your skewer bypasses ripost frames.</font></div><div><font color=\"#88ccff\"><b><br></b></font></div><div><b><font color=\"#88ccff\">Reiatsu Costs: 29</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 44</font></b></div><div><b><font color=\"#ffaa66\">Damage: 25</font></b></div><div><br></div><div><b><font color=\"#e00000\">Requires weapon equipped.</font></b></div>","x":2471,"y":5309,"radius":30,"fillColor":"#b99341","lineColor":"#5c8aa6","leadsTo":[131,132]},{"id":131,"name":"Flash Trick","levelReq":1,"patternType":"hex","description":"Dashing before using flash step created a clone.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">3 Skill Points</font></b></div><div><b><font color=\"#88ccff\">380 Speed</font></b></div><div><br></div><div><font color=\"#867979\">Passive</font></div>","x":2591,"y":5602,"radius":20,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[]},{"id":132,"name":"Speed Node","levelReq":0,"patternType":"hex","description":"Increase Speed Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":2804,"y":5384,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[]},{"id":133,"name":"Feint Mastery","levelReq":1,"patternType":"hex","description":"You can cancel basic attacks by flsh stepping.","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">9 Skill Points</font></b></div><div><b><font color=\"#88ccff\">390 Speed</font></b></div><div><br></div><div><font color=\"#867979\">Passive</font></div>","x":2077,"y":5744,"radius":30,"fillColor":"#b99341","lineColor":"#5c8aa6","leadsTo":[134,135]},{"id":134,"name":"Spee Node","levelReq":0,"patternType":"hex","description":"Increase Speed Scaling","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><font color=\"#ffaa66\"><b>2 Skill Points</b></font></div><div><font color=\"#ffaa66\"><b><br></b></font></div><div><b><font color=\"#7e7272\">Passive</font></b></div>","x":1917,"y":6064,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[]},{"id":135,"name":"Phantom Trifecta","levelReq":1,"patternType":"hex","description":"Landing 3 consecutive attacks on a single opponent causes an afterimage to strike them. ","detailedHTML":"<b><font color=\"#ffffff\">Unlock Requirements:</font></b><div><b><font color=\"#ffaa66\">10 Skill Points</font></b></div><div><b><font color=\"#88ccff\">420 Speed</font></b></div><div><br></div><div><font color=\"#867979\">Passive</font></div>","x":2291,"y":6107,"radius":30,"fillColor":"#5c8aa6","lineColor":"#5c8aa6","leadsTo":[]},{"id":136,"name":"Aerial Fighter","levelReq":0,"patternType":"dots","description":"Hold run while using your critical attack to launch an opponent into the air.","detailedHTML":"<b>Unlock Requirements:</b><div><font color=\"#2eea44\"><b>75 Soul Tokens</b></font></div><div><font color=\"#2eea44\"><b><br></b></font></div><div><font color=\"#79867b\">Passive</font></div>","x":1747,"y":2237,"radius":20,"fillColor":"#e6bd28","lineColor":"#ccccaa","leadsTo":[137]},{"id":137,"name":"Rushdown","levelReq":1,"patternType":"dots","description":"Flashstep after applying heavy knockback to someone, or knock someone into the air to teleport to them","detailedHTML":"<b>Unlock Requirements:</b><div><font color=\"#2eea44\"><b>75 Soul Tokens</b></font></div><div><b style=\"\"><font color=\"#ffaa66\">Level 5</font></b></div><div><font color=\"#2eea44\"><b><br></b></font></div><div><font color=\"#79867b\">Passive</font></div>","x":1554,"y":2366,"radius":20,"fillColor":"#e6bd28","lineColor":"#ccccaa","leadsTo":[138]},{"id":138,"name":"Drop Cancel","levelReq":1,"patternType":"dots","description":"Flashstep before landing to cancel the stun","detailedHTML":"<b>Unlock Requirements:</b><div><font color=\"#2eea44\"><b>100 Soul Tokens</b></font></div><div><b><font color=\"#ffaa66\">Level 8</font></b></div><div><font color=\"#2eea44\"><b><br></b></font></div><div><font color=\"#79867b\">Passive</font></div>","x":1376,"y":2506,"radius":30,"fillColor":"#e6bd28","lineColor":"#ccccaa","leadsTo":[139,140]},{"id":139,"name":"Spiritual Potential","levelReq":1,"patternType":"dots","description":"Gain the ability to fill up your aura bar when fighting players. Once filled, you can unleash your spiritual pressure and gain a short-term buff.","detailedHTML":"<b>Unlock Requirements:</b><div><font color=\"#2eea44\"><b>250 Soul Tokens</b></font></div><div><b><font color=\"#ffaa66\">Level 25</font></b></div><div><font color=\"#2eea44\"><b><br></b></font></div><div><font color=\"#79867b\">Passive</font></div>","x":1109,"y":2406,"radius":20,"fillColor":"#e6bd28","lineColor":"#ccccaa","leadsTo":[141]},{"id":140,"name":"Manual Rushdown","levelReq":1,"patternType":"dots","description":"Hold shift and flashstep to manually use rushdown on a target with added startup.","detailedHTML":"<b>Unlock Requirements:</b><div><font color=\"#2eea44\"><b>125 Soul Tokens</b></font></div><div><b><font color=\"#ffaa66\">Level 15</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><div><b><font color=\"#88ccff\">Reiatsu Costs: 15</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 12</font></b></div></div><div><font color=\"#2eea44\"><b><br></b></font></div><div><font color=\"#79867b\">Passive</font></div>","x":1383,"y":2749,"radius":20,"fillColor":"#e6bd28","lineColor":"#ccccaa","leadsTo":[142,143,144]},{"id":141,"name":"Spiritual Pressure","levelReq":1,"patternType":"dots","description":"Flex your spiritual power (keybind in settings), affecting weaker opponents to varying degrees.","detailedHTML":"<b>Unlock Requirements:</b><div><font color=\"#2eea44\"><b>450 Soul Tokens</b></font></div><div><b><font color=\"#ffaa66\">Level 35</font></b></div><div><b><font color=\"#ffaa66\"><br></font></b></div><div><div><b><font color=\"#88ccff\">Reiatsu Costs: 50</font></b></div><div><b><font color=\"#e6c700\">Cooldown: 180</font></b></div></div><div><font color=\"#2eea44\"><b><br></b></font></div><div><font color=\"#79867b\">Passive</font></div>","x":853,"y":2568,"radius":20,"fillColor":"#e6bd28","lineColor":"#ccccaa","leadsTo":[]},{"id":142,"name":"Overhead Counter","levelReq":0,"patternType":"dots","description":"Counter weapon-based overheaded swings on deflect, increasing the enemies posture significantly.","detailedHTML":"<b>Unlock Requirements:</b><div><font color=\"#2eea44\"><b>300 Soul Tokens</b></font></div><div><font color=\"#ffaa66\"><b>40 Hakuda</b></font></div><div><font color=\"#2eea44\"><b><br></b></font></div><div><font color=\"#79867b\">Passive</font></div>","x":1024,"y":2759,"radius":20,"fillColor":"#e6bd28","lineColor":"#ccccaa","leadsTo":[145]},{"id":143,"name":"Advanced Counter 1","levelReq":0,"patternType":"dots","description":"Counter specific melee attacks with your foot, increasing the enemies posture significantly.","detailedHTML":"<b>Unlock Requirements:</b><div><font color=\"#2eea44\"><b>300 Soul Tokens</b></font></div><div><b style=\"\"><font color=\"#ff8888\">40 Strength</font></b></div><div><font color=\"#2eea44\"><b><br></b></font></div><div><font color=\"#79867b\">Passive</font></div>","x":1369,"y":3046,"radius":20,"fillColor":"#e6bd28","lineColor":"#ccccaa","leadsTo":[146]},{"id":144,"name":"Slippery Fighter","levelReq":0,"patternType":"dots","description":"Press Counter after winning a clash to launch your opponent into the air.","detailedHTML":"<b>Unlock Requirements:</b><div><font color=\"#2eea44\"><b>250 Soul Tokens</b></font></div><div><b><font color=\"#ffaa66\">Level 40</font></b></div><div><font color=\"#2eea44\"><b><br></b></font></div><div><font color=\"#79867b\">Passive</font></div>","x":1170,"y":2936.6666666666665,"radius":20,"fillColor":"#e6bd28","lineColor":"#ccccaa","leadsTo":[]},{"id":145,"name":"One Way Ticket to Hell","levelReq":0,"patternType":"dots","description":"Winning a clash when the opponent is low on health and high on posture will cause you to impale them with your fist.","detailedHTML":"<b>Unlock Requirements:</b><div><b><font color=\"#ffaa66\">4 Skill Points<br></font></b><div><b style=\"font-size: 0.85rem;\"><font color=\"#e19209\">125 Hakuda&nbsp;</font></b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#e9c649\">Level 40</font></b></div><div><font color=\"#2eea44\"><b><br></b></font></div><div><font color=\"#79867b\">Passive</font></div></div>","x":804,"y":2908,"radius":20,"fillColor":"#e6bd28","lineColor":"#ccccaa","leadsTo":[]},{"id":146,"name":"Clash Proficiency","levelReq":0,"patternType":"dots","description":"Winning a clash when the opponent has low health and medium posture initiates an execution.","detailedHTML":"<b>Unlock Requirements:</b><div><b><font color=\"#ffaa66\">4 Skill Points<br></font></b><div><b style=\"font-size: 0.85rem;\"><font color=\"#ff8888\">80 Strength</font></b></div><div><b style=\"font-size: 0.85rem;\"><font color=\"#e9c649\">Level 40</font></b></div><div><font color=\"#2eea44\"><b><br></b></font></div><div><font color=\"#79867b\">Passive</font></div></div>","x":1095,"y":3210,"radius":20,"fillColor":"#e6bd28","lineColor":"#ccccaa","leadsTo":[]}];
+    let nodes = rawNodes;
+
+    const hasPreset = nodes.some(n => n.id === -1);
+if (!hasPreset) {
+    const presetNode = {
+        id: -1,
+        name: "✦ PRIMAL FLUX ✦",
+        levelReq: 0,
+        description: "",
+        detailedHTML: "",
+        x: 1931,
+        y: 2177,
+        radius: 55,
+        fillColor: "#6c90c5",
+        lineColor: "#91c9f4",
+        leadsTo: [1,35,39,97,136],
+        isPreset: true,
+        patternType: "hex"
+    };
+    
+    nodes.push(presetNode);
+}
+    
+    nodes.forEach(node => {
+        if (!node.patternType) node.patternType = "hex";
+        node.pulseOffset = Math.random() * Math.PI * 2;
+    });
+    let glowIntensityMap = new Map();   
+let glowTargetMap = new Map();      
+
+    nodes.forEach(node => {
+    glowIntensityMap.set(node.id, 0);
+    glowTargetMap.set(node.id, 0);
+});
+
+    
+    
+    let zoom = 1.0;
+    let offsetX = 0, offsetY = 0;
+    let canvas, ctx;
+    let canvasWidth, canvasHeight;
+    
+    let currentTooltipNode = null;
+    let tooltipElement = null;
+    let hoverTimeout = null;
+    let activeGlowNodeId = null;        
+    let isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    let searchTerm = "";
+    
+    let isDragging = false;
+    let dragStartX = 0, dragStartY = 0;
+    let dragStartOffsetX = 0, dragStartOffsetY = 0;
+    
+    let initialPinchDist = 0;
+    let initialZoom = 1;
+    let pinchCenterX = 0, pinchCenterY = 0;
+    
+    let tapStartX = 0, tapStartY = 0;
+    let isPotentialTap = false;
+    
+    let animationFrame = null;
+    
+    let edgeList = [];
+    function rebuildEdges() {
+        edgeList = [];
+        nodes.forEach(parent => {
+            if (parent.leadsTo && parent.leadsTo.length) {
+                parent.leadsTo.forEach(childId => {
+                    const child = nodes.find(n => n.id === childId);
+                    if (child) {
+                        edgeList.push({ from: parent, to: child, color: child.lineColor || "#aaaaff" });
+                    }
+                });
+            }
+        });
+    }
+    rebuildEdges();
+
+    function resizeCanvas() {
+        const container = document.querySelector('.viewer-container');
+        const rect = container.getBoundingClientRect();
+        canvasWidth = rect.width;
+        canvasHeight = rect.height;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        canvas.style.width = `${canvasWidth}px`;
+        canvas.style.height = `${canvasHeight}px`;
+        draw();
+    }
+    
+    function worldToScreen(worldX, worldY) {
+        return {
+            x: worldX * zoom + offsetX,
+            y: worldY * zoom + offsetY
+        };
+    }
+    function screenToWorld(screenX, screenY) {
+        return {
+            x: (screenX - offsetX) / zoom,
+            y: (screenY - offsetY) / zoom
+        };
+    }
+    
+    function drawNebulaBackground(now) {
+    const t = now * 0.0002;
+    const w = canvasWidth, h = canvasHeight;
+    
+    const grad = ctx.createLinearGradient(
+        w * (0.5 + Math.sin(t * 0.1) * 0.1),
+        h * (0.5 + Math.cos(t * 0.12) * 0.1),
+        w * (0.5 + Math.sin(t * 0.1 + 2) * 0.1),
+        h * (0.5 + Math.cos(t * 0.12 + 2) * 0.1)
+    );
+    grad.addColorStop(0, '#030a18');
+    grad.addColorStop(1, '#0e1a2f');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    
+    for (let i = 0; i < 5; i++) {
+        const xOff = Math.sin(t * 0.8 + i) * 150;
+        const yOff = Math.cos(t * 1.2 + i) * 120;
+        const centerX = w * (0.2 + 0.6 * Math.sin(t * 0.5 + i)) + xOff;
+        const centerY = h * (0.3 + 0.4 * Math.cos(t * 0.7 + i)) + yOff;
+        const radGrad = ctx.createRadialGradient(centerX, centerY, 30, centerX, centerY, Math.max(w, h) * 0.7);
+        const hue = (210 + i * 35 + Math.sin(t * 2) * 25) % 360;
+        radGrad.addColorStop(0, `hsla(${hue}, 85%, 35%, 0.45)`);
+        radGrad.addColorStop(0.5, `hsla(${hue - 25}, 75%, 20%, 0.3)`);
+        radGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = radGrad;
+        ctx.fillRect(0, 0, w, h);
+    }
+    
+    ctx.fillStyle = 'rgba(160, 200, 255, 0.15)';
+    for (let i = 0; i < 300; i++) {
+        const driftX = Math.sin(t * 0.9 + i) * 30;
+        const driftY = Math.cos(t * 1.1 + i * 0.7) * 25;
+        const x = ((i * 131071) % w + driftX + w) % w;
+        const y = ((i * 524287) % h + driftY + h) % h;
+        ctx.fillRect(x, y, 1.5, 1.5);
+    }
+ctx.fillStyle = 'rgba(180, 200, 255, 0.2)';
+for (let i = 0; i < 350; i++) {
+    const driftX = Math.sin(t * 0.7 + i * 0.023) * 80;
+    const driftY = Math.cos(t * 0.9 + i * 0.017) * 70;
+    const baseX = (i * 93179) % w;
+    const baseY = (i * 29989) % h;
+    let x = baseX + driftX;
+    let y = baseY + driftY;
+    x = ((x % w) + w) % w;
+    y = ((y % h) + h) % h;
+    
+    ctx.beginPath();
+    ctx.arc(x, y, 1.2 + Math.sin(t * 2 + i) * 0.6, 0, Math.PI * 2);
+    ctx.fill();
+}
+    ctx.restore();
+}
+    
+    function drawTravelingParticles(now) {
+    if (edgeList.length === 0) return;
+    const speed = 0.001;           
+    const travelTime = now * speed;
+    const dashLength = 10;           
+    const dashCount = 6;             
+    ctx.save();
+    ctx.shadowBlur = 0;
+    for (let edge of edgeList) {
+        const from = edge.from, to = edge.to;
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 0.1) continue;
+        const dirX = dx / dist;
+        const dirY = dy / dist;
+        
+        for (let p = 0; p < dashCount; p++) {
+            const phaseOffset = p / dashCount;  
+            let phase = (travelTime + phaseOffset) % 1.0;
+            const tStart = phase;
+            const startX = from.x + dirX * dist * tStart;
+            const startY = from.y + dirY * dist * tStart;
+            let tEnd = tStart + dashLength / dist;
+            let endX, endY;
+            if (tEnd >= 1.0) {
+                endX = to.x;
+                endY = to.y;
+            } else {
+                endX = from.x + dirX * dist * tEnd;
+                endY = from.y + dirY * dist * tEnd;
+            }
+            const screenStart = worldToScreen(startX, startY);
+            const screenEnd = worldToScreen(endX, endY);
+            
+            ctx.beginPath();
+            ctx.moveTo(screenStart.x, screenStart.y);
+            ctx.lineTo(screenEnd.x, screenEnd.y);
+            ctx.strokeStyle = edge.color;
+            ctx.lineWidth = 2.5;
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = "rgba(255,200,100,0.7)";
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(screenEnd.x, screenEnd.y, 2.5, 0, Math.PI*2);
+            ctx.fillStyle = edge.color;
+            ctx.fill();
+        }
+    }
+    ctx.restore();
+}
+    
+    function applyNodePattern(node, x, y, radius, isMatching) {
+        const pattern = node.patternType;
+        const angle = (node.patternAngle || 0) + (isMatching ? 0 : 0); 
+        ctx.save();
+        if (!isMatching) {
+            ctx.globalAlpha = 0.55;
+            ctx.filter = "grayscale(0.7)";
+        } else {
+            ctx.filter = "none";
+            ctx.globalAlpha = 1;
+        }
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.shadowBlur = 0;
+        
+        switch(pattern) {
+            case 'hex':
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const rad = angle + (i * Math.PI * 2 / 6);
+                    const px = x + Math.cos(rad) * radius * 0.7;
+                    const py = y + Math.sin(rad) * radius * 0.7;
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.strokeStyle = isMatching ? 'rgba(255,210,130,0.9)' : '#aaa';
+                ctx.lineWidth = 2.2;
+                ctx.stroke();
+                break;
+            case 'stripes':
+                for (let i = -radius; i <= radius; i += 6) {
+                    const radAngle = angle;
+                    const cosA = Math.cos(radAngle), sinA = Math.sin(radAngle);
+                    const x1 = x + (i * cosA) - (radius * sinA);
+                    const y1 = y + (i * sinA) + (radius * cosA);
+                    const x2 = x + (i * cosA) + (radius * sinA);
+                    const y2 = y + (i * sinA) - (radius * cosA);
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.strokeStyle = isMatching ? 'rgba(255, 200, 100, 0.8)' : '#aaa';
+                    ctx.lineWidth = 1.8;
+                    ctx.stroke();
+                }
+                break;
+            case 'dots':
+                for (let i = 0; i < 18; i++) {
+                    const rAngle = angle + (i * Math.PI * 2 / 18);
+                    const dx = Math.cos(rAngle) * radius * 0.65;
+                    const dy = Math.sin(rAngle) * radius * 0.65;
+                    ctx.beginPath();
+                    ctx.arc(x + dx, y + dy, radius * 0.12, 0, Math.PI*2);
+                    ctx.fillStyle = isMatching ? 'rgba(255, 220, 140, 0.9)' : '#aaa';
+                    ctx.fill();
+                }
+                break;
+            case 'radialLines':
+                for (let i = 0; i < 12; i++) {
+                    const radAng = angle + (i * Math.PI * 2 / 12);
+                    const px = x + Math.cos(radAng) * radius * 0.9;
+                    const py = y + Math.sin(radAng) * radius * 0.9;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(px, py);
+                    ctx.strokeStyle = isMatching ? 'rgba(230,210,150,0.8)' : '#aaa';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+                break;
+            case 'glowEdge':
+                ctx.beginPath();
+                ctx.arc(x, y, radius + 2, 0, Math.PI*2);
+                ctx.strokeStyle = isMatching ? `rgba(100, 200, 255, 0.7)` : '#888';
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+                break;
+            default: break;
+        }
+        ctx.restore();
+    }
+    
+    function drawActiveNodeFlow(node, x, y, radius, now) {
+    const intensity = glowIntensityMap.get(node.id) || 0;
+    if (intensity <= 0.01) return;
+    
+    const time = now * 0.008;
+    ctx.save();
+    ctx.shadowBlur = 12 * intensity;
+    ctx.shadowColor = `rgba(255, 204, 136, ${0.8 * intensity})`;
+    
+    for (let i = 0; i < 3; i++) {
+        const pulse = (Math.sin(time * 2 + i) * 0.2 + 0.7) * intensity;
+        ctx.beginPath();
+        ctx.arc(x, y, radius + 5 + i * 2, 0, Math.PI*2);
+        ctx.strokeStyle = `rgba(255, 180, 80, ${0.5 * pulse})`;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+    }
+    const angle = time % (Math.PI * 2);
+    ctx.beginPath();
+    ctx.arc(x, y, radius + 3, angle - 0.8, angle + 0.8);
+    ctx.strokeStyle = `rgba(255, 221, 153, ${0.9 * intensity})`;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x, y, radius + 7, angle + Math.PI, angle + Math.PI + 1.2);
+    ctx.strokeStyle = `rgba(255, 170, 102, ${0.8 * intensity})`;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    ctx.restore();
+}
+    
+    function drawNodeText(node, x, y, isMatching) {
+        const fontSize = Math.max(14, 16 / zoom);
+        ctx.font = `bold ${fontSize}px 'Share Tech Mono', monospace`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        const textY = y + node.radius + (8 / zoom);
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillText(node.name, x, textY);
+        ctx.fillStyle = node.lineColor || "#aaaaff";
+        ctx.fillText(node.name, x + 1, textY + 1);
+    }
+    
+    function desaturateColor(hex) {
+        let r, g, b;
+        if (hex.startsWith('#')) {
+            r = parseInt(hex.slice(1,3), 16);
+            g = parseInt(hex.slice(3,5), 16);
+            b = parseInt(hex.slice(5,7), 16);
+        } else {
+            return "#555";
+        }
+        const gray = Math.floor(0.3 * r + 0.59 * g + 0.11 * b);
+        return `rgb(${gray}, ${gray}, ${gray})`;
+    }
+
+    function initOrbitData(node) {
+    if (node.orbits) return;
+    const count = 2 + Math.floor(Math.random() * 3); 
+    const orbits = [];
+    for (let i = 0; i < count; i++) {
+        const radius = node.radius + 8 + Math.random() * 12;
+        const speed = 0.5 + Math.random() * 1.5;     
+        const phase = Math.random() * Math.PI * 2;
+        const angle = Math.random() * Math.PI * 2;
+        const size = 2 + Math.random() * 2.5;
+        orbits.push({ radius, speed, phase, angle, size });
+    }
+    node.orbits = orbits;
+}
+
+function drawMistAura(node, now, isMatching) {
+    if (!isMatching) return;
+    
+    const time = now * 0.002;
+    const pulse = 0.65 + Math.sin(time * 1.2 + node.id) * 0.25;
+    
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.shadowBlur = 0;
+    
+    for (let layer = 0; layer < 3; layer++) {
+        const offset = layer * 1.5;
+        const radius = node.radius + 3 + offset + Math.sin(time * 1.5 + layer) * 1.5;
+        const alpha = (0.15 - layer * 0.04) * pulse;
+        
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
+        
+        let r, g, b;
+        if (node.fillColor.startsWith('#')) {
+            r = parseInt(node.fillColor.slice(1,3), 16);
+            g = parseInt(node.fillColor.slice(3,5), 16);
+            b = parseInt(node.fillColor.slice(5,7), 16);
+        } else {
+            r = 100; g = 150; b = 220;
+        }
+        ctx.fillStyle = `rgba(${r + 40}, ${g + 30}, ${b + 20}, ${alpha})`;
+        ctx.fill();
+    }
+    
+    ctx.beginPath();
+    const waves = 8;
+    const waveRadius = node.radius + 5 + Math.sin(time * 1.2) * 1.5;
+    for (let i = 0; i <= 360; i += 15) {
+        const rad = i * Math.PI / 180;
+        const wiggle = Math.sin(rad * waves + time * 2.5) * 2;
+        const x = node.x + (waveRadius + wiggle) * Math.cos(rad);
+        const y = node.y + (waveRadius + wiggle) * Math.sin(rad);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    const waveAlpha = 0.1 + Math.sin(time * 1.8) * 0.06;
+    ctx.fillStyle = `rgba(200, 180, 255, ${waveAlpha})`;
+    ctx.fill();
+    
+    ctx.restore();
+}
+
+function drawEnergyFlux(node, now) {
+    const t = now * 0.002;  
+    const x = node.x, y = node.y;
+    const r = node.radius;
+    
+    ctx.save();
+    ctx.shadowBlur = 0;
+    
+    ctx.beginPath();
+    ctx.arc(x, y, r + 4 + Math.sin(t * 1.5) * 3, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(108, 144, 197, ${0.25 + Math.sin(t * 0.8) * 0.1})`;
+    ctx.fill();
+    
+    for (let i = 0; i < 3; i++) {
+        const angleOffset = t * 1.2 + i * Math.PI * 2 / 3;
+        const start = angleOffset;
+        const end = start + Math.PI * 1.2;
+        ctx.beginPath();
+        ctx.arc(x, y, r - 8 + Math.sin(t * 1.5 + i) * 4, start, end);
+        ctx.strokeStyle = `rgba(145, 201, 244, ${0.7 + Math.sin(t * 1.5 + i) * 0.3})`;
+        ctx.lineWidth = 6;
+        ctx.stroke();
+    }
+    
+    for (let p = 0; p < 40; p++) {
+        const angle = (p * 37) % 360 + t * 4;
+        const rad = angle * Math.PI / 180;
+        const dist = (r - 12) * (0.3 + 0.7 * (Math.sin(t * 1.5 + p) * 0.5 + 0.5));
+        const px = x + Math.cos(rad) * dist;
+        const py = y + Math.sin(rad) * dist;
+        ctx.beginPath();
+        ctx.arc(px, py, 1.5 + Math.sin(t * 3 + p) * 1, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(145, 201, 244, ${0.6 + Math.sin(t * 1.2 + p) * 0.3})`;
+        ctx.fill();
+    }
+    
+    const corePulse = 0.35 + Math.sin(t * 1.8) * 0.07;   
+    const coreRadius = r * corePulse;
+    
+    const ringRadius = coreRadius ;
+    ctx.beginPath();
+    ctx.arc(x, y, ringRadius, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(108, 144, 197, ${0.8 + Math.sin(t * 2.2) * 0.2})`;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(x, y, coreRadius - 1, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${0.9 + Math.sin(t * 2.5) * 0.1})`;
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(x, y, coreRadius * 0.5, 0, Math.PI * 2);
+    ctx.fillStyle = `white`;
+    ctx.fill();
+    
+    ctx.restore();
+}
+    
+    function draw() {
+        if (!ctx) return;
+        const now = performance.now();
+        drawNebulaBackground(now);
+
+        for (let node of nodes) {
+    const current = glowIntensityMap.get(node.id) || 0;
+    const target = glowTargetMap.get(node.id) || 0;
+    let newVal = current;
+    if (Math.abs(current - target) < 0.01) {
+        newVal = target;
+    } else {
+        newVal = current + (target - current) * 0.2;
+    }
+    glowIntensityMap.set(node.id, newVal);
+}
+        
+        drawTravelingParticles(now);
+        
+        
+        ctx.save();
+        ctx.translate(offsetX, offsetY);
+        ctx.scale(zoom, zoom);
+        
+        
+        const lowerTerm = searchTerm.toLowerCase();
+        const pulseTime = now / 1000;
+        for (let node of nodes) {
+            const matches = lowerTerm === "" || node.name.toLowerCase().includes(lowerTerm);
+            drawMistAura(node, now, matches);
+        }
+        for (let node of nodes) {
+            const matches = lowerTerm === "" || node.name.toLowerCase().includes(lowerTerm);
+            const isActiveGlow = (activeGlowNodeId === node.id);
+
+            if (node.isPreset) {
+    drawEnergyFlux(node, now);
+    continue; 
+}
+            
+            let fillColor = node.fillColor;
+            if (!matches) {
+                fillColor = desaturateColor(node.fillColor);
+            }
+            
+            ctx.shadowColor = "rgba(0,0,0,0.5)";
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+            const grad = ctx.createRadialGradient(node.x - 5, node.y - 5, 5, node.x, node.y, node.radius);
+            grad.addColorStop(0, fillColor);
+            grad.addColorStop(1, matches ? "#1e3a4a" : "#2a2a2a");
+            ctx.fillStyle = grad;
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+            ctx.strokeStyle = matches ? "#c0f0ff" : "#666";
+            ctx.lineWidth = 2 / zoom;
+            ctx.stroke();
+            
+            if (matches && lowerTerm !== "") {
+                const glowWidth = (3 + (Math.sin(pulseTime * Math.PI * 2) * 0.5 + 0.5) * 2) / zoom;
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.radius + 3 + Math.sin(pulseTime * 5) * 1.5, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 215, 100, ${0.7 + Math.sin(pulseTime * 8) * 0.3})`;
+                ctx.lineWidth = glowWidth;
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.radius + 1, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 180, 80, 0.9)`;
+                ctx.lineWidth = 2 / zoom;
+                ctx.stroke();
+            }
+            
+            applyNodePattern(node, node.x, node.y, node.radius, matches);
+            
+            if (isActiveGlow && matches) {
+                drawActiveNodeFlow(node, node.x, node.y, node.radius, now);
+            }
+            
+            drawNodeText(node, node.x, node.y, matches);
+        }
+        ctx.restore();
+        
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        animationFrame = requestAnimationFrame(() => draw());
+    }
+    
+    function hideTooltip() {
+    if (hoverTimeout) clearTimeout(hoverTimeout);
+    if (activeGlowNodeId) {
+        glowTargetMap.set(activeGlowNodeId, 0);
+        activeGlowNodeId = null;
+    }
+    if (tooltipElement) {
+        tooltipElement.style.opacity = '0';
+        setTimeout(() => {
+            if (tooltipElement && tooltipElement.parentNode) {
+                tooltipElement.remove();
+                tooltipElement = null;
+            }
+        }, 150);
+    }
+    currentTooltipNode = null;
+}
+
+function showTooltipForNode(node, screenX, screenY) {
+    if (node.isPreset) return;
+    if (currentTooltipNode === node && tooltipElement) return;
+    
+    if (activeGlowNodeId && activeGlowNodeId !== node.id) {
+        glowTargetMap.set(activeGlowNodeId, 0);
+    }
+    activeGlowNodeId = node.id;
+    glowTargetMap.set(node.id, 1);
+    
+    if (tooltipElement) {
+        tooltipElement.remove();
+        tooltipElement = null;
+    }
+    const div = document.createElement("div");
+    div.className = "tooltip-node";
+    div.style.opacity = '0';
+    div.style.transition = 'opacity 0.15s ease';
+    div.innerHTML = `
+        <div class="node-name">${escapeHtml(node.name)}</div>
+        <div class="level-req">Level ${node.levelReq}</div>
+        <div class="desc">${escapeHtml(node.description)}</div>
+        <hr/>
+        <div>${node.detailedHTML || "—"}</div>
+    `;
+    document.body.appendChild(div);
+    
+    let left = screenX + 15;
+    let top = screenY - 40;
+    const rect = div.getBoundingClientRect();
+    if (top < 0) top = screenY + 20;
+    if (top + rect.height > window.innerHeight) top = screenY - rect.height - 10;
+    if (left + rect.width > window.innerWidth) left = screenX - rect.width - 10;
+    if (left < 0) left = 10;
+    div.style.left = left + "px";
+    div.style.top = top + "px";
+    tooltipElement = div;
+    currentTooltipNode = node;
+    div.offsetHeight;
+    div.style.opacity = '1';
+}
+    
+    function escapeHtml(str) {
+        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+    
+    function getNodeAtScreen(screenX, screenY) {
+        const world = screenToWorld(screenX, screenY);
+        for (let node of nodes) {
+        if (node.isPreset) continue; 
+            const dx = node.x - world.x;
+            const dy = node.y - world.y;
+            if (Math.hypot(dx, dy) <= node.radius) {
+                return node;
+            }
+        }
+        return null;
+    }
+    
+    function zoomAtPoint(zoomDelta, screenCenterX, screenCenterY) {
+        const oldZoom = zoom;
+        let newZoom = zoom * zoomDelta;
+        newZoom = Math.min(3.0, Math.max(0.3, newZoom));
+        if (newZoom === zoom) return;
+        const worldBefore = screenToWorld(screenCenterX, screenCenterY);
+        zoom = newZoom;
+        const worldAfter = screenToWorld(screenCenterX, screenCenterY);
+        offsetX += (worldAfter.x - worldBefore.x) * zoom;
+        offsetY += (worldAfter.y - worldBefore.y) * zoom;
+        hideTooltip();
+    }
+    
+    function resetView() {
+        if (!nodes.length) {
+            zoom = 1; offsetX = 0; offsetY = 0; return;
+        }
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        nodes.forEach(n => {
+            minX = Math.min(minX, n.x - n.radius);
+            minY = Math.min(minY, n.y - n.radius);
+            maxX = Math.max(maxX, n.x + n.radius);
+            maxY = Math.max(maxY, n.y + n.radius);
+        });
+        const contentW = maxX - minX + 100;
+        const contentH = maxY - minY + 100;
+        const viewW = canvasWidth;
+        const viewH = canvasHeight;
+        let fitZoom = Math.min(viewW / contentW, viewH / contentH, 1.8);
+        fitZoom = Math.min(2.5, Math.max(0.4, fitZoom));
+        zoom = fitZoom;
+        const centerWorldX = (minX + maxX) / 2;
+        const centerWorldY = (minY + maxY) / 2;
+        offsetX = viewW / 2 - centerWorldX * zoom;
+        offsetY = viewH / 2 - centerWorldY * zoom;
+        hideTooltip();
+    }
+    
+    function initEvents() {
+        canvas.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            isDragging = true;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            dragStartOffsetX = offsetX;
+            dragStartOffsetY = offsetY;
+            canvas.style.cursor = 'grabbing';
+            hideTooltip();
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - dragStartX;
+            const dy = e.clientY - dragStartY;
+            offsetX = dragStartOffsetX + dx;
+            offsetY = dragStartOffsetY + dy;
+        });
+        window.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                canvas.style.cursor = 'grab';
+            }
+        });
+        
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                const touch = e.touches[0];
+                tapStartX = touch.clientX;
+                tapStartY = touch.clientY;
+                isPotentialTap = true;
+                isDragging = true;
+                dragStartX = touch.clientX;
+                dragStartY = touch.clientY;
+                dragStartOffsetX = offsetX;
+                dragStartOffsetY = offsetY;
+                hideTooltip();
+                e.preventDefault();
+            }
+        });
+        window.addEventListener('touchmove', (e) => {
+            if (isDragging && e.touches.length === 1) {
+                const touch = e.touches[0];
+                const dx = touch.clientX - dragStartX;
+                const dy = touch.clientY - dragStartY;
+                if (isPotentialTap && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) isPotentialTap = false;
+                offsetX = dragStartOffsetX + dx;
+                offsetY = dragStartOffsetY + dy;
+                e.preventDefault();
+            }
+        });
+        window.addEventListener('touchend', (e) => {
+            if (isPotentialTap && e.touches.length === 0) {
+                const node = getNodeAtScreen(tapStartX, tapStartY);
+                if (node) showTooltipForNode(node, tapStartX, tapStartY);
+                else hideTooltip();
+                isPotentialTap = false;
+            }
+            isDragging = false;
+            canvas.style.cursor = 'grab';
+        });
+        
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.92 : 1.08;
+            zoomAtPoint(delta, e.clientX, e.clientY);
+        }, { passive: false });
+        
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                const t1 = e.touches[0], t2 = e.touches[1];
+                const dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY;
+                initialPinchDist = Math.hypot(dx, dy);
+                initialZoom = zoom;
+                pinchCenterX = (t1.clientX + t2.clientX) / 2;
+                pinchCenterY = (t1.clientY + t2.clientY) / 2;
+                hideTooltip();
+                isPotentialTap = false;
+                isDragging = false;
+            }
+        });
+        canvas.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && initialPinchDist > 0) {
+                e.preventDefault();
+                const t1 = e.touches[0], t2 = e.touches[1];
+                const dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY;
+                const newDist = Math.hypot(dx, dy);
+                const scale = newDist / initialPinchDist;
+                let newZoom = initialZoom * scale;
+                newZoom = Math.min(3.0, Math.max(0.3, newZoom));
+                if (newZoom !== zoom) {
+                    const worldCenter = screenToWorld(pinchCenterX, pinchCenterY);
+                    zoom = newZoom;
+                    const newWorldCenter = screenToWorld(pinchCenterX, pinchCenterY);
+                    offsetX += (newWorldCenter.x - worldCenter.x) * zoom;
+                    offsetY += (newWorldCenter.y - worldCenter.y) * zoom;
+                }
+            }
+        });
+        canvas.addEventListener('touchend', () => { initialPinchDist = 0; });
+        
+        if (!isTouchDevice) {
+            canvas.addEventListener('mousemove', (e) => {
+                if (isDragging) return;
+                const node = getNodeAtScreen(e.clientX, e.clientY);
+                if (hoverTimeout) clearTimeout(hoverTimeout);
+                if (node) {
+                    hoverTimeout = setTimeout(() => {
+                        showTooltipForNode(node, e.clientX, e.clientY);
+                    }, 150);
+                } else {
+                    hideTooltip();
+                }
+            });
+            canvas.addEventListener('mouseleave', () => hideTooltip());
+        }
+        
+        canvas.addEventListener('click', (e) => {
+            if (!isTouchDevice) {
+                const node = getNodeAtScreen(e.clientX, e.clientY);
+                if (node) showTooltipForNode(node, e.clientX, e.clientY);
+                else hideTooltip();
+            }
+        });
+        document.body.addEventListener('click', (e) => {
+            if (!e.target.closest('.tooltip-node') && e.target !== canvas && !canvas.contains(e.target)) hideTooltip();
+        });
+    }
+    
+    function initUI() {
+        const searchInput = document.getElementById('searchInputViewer');
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+        });
+        document.getElementById('zoomInBtn').addEventListener('click', () => zoomAtPoint(1.2, canvasWidth/2, canvasHeight/2));
+        document.getElementById('zoomOutBtn').addEventListener('click', () => zoomAtPoint(0.8, canvasWidth/2, canvasHeight/2));
+        document.getElementById('resetViewBtn').addEventListener('click', () => resetView());
+    }
+    
+    window.onload = () => {
+        canvas = document.getElementById('treeCanvas');
+        ctx = canvas.getContext('2d');
+        resizeCanvas();
+        initEvents();
+        initUI();
+        resetView();
+        rebuildEdges();
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            resetView();
+        });
+        draw();
+    };
+</script>
+</body>
+</html>
