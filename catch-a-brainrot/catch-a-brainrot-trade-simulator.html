@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catch a Brainrot – Trade Simulator</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff8800;
+            border-radius: 10px;
+        }
+        .fairness-fill {
+            transition: width 0.4s ease;
+        }
+        .slot-card {
+            aspect-ratio: 1 / 1;
+        }
+        .header-border {
+            border-top: 3px solid transparent;
+            border-image: linear-gradient(90deg, #ff8800, #ffcc00, #ff8800);
+            border-image-slice: 1;
+            border-radius: 24px 24px 0 0;
+        }
+        .qty-control input[type="number"] {
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+        .qty-control input[type="number"]::-webkit-outer-spin-button,
+        .qty-control input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="bg-[#0b0b0b] font-sans flex items-center justify-center min-h-screen p-3">
+
+    <div class="max-w-[960px] w-full bg-gradient-to-br from-[#141414] to-[#1f1f1f] rounded-3xl shadow-2xl border border-orange-900/10 overflow-hidden">
+        <!-- Header -->
+        <div class="header-border pt-4 px-4 sm:px-5 pb-2">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <h1 class="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-orange-400 to-yellow-300 bg-clip-text text-transparent tracking-tight">
+                    Catch a Brainrot Trade Simulator
+                </h1>
+                <button onclick="clearAll()" class="text-xs sm:text-sm bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition border border-gray-700">
+                    <i class="fas fa-undo-alt"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Trade Area -->
+        <div class="p-4 sm:p-5 pt-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Offer -->
+                <div class="bg-[#0e0e0e] rounded-2xl p-3 border border-gray-800/50">
+                    <div class="flex items-center justify-between mb-2 px-1">
+                        <span class="text-sm font-bold text-orange-400 uppercase flex items-center gap-2">
+                            <i class="fas fa-hand-paper"></i> Offer
+                        </span>
+                        <span class="text-xs text-gray-400" id="offerCount">0/9</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2" id="offerGrid"></div>
+                </div>
+
+                <!-- Request -->
+                <div class="bg-[#0e0e0e] rounded-2xl p-3 border border-gray-800/50">
+                    <div class="flex items-center justify-between mb-2 px-1">
+                        <span class="text-sm font-bold text-blue-400 uppercase flex items-center gap-2">
+                            <i class="fas fa-hand-holding"></i> Request
+                        </span>
+                        <span class="text-xs text-gray-400" id="requestCount">0/9</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2" id="requestGrid"></div>
+                </div>
+            </div>
+
+            <!-- Fairness Bar -->
+            <div class="mt-4 bg-[#0e0e0e] rounded-2xl p-3 border border-gray-800/50">
+                <div class="flex justify-between text-xs text-gray-400 mb-1.5">
+                    <span class="text-orange-300 font-semibold">Offer</span>
+                    <span id="fairnessLabel" class="font-semibold">Balanced</span>
+                    <span class="text-blue-300 font-semibold">Request</span>
+                </div>
+                <div class="bg-gray-700/50 rounded-full h-2 overflow-hidden relative">
+                    <div class="fairness-fill h-full rounded-full" id="fairnessFill" style="width:50%; background: linear-gradient(90deg, #4CAF50, #8BC34A);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[999] hidden items-center justify-center p-4" id="slotModal">
+        <div class="bg-gradient-to-br from-[#1c1c1c] to-[#121212] rounded-2xl max-w-[720px] w-full max-h-[92vh] flex flex-col border border-orange-900/20 shadow-2xl overflow-hidden">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between px-5 py-3.5 border-b border-white/5 shrink-0">
+                <h3 class="text-white font-bold text-base flex items-center gap-2">
+                    <i class="fas fa-edit text-orange-400"></i>
+                    <span id="modalTitle">Edit Slot</span>
+                </h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white text-xl transition">&times;</button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 sm:p-5 overflow-y-auto flex-1" id="modalBody">
+                <!-- Search -->
+                <div class="relative mb-3">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+                    <input type="text" id="modalSearch" placeholder="Search brainrots…"
+                    class="w-full bg-black/30 border border-gray-700 rounded-xl py-2 pl-9 pr-3 text-sm text-white placeholder-gray-500 focus:border-orange-500 focus:outline-none transition">
+                </div>
+                <!-- Zones grid -->
+                <div id="modalZones"></div>
+            </div>
+            <!-- Modal footer -->
+            <div class="p-3 sm:p-4 border-t border-white/5 shrink-0">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-gray-400 font-medium">Qty:</span>
+                        <div class="qty-control flex items-center gap-2 bg-black/40 px-2 py-1 rounded-full border border-white/10">
+                            <button onclick="adjustQty(-1)" class="text-orange-500 hover:text-orange-400 text-xl w-8 h-8 rounded-full flex items-center justify-center transition">−</button>
+                            <input type="number" id="modalQty" value="1" min="1" max="999" class="w-12 text-center bg-transparent border-none text-white font-bold text-lg outline-none">
+                            <button onclick="adjustQty(1)" class="text-orange-500 hover:text-orange-400 text-xl w-8 h-8 rounded-full flex items-center justify-center transition">+</button>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <button onclick="clearSlot()" class="text-sm text-red-400 hover:text-red-300 font-medium px-3 py-1.5 rounded-lg hover:bg-red-900/20 transition">
+                            <i class="fas fa-trash-alt mr-1"></i> Remove
+                        </button>
+                        <button onclick="closeModal()" class="text-sm text-gray-400 hover:text-white px-4 py-1.5 rounded-lg border border-gray-700 transition">
+                            Cancel
+                        </button>
+                        <button onclick="confirmSlot()" class="text-sm bg-orange-600 hover:bg-orange-500 text-white px-5 py-1.5 rounded-lg font-semibold transition shadow-lg shadow-orange-900/20">
+                            <i class="fas fa-check mr-1"></i> Confirm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        //  Data
+
+        const RARITY_WEIGHT = { insane: 5, epic: 4, rare: 3, uncommon: 2, common: 1 };
+        const RARITY_VALUE = { insane: 5000, epic: 2500, rare: 1500, uncommon: 500, common: 100 };
+
+        const ZONES = {
+            'Rot Forest': [
+                { name: "Glorbo Fruttodrillo", image: "https://bloxinformer.com/wp-content/uploads/2026/07/glorbo-frutodrillo-brainrot-catch-a-brainrot.webp", rarity: "common" },
+                { name: "Flamingulli", image: "https://bloxinformer.com/wp-content/uploads/2026/07/flamingulli-brainrot-catch-a-brainrot.webp", rarity: "common" },
+                { name: "Tric Trac Barabum", image: "https://bloxinformer.com/wp-content/uploads/2026/07/tric-trac-barabum-brainrot-catch-a-brainrot.webp", rarity: "common" },
+                { name: "Capyberelli Bananalelli", image: "https://bloxinformer.com/wp-content/uploads/2026/07/capyberelli-bananalelli-brainrot-catch-a-brainrot.webp", rarity: "uncommon" },
+                { name: "Pussini Sushini", image: "https://bloxinformer.com/wp-content/uploads/2026/07/pussini-sushini-brainrot-catch-a-brainrot.webp", rarity: "uncommon" },
+                { name: "Trippi Troppi", image: "https://bloxinformer.com/wp-content/uploads/2026/07/trippi-troppi-brainrot-catch-a-brainrot.webp", rarity: "uncommon" },
+                { name: "Salt", image: "https://bloxinformer.com/wp-content/uploads/2026/07/salt-brainrot-catch-a-brainrot.webp", rarity: "uncommon" },
+                { name: "Pepper Shaker", image: "https://bloxinformer.com/wp-content/uploads/2026/07/pepper-shaker-brainrot-catch-a-brainrot.webp", rarity: "uncommon" },
+                { name: "Zibra Zubra", image: "https://bloxinformer.com/wp-content/uploads/2026/07/zibra-zubra-brainrot-catch-a-brainrot.webp", rarity: "uncommon" },
+                { name: "Ballerina Cappuccina", image: "https://bloxinformer.com/wp-content/uploads/2026/07/ballerina-cappuccina-brainrot-catch-a-brainrot.webp", rarity: "rare" },
+                { name: "TaTaTa Sahur", image: "https://bloxinformer.com/wp-content/uploads/2026/07/tatata-sahur-brainrot-catch-a-brainrot.webp", rarity: "rare" },
+                { name: "Avocadini Guffo", image: "https://bloxinformer.com/wp-content/uploads/2026/07/avocadini-guffo-brainrot-catch-a-brainrot.webp", rarity: "rare" },
+                { name: "Rhino Tosterino", image: "https://bloxinformer.com/wp-content/uploads/2026/07/rhino-tosterino-brainrot-catch-a-brainrot.webp", rarity: "rare" },
+                { name: "Perchello Lemonchello", image: "https://bloxinformer.com/wp-content/uploads/2026/07/perchello-lemonchello-brainrot-catch-a-brainrot.webp", rarity: "rare" },
+                { name: "Cappuccino Assassino", image: "https://bloxinformer.com/wp-content/uploads/2026/07/cappuccino-assassino-brainrot-catch-a-brainrot.webp", rarity: "rare" },
+                { name: "Chicleteira Bicicleteira", image: "https://bloxinformer.com/wp-content/uploads/2026/07/chicleteira-bicicleteira-brainrot-catch-a-brainrot.webp", rarity: "epic" },
+                { name: "Spijuniro Golubiro", image: "https://bloxinformer.com/wp-content/uploads/2026/07/spijuniro-golubiro-brainrot-catch-a-brainrot.webp", rarity: "epic" },
+                { name: "Orangutini Ananasini", image: "https://bloxinformer.com/wp-content/uploads/2026/07/orangutini-ananasini-brainrot-catch-a-brainrot.webp", rarity: "epic" },
+                { name: "Ecco Cavallo Virtuoso", image: "https://bloxinformer.com/wp-content/uploads/2026/07/ecco-cavallo-virtuoso-brainrot-catch-a-brainrot.webp", rarity: "epic" },
+                { name: "Bombombini Gussini", image: "https://bloxinformer.com/wp-content/uploads/2026/07/bombombini-gusini-brainrot-catch-a-brainrot.webp", rarity: "epic" }
+            ],
+            'Snow Forest Zone 1': [
+                { name: "Penguino Cocosino", image: "https://bloxinformer.com/wp-content/uploads/2026/07/penguino-cocosino-brainrot-catch-a-brainrot.webp", rarity: "common" },
+                { name: "Quivioli Ameleonni", image: "https://bloxinformer.com/wp-content/uploads/2026/07/quivioli-ameleonni-brainrot-craft-a-brainrot.webp", rarity: "common" },
+                { name: "Six Seven", image: "https://bloxinformer.com/wp-content/uploads/2026/07/six-seven-brainrot-catch-a-brainrot.webp", rarity: "uncommon" },
+                { name: "Elephantuchi Bananuchi", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Elephantuchi-Bananuchi-Catch-A-Brainrot.webp", rarity: "uncommon" },
+                { name: "Brr Es Teh Patipum", image: "https://bloxinformer.com/wp-content/uploads/2026/07/brr-es-teh-patipum-brainrot-catch-a-brainrot.webp", rarity: "rare" },
+                { name: "Frigo Camelo", image: "https://bloxinformer.com/wp-content/uploads/2026/07/frigo-camelo-brainrot-catch-a-brainrot.webp", rarity: "rare" },
+                { name: "Svinino Bombondino", image: "https://bloxinformer.com/wp-content/uploads/2026/07/svinino-bombondino-brainrot-catch-a-brainrot.webp", rarity: "rare" },
+                { name: "Lirili Larila", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Lirili-Larila-Brainrt-Catch-A-Brainrot.webp", rarity: "epic" },
+                { name: "Strawberrelli Flamingelli", image: "https://bloxinformer.com/wp-content/uploads/2026/07/strawberrelli-flamingelli-brainrot-catch-a-brainrot.webp", rarity: "epic" },
+                { name: "Penguinelli Cactussini", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Penguinelli-Cactussini-Brainrot-Catch-A-Brainrot.webp", rarity: "epic" },
+                { name: "Tractoro Dinosauro", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Tractoro-Dinosauro-Brainrot-Catch-A-Brainrot.webp", rarity: "epic" },
+                { name: "Torrtuginni Dragonfrutinni", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Torrtuginni-Dragonfrutinni-Catch-A-Brainrot-.webp", rarity: "insane" }
+            ],
+            'Snow Forest Zone 2': [
+                { name: "Cocophanto Elephanto", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Cocophanto-Elephanto-Catch-A-Brainrot.webp", rarity: "common" },
+                { name: "Trulimero Trulicina", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Trulimero-Trulicina-Catch-A-Brainrot.webp", rarity: "common" },
+                { name: "Bambini Crostini", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Bambini-Crostini-Catch-A-Brainrot.webp", rarity: "uncommon" },
+                { name: "Pandaccini Bananini", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Pandaccini-Bananini-Catch-A-Brainrot.webp", rarity: "uncommon" },
+                { name: "Casito Satalito", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Casito-Satalito-Catch-A-Brainrot.webp", rarity: "rare" },
+                { name: "Bicus Dicus", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Bicus-Dicus-Catch-A-Brainrot.webp", rarity: "rare" },
+                { name: "Avocadini Antilopini", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Avocadini-Antilopini-Catch-A-Brainrot.webp", rarity: "rare" },
+                { name: "Los Tralaleritos", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Los-Tralaleritos-Catch-A-Brainrot.webp", rarity: "rare" },
+                { name: "Moo Moo Moohiunu", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Moo-Moo-Moohiunu-Catch-A-Brainrot.webp", rarity: "epic" },
+                { name: "Chai Maestro", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Chai-Maestro-Catch-A-Brainrot.webp", rarity: "epic" },
+                { name: "Tracotrucotulu Delapeladstuz", image: "https://bloxinformer.com/wp-content/uploads/2026/07/Tratotrucotulu-Delapeladstuz-Catch-A-Brainrot.webp", rarity: "epic" },
+                { name: "Graipussi Medussi", image: "", rarity: "insane" }
+            ]
+        };
+
+        for (const zone in ZONES) {
+            ZONES[zone].sort((a, b) => RARITY_WEIGHT[b.rarity] - RARITY_WEIGHT[a.rarity]);
+        }
+
+        const ALL_BRAINROTS = Object.values(ZONES).flat();
+
+        // State
+
+        const SLOT_COUNT = 9;
+
+        function makeEmptySlots() {
+            return Array.from({ length: SLOT_COUNT }, () => ({ brainrot: null, quantity: 0 }));
+        }
+
+        let state = {
+            offer: makeEmptySlots(),
+            request: makeEmptySlots(),
+        };
+
+        let modalState = {
+            side: 'offer',
+            index: 0,
+            selectedBrainrot: null,
+            quantity: 1,
+            searchTerm: '',
+        };
+
+        // Helpers
+
+        function getRarityTextClass(r) {
+            const map = { common: 'text-[#8c8c8c]', uncommon: 'text-[#4CAF50]', rare: 'text-[#42a5f5]', epic: 'text-[#ab47bc]',
+                insane: 'text-[#e91e8c]' };
+            return map[r] || 'text-[#8c8c8c]';
+        }
+
+        function getRarityBorder(r) {
+            const map = { common: 'border-[#8c8c8c]', uncommon: 'border-[#4CAF50]', rare: 'border-[#42a5f5]', epic: 'border-[#ab47bc]',
+                insane: 'border-[#e91e8c]' };
+            return map[r] || 'border-[#8c8c8c]';
+        }
+
+        function getPlaceholderImage() {
+            return 'data:image/svg+xml,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+              <rect width="100" height="100" fill="#1a1a1a" rx="12"/>
+              <circle cx="50" cy="40" r="18" fill="#2a2a2a" stroke="#444" stroke-width="2"/>
+              <circle cx="50" cy="40" r="8" fill="#3a3a3a"/>
+              <circle cx="40" cy="34" r="2.5" fill="#555"/>
+              <circle cx="60" cy="34" r="2.5" fill="#555"/>
+              <path d="M40 48 Q50 56 60 48" stroke="#555" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <rect x="30" y="70" width="40" height="6" rx="3" fill="#2a2a2a"/>
+              <rect x="38" y="76" width="24" height="4" rx="2" fill="#1a1a1a"/>
+              <text x="50" y="94" text-anchor="middle" font-size="8" fill="#666" font-family="sans-serif">?</text>
+            </svg>
+          `);
+        }
+
+        function getBrainrotImage(br) {
+            if (br && br.image && br.image.trim() !== '') return br.image;
+            return getPlaceholderImage();
+        }
+
+        function getSlotValue(slot) {
+            if (!slot.brainrot) return 0;
+            return (RARITY_VALUE[slot.brainrot.rarity] || 0) * slot.quantity;
+        }
+
+        // Render
+
+        function renderGrid(side) {
+            const grid = document.getElementById(side === 'offer' ? 'offerGrid' : 'requestGrid');
+            const slots = state[side];
+            const countLabel = document.getElementById(side === 'offer' ? 'offerCount' : 'requestCount');
+
+            let filled = 0;
+            grid.innerHTML = '';
+
+            slots.forEach((slot, idx) => {
+                const div = document.createElement('div');
+                div.className = `slot-card relative rounded-xl border-2 ${slot.brainrot ? 'border-solid border-orange-500/30' : 'border-dashed border-white/10'} bg-black/50 hover:border-orange-400/60 hover:-translate-y-0.5 transition duration-200 cursor-pointer overflow-hidden shadow-inner flex items-center justify-center`;
+
+                if (slot.brainrot) {
+                    filled++;
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = `absolute top-1 left-1/2 -translate-x-1/2 text-[0.7rem] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm whitespace-nowrap max-w-[85%] overflow-hidden text-ellipsis z-10 text-center shadow-[0_2px_8px_rgba(0,0,0,0.8)] ${getRarityTextClass(slot.brainrot.rarity)}`;
+                    nameSpan.textContent = slot.brainrot.name;
+
+                    const img = document.createElement('img');
+                    img.className = 'w-full h-full object-cover';
+                    img.src = getBrainrotImage(slot.brainrot);
+                    img.alt = slot.brainrot.name;
+                    img.loading = 'lazy';
+                    img.onerror = function() { this.src = getPlaceholderImage(); };
+
+                    const qtySpan = document.createElement('span');
+                    qtySpan.className = 'absolute bottom-1 right-1.5 bg-black/80 text-orange-400 font-bold text-[0.65rem] px-2 py-0.5 rounded-full border border-orange-500/30 backdrop-blur-sm z-10';
+                    qtySpan.textContent = `×${slot.quantity}`;
+
+                    if (slot.brainrot.rarity) {
+                        div.classList.add(getRarityBorder(slot.brainrot.rarity));
+                    }
+
+                    div.appendChild(nameSpan);
+                    div.appendChild(img);
+                    div.appendChild(qtySpan);
+                } else {
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-plus text-white/10 text-3xl';
+                    div.appendChild(icon);
+                }
+
+                div.dataset.side = side;
+                div.dataset.index = idx;
+                div.addEventListener('click', () => openModal(side, idx));
+
+                grid.appendChild(div);
+            });
+
+            countLabel.textContent = `${filled}/${SLOT_COUNT}`;
+            updateFairness();
+        }
+
+        function renderAll() {
+            renderGrid('offer');
+            renderGrid('request');
+        }
+
+        // Fairness
+
+        function updateFairness() {
+            let offerTotal = 0,
+                requestTotal = 0;
+            state.offer.forEach(s => offerTotal += getSlotValue(s));
+            state.request.forEach(s => requestTotal += getSlotValue(s));
+
+            const total = offerTotal + requestTotal;
+            let ratio = total === 0 ? 0.5 : offerTotal / total;
+            ratio = Math.min(1, Math.max(0, ratio));
+
+            const fill = document.getElementById('fairnessFill');
+            fill.style.width = `${ratio * 100}%`;
+
+            const label = document.getElementById('fairnessLabel');
+
+            if (total === 0) {
+                label.textContent = 'Empty';
+                label.className = 'font-semibold text-gray-500';
+                fill.style.background = 'linear-gradient(90deg, #555, #888)';
+                return;
+            }
+
+            const diff = Math.abs(offerTotal - requestTotal);
+            const maxVal = Math.max(offerTotal, requestTotal);
+            const percentDiff = maxVal === 0 ? 0 : (diff / maxVal) * 100;
+
+            if (percentDiff < 10) {
+                label.textContent = 'Fair Trade';
+                label.className = 'font-semibold text-green-400';
+                fill.style.background = 'linear-gradient(90deg, #4CAF50, #8BC34A)';
+            } else if (percentDiff < 30) {
+                label.textContent = 'Slightly Unbalanced';
+                label.className = 'font-semibold text-yellow-400';
+                fill.style.background = 'linear-gradient(90deg, #FF9800, #FFC107)';
+            } else {
+                label.textContent = 'Very Unbalanced';
+                label.className = 'font-semibold text-red-400';
+                fill.style.background = 'linear-gradient(90deg, #f44336, #FF5722)';
+            }
+        }
+
+        // Modal
+
+        const modalOverlay = document.getElementById('slotModal');
+        const modalZones = document.getElementById('modalZones');
+        const modalSearch = document.getElementById('modalSearch');
+        const modalQty = document.getElementById('modalQty');
+        const modalTitle = document.getElementById('modalTitle');
+
+        function openModal(side, index) {
+            const slot = state[side][index];
+            modalState.side = side;
+            modalState.index = index;
+            modalState.selectedBrainrot = slot.brainrot ? { ...slot.brainrot } : null;
+            modalState.quantity = slot.brainrot ? slot.quantity : 1;
+            modalState.searchTerm = '';
+
+            modalTitle.textContent = `${side === 'offer' ? 'Offer' : 'Request'} Slot ${index + 1}`;
+            modalSearch.value = '';
+            modalQty.value = modalState.quantity;
+
+            renderModalGrid();
+
+            modalOverlay.classList.remove('hidden');
+            modalOverlay.classList.add('flex');
+            setTimeout(() => modalSearch.focus(), 100);
+        }
+
+        function closeModal() {
+            modalOverlay.classList.add('hidden');
+            modalOverlay.classList.remove('flex');
+        }
+
+        function renderModalGrid() {
+            const search = modalState.searchTerm.toLowerCase().trim();
+            let filteredZones = {};
+
+            if (search) {
+                const matched = ALL_BRAINROTS.filter(b => b.name.toLowerCase().includes(search));
+                if (matched.length) {
+                    for (const zone in ZONES) {
+                        const zItems = ZONES[zone].filter(b => matched.includes(b));
+                        if (zItems.length) filteredZones[zone] = zItems;
+                    }
+                }
+            } else {
+                filteredZones = ZONES;
+            }
+
+            modalZones.innerHTML = '';
+
+            if (Object.keys(filteredZones).length === 0) {
+                modalZones.innerHTML = `<div class="text-center text-gray-500 py-8 text-sm">No brainrots found</div>`;
+                return;
+            }
+
+            for (const [zone, items] of Object.entries(filteredZones)) {
+                const zoneDiv = document.createElement('div');
+                zoneDiv.className = 'mb-4';
+                const header = document.createElement('h4');
+                header.className = 'text-sm font-bold text-gray-400 mb-1.5';
+                header.textContent = zone;
+                zoneDiv.appendChild(header);
+
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-[repeat(auto-fill,minmax(90px,1fr))] gap-2.5';
+
+                items.forEach(br => {
+                    const opt = document.createElement('div');
+                    const isSelected = modalState.selectedBrainrot && modalState.selectedBrainrot.name === br.name;
+                    opt.className = `relative aspect-square rounded-xl overflow-hidden cursor-pointer border-2 transition-all duration-150 ${isSelected ? 'border-orange-500 shadow-lg shadow-orange-500/20' : 'border-transparent'} hover:border-orange-400/60 hover:-translate-y-0.5 hover:shadow-lg bg-black/30`;
+
+                    const img = document.createElement('img');
+                    img.className = 'w-full h-full object-cover';
+                    img.src = getBrainrotImage(br);
+                    img.alt = br.name;
+                    img.loading = 'lazy';
+                    img.onerror = function() { this.src = getPlaceholderImage(); };
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = `absolute bottom-1 left-1/2 -translate-x-1/2 text-[0.7rem] sm:text-[0.7rem] font-bold px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm whitespace-nowrap max-w-[85%] overflow-hidden text-ellipsis z-10 text-center shadow-[0_2px_8px_rgba(0,0,0,0.8)] ${getRarityTextClass(br.rarity)}`;
+                    nameSpan.textContent = br.name;
+
+                    opt.appendChild(img);
+                    opt.appendChild(nameSpan);
+
+                    opt.addEventListener('click', () => {
+                        modalState.selectedBrainrot = { ...br };
+                        modalState.quantity = Math.max(1, modalState.quantity);
+                        modalQty.value = modalState.quantity;
+                        renderModalGrid();
+                    });
+
+                    grid.appendChild(opt);
+                });
+
+                zoneDiv.appendChild(grid);
+                modalZones.appendChild(zoneDiv);
+            }
+        }
+
+        function adjustQty(delta) {
+            const input = document.getElementById('modalQty');
+            let val = parseInt(input.value) || 1;
+            val = Math.max(1, val + delta);
+            val = Math.min(999, val);
+            input.value = val;
+            modalState.quantity = val;
+        }
+
+        function confirmSlot() {
+            const sel = modalState.selectedBrainrot;
+            const qty = parseInt(document.getElementById('modalQty').value) || 1;
+            const side = modalState.side;
+            const idx = modalState.index;
+
+            if (sel) {
+                state[side][idx] = { brainrot: { ...sel }, quantity: Math.max(1, qty) };
+            } else {
+                state[side][idx] = { brainrot: null, quantity: 0 };
+            }
+
+            renderAll();
+            saveState();
+            closeModal();
+        }
+
+        function clearSlot() {
+            const side = modalState.side;
+            const idx = modalState.index;
+            state[side][idx] = { brainrot: null, quantity: 0 };
+            renderAll();
+            saveState();
+            closeModal();
+        }
+
+        modalSearch.addEventListener('input', () => {
+            modalState.searchTerm = modalSearch.value;
+            renderModalGrid();
+        });
+
+        modalQty.addEventListener('change', () => {
+            let val = parseInt(modalQty.value) || 1;
+            val = Math.max(1, Math.min(999, val));
+            modalQty.value = val;
+            modalState.quantity = val;
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal();
+            if (e.key === 'Enter' && !modalOverlay.classList.contains('hidden')) confirmSlot();
+        });
+
+        // Clear
+
+        function clearAll() {
+            state.offer = makeEmptySlots();
+            state.request = makeEmptySlots();
+            renderAll();
+            saveState();
+        }
+
+        // Save
+
+        function saveState() {
+            try {
+                localStorage.setItem('brainrot_trade_state_v2', JSON.stringify(state));
+            } catch (_) {}
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem('brainrot_trade_state_v2');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed.offer && parsed.request &&
+                        parsed.offer.length === SLOT_COUNT &&
+                        parsed.request.length === SLOT_COUNT) {
+                        state.offer = parsed.offer;
+                        state.request = parsed.request;
+                    }
+                }
+            } catch (_) {}
+        }
+
+        // Init
+
+        loadState();
+        renderAll();
+
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.confirmSlot = confirmSlot;
+        window.clearSlot = clearSlot;
+        window.adjustQty = adjustQty;
+        window.clearAll = clearAll;
+
+        console.log(`🧠 Trade Simulator ready · ${ALL_BRAINROTS.length} brainrots loaded`);
+    </script>
+</body>
+</html>
