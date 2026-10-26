@@ -4004,7 +4004,10 @@
         let currentStep = 0;
         let currentArea = 'crimsonsakuraisles';
         let highestProbabilityItem = null;
-        let forgedItems = JSON.parse(localStorage.getItem('forgedItems') || '[]');
+        // Storage can throw in a third-party iframe when the browser blocks it
+        let forgedItems = [];
+        try { forgedItems = JSON.parse(localStorage.getItem('forgedItems') || '[]'); } catch (e) { }
+        if (!Array.isArray(forgedItems)) forgedItems = [];
         const MAX_INVENTORY_SIZE = 20;
         let currentSearchTerm = '';
         let isQuickCraft = false;
@@ -4192,7 +4195,7 @@
                 forgedItems = forgedItems.slice(0, MAX_INVENTORY_SIZE);
             }
 
-            localStorage.setItem('forgedItems', JSON.stringify(forgedItems));
+            try { localStorage.setItem('forgedItems', JSON.stringify(forgedItems)); } catch (e) { }
 
             updateInventoryUI();
         }
@@ -4223,6 +4226,8 @@
 
             forgedItems.forEach(item => {
                 const card = document.createElement('div');
+                // Items saved by older versions can miss stats; skip them instead of breaking page setup
+                try {
                 card.innerHTML = createItemCard({
                     type: 'inventory',
                     itemName: item.itemName,
@@ -4241,6 +4246,9 @@
                     image: item.image || '',
                     isLocked: false
                 });
+                } catch (e) {
+                    return;
+                }
 
                 inventoryCards.appendChild(card.firstElementChild);
             });
@@ -4281,7 +4289,7 @@
         function clearInventory() {
             if (forgedItems.length > 0) {
                 forgedItems = [];
-                localStorage.removeItem('forgedItems');
+                try { localStorage.removeItem('forgedItems'); } catch (e) { }
                 updateInventoryUI();
             }
         }
