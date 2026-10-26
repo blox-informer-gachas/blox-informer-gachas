@@ -1529,6 +1529,17 @@
             z-index: -1;
         }
 
+        .art-credit {
+            margin-top: 12px;
+            font-size: 0.65rem;
+            color: #888;
+            text-align: center;
+        }
+
+        .art-credit a {
+            color: inherit;
+        }
+
         /* Inventory Modal Styles */
         .inventory-modal .modal-content {
             max-width: 700px;
@@ -2524,6 +2535,7 @@
             <div class="probability-grid" id="probability-list"></div>
             <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px; text-align: center;">(Click
                 on an item type for specific item forge odds)</div>
+            <div class="art-credit">Item and ore art: The Forge (Roblox), via <a href="https://forgewiki.org" target="_blank" rel="noopener">The Forge Wiki</a> (CC BY-SA 4.0)</div>
     </div>
 
     <div class="tooltip" id="variant-tooltip">
@@ -2580,8 +2592,10 @@
 
     <script>
         // Rendered by dev/render_images.py from the wiki art (images/out), uploaded to the WordPress media library.
-        // If the upload lands in another month folder, change only this line.
-        const IMAGE_BASE = 'https://bloxinformer.com/wp-content/uploads/2026/10/';
+        // PREVIEW: loads the images from the project's images/out folder until they are uploaded.
+        // Before the push, switch to the WordPress line below (check_data.js warns while this is on).
+        const IMAGE_BASE = '../../images/out/';
+        // const IMAGE_BASE = 'https://bloxinformer.com/wp-content/uploads/2026/10/';
 
         const oreImages = {
             "Stone": IMAGE_BASE + "the-forge-ore-stone.webp",
