@@ -1529,174 +1529,6 @@
             z-index: -1;
         }
 
-        /* Recipe Helper */
-        .section-title-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        @media (max-width: 480px) {
-            .section-title > span {
-                white-space: nowrap;
-            }
-
-            .section-title-buttons .quick-craft-btn {
-                padding: 8px 12px;
-            }
-        }
-
-        .recipe-modal .modal-content {
-            max-width: 700px;
-            width: 95%;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .recipe-intro {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-        }
-
-        #recipe-search {
-            width: 100%;
-            padding: 10px 14px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            color: var(--text);
-            font-size: 0.85rem;
-            outline: none;
-            margin-bottom: 10px;
-        }
-
-        #recipe-search:focus {
-            border-color: var(--primary-dark);
-            box-shadow: 0 0 0 2px var(--primary-glow);
-        }
-
-        .recipe-list {
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding-right: 4px;
-        }
-
-        .recipe-card {
-            background: rgba(0, 0, 0, 0.25);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px 12px;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .recipe-card.highlight {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px var(--primary-glow);
-        }
-
-        .recipe-head {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
-        }
-
-        .recipe-head img,
-        .recipe-ore img {
-            object-fit: contain;
-        }
-
-        .recipe-head img,
-        .recipe-head > .fa-gem {
-            width: 32px;
-            height: 32px;
-            font-size: 24px;
-            text-align: center;
-        }
-
-        .recipe-name {
-            font-weight: 700;
-        }
-
-        .recipe-sub {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .recipe-cost {
-            margin-left: auto;
-            font-size: 0.8rem;
-            white-space: nowrap;
-        }
-
-        .recipe-cost i {
-            color: var(--legendary);
-            margin: 0 3px 0 8px;
-        }
-
-        .recipe-ores {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .recipe-ore {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 10px 4px 6px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            color: var(--text);
-            font: inherit;
-            font-size: 0.8rem;
-        }
-
-        .recipe-ore img,
-        .recipe-ore .fa-gem {
-            width: 20px;
-            height: 20px;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .recipe-ore.craftable {
-            cursor: pointer;
-            border-color: var(--primary-dark);
-        }
-
-        .recipe-ore.craftable:hover,
-        .recipe-ore.craftable:focus-visible {
-            background: var(--primary-light);
-            outline: none;
-        }
-
-        .recipe-raw {
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px dashed var(--border);
-        }
-
-        .recipe-raw-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-        }
-
-        .recipe-empty {
-            text-align: center;
-            color: var(--text-secondary);
-            padding: 20px;
-        }
-
         /* Inventory Modal Styles */
         .inventory-modal .modal-content {
             max-width: 700px;
@@ -2545,14 +2377,9 @@
         <section class="inventory-section">
             <div class="section-title">
                 <span><i class="fas fa-gem"></i> Ore List</span>
-                <div class="section-title-buttons">
-                    <button class="quick-craft-btn" id="recipe-btn">
-                        <i class="fas fa-flask"></i> Recipes
-                    </button>
-                    <button class="quick-craft-btn" id="quick-craft-btn">
-                        <i class="fas fa-bolt"></i> Quick Craft
-                    </button>
-                </div>
+                <button class="quick-craft-btn" id="quick-craft-btn">
+                    <i class="fas fa-bolt"></i> Quick Craft
+                </button>
             </div>
 
             <div class="filter-search-container"
@@ -2720,17 +2547,6 @@
                 <button class="control-btn forge-btn" id="forge-again-btn">Forge Again</button>
                 <button class="control-btn reset-btn" id="close-result-btn">Close</button>
             </div>
-        </div>
-    </div>
-    <div class="modal-overlay recipe-modal" id="recipe-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-flask"></i> Ore Crafting Recipes</h3>
-                <button class="modal-close" id="recipe-close">&times;</button>
-            </div>
-            <div class="recipe-intro">Craft at the Crafting Stall in each island hub. Each recipe makes 1 ore. Click a highlighted ore to jump to its recipe.</div>
-            <input type="text" id="recipe-search" placeholder="Search by result or ingredient, e.g. Quartz" autocomplete="off">
-            <div class="recipe-list" id="recipe-list"></div>
         </div>
     </div>
     <div class="modal-overlay inventory-modal" id="inventory-modal">
@@ -4354,67 +4170,74 @@
             { id: 150, name: "Candy Ore", multiplier: 1, rarity: "legendary", area: "halloween", color: "#c86bfa", traitType: null, traits: [], seasonal: "Halloween" }
         ];
 
+        // Trait icon per ore id, picked from the ore's main effect
         const traitIconMapping = {
-            // Stonewake's Cross
-            13: { icon: 'fas fa-skull-crossbones', color: '#5f4937' }, // Poopite
-
-            // Forgotten Kingdom
-            24: { icon: 'fas fa-heart', color: '#4b2e87' }, // Obsidian
-            27: { icon: 'fas fa-crosshairs', color: '#8e4a4c' }, // Rivalite
-            28: { icon: 'fas fa-skull', color: '#97c889' }, // Uranium
-            29: { icon: 'fas fa-heart', color: '#9f61fa' }, // Mythril
-            30: { icon: 'fas fa-fan', color: '#fab67f' }, // Eye Ore
-            31: { icon: 'fas fa-fire', color: '#a4532e' }, // Fireite
-            32: { icon: 'fas fa-bomb', color: '#f77b61' }, // Magmaite
-            33: { icon: 'fas fa-running', color: '#9ac9fa' }, // Lightite
-            34: { icon: 'fas fa-fire', color: '#7d1b1d' }, // Demonite
-            35: { icon: 'fas fa-ghost', color: '#f0f0f0' }, // Darkryte
-
-            // Frostspire Expanse
-            49: { icon: 'fas fa-heart', color: '#d6cedd' }, // Pumice
-            50: { icon: 'fas fa-shield', color: '#656b7b' }, // Graphite
-            51: { icon: 'fas fa-running', color: '#e2f0ff' }, // Aetherit
-            55: { icon: 'fas fa-fan', color: '#5d7a7e' }, // Frost Fossil
-            57: { icon: 'fas fa-running', color: '#f0fdb8' }, // Velchire
-            58: { icon: 'fas fa-shield', color: '#b6b9c8' }, // Sanctis
-            59: { icon: 'fas fa-snowflake', color: '#dcd9d4' }, // Snowite
-            60: { icon: 'fas fa-snowflake', color: '#6591c0' },  // Iceite
-            61: { icon: 'fas fa-heart', color: '#687196' },  // Mosasaursit
-
-            // Peak
-            66: { icon: 'fas fa-fan', color: '#c26073' }, // Crimsonite
-            67: { icon: 'fas fa-skull-crossbones', color: '#a89be4' }, // Malachite
-            71: { icon: 'fas fa-crosshairs', color: '#c393f7' }, // Voidstar
-            72: { icon: 'fas fa-heart', color: '#e8b9e1' }, // Etherealite
-            74: { icon: 'fas fa-bolt-lightning', color: '#fff4c0' },  // Heavenite
-            75: { icon: 'fas fa-bomb', color: '#ffde65' },  // Gargantuan
-
-            //Raven Cave
-            76: { icon: 'fas fa-crosshairs', color: '#ddeefb' }, // Prismatic Heart
-            77: { icon: 'fas fa-crosshairs', color: '#adafb9' }, // Yeti Heart
-            78: { icon: 'fas fa-crosshairs', color: '#88c2e3' }, // Golem Heart
-            79: { icon: 'fas fa-running', color: '#b4ff88' }, // Frogite
-            80: { icon: 'fas fa-fan', color: '#8efdff' }, // Moon Stone
-            83: { icon: 'fas fa-heart', color: '#e1a44d' },  // Duranite
-            85: { icon: 'fas fa-heartbeat', color: '#e45768' }, // Stolen Heart
-            86: { icon: 'fas fa-heart', color: '#f9696d' },  // Heart Of The Island
-
-            // Bamboo Cave
-            90: { icon: 'fas fa-heart', color: '#4f6d60' }, // Earthite
-            94: { icon: 'fas fa-fan', color: '#eda04c' }, // Tiger Eye
-            95: { icon: 'fas fa-heart', color: '#78e5ff' }, // Cyanite Jade
-            97: { icon: 'fas fa-running', color: '#f0b209' }, // Duquack
-            98: { icon: 'fas fa-crosshairs', color: '#808ab4' }, // Onyx
-
-            // Holy Tree
-            102: { icon: 'fas fa-running', color: '#9c27b0' }, // Blue Gem Quill
-            104: { icon: 'fas fa-fan', color: '#9c27b0' }, // Sealed Curse
-            106: { icon: 'fas fa-heart', color: '#f0b209' }, // Azuryxite
-            107: { icon: 'fas fa-fire', color: '#f0b209' }, // Sun Stone
-            109: { icon: 'fas fa-bomb', color: '#d13429' }, // Meteorite
-            110: { icon: 'fas fa-heart', color: '#d13429' }, // Heavenly Orb
-            111: { icon: 'fas fa-dice', color: '#9c27b0' }, // Lucky Cat
-            113: { icon: 'fas fa-crosshairs', color: '#885ec6' } // Kyubite
+            13: { icon: 'fas fa-poo' }, // Poopite: poison cloud at low HP
+            24: { icon: 'fas fa-heart' }, // Obsidian: health
+            27: { icon: 'fas fa-crosshairs' }, // Rivalite: crit
+            28: { icon: 'fas fa-radiation' }, // Uranium: AoE damage aura
+            29: { icon: 'fas fa-heart' }, // Mythril: health
+            30: { icon: 'fas fa-eye' }, // Eye Ore: damage for health
+            31: { icon: 'fas fa-fire' }, // Fireite: burn
+            32: { icon: 'fas fa-bomb' }, // Magmaite: explosion
+            33: { icon: 'fas fa-person-running' }, // Lightite: movement speed
+            34: { icon: 'fas fa-fire-flame-curved' }, // Demonite: burn on hit and when hit
+            35: { icon: 'fas fa-ghost' }, // Darkryte: shadow dodge
+            50: { icon: 'fas fa-shield-heart' }, // Graphite: health and damage reduction
+            51: { icon: 'fas fa-gauge-high' }, // Aetherit: attack and movement speed
+            55: { icon: 'fas fa-hand-fist' }, // Frost Fossil: physical damage
+            57: { icon: 'fas fa-person-running' }, // Velchire: movement speed
+            58: { icon: 'fas fa-battery-full' }, // Sanctis: stamina
+            59: { icon: 'fas fa-snowflake' }, // Snowite: slow
+            60: { icon: 'fas fa-icicles' }, // Iceite: freeze
+            61: { icon: 'fas fa-heart' }, // Mosasaursit: health
+            66: { icon: 'fas fa-hand-fist' }, // Crimsonite: physical damage
+            67: { icon: 'fas fa-skull-crossbones' }, // Malachite: poison
+            71: { icon: 'fas fa-crosshairs' }, // Voidstar: crit
+            72: { icon: 'fas fa-heart' }, // Etherealite: health
+            74: { icon: 'fas fa-bolt-lightning' }, // Heavenite: smite
+            75: { icon: 'fas fa-volcano' }, // Gargantuan: explosion and burn
+            76: { icon: 'fas fa-crosshairs' }, // Prismatic Heart: crit and freeze
+            77: { icon: 'fas fa-crosshairs' }, // Yeti Heart: crit and attack speed
+            78: { icon: 'fas fa-crosshairs' }, // Golem Heart: crit and slow
+            79: { icon: 'fas fa-frog' }, // Frogite: jump and dash
+            80: { icon: 'fas fa-moon' }, // Moon Stone: damage at night
+            83: { icon: 'fas fa-shield-heart' }, // Duranite: health and damage reduction
+            85: { icon: 'fas fa-droplet' }, // Stolen Heart: lifesteal
+            86: { icon: 'fas fa-heart-circle-bolt' }, // Heart Of The Island: health, rage at low HP
+            90: { icon: 'fas fa-heart' }, // Earthite: health
+            94: { icon: 'fas fa-paw' }, // Tiger's Eye: damage, attack and movement speed
+            95: { icon: 'fas fa-heart' }, // Cyanite Jade: health
+            97: { icon: 'fas fa-feather' }, // Duquack: jump and dash
+            98: { icon: 'fas fa-crosshairs' }, // Onyx: crit
+            102: { icon: 'fas fa-feather-pointed' }, // Blue Gem Quill: jump and dash
+            104: { icon: 'fas fa-book-skull' }, // Sealed Curse: damage for health, rage at low HP
+            106: { icon: 'fas fa-shield-heart' }, // Azuryxite: health and damage reduction
+            107: { icon: 'fas fa-sun' }, // Sun Stone: burn
+            109: { icon: 'fas fa-meteor' }, // Meteorite: explosion
+            110: { icon: 'fas fa-heart-pulse' }, // Heavenly Orb: health and regen
+            111: { icon: 'fas fa-cat' }, // Lucky Cat: luck
+            113: { icon: 'fas fa-crosshairs' }, // Kyubite: crit and burn
+            118: { icon: 'fas fa-yin-yang' }, // Yin: health, rage at low HP
+            119: { icon: 'fas fa-yin-yang' }, // Yang: crit
+            126: { icon: 'fas fa-eye-slash' }, // Ceyite: dodge
+            127: { icon: 'fas fa-bolt' }, // Marblite: chain lightning
+            128: { icon: 'fas fa-heart-pulse' }, // Takenokoishi: health and regen
+            129: { icon: 'fas fa-hand-fist' }, // Kokorite: damage, rage at low HP
+            130: { icon: 'fas fa-spa' }, // Sakurite: jump and dash
+            131: { icon: 'fas fa-shield-halved' }, // Sentira: health, regen and thorns
+            132: { icon: 'fas fa-paw' }, // Wolfarite: damage, attack and movement speed
+            133: { icon: 'fas fa-yin-yang' }, // Yin-Yang: crit and health
+            135: { icon: 'fas fa-star' }, // Starite: luck
+            139: { icon: 'fas fa-burst' }, // Supermassive Black Hole: explosion and burn
+            140: { icon: 'fas fa-hurricane' }, // Galaxite: black hole, crit and health
+            141: { icon: 'fas fa-dragon' }, // Fierce Jade: attack speed, crit, rage
+            142: { icon: 'fas fa-leaf' }, // Aether Lotus: health and regen
+            143: { icon: 'fas fa-wind' }, // Zephyte: movement, jump and dash
+            144: { icon: 'fas fa-skull' }, // Vanegos: damage for health, rage and thorns
+            145: { icon: 'fas fa-biohazard' }, // Vooite: poison clouds and thorns
+            146: { icon: 'fas fa-wand-magic-sparkles' }, // Kitsunite: lightning, smite, burn, explosion
+            148: { icon: 'fas fa-cube' } // Bismuth: attack speed, runes, crit
         };
 
         // Optimal ore counts for each item type
@@ -4527,57 +4350,6 @@
             return ({ frostspire: optimalCountsFrostspire, crimsonsakuraisles: optimalCountsCrimsonSakuraIsles, guild: optimalCountsGuild }[currentArea] || optimalCounts).weapon;
         }
 
-        // Ore crafting recipes from the wiki Crafting page (2026-10-26), with the 1.08 recipe changes applied.
-        const oreRecipes = [
-            { result: "Arcane Crystal", island: "kingdom", ores: [["Rainbow Crystal", 3]], gold: 15000, time: "5m" },
-            { result: "Blue Crystal Ore", island: "kingdom", ores: [["Quartz", 3], ["Sapphire", 2]], gold: 80, time: "5s" },
-            { result: "Crimson Crystal Ore", island: "kingdom", ores: [["Cuprite", 1], ["Quartz", 3]], gold: 100, time: "5s" },
-            { result: "Darkryte", island: "kingdom", ores: [["Demonite", 1], ["Magmaite", 1]], gold: 500, time: "1m" },
-            { result: "Demonite", island: "kingdom", ores: [["Magmaite", 1], ["Uranium", 1], ["Fireite", 1]], gold: 500, time: "1m" },
-            { result: "Eye Ore", island: "kingdom", ores: [["Cuprite", 2], ["Rivalite", 1]], gold: 150, time: "20s" },
-            { result: "Green Crystal Ore", island: "kingdom", ores: [["Emerald", 2], ["Quartz", 3]], gold: 90, time: "5s" },
-            { result: "Lightite", island: "kingdom", ores: [["Diamond", 2], ["Eye Ore", 1], ["Mythril", 2]], gold: 250, time: "20s" },
-            { result: "Magenta Crystal Ore", island: "kingdom", ores: [["Amethyst", 3], ["Quartz", 3]], gold: 95, time: "5s" },
-            { result: "Magmaite", island: "kingdom", ores: [["Fireite", 1], ["Obsidian", 3]], gold: 225, time: "20s" },
-            { result: "Mythril", island: "kingdom", ores: [["Obsidian", 1], ["Rivalite", 1]], gold: 125, time: "20s" },
-            { result: "Orange Crystal Ore", island: "kingdom", ores: [["Quartz", 3], ["Topaz", 3]], gold: 85, time: "5s" },
-            { result: "Rainbow Crystal", island: "kingdom", ores: [["Crimson Crystal Ore", 3], ["Green Crystal Ore", 3], ["Blue Crystal Ore", 3]], gold: 1000, time: "20s" },
-            { result: "Stolen Heart", island: "frostspire", ores: [["Arcane Crystal", 1], ["Golem Heart", 3]], gold: 15000, time: "3m" },
-            { result: "Suryafal", island: "frostspire", ores: [["Etherealite", 1], ["Fireite", 5], ["Orange Crystal Ore", 3]], gold: 5000, time: "2m" },
-            { result: "Heart Of The Island", island: "frostspire", ores: [["Duranite", 5], ["Gulabite", 3], ["Stolen Heart", 2]], gold: 25000, time: "5m" },
-            { result: "Duranite", island: "frostspire", ores: [["Etherealite", 2]], gold: 3000, time: "60s" },
-            { result: "Iceite", island: "frostspire", ores: [["Blue Crystal Ore", 2], ["Snowite", 2]], gold: 1000, time: "60s" },
-            { result: "Etherealite", island: "frostspire", ores: [["Demonite", 1], ["Iceite", 1], ["Rainbow Crystal", 1]], gold: 25000, time: "60s" },
-            { result: "Voidstar", island: "frostspire", ores: [["Mythril", 2], ["Voidfractal", 2]], gold: 2000, time: "20s" },
-            { result: "Velchire", island: "frostspire", ores: [["Aetherit", 1], ["Lightite", 1]], gold: 300, time: "20s" },
-            { result: "Snowite", island: "frostspire", ores: [["Blue Crystal Ore", 1], ["Diamond", 2], ["Sapphire", 3]], gold: 400, time: "20s" },
-            { result: "Aetherit", island: "frostspire", ores: [["Pumice", 1], ["Tungsten", 2]], gold: 50, time: "2s" },
-            { result: "Gargantuan", island: "frostspire", ores: [["Darkryte", 7], ["Heavenite", 1], ["Suryafal", 5]], gold: 40000, time: "15m" },
-            { result: "Heavenite", island: "frostspire", ores: [["Arcane Crystal", 2], ["Etherealite", 7], ["Suryafal", 3]], gold: 25000, time: "5m" },
-            { result: "Azuryxite", island: "crimsonsakuraisles", ores: [["Cyanite Jade", 1], ["Frost Fossil", 3], ["Heat Steel", 2]], gold: 2500, time: "20s" },
-            { result: "Onyx", island: "crimsonsakuraisles", ores: [["Golem Heart", 1], ["Sealed Curse", 10], ["Tiger's Eye", 10]], gold: 2500, time: "20s" },
-            { result: "Blue Gem Quill", island: "crimsonsakuraisles", ores: [["Blue Crystal Ore", 2], ["Cyanite Jade", 1]], gold: 1000, time: "2s" },
-            { result: "Tiger's Eye", island: "crimsonsakuraisles", ores: [["Rock Seed", 2], ["Wraith", 1]], gold: 750, time: "5s" },
-            { result: "Sealed Curse", island: "crimsonsakuraisles", ores: [["Tiger's Eye", 1], ["Wraith", 1]], gold: 1500, time: "5s" },
-            { result: "Cyanite Jade", island: "crimsonsakuraisles", ores: [["Water Stone", 3]], gold: 1000, time: "5s" },
-            { result: "Earthite", island: "crimsonsakuraisles", ores: [["Bamboo", 5]], gold: 10, time: "5s" },
-            { result: "Heavenly Orb", island: "crimsonsakuraisles", ores: [["Azuryxite", 2], ["Sanctis", 5], ["Zenstone", 2]], gold: 10000, time: "1m" },
-            { result: "Meteorite", island: "crimsonsakuraisles", ores: [["Heat Steel", 5], ["Sealed Curse", 3], ["Sun Stone", 2]], gold: 10000, time: "1m" },
-            { result: "Duquack", island: "crimsonsakuraisles", ores: [["Frogite", 1]], gold: 1500, time: "20s" },
-            { result: "Yin-Yang", island: "crimsonsakuraisles", ores: [["Yin", 1], ["Yang", 1]], gold: 5000, time: "5m" },
-            { result: "Sakurite", island: "crimsonsakuraisles", ores: [["Sakuranite", 1], ["Kyomutite", 1]], gold: 3800, time: "3m" },
-            { result: "Sentira", island: "crimsonsakuraisles", ores: [["Fruite", 3], ["Heavenly Orb", 2], ["Meteorite", 2]], gold: 4500, time: "5m" },
-            { result: "Takenokoishi", island: "crimsonsakuraisles", ores: [["Earthite", 10], ["Wraith", 7], ["Zenstone", 5]], gold: 3500, time: "3m" },
-            { result: "Kokorite", island: "crimsonsakuraisles", ores: [["Roosite", 4], ["Sealed Curse", 5]], gold: 4000, time: "4m" },
-            { result: "Wolfarite", island: "crimsonsakuraisles", ores: [["Kokorite", 3], ["Lgarite", 3], ["Onite", 3]], gold: 4200, time: "4m" },
-            { result: "Starite", island: "voidcave", ores: [["Star Dust", 10]], gold: 2000, time: "30s" },
-            { result: "Matter", island: "voidcave", ores: [["Darkryte", 5], ["Starite", 5]], gold: 4000, time: "2m" },
-            { result: "Anti Matter", island: "voidcave", ores: [["Arcane Crystal", 3], ["Starite", 1]], gold: 5000, time: "2m" },
-            { result: "Singularity", island: "voidcave", ores: [["Anti Matter", 1], ["Matter", 1]], gold: 10000, time: "5m" },
-            { result: "Supermassive Black Hole", island: "voidcave", ores: [["Gargantuan", 5], ["Matter", 3], ["Takiseki", 10]], gold: 15000, time: "15m" },
-            { result: "Galaxite", island: "voidcave", ores: [["Anti Matter", 3], ["Singularity", 1], ["Supermassive Black Hole", 1]], gold: 25000, time: "30m" }
-        ];
-
         let currentMode = 'weapon';
         let oreMix = [];
         let activeFilter = 'all';
@@ -4650,7 +4422,6 @@
             updateAreaToggle();
             setupForgeResultModal();
             setupInventorySystem();
-            setupRecipeHelper();
             setupFiltersDropdown();
             updateForgeButtonState();
         }
@@ -4842,28 +4613,22 @@
         }
 
         function getTraitIconClass(oreId) {
-            if (!oreId) return 'fas fa-gem';
+            return traitIconMapping[oreId]?.icon || 'fas fa-gem';
+        }
 
-            if (traitIconMapping[oreId]) {
-                return traitIconMapping[oreId].icon;
-            }
-
-            const ore = oreData.find(o => o.id === oreId);
-            if (!ore) return 'fas fa-gem';
-
-            const lowerName = ore.name.toLowerCase();
-
-            if (lowerName.includes('fire') || lowerName.includes('magma')) return 'fas fa-fire';
-            if (lowerName.includes('demon') || lowerName.includes('dark')) return 'fas fa-ghost';
-            if (lowerName.includes('light') || lowerName.includes('aetherit') || lowerName.includes('velchire')) return 'fas fa-running';
-            if (lowerName.includes('myth') || lowerName.includes('obsidian') || lowerName.includes('pumice') || lowerName.includes('etheralite') || lowerName.includes('mosasaursit')) return 'fas fa-heart';
-            if (lowerName.includes('rival') || lowerName.includes('voidstar')) return 'fas fa-crosshairs';
-            if (lowerName.includes('uranium') || lowerName.includes('poop') || lowerName.includes('malachite')) return 'fas fa-skull-crossbones';
-            if (lowerName.includes('eye') || lowerName.includes('frost fossil') || lowerName.includes('crimsonite')) return 'fas fa-fan';
-            if (lowerName.includes('graphite') || lowerName.includes('sanctis')) return 'fas fa-shield';
-            if (lowerName.includes('snowite') || lowerName.includes('iceite')) return 'fas fa-snowflake';
-
-            return 'fas fa-gem';
+        // One entry per ore: multi-effect ores keep each effect as its own trait
+        function groupTraitsByOre(traits) {
+            const byOre = new Map();
+            traits.forEach(trait => {
+                const key = trait.oreId ?? trait.oreName;
+                const group = byOre.get(key);
+                if (group) {
+                    group.description += '<br>' + trait.description;
+                } else {
+                    byOre.set(key, { ...trait });
+                }
+            });
+            return [...byOre.values()];
         }
 
         function clearInventory() {
@@ -5290,7 +5055,7 @@
                     <div class="traits-full-list">
             `;
 
-                    activeTraits.forEach(trait => {
+                    groupTraitsByOre(activeTraits).forEach(trait => {
                         const iconClass = getTraitIconClass(trait.oreId);
                         html += `
                     <div class="trait-full-item" style="border-color: ${trait.oreColor || oreColor}40;">
@@ -5312,7 +5077,7 @@
                     <div class="traits-icons">
             `;
 
-                    activeTraits.forEach((trait, index) => {
+                    groupTraitsByOre(activeTraits).forEach((trait, index) => {
                         const iconClass = getTraitIconClass(trait.oreId);
                         const traitColor = trait.oreColor || oreColor;
                         html += `
@@ -5897,7 +5662,7 @@
                 return;
             }
 
-            traitsList.forEach(traitInfo => {
+            groupTraitsByOre(traitsList).forEach(traitInfo => {
                 const traitElement = document.createElement('div');
                 traitElement.className = 'trait-card';
                 traitElement.dataset.oreId = traitInfo.oreId;
@@ -6057,116 +5822,6 @@
             }
 
             updateForgeButtonState();
-        }
-
-        const recipeIslandNames = { kingdom: 'Forgotten Kingdom', frostspire: 'Frostspire Expanse', crimsonsakuraisles: 'Crimson Sakura Isles', voidcave: 'Void Cave' };
-
-        function getRecipe(name) {
-            return oreRecipes.find(r => r.result === name);
-        }
-
-        // Adds up the uncraftable ores and gold needed to make qty of an ore from scratch
-        function getRawRecipeCost(name, qty, totals = { ores: {}, gold: 0 }, depth = 0) {
-            const recipe = getRecipe(name);
-            if (!recipe || depth > 10) {
-                totals.ores[name] = (totals.ores[name] || 0) + qty;
-                return totals;
-            }
-            totals.gold += recipe.gold * qty;
-            recipe.ores.forEach(([ore, amount]) => getRawRecipeCost(ore, amount * qty, totals, depth + 1));
-            return totals;
-        }
-
-        function recipeOreIcon(name) {
-            const ore = oreData.find(o => o.name === name);
-            return oreImages[name]
-                ? `<img src="${oreImages[name]}" alt="" loading="lazy">`
-                : `<i class="fas fa-gem" style="color: ${ore ? ore.color : 'var(--text)'};"></i>`;
-        }
-
-        function recipeOreChip(name, amount, linkable) {
-            const label = `${recipeOreIcon(name)}<span>${amount}x ${name}</span>`;
-            return linkable && getRecipe(name)
-                ? `<button type="button" class="recipe-ore craftable" data-recipe="${name}" title="Show the ${name} recipe">${label}</button>`
-                : `<span class="recipe-ore">${label}</span>`;
-        }
-
-        function renderRecipes() {
-            const list = document.getElementById('recipe-list');
-            list.innerHTML = oreRecipes.map(recipe => {
-                const ore = oreData.find(o => o.name === recipe.result);
-                const raw = getRawRecipeCost(recipe.result, 1);
-                const hasSubRecipes = recipe.ores.some(([name]) => getRecipe(name));
-                const search = [recipe.result, ...recipe.ores.map(([name]) => name), ...Object.keys(raw.ores)].join('|').toLowerCase();
-                return `
-                    <div class="recipe-card" data-result="${recipe.result}" data-search="${search}">
-                        <div class="recipe-head">
-                            ${recipeOreIcon(recipe.result)}
-                            <div>
-                                <div class="recipe-name" style="color: ${ore ? ore.color : 'var(--text)'};">${recipe.result}</div>
-                                <div class="recipe-sub">${ore ? `${ore.multiplier}x · ` : ''}${recipeIslandNames[recipe.island]}</div>
-                            </div>
-                            <div class="recipe-cost"><i class="fas fa-coins"></i>${recipe.gold.toLocaleString('en-US')}<i class="fas fa-clock"></i>${recipe.time}</div>
-                        </div>
-                        <div class="recipe-ores">${recipe.ores.map(([name, amount]) => recipeOreChip(name, amount, true)).join('')}</div>
-                        ${hasSubRecipes ? `
-                        <div class="recipe-raw">
-                            <div class="recipe-raw-label">From scratch: ${raw.gold.toLocaleString('en-US')} gold in total</div>
-                            <div class="recipe-ores">${Object.entries(raw.ores).map(([name, amount]) => recipeOreChip(name, amount, false)).join('')}</div>
-                        </div>` : ''}
-                    </div>`;
-            }).join('') + '<div class="recipe-empty" style="display: none;">No recipe uses that ore.</div>';
-        }
-
-        function filterRecipes(query) {
-            const q = query.trim().toLowerCase();
-            let shown = 0;
-            document.querySelectorAll('#recipe-list .recipe-card').forEach(card => {
-                const match = !q || card.dataset.search.includes(q);
-                card.style.display = match ? '' : 'none';
-                if (match) shown++;
-            });
-            document.querySelector('#recipe-list .recipe-empty').style.display = shown ? 'none' : '';
-        }
-
-        function setupRecipeHelper() {
-            const modal = document.getElementById('recipe-modal');
-            const searchInput = document.getElementById('recipe-search');
-            const list = document.getElementById('recipe-list');
-            renderRecipes();
-
-            document.getElementById('recipe-btn').addEventListener('click', () => {
-                modal.style.display = 'flex';
-                modal.offsetHeight;
-                requestAnimationFrame(() => modal.classList.add('show'));
-                if (window.innerWidth <= 480) {
-                    document.body.classList.add('modal-open');
-                }
-            });
-
-            document.getElementById('recipe-close').addEventListener('click', () => closeModalSmoothly(modal));
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModalSmoothly(modal);
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modal.classList.contains('show')) closeModalSmoothly(modal);
-            });
-
-            searchInput.addEventListener('input', () => filterRecipes(searchInput.value));
-
-            list.addEventListener('click', (e) => {
-                const chip = e.target.closest('.recipe-ore.craftable');
-                if (!chip) return;
-                const card = [...list.querySelectorAll('.recipe-card')].find(c => c.dataset.result === chip.dataset.recipe);
-                if (!card) return;
-                if (card.style.display === 'none') {
-                    searchInput.value = '';
-                    filterRecipes('');
-                }
-                list.scrollTo({ top: card.offsetTop, behavior: 'smooth' });
-                card.classList.add('highlight');
-                setTimeout(() => card.classList.remove('highlight'), 1500);
-            });
         }
 
         function closeModalSmoothly(modal) {
@@ -6431,20 +6086,23 @@
             };
 
             availableTraits.forEach(ore => {
-                ore.traits.forEach(trait => {
-                    if (trait.type === 'all' || trait.type === quickCraftType) {
+                const traits = ore.traits.filter(trait => trait.type === 'all' || trait.type === quickCraftType);
+                if (traits.length > 0) {
                         const option = document.createElement('div');
                         option.className = 'trait-option';
                         option.dataset.oreId = ore.id;
 
-                        let desc = trait.description;
-                        Object.keys(trait.scaling).forEach(key => {
-                            const scale = trait.scaling[key];
-                            desc = desc.replace(
-                                new RegExp(`([-+]?){${key}}(\\s*[+%s]*)`, 'g'),
-                                `<span class="scalable-value">$1${scale.min}-${scale.max}<span class="scalable-symbol">$2</span></span>`
-                            );
-                        });
+                        const desc = traits.map(trait => {
+                            let text = trait.description;
+                            Object.keys(trait.scaling).forEach(key => {
+                                const scale = trait.scaling[key];
+                                text = text.replace(
+                                    new RegExp(`([-+]?){${key}}(\\s*[+%s]*)`, 'g'),
+                                    `<span class="scalable-value">$1${scale.min}-${scale.max}<span class="scalable-symbol">$2</span></span>`
+                                );
+                            });
+                            return text;
+                        }).join('<br>');
 
                         option.innerHTML = `
     <div class="trait-info">
@@ -6471,8 +6129,7 @@
                                 selectedTraits.push({
                                     oreId: ore.id,
                                     oreName: ore.name,
-                                    description: trait.description,
-                                    scaling: trait.scaling
+                                    description: traits.map(trait => trait.description).join(' ')
                                 });
                                 option.classList.add('selected');
                             } else {
@@ -6483,8 +6140,7 @@
                         });
 
                         traitOptions.appendChild(option);
-                    }
-                });
+                }
             });
             updateDisabledState();
         }
@@ -6856,7 +6512,7 @@
                 }
             });
 
-            return traitsList;
+            return groupTraitsByOre(traitsList);
         }
 
         function simulateForge(forgeVariant = false) {
