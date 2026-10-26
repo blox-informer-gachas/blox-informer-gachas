@@ -4633,10 +4633,19 @@
             });
         }
 
+        // Fills a trait's {placeholders} and highlights only those values: they scale with the ore mix,
+        // fixed numbers in the text ("below 35%", "T3 rune") stay plain
+        function fillTraitText(description, values) {
+            return description.replace(/([-+]?)\{(\w+)\}(%|s\b|x\b)?/g, (match, sign, key, unit = '') =>
+                key in values ? `<span class="scalable-value">${sign}${values[key]}<span class="scalable-symbol">${unit}</span></span>` : match);
+        }
+
         function formatTraitDescription(description) {
+            if (description.includes('scalable-value')) return description;
+            // Items saved by older versions hold plain text: highlight standalone numbers only
             return description.replace(
-                /([-+]?\d+(?:\.\d+)?)(\s*[+%a-zA-Z]*)/g,
-                '<span class="scalable-value">$1<span class="scalable-symbol">$2</span></span>'
+                /(?<![\w.])([-+]?\d+(?:\.\d+)?)(%|s\b|x\b)?/g,
+                (match, number, unit = '') => `<span class="scalable-value">${number}<span class="scalable-symbol">${unit}</span></span>`
             );
         }
 
@@ -5665,13 +5674,7 @@
                                 scaledValues[key] = Math.round(value * 10) / 10;
                             });
 
-                            let formattedDesc = trait.description;
-                            Object.keys(scaledValues).forEach(key => {
-                                formattedDesc = formattedDesc.replace(
-                                    new RegExp(`([-+]?){${key}}(\\s*[+%s]*)`, 'g'),
-                                    `<span class="scalable-value">$1${scaledValues[key]}<span class="scalable-symbol">$2</span></span>`
-                                );
-                            });
+                            const formattedDesc = fillTraitText(trait.description, scaledValues);
 
                             traitsList.push({
                                 oreName: ore.name,
@@ -6120,17 +6123,9 @@
                         option.className = 'trait-option';
                         option.dataset.oreId = ore.id;
 
-                        const desc = traits.map(trait => {
-                            let text = trait.description;
-                            Object.keys(trait.scaling).forEach(key => {
-                                const scale = trait.scaling[key];
-                                text = text.replace(
-                                    new RegExp(`([-+]?){${key}}(\\s*[+%s]*)`, 'g'),
-                                    `<span class="scalable-value">$1${scale.min}-${scale.max}<span class="scalable-symbol">$2</span></span>`
-                                );
-                            });
-                            return text;
-                        }).join('<br>');
+                        const desc = traits.map(trait => fillTraitText(trait.description,
+                            Object.fromEntries(Object.entries(trait.scaling).map(([key, scale]) => [key, `${scale.min} to ${scale.max}`])))
+                        ).join('<br>');
 
                         option.innerHTML = `
     <div class="trait-info">
@@ -6523,10 +6518,7 @@
                                 scaledValues[key] = Math.round(value * 10) / 10;
                             });
 
-                            let formattedDesc = trait.description;
-                            Object.keys(scaledValues).forEach(key => {
-                                formattedDesc = formattedDesc.replace(`{${key}}`, scaledValues[key]);
-                            });
+                            const formattedDesc = fillTraitText(trait.description, scaledValues);
 
                             traitsList.push({
                                 oreName: ore.name,
