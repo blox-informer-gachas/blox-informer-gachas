@@ -1529,6 +1529,174 @@
             z-index: -1;
         }
 
+        /* Recipe Helper */
+        .section-title-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .section-title > span {
+                white-space: nowrap;
+            }
+
+            .section-title-buttons .quick-craft-btn {
+                padding: 8px 12px;
+            }
+        }
+
+        .recipe-modal .modal-content {
+            max-width: 700px;
+            width: 95%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .recipe-intro {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        #recipe-search {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text);
+            font-size: 0.85rem;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        #recipe-search:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+
+        .recipe-list {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 4px;
+        }
+
+        .recipe-card {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .recipe-card.highlight {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+
+        .recipe-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .recipe-head img,
+        .recipe-ore img {
+            object-fit: contain;
+        }
+
+        .recipe-head img,
+        .recipe-head > .fa-gem {
+            width: 32px;
+            height: 32px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .recipe-name {
+            font-weight: 700;
+        }
+
+        .recipe-sub {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .recipe-cost {
+            margin-left: auto;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .recipe-cost i {
+            color: var(--legendary);
+            margin: 0 3px 0 8px;
+        }
+
+        .recipe-ores {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .recipe-ore {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 6px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font: inherit;
+            font-size: 0.8rem;
+        }
+
+        .recipe-ore img,
+        .recipe-ore .fa-gem {
+            width: 20px;
+            height: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .recipe-ore.craftable {
+            cursor: pointer;
+            border-color: var(--primary-dark);
+        }
+
+        .recipe-ore.craftable:hover,
+        .recipe-ore.craftable:focus-visible {
+            background: var(--primary-light);
+            outline: none;
+        }
+
+        .recipe-raw {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .recipe-raw-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .recipe-empty {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 20px;
+        }
+
         /* Inventory Modal Styles */
         .inventory-modal .modal-content {
             max-width: 700px;
@@ -2377,9 +2545,14 @@
         <section class="inventory-section">
             <div class="section-title">
                 <span><i class="fas fa-gem"></i> Ore List</span>
-                <button class="quick-craft-btn" id="quick-craft-btn">
-                    <i class="fas fa-bolt"></i> Quick Craft
-                </button>
+                <div class="section-title-buttons">
+                    <button class="quick-craft-btn" id="recipe-btn">
+                        <i class="fas fa-flask"></i> Recipes
+                    </button>
+                    <button class="quick-craft-btn" id="quick-craft-btn">
+                        <i class="fas fa-bolt"></i> Quick Craft
+                    </button>
+                </div>
             </div>
 
             <div class="filter-search-container"
@@ -2547,6 +2720,17 @@
                 <button class="control-btn forge-btn" id="forge-again-btn">Forge Again</button>
                 <button class="control-btn reset-btn" id="close-result-btn">Close</button>
             </div>
+        </div>
+    </div>
+    <div class="modal-overlay recipe-modal" id="recipe-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-flask"></i> Ore Crafting Recipes</h3>
+                <button class="modal-close" id="recipe-close">&times;</button>
+            </div>
+            <div class="recipe-intro">Craft at the Crafting Stall in each island hub. Each recipe makes 1 ore. Click a highlighted ore to jump to its recipe.</div>
+            <input type="text" id="recipe-search" placeholder="Search by result or ingredient, e.g. Quartz" autocomplete="off">
+            <div class="recipe-list" id="recipe-list"></div>
         </div>
     </div>
     <div class="modal-overlay inventory-modal" id="inventory-modal">
@@ -2852,133 +3036,134 @@
         const baseItemStats = {
             // Generated from wiki Module:Weapon/Data and Module:Armor/Data (2026-10-26).
             // Weapon damage = wiki damage x 2 (Masterwork scale). Armor def = health x 2.
+            // Prices from dev/item-prices.json (in-game tested), not the wiki.
             weapon: {
                 "Dagger": { damage: 8.6, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 68, type: "Dagger" },
-                "Falchion Knife": { damage: 8.9, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 68, type: "Dagger" },
-                "Gladius Daggers": { damage: 9.2, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 68, type: "Dagger" },
-                "Hook": { damage: 9.46, atkSpeed: 0.39, realSpeed: 0.52, range: 6, price: 68, type: "Dagger" },
-                "Cultist Dagger": { damage: 10.5, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 68, type: "Dagger" },
-                "Shark's Fangs": { damage: 7.74, atkSpeed: 0.27, realSpeed: 0.36, range: 6, price: 68, type: "Dagger" },
-                "Curved Dagger": { damage: 9.9, atkSpeed: 0.3, realSpeed: 0.41, range: 6, price: 68, type: "Dagger" },
-                "Kunai": { damage: 7.74, atkSpeed: 0.29, realSpeed: 0.39, range: 6, price: 68, type: "Dagger" },
-                "Jitte": { damage: 9.9, atkSpeed: 0.37, realSpeed: 0.49, range: 6, price: 68, type: "Dagger" },
-                "Damascus Dagger": { damage: 9.46, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 75, type: "Dagger" },
-                "Tanto": { damage: 9.9, atkSpeed: 0.29, realSpeed: 0.39, range: 6, price: 78, type: "Dagger" },
-                "Falchion Sword": { damage: 15, atkSpeed: 0.59, realSpeed: 0.7, range: 8, price: 120, type: "Straight Sword" },
+                "Falchion Knife": { damage: 8.9, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 71.4, type: "Dagger" },
+                "Gladius Daggers": { damage: 9.2, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 74.8, type: "Dagger" },
+                "Hook": { damage: 9.46, atkSpeed: 0.39, realSpeed: 0.52, range: 6, price: 74.8, type: "Dagger" },
+                "Cultist Dagger": { damage: 10.5, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 74.8, type: "Dagger" },
+                "Shark's Fangs": { damage: 7.74, atkSpeed: 0.27, realSpeed: 0.36, range: 6, price: 74.8, type: "Dagger" },
+                "Curved Dagger": { damage: 9.9, atkSpeed: 0.3, realSpeed: 0.41, range: 6, price: 74.8, type: "Dagger" },
+                "Kunai": { damage: 7.74, atkSpeed: 0.29, realSpeed: 0.39, range: 6, price: 71.4, type: "Dagger" },
+                "Jitte": { damage: 9.9, atkSpeed: 0.37, realSpeed: 0.49, range: 6, price: 74.8, type: "Dagger" },
+                "Damascus Dagger": { damage: 9.46, atkSpeed: 0.35, realSpeed: 0.47, range: 6, price: 78.8, type: "Dagger" },
+                "Tanto": { damage: 9.9, atkSpeed: 0.29, realSpeed: 0.39, range: 6, price: 81.6, type: "Dagger" },
+                "Falchion Sword": { damage: 15, atkSpeed: 0.59, realSpeed: 0.7, range: 8, price: 126, type: "Straight Sword" },
                 "Gladius Sword": { damage: 16, atkSpeed: 0.62, realSpeed: 0.74, range: 8, price: 120, type: "Straight Sword" },
-                "Cutlass": { damage: 18.75, atkSpeed: 0.66, realSpeed: 0.78, range: 8, price: 120, type: "Straight Sword" },
-                "Rapier": { damage: 15, atkSpeed: 0.49, realSpeed: 0.58, range: 8, price: 120, type: "Straight Sword" },
-                "Chaos": { damage: 18.75, atkSpeed: 0.59, realSpeed: 0.7, range: 8, price: 120, type: "Straight Sword" },
-                "Candy Cane": { damage: 15, atkSpeed: 0.44, realSpeed: 0.52, range: 8.8, price: 120, type: "Straight Sword", seasonal: "Christmas" },
-                "Hell Slayer": { damage: 22.25, atkSpeed: 0.59, realSpeed: 0.7, range: 9.2, price: 120, type: "Straight Sword", seasonal: "Christmas" },
-                "Crystallized Broadsword": { damage: 19.95, atkSpeed: 0.62, realSpeed: 0.74, range: 8, price: 120, type: "Straight Sword" },
-                "Hook Blade": { damage: 16.5, atkSpeed: 0.44, realSpeed: 0.52, range: 8.8, price: 120, type: "Straight Sword" },
-                "Hachiwari": { damage: 16.5, atkSpeed: 0.59, realSpeed: 0.7, range: 8, price: 120, type: "Straight Sword" },
-                "Chokuto": { damage: 15, atkSpeed: 0.54, realSpeed: 0.64, range: 8, price: 120, type: "Straight Sword" },
-                "Dragon Blade": { damage: 21, atkSpeed: 0.59, realSpeed: 0.7, range: 9.2, price: 150, type: "Straight Sword" },
-                "Thornspire": { damage: 21.75, atkSpeed: 0.59, realSpeed: 0.7, range: 8, price: 150, type: "Straight Sword", seasonal: "Halloween" },
+                "Cutlass": { damage: 18.75, atkSpeed: 0.66, realSpeed: 0.78, range: 8, price: 132, type: "Straight Sword" },
+                "Rapier": { damage: 15, atkSpeed: 0.49, realSpeed: 0.58, range: 8, price: 138, type: "Straight Sword" },
+                "Chaos": { damage: 18.75, atkSpeed: 0.59, realSpeed: 0.7, range: 8, price: 144, type: "Straight Sword" },
+                "Candy Cane": { damage: 15, atkSpeed: 0.44, realSpeed: 0.52, range: 8.8, price: 138, type: "Straight Sword", seasonal: "Christmas" },
+                "Hell Slayer": { damage: 22.25, atkSpeed: 0.59, realSpeed: 0.7, range: 9.2, price: 144, type: "Straight Sword", seasonal: "Christmas" },
+                "Crystallized Broadsword": { damage: 19.95, atkSpeed: 0.62, realSpeed: 0.74, range: 8, price: 138, type: "Straight Sword" },
+                "Hook Blade": { damage: 16.5, atkSpeed: 0.44, realSpeed: 0.52, range: 8.8, price: 138, type: "Straight Sword" },
+                "Hachiwari": { damage: 16.5, atkSpeed: 0.59, realSpeed: 0.7, range: 8, price: 132, type: "Straight Sword" },
+                "Chokuto": { damage: 15, atkSpeed: 0.54, realSpeed: 0.64, range: 8, price: 138, type: "Straight Sword" },
+                "Dragon Blade": { damage: 21, atkSpeed: 0.59, realSpeed: 0.7, range: 9.2, price: 144, type: "Straight Sword" },
+                "Thornspire": { damage: 21.75, atkSpeed: 0.59, realSpeed: 0.7, range: 8, price: 144, type: "Straight Sword", seasonal: "Halloween" },
                 "Mace": { damage: 14, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 205, type: "Mace" },
-                "Spiked Mace": { damage: 14.6, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 205, type: "Mace" },
-                "Winged Mace": { damage: 15.2, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 205, type: "Mace" },
-                "Hammerhead Mace": { damage: 15.8, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 205, type: "Mace" },
-                "Grave Maker": { damage: 17.6, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 205, type: "Mace" },
-                "Tetsubo": { damage: 15.44, atkSpeed: 0.44, realSpeed: 1.11, range: 7.6, price: 226, type: "Mace" },
-                "Kanabo": { damage: 16.4, atkSpeed: 0.51, realSpeed: 1.3, range: 8.8, price: 246, type: "Mace" },
+                "Spiked Mace": { damage: 14.6, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 215.25, type: "Mace" },
+                "Winged Mace": { damage: 15.2, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 225.5, type: "Mace" },
+                "Hammerhead Mace": { damage: 15.8, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 235.75, type: "Mace" },
+                "Grave Maker": { damage: 17.6, atkSpeed: 0.46, realSpeed: 1.17, range: 8, price: 246, type: "Mace" },
+                "Tetsubo": { damage: 15.44, atkSpeed: 0.44, realSpeed: 1.11, range: 7.6, price: 246, type: "Mace" },
+                "Kanabo": { damage: 16.4, atkSpeed: 0.51, realSpeed: 1.3, range: 8.8, price: 235.75, type: "Mace" },
                 "Ironhand": { damage: 15.2, atkSpeed: 0.51, realSpeed: 0.55, range: 6, price: 205, type: "Gauntlet" },
-                "Boxing Gloves": { damage: 16, atkSpeed: 0.59, realSpeed: 0.63, range: 6, price: 205, type: "Gauntlet" },
-                "Relevator": { damage: 19.2, atkSpeed: 0.69, realSpeed: 0.74, range: 6, price: 205, type: "Gauntlet" },
-                "Savage Claws": { damage: 16, atkSpeed: 0.47, realSpeed: 0.51, range: 6, price: 205, type: "Gauntlet" },
-                "Dark Knight's Gauntlets": { damage: 20, atkSpeed: 0.47, realSpeed: 0.51, range: 6, price: 205, type: "Gauntlet" },
+                "Boxing Gloves": { damage: 16, atkSpeed: 0.59, realSpeed: 0.63, range: 6, price: 225.5, type: "Gauntlet" },
+                "Relevator": { damage: 19.2, atkSpeed: 0.69, realSpeed: 0.74, range: 6, price: 246, type: "Gauntlet" },
+                "Savage Claws": { damage: 16, atkSpeed: 0.47, realSpeed: 0.51, range: 6, price: 246, type: "Gauntlet" },
+                "Dark Knight's Gauntlets": { damage: 20, atkSpeed: 0.47, realSpeed: 0.51, range: 6, price: 246, type: "Gauntlet" },
                 "Axe": { damage: 14, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 205, type: "Axe" },
-                "Battleaxe": { damage: 14.7, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 205, type: "Axe" },
-                "Curved Handle Axe": { damage: 15.4, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 205, type: "Axe" },
-                "Spade Armed Axe": { damage: 16.1, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 205, type: "Axe" },
-                "Ornate Short Axe": { damage: 16.8, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 205, type: "Axe" },
-                "Duskwing's Cleaver": { damage: 16.8, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 205, type: "Axe", seasonal: "Halloween" },
+                "Battleaxe": { damage: 14.7, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 215.25, type: "Axe" },
+                "Curved Handle Axe": { damage: 15.4, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 225.5, type: "Axe" },
+                "Spade Armed Axe": { damage: 16.1, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 235.75, type: "Axe" },
+                "Ornate Short Axe": { damage: 16.8, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 235.75, type: "Axe" },
+                "Duskwing's Cleaver": { damage: 16.8, atkSpeed: 0.48, realSpeed: 0.88, range: 8, price: 235.75, type: "Axe", seasonal: "Halloween" },
                 "Uchigatana": { damage: 17, atkSpeed: 0.6, realSpeed: 0.69, range: 9, price: 324, type: "Katana" },
-                "Tachi": { damage: 17.85, atkSpeed: 0.63, realSpeed: 0.73, range: 9.45, price: 324, type: "Katana" },
-                "Straight Edge Katana": { damage: 18.7, atkSpeed: 0.6, realSpeed: 0.69, range: 9.45, price: 324, type: "Katana" },
-                "Juto Katana": { damage: 17, atkSpeed: 0.6, realSpeed: 0.69, range: 9.45, price: 340, type: "Katana" },
-                "Kurokiba-gatana": { damage: 18.7, atkSpeed: 0.55, realSpeed: 0.63, range: 9, price: 356, type: "Katana" },
-                "Washi-maru": { damage: 20.4, atkSpeed: 0.5, realSpeed: 0.58, range: 10.35, price: 324, type: "Katana" },
+                "Tachi": { damage: 17.85, atkSpeed: 0.63, realSpeed: 0.73, range: 9.45, price: 356.4, type: "Katana" },
+                "Straight Edge Katana": { damage: 18.7, atkSpeed: 0.6, realSpeed: 0.69, range: 9.45, price: 388.8, type: "Katana" },
+                "Juto Katana": { damage: 17, atkSpeed: 0.6, realSpeed: 0.69, range: 9.45, price: 356.4, type: "Katana" },
+                "Kurokiba-gatana": { damage: 18.7, atkSpeed: 0.55, realSpeed: 0.63, range: 9, price: 388.8, type: "Katana" },
+                "Washi-maru": { damage: 20.4, atkSpeed: 0.5, realSpeed: 0.58, range: 10.35, price: 405, type: "Katana" },
                 "Crusader Sword": { damage: 24, atkSpeed: 1, realSpeed: 1.2, range: 9, price: 485, type: "Great Sword" },
-                "Long Sword": { damage: 24, atkSpeed: 1.11, realSpeed: 1.33, range: 9.9, price: 485, type: "Great Sword" },
-                "Dark Knight's Greatsword": { damage: 30, atkSpeed: 1.11, realSpeed: 1.33, range: 9.9, price: 485, type: "Great Sword" },
-                "Anchored Greatsword": { damage: 27.6, atkSpeed: 0.91, realSpeed: 1.09, range: 9.9, price: 485, type: "Great Sword" },
-                "Zweihander": { damage: 28.8, atkSpeed: 1.05, realSpeed: 1.26, range: 10.35, price: 485, type: "Great Sword" },
-                "The Craver": { damage: 27.6, atkSpeed: 0.91, realSpeed: 1.26, range: 9, price: 485, type: "Great Sword", seasonal: "Halloween" },
-                "Jack's Crest": { damage: 27.6, atkSpeed: 0.91, realSpeed: 1.26, range: 9, price: 485, type: "Great Sword", seasonal: "Halloween" },
+                "Long Sword": { damage: 24, atkSpeed: 1.11, realSpeed: 1.33, range: 9.9, price: 509.25, type: "Great Sword" },
+                "Dark Knight's Greatsword": { damage: 30, atkSpeed: 1.11, realSpeed: 1.33, range: 9.9, price: 533.5, type: "Great Sword" },
+                "Anchored Greatsword": { damage: 27.6, atkSpeed: 0.91, realSpeed: 1.09, range: 9.9, price: 533.5, type: "Great Sword" },
+                "Zweihander": { damage: 28.8, atkSpeed: 1.05, realSpeed: 1.26, range: 10.35, price: 533.5, type: "Great Sword" },
+                "The Craver": { damage: 27.6, atkSpeed: 0.91, realSpeed: 1.26, range: 9, price: 533.5, type: "Great Sword", seasonal: "Halloween" },
+                "Jack's Crest": { damage: 27.6, atkSpeed: 0.91, realSpeed: 1.26, range: 9, price: 533.5, type: "Great Sword", seasonal: "Halloween" },
                 "Spear": { damage: 15, atkSpeed: 0.45, realSpeed: 0.73, range: 11, price: 120, type: "Spear" },
-                "Angelic Spear": { damage: 19.5, atkSpeed: 0.41, realSpeed: 0.66, range: 11, price: 120, type: "Spear" },
-                "Trident": { damage: 16.5, atkSpeed: 0.45, realSpeed: 0.73, range: 11, price: 120, type: "Spear" },
-                "Knight Spear": { damage: 20.25, atkSpeed: 0.38, realSpeed: 0.6, range: 11, price: 120, type: "Spear" },
-                "Compass Spear": { damage: 21, atkSpeed: 0.47, realSpeed: 0.76, range: 11, price: 120, type: "Spear" },
-                "Shakujo": { damage: 16.5, atkSpeed: 0.45, realSpeed: 0.73, range: 11, price: 144, type: "Spear" },
-                "Sodegarami": { damage: 20.26, atkSpeed: 0.41, realSpeed: 0.66, range: 11, price: 168, type: "Spear" },
-                "Bo Staff": { damage: 21, atkSpeed: 0.41, realSpeed: 0.66, range: 11, price: 162, type: "Spear" },
-                "Naginata": { damage: 21.76, atkSpeed: 0.45, realSpeed: 0.73, range: 12.65, price: 174, type: "Spear" },
-                "Demonic Spear": { damage: 25.5, atkSpeed: 0.56, realSpeed: 0.6, range: 11, price: 120, type: "Spear" },
+                "Angelic Spear": { damage: 19.5, atkSpeed: 0.41, realSpeed: 0.66, range: 11, price: 138, type: "Spear" },
+                "Trident": { damage: 16.5, atkSpeed: 0.45, realSpeed: 0.73, range: 11, price: 126, type: "Spear" },
+                "Knight Spear": { damage: 20.25, atkSpeed: 0.38, realSpeed: 0.6, range: 11, price: 132, type: "Spear" },
+                "Compass Spear": { damage: 21, atkSpeed: 0.47, realSpeed: 0.76, range: 11, price: 132, type: "Spear" },
+                "Shakujo": { damage: 16.5, atkSpeed: 0.45, realSpeed: 0.73, range: 11, price: 126, type: "Spear" },
+                "Sodegarami": { damage: 20.26, atkSpeed: 0.41, realSpeed: 0.66, range: 11, price: 132, type: "Spear" },
+                "Bo Staff": { damage: 21, atkSpeed: 0.41, realSpeed: 0.66, range: 11, price: 138, type: "Spear" },
+                "Naginata": { damage: 21.76, atkSpeed: 0.45, realSpeed: 0.73, range: 12.65, price: 144, type: "Spear" },
+                "Demonic Spear": { damage: 25.5, atkSpeed: 0.56, realSpeed: 0.6, range: 11, price: 132, type: "Spear" },
                 "Double Battle Axe": { damage: 31.5, atkSpeed: 1.05, realSpeed: 1.7, range: 9, price: 850, type: "Great Axe" },
-                "Scythe": { damage: 28.5, atkSpeed: 0.95, realSpeed: 1.54, range: 9, price: 850, type: "Great Axe" },
-                "Reaper Scythe": { damage: 34, atkSpeed: 0.95, realSpeed: 1.54, range: 9, price: 850, type: "Great Axe" },
-                "Greater Battle Axe": { damage: 34.5, atkSpeed: 1, realSpeed: 1.62, range: 9, price: 850, type: "Great Axe" },
-                "Wyvern Axe": { damage: 37.5, atkSpeed: 0.91, realSpeed: 1.47, range: 9, price: 850, type: "Great Axe" },
-                "Anchored Straight Blade": { damage: 36, atkSpeed: 1, realSpeed: 1.62, range: 9, price: 850, type: "Great Axe" },
-                "Executioner's Greataxe": { damage: 39, atkSpeed: 1.05, realSpeed: 1.7, range: 9, price: 850, type: "Great Axe" },
-                "Sun Great Axe": { damage: 39, atkSpeed: 0.83, realSpeed: 1.35, range: 9, price: 850, type: "Great Axe" },
-                "Batwing Reaver": { damage: 38.1, atkSpeed: 1.05, realSpeed: 1.7, range: 9, price: 850, type: "Great Axe", seasonal: "Halloween" },
+                "Scythe": { damage: 28.5, atkSpeed: 0.95, realSpeed: 1.54, range: 9, price: 935, type: "Great Axe" },
+                "Reaper Scythe": { damage: 34, atkSpeed: 0.95, realSpeed: 1.54, range: 9, price: 935, type: "Great Axe" },
+                "Greater Battle Axe": { damage: 34.5, atkSpeed: 1, realSpeed: 1.62, range: 9, price: 1020, type: "Great Axe" },
+                "Wyvern Axe": { damage: 37.5, atkSpeed: 0.91, realSpeed: 1.47, range: 9, price: 1020, type: "Great Axe" },
+                "Anchored Straight Blade": { damage: 36, atkSpeed: 1, realSpeed: 1.62, range: 9, price: 1085, type: "Great Axe" },
+                "Executioner's Greataxe": { damage: 39, atkSpeed: 1.05, realSpeed: 1.7, range: 9, price: 1085, type: "Great Axe" },
+                "Sun Great Axe": { damage: 39, atkSpeed: 0.83, realSpeed: 1.35, range: 9, price: 1150, type: "Great Axe" },
+                "Batwing Reaver": { damage: 38.1, atkSpeed: 1.05, realSpeed: 1.7, range: 9, price: 1150, type: "Great Axe", seasonal: "Halloween" },
                 "Halberd": { damage: 33.6, atkSpeed: 1, realSpeed: 0.91, range: 10, price: 850, type: "Halberd" },
                 "Great Sword": { damage: 40, atkSpeed: 1.12, realSpeed: 1.4, range: 10, price: 1355, type: "Colossal Sword" },
-                "Hammer": { damage: 44, atkSpeed: 1.24, realSpeed: 1.56, range: 10, price: 1355, type: "Colossal Sword" },
-                "Skull Crusher": { damage: 48, atkSpeed: 1.4, realSpeed: 1.75, range: 10, price: 1355, type: "Colossal Sword" },
-                "Dragon Slayer": { damage: 44, atkSpeed: 1.12, realSpeed: 1.4, range: 11, price: 1355, type: "Colossal Sword" },
-                "Comically Large Spoon": { damage: 36, atkSpeed: 1.12, realSpeed: 1.4, range: 10, price: 1355, type: "Colossal Sword" },
-                "Excalibur": { damage: 60, atkSpeed: 1.12, realSpeed: 1.4, range: 15, price: 1355, type: "Colossal Sword" },
-                "Colossal TerrorBlade": { damage: 44, atkSpeed: 1.02, realSpeed: 1.28, range: 10, price: 1355, type: "Colossal Sword" },
-                "Colossal Gemblade": { damage: 46, atkSpeed: 1.12, realSpeed: 1.4, range: 12, price: 1355, type: "Colossal Sword" },
-                "Kinmon Kamagatana": { damage: 46.8, atkSpeed: 1.12, realSpeed: 1.4, range: 10, price: 1355, type: "Colossal Sword" },
-                "Otsuchi": { damage: 50, atkSpeed: 1.24, realSpeed: 1.56, range: 10, price: 1355, type: "Colossal Sword" },
-                "Sharktooth Odachi": { damage: 54, atkSpeed: 1.12, realSpeed: 1.4, range: 13, price: 2033, type: "Colossal Sword" },
-                "Coffin's Lid": { damage: 46, atkSpeed: 1.12, realSpeed: 1.56, range: 10, price: 1355, type: "Colossal Sword", seasonal: "Halloween" }
+                "Hammer": { damage: 44, atkSpeed: 1.24, realSpeed: 1.56, range: 10, price: 1490.5, type: "Colossal Sword" },
+                "Skull Crusher": { damage: 48, atkSpeed: 1.4, realSpeed: 1.75, range: 10, price: 1558.25, type: "Colossal Sword" },
+                "Dragon Slayer": { damage: 44, atkSpeed: 1.12, realSpeed: 1.4, range: 11, price: 1626, type: "Colossal Sword" },
+                "Comically Large Spoon": { damage: 36, atkSpeed: 1.12, realSpeed: 1.4, range: 10, price: 1490.5, type: "Colossal Sword" },
+                "Excalibur": { damage: 60, atkSpeed: 1.12, realSpeed: 1.4, range: 15, price: 2710, type: "Colossal Sword" },
+                "Colossal TerrorBlade": { damage: 44, atkSpeed: 1.02, realSpeed: 1.28, range: 10, price: 1558.25, type: "Colossal Sword" },
+                "Colossal Gemblade": { damage: 46, atkSpeed: 1.12, realSpeed: 1.4, range: 12, price: 1558.25, type: "Colossal Sword" },
+                "Kinmon Kamagatana": { damage: 46.8, atkSpeed: 1.12, realSpeed: 1.4, range: 10, price: 1626, type: "Colossal Sword" },
+                "Otsuchi": { damage: 50, atkSpeed: 1.24, realSpeed: 1.56, range: 10, price: 1558.25, type: "Colossal Sword" },
+                "Sharktooth Odachi": { damage: 54, atkSpeed: 1.12, realSpeed: 1.4, range: 13, price: 1761, type: "Colossal Sword" },
+                "Coffin's Lid": { damage: 46, atkSpeed: 1.12, realSpeed: 1.56, range: 10, price: 1761, type: "Colossal Sword", seasonal: "Halloween" }
             },
             armor: {
                 "Light Helmet": { health: 3.75, price: 65, def: 7.5, type: "Light Helmet" },
                 "Light Chestplate": { health: 5, price: 225, def: 10, type: "Light Chestplate" },
                 "Light Leggings": { health: 4.375, price: 112.5, def: 8.75, type: "Light Leggings" },
-                "Ninja's Helmet": { health: 9, price: 65, def: 18, type: "Light Helmet" },
-                "Ninja's Armor": { health: 13.5, price: 225, def: 27, type: "Light Chestplate" },
-                "Ninja's Leggings": { health: 10, price: 112.5, def: 20, type: "Light Leggings" },
+                "Ninja's Helmet": { health: 9, price: 86, def: 18, type: "Light Helmet" },
+                "Ninja's Armor": { health: 13.5, price: 297.5, def: 27, type: "Light Chestplate" },
+                "Ninja's Leggings": { health: 10, price: 148.75, def: 20, type: "Light Leggings" },
                 "Medium Helmet": { health: 6.25, price: 335, def: 12.5, type: "Medium Helmet" },
                 "Medium Chestplate": { health: 8.75, price: 850, def: 17.5, type: "Medium Chestplate" },
                 "Medium Leggings": { health: 7.5, price: 485, def: 15, type: "Medium Leggings" },
-                "Samurai Helmet": { health: 8, price: 335, def: 16, type: "Medium Helmet" },
-                "Samurai Chestplate": { health: 12.75, price: 850, def: 25.5, type: "Medium Chestplate" },
-                "Samurai Leggings": { health: 9, price: 485, def: 18, type: "Medium Leggings" },
-                "Viking Helmet": { health: 10.5, price: 335, def: 21, type: "Medium Helmet" },
-                "Viking Chestplate": { health: 15, price: 850, def: 30, type: "Medium Chestplate" },
-                "Viking Leggings": { health: 11, price: 485, def: 22, type: "Medium Leggings" },
-                "Rootguard Helmet": { health: 15, price: 335, def: 30, type: "Medium Helmet" },
-                "Rootguard Chestplate": { health: 21, price: 850, def: 42, type: "Medium Chestplate" },
-                "Rootguard Leggings": { health: 17, price: 485, def: 34, type: "Medium Leggings" },
+                "Samurai Helmet": { health: 8, price: 368.5, def: 16, type: "Medium Helmet" },
+                "Samurai Chestplate": { health: 12.75, price: 935, def: 25.5, type: "Medium Chestplate" },
+                "Samurai Leggings": { health: 9, price: 533.5, def: 18, type: "Medium Leggings" },
+                "Viking Helmet": { health: 10.5, price: 402, def: 21, type: "Medium Helmet" },
+                "Viking Chestplate": { health: 15, price: 1020, def: 30, type: "Medium Chestplate" },
+                "Viking Leggings": { health: 11, price: 582, def: 22, type: "Medium Leggings" },
+                "Rootguard Helmet": { health: 15, price: 483, def: 30, type: "Medium Helmet" },
+                "Rootguard Chestplate": { health: 21, price: 1388, def: 42, type: "Medium Chestplate" },
+                "Rootguard Leggings": { health: 17, price: 784, def: 34, type: "Medium Leggings" },
                 "Knight Helmet": { health: 12.5, price: 1020, def: 25, type: "Heavy Helmet" },
                 "Knight Chestplate": { health: 16.25, price: 1355, def: 32.5, type: "Heavy Chestplate" },
                 "Knight Leggings": { health: 13.75, price: 1200, def: 27.5, type: "Heavy Leggings" },
-                "Dark Knight Helmet": { health: 18.75, price: 1020, def: 37.5, type: "Heavy Helmet" },
-                "Dark Knight Chestplate": { health: 25, price: 1355, def: 50, type: "Heavy Chestplate" },
-                "Dark Knight Leggings": { health: 21.875, price: 1200, def: 43.75, type: "Heavy Leggings" },
-                "Wolf Helmet": { health: 25, price: 1020, def: 50, type: "Heavy Helmet" },
-                "Wolf Chestplate": { health: 35, price: 1355, def: 70, type: "Heavy Chestplate" },
-                "Wolf Leggings": { health: 28, price: 1200, def: 56, type: "Heavy Leggings" },
-                "Goblin's Crown": { health: 26, price: 1020, def: 52, type: "Heavy Helmet" },
-                "Raven's Helmet": { health: 26.5, price: 1020, def: 53, type: "Heavy Helmet" },
-                "Raven's Chestplate": { health: 37, price: 1355, def: 74, type: "Heavy Chestplate" },
-                "Raven's Leggings": { health: 29.25, price: 1200, def: 58.5, type: "Heavy Leggings" },
-                "Vanguard Helmet": { health: 29, price: 1020, def: 58, type: "Heavy Helmet" },
-                "Vanguard Chestplate": { health: 40, price: 1355, def: 80, type: "Heavy Chestplate" },
-                "Vanguard Leggings": { health: 32, price: 1200, def: 64, type: "Heavy Leggings" },
-                "Shogun Helmet": { health: 34, price: 1020, def: 68, type: "Heavy Helmet" },
-                "Shogun Chestplate": { health: 46, price: 1355, def: 92, type: "Heavy Chestplate" },
-                "Shogun Leggings": { health: 36, price: 1200, def: 72, type: "Heavy Leggings" }
+                "Dark Knight Helmet": { health: 18.75, price: 1224, def: 37.5, type: "Heavy Helmet" },
+                "Dark Knight Chestplate": { health: 25, price: 1626, def: 50, type: "Heavy Chestplate" },
+                "Dark Knight Leggings": { health: 21.875, price: 1440, def: 43.75, type: "Heavy Leggings" },
+                "Wolf Helmet": { health: 25, price: 1326, def: 50, type: "Heavy Helmet" },
+                "Wolf Chestplate": { health: 35, price: 1761.5, def: 70, type: "Heavy Chestplate" },
+                "Wolf Leggings": { health: 28, price: 1560, def: 56, type: "Heavy Leggings" },
+                "Goblin's Crown": { health: 26, price: 1350, def: 52, type: "Heavy Helmet" },
+                "Raven's Helmet": { health: 26.5, price: 1377, def: 53, type: "Heavy Helmet" },
+                "Raven's Chestplate": { health: 37, price: 1830, def: 74, type: "Heavy Chestplate" },
+                "Raven's Leggings": { health: 29.25, price: 1620, def: 58.5, type: "Heavy Leggings" },
+                "Vanguard Helmet": { health: 29, price: 1713, def: 58, type: "Heavy Helmet" },
+                "Vanguard Chestplate": { health: 40, price: 2276, def: 80, type: "Heavy Chestplate" },
+                "Vanguard Leggings": { health: 32, price: 2016, def: 64, type: "Heavy Leggings" },
+                "Shogun Helmet": { health: 34, price: 1713, def: 68, type: "Heavy Helmet" },
+                "Shogun Chestplate": { health: 46, price: 2276, def: 92, type: "Heavy Chestplate" },
+                "Shogun Leggings": { health: 36, price: 2016, def: 72, type: "Heavy Leggings" }
             }
         };
 
@@ -4342,6 +4527,57 @@
             return ({ frostspire: optimalCountsFrostspire, crimsonsakuraisles: optimalCountsCrimsonSakuraIsles, guild: optimalCountsGuild }[currentArea] || optimalCounts).weapon;
         }
 
+        // Ore crafting recipes from the wiki Crafting page (2026-10-26), with the 1.08 recipe changes applied.
+        const oreRecipes = [
+            { result: "Arcane Crystal", island: "kingdom", ores: [["Rainbow Crystal", 3]], gold: 15000, time: "5m" },
+            { result: "Blue Crystal Ore", island: "kingdom", ores: [["Quartz", 3], ["Sapphire", 2]], gold: 80, time: "5s" },
+            { result: "Crimson Crystal Ore", island: "kingdom", ores: [["Cuprite", 1], ["Quartz", 3]], gold: 100, time: "5s" },
+            { result: "Darkryte", island: "kingdom", ores: [["Demonite", 1], ["Magmaite", 1]], gold: 500, time: "1m" },
+            { result: "Demonite", island: "kingdom", ores: [["Magmaite", 1], ["Uranium", 1], ["Fireite", 1]], gold: 500, time: "1m" },
+            { result: "Eye Ore", island: "kingdom", ores: [["Cuprite", 2], ["Rivalite", 1]], gold: 150, time: "20s" },
+            { result: "Green Crystal Ore", island: "kingdom", ores: [["Emerald", 2], ["Quartz", 3]], gold: 90, time: "5s" },
+            { result: "Lightite", island: "kingdom", ores: [["Diamond", 2], ["Eye Ore", 1], ["Mythril", 2]], gold: 250, time: "20s" },
+            { result: "Magenta Crystal Ore", island: "kingdom", ores: [["Amethyst", 3], ["Quartz", 3]], gold: 95, time: "5s" },
+            { result: "Magmaite", island: "kingdom", ores: [["Fireite", 1], ["Obsidian", 3]], gold: 225, time: "20s" },
+            { result: "Mythril", island: "kingdom", ores: [["Obsidian", 1], ["Rivalite", 1]], gold: 125, time: "20s" },
+            { result: "Orange Crystal Ore", island: "kingdom", ores: [["Quartz", 3], ["Topaz", 3]], gold: 85, time: "5s" },
+            { result: "Rainbow Crystal", island: "kingdom", ores: [["Crimson Crystal Ore", 3], ["Green Crystal Ore", 3], ["Blue Crystal Ore", 3]], gold: 1000, time: "20s" },
+            { result: "Stolen Heart", island: "frostspire", ores: [["Arcane Crystal", 1], ["Golem Heart", 3]], gold: 15000, time: "3m" },
+            { result: "Suryafal", island: "frostspire", ores: [["Etherealite", 1], ["Fireite", 5], ["Orange Crystal Ore", 3]], gold: 5000, time: "2m" },
+            { result: "Heart Of The Island", island: "frostspire", ores: [["Duranite", 5], ["Gulabite", 3], ["Stolen Heart", 2]], gold: 25000, time: "5m" },
+            { result: "Duranite", island: "frostspire", ores: [["Etherealite", 2]], gold: 3000, time: "60s" },
+            { result: "Iceite", island: "frostspire", ores: [["Blue Crystal Ore", 2], ["Snowite", 2]], gold: 1000, time: "60s" },
+            { result: "Etherealite", island: "frostspire", ores: [["Demonite", 1], ["Iceite", 1], ["Rainbow Crystal", 1]], gold: 25000, time: "60s" },
+            { result: "Voidstar", island: "frostspire", ores: [["Mythril", 2], ["Voidfractal", 2]], gold: 2000, time: "20s" },
+            { result: "Velchire", island: "frostspire", ores: [["Aetherit", 1], ["Lightite", 1]], gold: 300, time: "20s" },
+            { result: "Snowite", island: "frostspire", ores: [["Blue Crystal Ore", 1], ["Diamond", 2], ["Sapphire", 3]], gold: 400, time: "20s" },
+            { result: "Aetherit", island: "frostspire", ores: [["Pumice", 1], ["Tungsten", 2]], gold: 50, time: "2s" },
+            { result: "Gargantuan", island: "frostspire", ores: [["Darkryte", 7], ["Heavenite", 1], ["Suryafal", 5]], gold: 40000, time: "15m" },
+            { result: "Heavenite", island: "frostspire", ores: [["Arcane Crystal", 2], ["Etherealite", 7], ["Suryafal", 3]], gold: 25000, time: "5m" },
+            { result: "Azuryxite", island: "crimsonsakuraisles", ores: [["Cyanite Jade", 1], ["Frost Fossil", 3], ["Heat Steel", 2]], gold: 2500, time: "20s" },
+            { result: "Onyx", island: "crimsonsakuraisles", ores: [["Golem Heart", 1], ["Sealed Curse", 10], ["Tiger's Eye", 10]], gold: 2500, time: "20s" },
+            { result: "Blue Gem Quill", island: "crimsonsakuraisles", ores: [["Blue Crystal Ore", 2], ["Cyanite Jade", 1]], gold: 1000, time: "2s" },
+            { result: "Tiger's Eye", island: "crimsonsakuraisles", ores: [["Rock Seed", 2], ["Wraith", 1]], gold: 750, time: "5s" },
+            { result: "Sealed Curse", island: "crimsonsakuraisles", ores: [["Tiger's Eye", 1], ["Wraith", 1]], gold: 1500, time: "5s" },
+            { result: "Cyanite Jade", island: "crimsonsakuraisles", ores: [["Water Stone", 3]], gold: 1000, time: "5s" },
+            { result: "Earthite", island: "crimsonsakuraisles", ores: [["Bamboo", 5]], gold: 10, time: "5s" },
+            { result: "Heavenly Orb", island: "crimsonsakuraisles", ores: [["Azuryxite", 2], ["Sanctis", 5], ["Zenstone", 2]], gold: 10000, time: "1m" },
+            { result: "Meteorite", island: "crimsonsakuraisles", ores: [["Heat Steel", 5], ["Sealed Curse", 3], ["Sun Stone", 2]], gold: 10000, time: "1m" },
+            { result: "Duquack", island: "crimsonsakuraisles", ores: [["Frogite", 1]], gold: 1500, time: "20s" },
+            { result: "Yin-Yang", island: "crimsonsakuraisles", ores: [["Yin", 1], ["Yang", 1]], gold: 5000, time: "5m" },
+            { result: "Sakurite", island: "crimsonsakuraisles", ores: [["Sakuranite", 1], ["Kyomutite", 1]], gold: 3800, time: "3m" },
+            { result: "Sentira", island: "crimsonsakuraisles", ores: [["Fruite", 3], ["Heavenly Orb", 2], ["Meteorite", 2]], gold: 4500, time: "5m" },
+            { result: "Takenokoishi", island: "crimsonsakuraisles", ores: [["Earthite", 10], ["Wraith", 7], ["Zenstone", 5]], gold: 3500, time: "3m" },
+            { result: "Kokorite", island: "crimsonsakuraisles", ores: [["Roosite", 4], ["Sealed Curse", 5]], gold: 4000, time: "4m" },
+            { result: "Wolfarite", island: "crimsonsakuraisles", ores: [["Kokorite", 3], ["Lgarite", 3], ["Onite", 3]], gold: 4200, time: "4m" },
+            { result: "Starite", island: "voidcave", ores: [["Star Dust", 10]], gold: 2000, time: "30s" },
+            { result: "Matter", island: "voidcave", ores: [["Darkryte", 5], ["Starite", 5]], gold: 4000, time: "2m" },
+            { result: "Anti Matter", island: "voidcave", ores: [["Arcane Crystal", 3], ["Starite", 1]], gold: 5000, time: "2m" },
+            { result: "Singularity", island: "voidcave", ores: [["Anti Matter", 1], ["Matter", 1]], gold: 10000, time: "5m" },
+            { result: "Supermassive Black Hole", island: "voidcave", ores: [["Gargantuan", 5], ["Matter", 3], ["Takiseki", 10]], gold: 15000, time: "15m" },
+            { result: "Galaxite", island: "voidcave", ores: [["Anti Matter", 3], ["Singularity", 1], ["Supermassive Black Hole", 1]], gold: 25000, time: "30m" }
+        ];
+
         let currentMode = 'weapon';
         let oreMix = [];
         let activeFilter = 'all';
@@ -4414,6 +4650,7 @@
             updateAreaToggle();
             setupForgeResultModal();
             setupInventorySystem();
+            setupRecipeHelper();
             setupFiltersDropdown();
             updateForgeButtonState();
         }
@@ -5820,6 +6057,116 @@
             }
 
             updateForgeButtonState();
+        }
+
+        const recipeIslandNames = { kingdom: 'Forgotten Kingdom', frostspire: 'Frostspire Expanse', crimsonsakuraisles: 'Crimson Sakura Isles', voidcave: 'Void Cave' };
+
+        function getRecipe(name) {
+            return oreRecipes.find(r => r.result === name);
+        }
+
+        // Adds up the uncraftable ores and gold needed to make qty of an ore from scratch
+        function getRawRecipeCost(name, qty, totals = { ores: {}, gold: 0 }, depth = 0) {
+            const recipe = getRecipe(name);
+            if (!recipe || depth > 10) {
+                totals.ores[name] = (totals.ores[name] || 0) + qty;
+                return totals;
+            }
+            totals.gold += recipe.gold * qty;
+            recipe.ores.forEach(([ore, amount]) => getRawRecipeCost(ore, amount * qty, totals, depth + 1));
+            return totals;
+        }
+
+        function recipeOreIcon(name) {
+            const ore = oreData.find(o => o.name === name);
+            return oreImages[name]
+                ? `<img src="${oreImages[name]}" alt="" loading="lazy">`
+                : `<i class="fas fa-gem" style="color: ${ore ? ore.color : 'var(--text)'};"></i>`;
+        }
+
+        function recipeOreChip(name, amount, linkable) {
+            const label = `${recipeOreIcon(name)}<span>${amount}x ${name}</span>`;
+            return linkable && getRecipe(name)
+                ? `<button type="button" class="recipe-ore craftable" data-recipe="${name}" title="Show the ${name} recipe">${label}</button>`
+                : `<span class="recipe-ore">${label}</span>`;
+        }
+
+        function renderRecipes() {
+            const list = document.getElementById('recipe-list');
+            list.innerHTML = oreRecipes.map(recipe => {
+                const ore = oreData.find(o => o.name === recipe.result);
+                const raw = getRawRecipeCost(recipe.result, 1);
+                const hasSubRecipes = recipe.ores.some(([name]) => getRecipe(name));
+                const search = [recipe.result, ...recipe.ores.map(([name]) => name), ...Object.keys(raw.ores)].join('|').toLowerCase();
+                return `
+                    <div class="recipe-card" data-result="${recipe.result}" data-search="${search}">
+                        <div class="recipe-head">
+                            ${recipeOreIcon(recipe.result)}
+                            <div>
+                                <div class="recipe-name" style="color: ${ore ? ore.color : 'var(--text)'};">${recipe.result}</div>
+                                <div class="recipe-sub">${ore ? `${ore.multiplier}x · ` : ''}${recipeIslandNames[recipe.island]}</div>
+                            </div>
+                            <div class="recipe-cost"><i class="fas fa-coins"></i>${recipe.gold.toLocaleString('en-US')}<i class="fas fa-clock"></i>${recipe.time}</div>
+                        </div>
+                        <div class="recipe-ores">${recipe.ores.map(([name, amount]) => recipeOreChip(name, amount, true)).join('')}</div>
+                        ${hasSubRecipes ? `
+                        <div class="recipe-raw">
+                            <div class="recipe-raw-label">From scratch: ${raw.gold.toLocaleString('en-US')} gold in total</div>
+                            <div class="recipe-ores">${Object.entries(raw.ores).map(([name, amount]) => recipeOreChip(name, amount, false)).join('')}</div>
+                        </div>` : ''}
+                    </div>`;
+            }).join('') + '<div class="recipe-empty" style="display: none;">No recipe uses that ore.</div>';
+        }
+
+        function filterRecipes(query) {
+            const q = query.trim().toLowerCase();
+            let shown = 0;
+            document.querySelectorAll('#recipe-list .recipe-card').forEach(card => {
+                const match = !q || card.dataset.search.includes(q);
+                card.style.display = match ? '' : 'none';
+                if (match) shown++;
+            });
+            document.querySelector('#recipe-list .recipe-empty').style.display = shown ? 'none' : '';
+        }
+
+        function setupRecipeHelper() {
+            const modal = document.getElementById('recipe-modal');
+            const searchInput = document.getElementById('recipe-search');
+            const list = document.getElementById('recipe-list');
+            renderRecipes();
+
+            document.getElementById('recipe-btn').addEventListener('click', () => {
+                modal.style.display = 'flex';
+                modal.offsetHeight;
+                requestAnimationFrame(() => modal.classList.add('show'));
+                if (window.innerWidth <= 480) {
+                    document.body.classList.add('modal-open');
+                }
+            });
+
+            document.getElementById('recipe-close').addEventListener('click', () => closeModalSmoothly(modal));
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModalSmoothly(modal);
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('show')) closeModalSmoothly(modal);
+            });
+
+            searchInput.addEventListener('input', () => filterRecipes(searchInput.value));
+
+            list.addEventListener('click', (e) => {
+                const chip = e.target.closest('.recipe-ore.craftable');
+                if (!chip) return;
+                const card = [...list.querySelectorAll('.recipe-card')].find(c => c.dataset.result === chip.dataset.recipe);
+                if (!card) return;
+                if (card.style.display === 'none') {
+                    searchInput.value = '';
+                    filterRecipes('');
+                }
+                list.scrollTo({ top: card.offsetTop, behavior: 'smooth' });
+                card.classList.add('highlight');
+                setTimeout(() => card.classList.remove('highlight'), 1500);
+            });
         }
 
         function closeModalSmoothly(modal) {
