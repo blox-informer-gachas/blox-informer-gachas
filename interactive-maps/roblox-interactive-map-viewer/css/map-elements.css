@@ -1,0 +1,878 @@
+/* Map elements on both pages: Leaflet DOM and its states, the marker CSS-variable system, keyframes and @property, and popup content (Leaflet measures it as soon as it is inserted) */
+
+.map-viewport.leaflet-container {
+    z-index: 0;
+    background-color: #0c0c0c;
+    font-family: inherit;
+    outline: none;
+}
+.map-viewport.leaflet-container {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+.map-viewport.leaflet-container img {
+    -webkit-user-drag: none;
+}
+.map-viewport .leaflet-popup-content {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+.map-viewport .leaflet-control-attribution {
+    background: rgba(12, 12, 12, 0.7);
+    color: #888;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-top-left-radius: 6px;
+}
+.map-viewport .leaflet-control-attribution a {
+    color: #bbb;
+}
+
+iconify-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    flex: none;
+}
+
+.lf-marker,
+.lf-label {
+    background: none;
+    border: none;
+}
+.leaflet-decor-pane .lf-marker-inner {
+    --marker-scale: var(--map-scale, 1);
+}
+.lf-marker-inner {
+    --w: calc(var(--s) * var(--marker-scale, 1));
+    --bw: 0px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--w);
+    height: var(--w);
+    font-size: calc(var(--w) * 0.6);
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        opacity 0.25s ease,
+        filter 0.25s ease;
+    --sh: 0 2px 3px rgba(0, 0, 0, 0.6);
+    --glr: 0px;
+    --glc: rgba(255, 255, 255, 0);
+    --gray: 0;
+    --br: 1;
+    filter: drop-shadow(var(--sh));
+}
+/* The full filter only on markers in a state: on every marker it doubled the cost of zooming big maps.
+   Eases in and out all the same (a shorter filter list interpolates as if padded with no-ops) */
+.lf-marker:hover .lf-marker-inner,
+.lf-marker.is-active .lf-marker-inner,
+.lf-glow .lf-marker-inner,
+.lf-dimmed .lf-marker-inner,
+.is-found .lf-marker-inner {
+    filter: drop-shadow(var(--sh)) drop-shadow(0 0 var(--glr) var(--glc)) grayscale(var(--gray)) brightness(var(--br));
+}
+.lf-marker-inner.no-shadow {
+    --sh: 0 0 0 rgba(0, 0, 0, 0);
+}
+.lf-marker-glyph {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(var(--rot, 0deg));
+}
+.lf-marker-glyph img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+.lf-marker:hover .lf-marker-inner {
+    --glr: 6px;
+    --glc: rgba(255, 255, 255, 0.5);
+    --br: 1.1;
+}
+.lf-marker.is-active .lf-marker-inner {
+    --glr: 10px;
+    --glc: rgba(255, 170, 90, 0.95);
+    --br: 1.1;
+}
+
+.lf-marker-inner.has-outline:not(.shape-none) {
+    --bw: max(2px, calc(var(--w) * 0.08));
+}
+.lf-marker-badge {
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--bg);
+    border: var(--bw) solid var(--ol, transparent);
+}
+.shape-square .lf-marker-badge,
+.shape-square-pin .lf-marker-badge {
+    border-radius: 24%;
+}
+.shape-circle,
+.shape-square,
+.shape-pin,
+.shape-square-pin {
+    font-size: calc(var(--w) * 0.5);
+}
+.shape-pin {
+    --ph: calc(var(--w) * 0.32);
+    --po: calc(var(--w) * 0.07);
+}
+.shape-square-pin {
+    --ph: calc(var(--w) * 0.31);
+    --po: calc(var(--w) * 0.01);
+}
+.shape-pin,
+.shape-square-pin {
+    transform: translate(-50%, calc(-100% - var(--ph) + var(--po)));
+}
+.shape-pin .lf-marker-badge::after,
+.shape-square-pin .lf-marker-badge::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: calc(100% + var(--bw) - var(--po));
+    transform: translateX(-50%);
+    border-style: solid;
+    border-width: var(--ph) calc(var(--w) * 0.2) 0;
+    border-color: var(--ol, var(--bg)) transparent transparent;
+}
+/* Images inside a shape become a round/square token */
+.lf-marker-inner.has-image:not(.shape-none) .lf-marker-glyph {
+    position: absolute;
+    inset: var(--bw);
+    width: auto;
+    height: auto;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.shape-square.has-image .lf-marker-glyph,
+.shape-square-pin.has-image .lf-marker-glyph {
+    border-radius: 20%;
+}
+.lf-marker-inner.has-image:not(.shape-none) .lf-marker-glyph img {
+    object-fit: cover;
+}
+/* No shape + outline: trace the icon itself */
+.shape-none.has-outline .lf-marker-glyph {
+    filter: drop-shadow(1.5px 0 0 var(--ol)) drop-shadow(-1.5px 0 0 var(--ol)) drop-shadow(0 1.5px 0 var(--ol))
+        drop-shadow(0 -1.5px 0 var(--ol));
+}
+.lf-marker:focus-visible {
+    outline: none;
+}
+.lf-marker:focus-visible .lf-marker-inner {
+    outline: 2px solid #ff6900;
+    outline-offset: 3px;
+    border-radius: 50%;
+}
+
+/* Text labels and area names */
+.lf-label-inner {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+    font-size: calc(var(--fs) * var(--marker-scale, 1));
+    line-height: 1.15;
+    white-space: nowrap;
+    text-shadow:
+        0 0 2px var(--halo),
+        0 0 7px var(--halo),
+        0 1px 2px var(--halo);
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+
+/* Area overlays (createAreaLayer) */
+.lf-area {
+    transition: opacity 0.2s;
+}
+.lf-area.leaflet-interactive {
+    cursor: default;
+}
+.lf-area-label {
+    pointer-events: none;
+}
+.lf-area-label .lf-label-inner {
+    opacity: 0.92;
+}
+.lf-area-label.is-hover-only .lf-label-inner {
+    opacity: 0;
+    transition: opacity 0.18s;
+}
+.lf-area-label.is-hover-only.is-hovered .lf-label-inner {
+    opacity: 1;
+}
+
+.lf-zone {
+    --br: 1;
+    --glr: 0px;
+    --glc: rgba(255, 170, 90, 0);
+    transition:
+        opacity 0.25s ease,
+        filter 0.25s ease,
+        fill-opacity 0.25s ease;
+}
+.lf-zone:hover,
+path.lf-zone.is-active,
+path.lf-zone.lf-glow {
+    filter: brightness(var(--br)) drop-shadow(0 0 var(--glr) var(--glc));
+}
+.lf-zone:hover {
+    --br: 1.2;
+}
+path.lf-zone.is-active {
+    --br: 1.15;
+    --glr: 6px;
+    --glc: rgba(255, 170, 90, 0.9);
+}
+path.lf-zone:focus-visible,
+path.lf-route-hit:focus-visible {
+    outline: none;
+    stroke: #ff6900;
+    stroke-width: 3;
+}
+
+/* Filtered out (dimmed in place) and found */
+.lf-dimmed .lf-marker-inner {
+    opacity: 0.18;
+    --gray: 0.8;
+}
+.lf-dimmed .lf-label-inner,
+path.lf-dimmed {
+    opacity: 0.18;
+}
+.is-found .lf-marker-inner {
+    --gray: 0.85;
+    --br: 0.8;
+    opacity: 0.75;
+}
+.is-found .lf-marker-inner::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: -3px;
+    top: -3px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #22c55e;
+    color: white;
+    font-size: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 2px #0c0c0c;
+}
+path.is-found {
+    stroke-dasharray: 3 5;
+    fill-opacity: 0.08;
+}
+
+/* Clusters (map.display.cluster) */
+.lf-cluster {
+    background: none;
+    border: none;
+}
+.lf-cluster-inner {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--cs);
+    height: var(--cs);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: rgba(255, 105, 0, 0.9);
+    box-shadow:
+        0 0 0 5px rgba(255, 105, 0, 0.25),
+        0 4px 12px rgba(0, 0, 0, 0.5);
+    color: white;
+    font-weight: 800;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.lf-cluster-count {
+    position: absolute;
+    right: -9px;
+    top: -9px;
+    z-index: 2;
+    box-sizing: border-box;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #181818;
+    border: 2px solid #ff6900;
+    color: #fff;
+    font:
+        800 11px/16px Inter,
+        sans-serif;
+    text-align: center;
+    pointer-events: none;
+}
+.lf-cluster:hover .lf-cluster-inner {
+    background: #ff6900;
+    box-shadow:
+        0 0 0 7px rgba(255, 105, 0, 0.3),
+        0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Hover label + info popup */
+.leaflet-tooltip.map-hover-label {
+    background: rgba(18, 18, 18, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 999px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+.leaflet-tooltip.map-hover-label::before {
+    display: none;
+}
+.map-popup .leaflet-popup-content-wrapper {
+    background: #181818;
+    color: #cccccc;
+    border: 1px solid #262626;
+    border-radius: 0.85rem;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    padding: 0;
+}
+.map-popup .leaflet-popup-content {
+    margin: 16px 5px 16px 16px;
+    padding-right: 11px;
+    max-height: 55vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-wrap: anywhere;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+.map-popup .leaflet-popup-tip {
+    background: #181818;
+    border: 1px solid #262626;
+}
+.map-popup a.leaflet-popup-close-button {
+    top: 8px;
+    right: 8px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #1c1c1c;
+    color: #888888;
+    font:
+        16px/26px Inter,
+        sans-serif;
+}
+.map-popup a.leaflet-popup-close-button:hover {
+    color: #ff6900;
+}
+.map-tooltip-image {
+    width: 100%;
+    max-height: 140px;
+    object-fit: cover;
+    border-radius: 0.6rem;
+    margin-bottom: 10px;
+}
+.map-tooltip-image-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 90px;
+    font-size: 2.2rem;
+    color: #ff6900;
+    background: #1c1c1c;
+}
+.map-tooltip-name {
+    color: white;
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding-right: 24px;
+    margin: 0 0 4px;
+}
+.map-tooltip-meta {
+    color: #888888;
+    font-size: 0.78rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.map-tooltip-cat-icon img {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+}
+.map-tooltip-desc {
+    color: #cccccc;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+.map-tooltip-desc img {
+    max-width: 100%;
+    border-radius: 0.5rem;
+}
+.popup-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #262626;
+}
+.popup-actions:empty {
+    display: none;
+}
+.popup-btn {
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid #333;
+    background: #1c1c1c;
+    color: #ddd;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-family: inherit;
+}
+.popup-btn:hover {
+    border-color: #ff6900;
+    color: white;
+}
+.popup-btn.icon-only {
+    width: 32px;
+    padding: 0;
+    justify-content: center;
+}
+.popup-icon-btns {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+}
+/* With "Go to <layer>" the buttons need ~330px */
+@media (min-width: 520px) {
+    .popup-actions:has([data-popup-action='go-layer']) {
+        min-width: 344px;
+    }
+}
+.popup-btn.primary {
+    max-width: 130px;
+}
+.popup-btn.primary {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: inline-block;
+    line-height: 30px;
+}
+.popup-btn.primary {
+    background: linear-gradient(to bottom right, #ff6900, #ff4500);
+    border-color: transparent;
+    color: white;
+}
+.popup-btn.is-on {
+    border-color: rgba(34, 197, 94, 0.6);
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.zoom-animating .lf-marker-inner {
+    transition:
+        width 0.25s cubic-bezier(0, 0, 0.25, 1),
+        height 0.25s cubic-bezier(0, 0, 0.25, 1),
+        font-size 0.25s cubic-bezier(0, 0, 0.25, 1),
+        opacity 0.2s,
+        filter 0.2s;
+}
+.zoom-animating .lf-label-inner {
+    transition:
+        font-size 0.25s cubic-bezier(0, 0, 0.25, 1),
+        opacity 0.2s;
+}
+
+.leaflet-overlay-pane svg path {
+    vector-effect: non-scaling-stroke;
+}
+
+/* Routes (createRouteOverlay) */
+.lf-route-dashed {
+    stroke-dasharray: calc(var(--rw, 4px) * 2.4 * var(--route-dash, 1)) calc(var(--rw, 4px) * 2 * var(--route-dash, 1));
+    animation: routeDash 1.1s linear infinite;
+}
+@keyframes routeDash {
+    to {
+        stroke-dashoffset: calc(var(--rw, 4px) * -4.4 * var(--route-dash, 1));
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .lf-route-dashed {
+        animation: none;
+    }
+}
+.lf-route-hit {
+    cursor: pointer;
+}
+path.lf-route-in {
+    animation:
+        routeDash 1.1s linear infinite,
+        lfFadeIn 0.3s ease-out;
+}
+path.lf-route-line.lf-dimmed,
+path.lf-route-casing.lf-dimmed {
+    opacity: 0.15;
+}
+.lf-route-badge {
+    background: none;
+    border: none;
+    pointer-events: none;
+}
+.lf-route-badge span {
+    position: absolute;
+    left: calc(var(--bx, 0px) * var(--marker-scale, 1) * -1);
+    top: calc(var(--by, 0px) * var(--marker-scale, 1) * -1);
+    transform: translate(-50%, -50%);
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    background: var(--rc, #38bdf8);
+    color: #0b0b0b;
+    font:
+        800 0.7rem/16px Inter,
+        sans-serif;
+    text-align: center;
+    border: 2px solid rgba(0, 0, 0, 0.65);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+@keyframes lfGlowMarker {
+    0%,
+    100% {
+        --glr: 0px;
+        --glc: rgba(255, 170, 90, 0);
+    }
+    35%,
+    60% {
+        --glr: 16px;
+        --glc: rgba(255, 170, 90, 1);
+    }
+}
+@keyframes lfGlowShape {
+    0%,
+    100% {
+        --glr: 0px;
+        --glc: rgba(255, 170, 90, 0);
+    }
+    35%,
+    60% {
+        --glr: 10px;
+        --glc: rgba(255, 170, 90, 1);
+    }
+}
+.lf-glow .lf-marker-inner {
+    animation: lfGlowMarker 1.8s ease-in-out;
+}
+path.lf-glow {
+    animation: lfGlowShape 1.8s ease-in-out;
+}
+.lf-label-inner {
+    --glr: 0px;
+    --glc: rgba(255, 170, 90, 0);
+}
+.lf-glow .lf-label-inner {
+    animation: lfGlowMarker 1.8s ease-in-out;
+    filter: drop-shadow(0 0 var(--glr) var(--glc));
+}
+@property --glr {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 0px;
+}
+@property --glc {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgba(255, 255, 255, 0);
+}
+@property --br {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 1;
+}
+@property --gray {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 0;
+}
+/* Hover labels fade in instead of popping */
+.leaflet-tooltip.map-hover-label {
+    animation: lfFadeIn 0.16s ease-out;
+}
+@keyframes lfFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* A viewer's own markers (js/view/mine.js) */
+.lf-mine .lf-marker-inner {
+    cursor: grab;
+}
+.lf-mine .lf-marker-inner::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    width: 10px;
+    height: 4px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.popup-thumbs {
+    display: flex;
+    gap: 6px;
+    margin: -4px 0 10px;
+    overflow-x: auto;
+}
+.popup-thumb {
+    flex: none;
+    width: 46px;
+    height: 34px;
+    padding: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    background: #1c1c1c;
+    cursor: pointer;
+    color: #aaa;
+}
+.popup-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.popup-thumb.active {
+    border-color: #ff6900;
+}
+.popup-video,
+.popup-video-frame {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    margin-top: 10px;
+    border-radius: 10px;
+    border: 0;
+    background: #0c0c0c center / cover no-repeat;
+}
+.popup-video {
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+}
+.popup-video::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(0, 0, 0, 0.25);
+}
+.popup-video:hover::before {
+    background: rgba(0, 0, 0, 0.1);
+}
+.popup-video-play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(to bottom right, #ff6900, #ff4500);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+.popup-video-play i {
+    margin-left: 3px;
+}
+.popup-video-site {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #ddd;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+.popup-video-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    color: #ff6900;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+.popup-btn.icon-only + .popup-btn.icon-only {
+    margin-left: 0;
+}
+
+/* SVG marker shapes (MARKER_SVG_SHAPES in leaflet-core.js) */
+.lf-marker-inner .lf-marker-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    z-index: 0;
+}
+.svg-shape .lf-marker-glyph {
+    z-index: 1;
+}
+.lf-marker-svg path {
+    fill: var(--bg);
+    stroke: none;
+}
+.lf-marker-inner.has-outline .lf-marker-svg path {
+    stroke: var(--ol);
+    stroke-width: var(--bw);
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+.lf-marker-inner.svg-shape {
+    font-size: calc(var(--w) * var(--gs, 0.5));
+}
+.lf-marker-inner.svg-shape .lf-marker-glyph {
+    transform: translateY(var(--gy, 0)) rotate(var(--rot, 0deg));
+}
+/* The drop's tip (y = 98 of 100) marks the spot */
+.lf-marker-inner.shape-drop {
+    transform: translate(-50%, -98%);
+}
+.lf-marker-inner.svg-shape.has-image .lf-marker-glyph {
+    position: absolute;
+    inset: 22%;
+    width: auto;
+    height: auto;
+    border-radius: 50%;
+    overflow: hidden;
+    transform: none;
+}
+.lf-marker-inner.shape-drop.has-image .lf-marker-glyph {
+    inset: 10% 22% 34%;
+}
+.lf-marker-inner.svg-shape.has-image .lf-marker-glyph img {
+    object-fit: cover;
+}
+
+.lf-marker-inner.is-text {
+    width: max-content;
+    height: auto;
+    min-width: var(--w);
+    min-height: var(--w);
+    max-width: calc(var(--w) * 3.4);
+    padding: calc(var(--w) * 0.18) calc(var(--w) * 0.28);
+    box-sizing: border-box;
+    font-size: calc(var(--w) * 0.34);
+}
+.lf-marker-inner.is-text.shape-none {
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+}
+.lf-marker-inner.is-text.svg-shape {
+    padding: calc(var(--w) * 0.3) calc(var(--w) * 0.42);
+    font-size: calc(var(--w) * 0.34);
+}
+.lf-marker-inner.is-text.shape-drop {
+    padding-bottom: calc(var(--w) * 0.55);
+}
+.lf-marker-inner.is-text .lf-marker-glyph {
+    width: auto;
+    height: auto;
+    transform: rotate(var(--rot, 0deg));
+}
+.lf-marker-inner.is-text .lf-marker-badge {
+    border-radius: calc(var(--w) * 0.5);
+}
+.lf-marker-inner.is-text.shape-square .lf-marker-badge,
+.lf-marker-inner.is-text.shape-square-pin .lf-marker-badge {
+    border-radius: calc(var(--w) * 0.22);
+}
+
+.lf-hiding .lf-marker-inner,
+.lf-hiding .lf-label-inner,
+path.lf-hiding {
+    opacity: 0 !important;
+    transition: opacity 0.2s ease;
+}
+.lf-appear .lf-marker-inner,
+.lf-appear .lf-label-inner,
+path.lf-appear {
+    animation: lfFadeIn 0.24s ease-out;
+}
+
+/* Category / group icon in lists (iconBadgeHtml) */
+.lf-icon-badge {
+    position: relative;
+    display: inline-block;
+    flex: none;
+    width: var(--b);
+    height: var(--b);
+    vertical-align: middle;
+}
+.lf-icon-badge .lf-marker-inner {
+    left: 50%;
+    top: 50%;
+    transition: none;
+}
+.lf-icon-badge .shape-pin,
+.lf-icon-badge .shape-square-pin {
+    transform: translate(-50%, -62%);
+}
+.lf-icon-flat {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--b);
+    height: var(--b);
+    font-size: calc(var(--b) * 0.75);
+}
+.lf-icon-flat img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}

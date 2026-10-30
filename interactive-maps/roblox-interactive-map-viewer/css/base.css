@@ -1,0 +1,77 @@
+:root {
+    color-scheme: dark;
+}
+/* Scrollbars, for every scrolling box (panels, popups, lists) */
+@supports not selector(::-webkit-scrollbar) {
+    html {
+        scrollbar-color: #3a3a3a transparent;
+    }
+    * {
+        scrollbar-width: thin;
+    }
+}
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #3a3a3a;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #ff6900;
+}
+
+body {
+    background-color: #0a0a0a;
+    background-image:
+        radial-gradient(ellipse 60% 50% at 20% 20%, rgba(255, 255, 255, 0.05), transparent 60%),
+        radial-gradient(ellipse 55% 45% at 80% 80%, rgba(255, 140, 60, 0.045), transparent 60%),
+        linear-gradient(145deg, #0a0a0a 0%, #16100e 60%, #0f0a0a 100%);
+    background-repeat: no-repeat;
+    background-size:
+        200% 200%,
+        200% 200%,
+        100% 100%;
+    background-attachment: fixed;
+    animation: pearlShift 32s ease-in-out infinite;
+}
+@keyframes pearlShift {
+    0%,
+    100% {
+        background-position:
+            0% 0%,
+            100% 100%,
+            0 0;
+    }
+    50% {
+        background-position:
+            90% 40%,
+            10% 60%,
+            0 0;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    body {
+        animation: none;
+    }
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 10px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+/* Shared by every page (was repeated in each page's CSS) */
+.hidden {
+    display: none !important;
+}

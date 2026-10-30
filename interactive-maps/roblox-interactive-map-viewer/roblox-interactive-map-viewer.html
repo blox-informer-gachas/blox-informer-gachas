@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en" class="[&.modal-open]:overflow-hidden">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+        <meta name="color-scheme" content="dark" />
+        <meta name="robots" content="noindex, nofollow" />
+        <title>Interactive Map</title>
+        <link rel="shortcut icon" type="image/png" href="https://i.ibb.co/whfxN1fy/mt-icon.png" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            accent: '#ff6900',
+                            amber: '#fcb900',
+                            'card-bg': '#181818',
+                            'input-bg': '#1c1c1c',
+                            border: '#262626',
+                            muted: '#888888',
+                            'text-secondary': '#cccccc',
+                        },
+                        fontFamily: { inter: ['Inter', 'sans-serif'] },
+                    },
+                },
+            };
+        </script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"
+        />
+        <link rel="stylesheet" href="css/base.css" />
+        <link rel="stylesheet" href="css/shared-components.css" />
+        <link rel="stylesheet" href="css/map-elements.css" />
+        <link rel="stylesheet" href="css/view.css" />
+    </head>
+    <body class="font-inter text-text-secondary min-h-screen overflow-x-hidden [&.view-maximized]:overflow-hidden">
+        <div
+            class="view-shell max-w-[1120px] mx-auto p-4 flex flex-col gap-4 min-h-screen [.embed_&]:max-w-none [.embed_&]:p-0 [.embed_&]:min-h-0"
+        >
+            <div
+                id="not-found-state"
+                class="hidden flex-1 flex flex-col items-center justify-center text-center gap-3.5 px-5 py-[60px] bg-card-bg border border-border rounded-xl"
+            >
+                <i class="fas fa-map-location-dot text-[2.4rem] text-accent opacity-70"></i>
+                <h2 class="text-white text-[1.2rem]">Map not found</h2>
+                <p class="text-muted text-[0.9rem] max-w-[26rem]">
+                    This map doesn't exist, was never published, or the link is incomplete.
+                </p>
+                <a
+                    href="map-maker.html"
+                    class="[.static_&]:hidden btn bg-[linear-gradient(to_bottom_right,#ff6900,#ff4500)] text-white hover:brightness-110 hover:-translate-y-px"
+                    ><i class="fas fa-pen"></i> Open the Map Maker</a
+                >
+            </div>
+
+            <div id="map-app" class="hidden" style="display: contents">
+                <header
+                    class="view-header bg-card-bg border border-border rounded-xl px-5 py-[18px] flex items-center justify-between gap-4 flex-wrap [.embed_&]:hidden"
+                >
+                    <div class="min-w-0">
+                        <nav
+                            id="view-breadcrumb"
+                            aria-label="Breadcrumb"
+                            class="flex items-center gap-1.5 mb-1.5 text-xs text-muted min-w-0"
+                        ></nav>
+                        <h1 class="text-white text-[1.3rem] font-bold flex items-center gap-2.5 flex-wrap">
+                            <i class="fas fa-map-marked-alt text-accent"></i> <span id="view-title">Untitled Map</span>
+                            <span
+                                id="view-version"
+                                class="hidden inline-flex items-center gap-[5px] bg-input-bg border border-border text-[#aaa] text-[0.72rem] font-semibold px-2.5 py-[3px] rounded-full"
+                            ></span>
+                        </h1>
+                        <div id="view-creator" class="hidden text-muted text-[0.85rem] mt-1"></div>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <button
+                            type="button"
+                            id="view-report-btn"
+                            class="[.static_&]:hidden btn bg-input-bg border border-solid border-border text-[#ddd] font-semibold hover:border-accent hover:text-white icon-only max-[720px]:px-3.5"
+                            title="Report a problem with this map"
+                            aria-label="Report a problem with this map"
+                        >
+                            <i class="fas fa-flag"></i>
+                        </button>
+                        <button
+                            type="button"
+                            id="view-embed-btn"
+                            class="btn bg-input-bg border border-solid border-border text-[#ddd] font-semibold hover:border-accent hover:text-white max-[720px]:px-3.5"
+                            title="Put this map on your own page"
+                        >
+                            <i class="fas fa-code"></i> <span class="max-[720px]:hidden">Embed</span>
+                        </button>
+                        <button
+                            type="button"
+                            id="view-copy-btn"
+                            class="[.static_&]:hidden btn bg-[linear-gradient(to_bottom_right,#ff6900,#ff4500)] text-white hover:brightness-110 hover:-translate-y-px max-[720px]:px-3.5"
+                            title="Make your own editable version of this map"
+                        >
+                            <i class="fas fa-clone"></i> <span class="max-[720px]:hidden">Create a Copy</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div id="desc-blocks-above" class="desc-blocks hidden flex flex-col gap-3"></div>
+
+                <section
+                    id="view-stage-card"
+                    class="view-stage-card bg-card-bg border border-border rounded-2xl overflow-hidden [.embed_&]:rounded-none [.embed_&]:border-none [.embed_&]:h-screen [.embed_&]:flex [.embed_&]:flex-col [&.is-maximized]:fixed [&.is-maximized]:inset-0 [&.is-maximized]:z-[1200] [&.is-maximized]:rounded-none [&.is-maximized]:border-none [&.is-maximized]:flex [&.is-maximized]:flex-col"
+                >
+                    <div
+                        id="layer-tab-bar"
+                        class="hidden flex flex-col gap-1.5 px-2.5 py-2 border-b border-border"
+                    ></div>
+
+                    <div
+                        id="view-stage"
+                        class="view-stage overlay-stage relative h-[clamp(480px,calc(100vh-150px),860px)] overflow-hidden max-[720px]:h-[clamp(420px,72vh,700px)] [.embed_&]:flex-1 [.embed_&]:h-auto [.is-maximized_&]:flex-1 [.is-maximized_&]:h-auto"
+                    >
+                        <div class="map-viewport absolute inset-0" id="map-viewport"></div>
+
+                        <aside
+                            id="filter-panel"
+                            class="side-panel--left absolute top-3 bottom-3 z-[300] flex flex-col bg-[rgba(18,18,18,0.72)] backdrop-blur-[12px] border border-white/[0.07] rounded-[14px] shadow-[0_12px_40px_rgba(0,0,0,0.45)] [transition:transform_0.25s_ease,opacity_0.2s_ease] max-[720px]:w-auto max-[720px]:left-2 max-[720px]:right-2 max-[720px]:top-2 max-[720px]:bottom-2 w-[270px] left-3 [.left-collapsed_&]:translate-x-[calc(-100%-16px)] [.left-collapsed_&]:opacity-0 [.left-collapsed_&]:pointer-events-none"
+                            aria-label="Filters"
+                        >
+                            <div
+                                class="flex items-center justify-between gap-2 py-2 pr-2 pl-2.5 border-b border-white/[0.06] flex-none"
+                            >
+                                <div
+                                    class="flex items-center gap-2 text-white text-[0.85rem] font-bold pl-1 min-w-0 [&_span]:truncate [&_i]:text-accent"
+                                >
+                                    <i class="fas fa-filter"></i> <span>Filters</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    class="w-[30px] h-[30px] flex-none border-none bg-transparent text-muted rounded-lg cursor-pointer hover:bg-white/[0.07] hover:text-white"
+                                    data-panel-toggle="left"
+                                    title="Hide filters"
+                                    aria-label="Hide filters"
+                                >
+                                    <i class="fas fa-angles-left"></i>
+                                </button>
+                            </div>
+                            <div
+                                class="flex-1 min-h-0 overflow-y-auto px-3.5 pt-3 pb-4 flex flex-col gap-3.5 [&>*]:shrink-0"
+                            >
+                                <div class="relative">
+                                    <i
+                                        class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[0.8rem]"
+                                    ></i>
+                                    <input
+                                        type="text"
+                                        id="filter-search"
+                                        class="w-full py-[9px] pr-[34px] pl-8 bg-input-bg border border-border rounded-lg text-white text-[0.85rem] focus:outline-none focus:border-accent"
+                                        placeholder="Search this map"
+                                        autocomplete="off"
+                                        aria-label="Search this map"
+                                    />
+                                    <kbd
+                                        class="[@media(hover:none)_and_(pointer:coarse)]:hidden absolute right-2 top-1/2 -translate-y-1/2 m-0 pointer-events-none"
+                                        title="Press / to search"
+                                        >/</kbd
+                                    >
+                                </div>
+                                <div
+                                    id="search-results"
+                                    class="hidden flex flex-col gap-0.5 max-h-[260px] overflow-y-auto -mt-1.5"
+                                ></div>
+
+                                <div
+                                    id="found-settings"
+                                    class="hidden flex items-center justify-between gap-2.5 px-2.5 py-2 border border-border rounded-[10px] bg-white/[0.025]"
+                                >
+                                    <label class="found-toggle"
+                                        ><input type="checkbox" id="filter-hide-found" />
+                                        <span>Hide what I've found</span></label
+                                    >
+                                    <button
+                                        type="button"
+                                        id="found-reset"
+                                        class="link-btn hidden mt-0 text-[0.75rem]"
+                                        title="Un-mark everything you found on this map"
+                                    >
+                                        Reset
+                                    </button>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    <button
+                                        type="button"
+                                        id="filter-show-all"
+                                        class="bg-transparent border border-border text-muted rounded-lg p-2 text-[0.75rem] font-semibold cursor-pointer hover:border-accent hover:text-accent"
+                                    >
+                                        <i class="fas fa-eye"></i> Show all
+                                    </button>
+                                    <button
+                                        type="button"
+                                        id="filter-hide-all"
+                                        class="bg-transparent border border-border text-muted rounded-lg p-2 text-[0.75rem] font-semibold cursor-pointer hover:border-accent hover:text-accent"
+                                    >
+                                        <i class="fas fa-eye-slash"></i> Hide all
+                                    </button>
+                                </div>
+                                <div id="filter-routes-section" class="hidden">
+                                    <h3 class="text-[0.7rem] uppercase tracking-[0.04em] text-muted mb-1.5">Routes</h3>
+                                    <div id="filter-routes" class="flex flex-col gap-0.5"></div>
+                                </div>
+                                <div>
+                                    <h3 class="text-[0.7rem] uppercase tracking-[0.04em] text-muted mb-1.5">
+                                        On the map
+                                    </h3>
+                                    <div
+                                        id="filter-tree"
+                                        class="flex flex-col gap-0.5"
+                                        role="tree"
+                                        aria-label="Groups, categories and their items"
+                                    ></div>
+                                    <label
+                                        id="annotations-toggle"
+                                        class="hidden flex items-center justify-between gap-2.5 px-2.5 py-2 border border-border rounded-[10px] bg-white/[0.025] mt-2 cursor-pointer"
+                                        title="Text labels and area outlines drawn on the map"
+                                        ><span class="found-toggle"
+                                            ><input type="checkbox" id="filter-show-annotations" checked />
+                                            <span>Labels &amp; areas</span></span
+                                        ></label
+                                    >
+                                </div>
+                                <div>
+                                    <h3 class="text-[0.7rem] uppercase tracking-[0.04em] text-muted mb-1.5">
+                                        My markers <span id="mine-count" class="text-amber ml-0.5"></span>
+                                    </h3>
+                                    <div class="grid grid-cols-2 gap-1.5 mb-1.5">
+                                        <button
+                                            type="button"
+                                            id="mine-add-marker"
+                                            class="h-[30px] justify-center px-2.5 rounded-full border border-[#333] bg-input-bg text-[#ddd] text-[0.72rem] font-semibold cursor-pointer inline-flex items-center gap-[5px] hover:border-amber hover:text-white [&.active]:border-amber [&.active]:text-white [&_i]:text-amber [&_i]:text-[0.65rem]"
+                                            title="Put your own marker on the map"
+                                        >
+                                            <i class="fas fa-plus"></i> Marker
+                                        </button>
+                                        <button
+                                            type="button"
+                                            id="mine-add-route"
+                                            class="h-[30px] justify-center px-2.5 rounded-full border border-[#333] bg-input-bg text-[#ddd] text-[0.72rem] font-semibold cursor-pointer inline-flex items-center gap-[5px] hover:border-amber hover:text-white [&.active]:border-amber [&.active]:text-white [&_i]:text-amber [&_i]:text-[0.65rem]"
+                                            title="Draw your own route"
+                                        >
+                                            <i class="fas fa-plus"></i> Route
+                                        </button>
+                                    </div>
+                                    <div id="mine-list" class="flex flex-col gap-0.5"></div>
+                                </div>
+                                <p
+                                    id="filter-credit"
+                                    class="hidden text-[#666] text-[0.68rem] text-center pt-0.5 [&_a]:text-[#999] [&_a]:underline [&_a:hover]:text-[#ff9a4d]"
+                                >
+                                    Icons:
+                                    <a href="https://game-icons.net" target="_blank" rel="noopener">game-icons.net</a>
+                                    (CC BY 3.0)
+                                </p>
+                            </div>
+                        </aside>
+                        <button
+                            type="button"
+                            class="absolute top-3 z-[290] h-[38px] px-3.5 rounded-full flex items-center gap-2 bg-[rgba(18,18,18,0.85)] backdrop-blur-[10px] border border-white/[0.08] text-[#ddd] text-[0.8rem] font-semibold cursor-pointer opacity-0 pointer-events-none [transition:opacity_0.2s_ease,border-color_0.2s] max-w-[200px] [&_span]:truncate [&_i]:text-accent hover:border-accent [&.has-selection]:border-accent/60 max-[720px]:top-2 left-3 max-[720px]:left-2 [.left-collapsed_&]:opacity-100 [.left-collapsed_&]:pointer-events-auto"
+                            data-panel-toggle="left"
+                            title="Show filters"
+                        >
+                            <i class="fas fa-filter"></i><span>Filters</span>
+                        </button>
+
+                        <a
+                            id="embed-open-full"
+                            class="hidden absolute right-3 top-3 z-[290] inline-flex items-center gap-[7px] h-[34px] px-3.5 rounded-full bg-[rgba(18,18,18,0.85)] backdrop-blur-[10px] border border-white/[0.08] text-[#ddd] text-[0.78rem] font-semibold no-underline hover:border-accent hover:text-white"
+                            target="_blank"
+                            rel="noopener"
+                            ><i class="fas fa-up-right-from-square"></i> Open full map</a
+                        >
+                        <div
+                            id="map-hint-bar"
+                            class="hidden absolute left-1/2 top-3 -translate-x-1/2 z-[300] flex items-center gap-2 max-w-[calc(100%-24px)] py-1.5 pr-1.5 pl-4 rounded-full bg-[rgba(18,18,18,0.92)] backdrop-blur-[10px] border border-amber/50 text-white text-[0.8rem] font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.5)] [&>i]:text-amber [&>span]:truncate [&>span]:min-w-0"
+                            role="status"
+                        ></div>
+                        <div
+                            id="gesture-hint"
+                            class="absolute inset-0 z-[400] flex items-center justify-center text-center p-6 bg-black/50 text-white text-[1.05rem] font-bold [text-shadow:0_1px_3px_rgba(0,0,0,0.8)] opacity-0 pointer-events-none [transition:opacity_0.25s] [&.show]:opacity-100"
+                            aria-hidden="true"
+                        ></div>
+
+                        <div
+                            id="view-minimap"
+                            class="view-minimap hidden absolute top-3 [.embed:not(.static)_&]:top-[52px] right-3 z-[280] rounded-[10px] overflow-hidden bg-[#141414] border border-white/[0.12] shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-crosshair touch-none max-[640px]:hidden"
+                            aria-hidden="true"
+                            title="Click or drag to move around"
+                        >
+                            <img
+                                id="view-minimap-img"
+                                class="w-full h-full block object-fill opacity-[0.85] pointer-events-none"
+                                alt=""
+                                draggable="false"
+                            />
+                            <div
+                                id="view-minimap-box"
+                                class="absolute border-2 border-accent bg-accent/[0.16] rounded-[2px] pointer-events-none box-border"
+                            ></div>
+                        </div>
+
+                        <div
+                            class="absolute right-3 bottom-3 z-[280] flex items-center gap-0.5 p-[3px] rounded-xl bg-[rgba(18,18,18,0.85)] backdrop-blur-[10px] border border-white/[0.08]"
+                        >
+                            <button
+                                type="button"
+                                id="view-zoom-out"
+                                class="w-8 h-8 rounded-lg border-none bg-transparent text-[#ccc] cursor-pointer text-[0.75rem] hover:bg-white/[0.07] hover:text-accent"
+                                title="Zoom out"
+                                aria-label="Zoom out"
+                            >
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span
+                                id="zoom-label"
+                                class="min-w-[46px] text-center tabular-nums text-[#ddd] font-semibold text-[0.75rem]"
+                                >100%</span
+                            >
+                            <button
+                                type="button"
+                                id="view-zoom-in"
+                                class="w-8 h-8 rounded-lg border-none bg-transparent text-[#ccc] cursor-pointer text-[0.75rem] hover:bg-white/[0.07] hover:text-accent"
+                                title="Zoom in"
+                                aria-label="Zoom in"
+                            >
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button
+                                type="button"
+                                id="view-zoom-reset"
+                                class="w-8 h-8 rounded-lg border-none bg-transparent text-[#ccc] cursor-pointer text-[0.75rem] hover:bg-white/[0.07] hover:text-accent"
+                                title="Show the whole map"
+                                aria-label="Show the whole map"
+                            >
+                                <i class="fas fa-house"></i>
+                            </button>
+                            <span class="w-px h-[18px] bg-white/10 mx-0.5 [.embed_&]:hidden"></span>
+                            <button
+                                type="button"
+                                id="view-maximize"
+                                class="w-8 h-8 rounded-lg border-none bg-transparent text-[#ccc] cursor-pointer text-[0.75rem] hover:bg-white/[0.07] hover:text-accent [.embed_&]:hidden"
+                                title="Maximize map"
+                                aria-label="Maximize map"
+                            >
+                                <i class="fas fa-maximize"></i>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <div id="desc-blocks-below" class="desc-blocks hidden flex flex-col gap-3"></div>
+            </div>
+        </div>
+
+        <!-- Embed code -->
+        <div
+            id="embedModal"
+            class="modal-overlay overscroll-contain [transition:opacity_0.18s_ease] fixed inset-0 bg-black/50 backdrop-blur-sm z-[1300] hidden opacity-0 justify-center p-6 overflow-y-auto"
+        >
+            <div
+                class="modal-box focus:[outline:none] [transition:transform_0.18s_ease] bg-card-bg border border-border rounded-2xl w-full max-w-lg p-6 my-auto scale-95"
+            >
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-lg font-bold text-white">Embed this map</h3>
+                    <button
+                        type="button"
+                        data-close-modal="embedModal"
+                        class="flex-none w-9 h-9 rounded-full bg-input-bg border border-border text-muted flex items-center justify-center cursor-pointer hover:border-accent hover:text-white"
+                        aria-label="Close"
+                    >
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+                <p class="text-sm text-muted mb-3">
+                    Paste this into any page (a guide, a wiki, a blog post). It shows the interactive map with a link
+                    back to the full version.
+                </p>
+                <textarea
+                    id="embed-code"
+                    class="w-full bg-[#101010] border border-border rounded-[10px] text-[#ddd] text-[0.78rem] leading-[1.5] [font-family:ui-monospace,Consolas,monospace] px-3 py-2.5 resize-y outline-none focus:border-accent"
+                    rows="4"
+                    readonly
+                ></textarea>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" data-close-modal="embedModal" class="modal-btn">Close</button>
+                    <button type="button" id="embed-copy" class="modal-btn primary">
+                        <i class="fas fa-copy"></i> Copy code
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report -->
+        <div
+            id="reportModal"
+            class="modal-overlay overscroll-contain [transition:opacity_0.18s_ease] fixed inset-0 bg-black/50 backdrop-blur-sm z-[1300] hidden opacity-0 justify-center p-6 overflow-y-auto"
+        >
+            <div
+                class="modal-box focus:[outline:none] [transition:transform_0.18s_ease] bg-card-bg border border-border rounded-2xl w-full max-w-md p-6 my-auto scale-95"
+            >
+                <div class="flex items-center justify-between mb-3">
+                    <h3 id="report-title" class="text-lg font-bold text-white">Report this map</h3>
+                    <button
+                        type="button"
+                        data-close-modal="reportModal"
+                        class="flex-none w-9 h-9 rounded-full bg-input-bg border border-border text-muted flex items-center justify-center cursor-pointer hover:border-accent hover:text-white"
+                        aria-label="Close"
+                    >
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+                <div id="report-form">
+                    <p id="report-intro" class="text-sm text-muted mb-3">What's wrong with it?</p>
+                    <div id="report-reasons" class="flex flex-wrap gap-1.5 mb-3"></div>
+                    <textarea
+                        id="report-details"
+                        class="w-full bg-[#101010] border border-border rounded-[10px] text-[#ddd] text-[0.78rem] leading-[1.5] [font-family:ui-monospace,Consolas,monospace] px-3 py-2.5 resize-y outline-none focus:border-accent"
+                        rows="3"
+                        maxlength="500"
+                        placeholder="Details help, e.g. which marker is wrong (optional)"
+                    ></textarea>
+                    <div class="flex justify-end gap-2 mt-4">
+                        <button type="button" data-close-modal="reportModal" class="modal-btn">Cancel</button>
+                        <button type="button" id="report-submit" class="modal-btn primary">
+                            <i class="fas fa-paper-plane"></i> Send report
+                        </button>
+                    </div>
+                </div>
+                <div id="report-done" class="hidden text-center py-3">
+                    <p class="text-white font-bold mb-1">Thanks for the report</p>
+                    <p id="report-done-text" class="text-sm text-muted mb-4">We'll take a look.</p>
+                    <button type="button" data-close-modal="reportModal" class="modal-btn">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- A viewer's own marker / route (js/view/mine.js) -->
+        <div
+            id="mineModal"
+            class="modal-overlay overscroll-contain [transition:opacity_0.18s_ease] fixed inset-0 bg-black/50 backdrop-blur-sm z-[1300] hidden opacity-0 justify-center p-6 overflow-y-auto"
+        >
+            <div
+                class="modal-box focus:[outline:none] [transition:transform_0.18s_ease] bg-card-bg border border-border rounded-2xl w-full max-w-md p-6 my-auto scale-95"
+            >
+                <div class="flex items-center justify-between mb-1">
+                    <h3 id="mine-modal-title" class="text-lg font-bold text-white">Your marker</h3>
+                    <button
+                        type="button"
+                        data-close-modal="mineModal"
+                        class="flex-none w-9 h-9 rounded-full bg-input-bg border border-border text-muted flex items-center justify-center cursor-pointer hover:border-accent hover:text-white"
+                        aria-label="Close"
+                    >
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-muted mb-4">Only you can see this. It's saved on this device for now.</p>
+                <label class="block text-[0.72rem] font-bold text-[#aaa] mb-[5px]" for="mine-name">Name</label>
+                <input
+                    id="mine-name"
+                    class="w-full bg-[#101010] border border-border rounded-[10px] text-[#eee] [font:0.85rem/1.45_Inter,sans-serif] px-[11px] py-[9px] outline-none resize-y focus:border-amber mb-3"
+                    maxlength="60"
+                    placeholder="e.g. Chest I can't open yet"
+                    autocomplete="off"
+                />
+                <label class="block text-[0.72rem] font-bold text-[#aaa] mb-[5px]" for="mine-note"
+                    >Note <span class="text-[#666] font-medium">optional</span></label
+                >
+                <textarea
+                    id="mine-note"
+                    class="w-full bg-[#101010] border border-border rounded-[10px] text-[#eee] [font:0.85rem/1.45_Inter,sans-serif] px-[11px] py-[9px] outline-none resize-y focus:border-amber mb-3"
+                    rows="3"
+                    maxlength="500"
+                    placeholder="Anything you want to remember here"
+                ></textarea>
+                <div class="flex gap-3 items-end mb-3">
+                    <div
+                        class="[&_.cp-trigger]:block [&_.cp-trigger]:w-16 [&_.cp-trigger]:h-[34px] [&_.cp-trigger]:rounded-[10px] [&_.cp-trigger]:border [&_.cp-trigger]:border-border"
+                    >
+                        <label class="block text-[0.72rem] font-bold text-[#aaa] mb-[5px]" for="mine-color"
+                            >Color</label
+                        >
+                        <input type="color" id="mine-color" value="#fcb900" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <label class="block text-[0.72rem] font-bold text-[#aaa] mb-[5px]"
+                            ><span id="mine-size-label">Size</span></label
+                        >
+                        <div id="mine-sizes" class="grid grid-cols-[repeat(4,1fr)] gap-1"></div>
+                    </div>
+                </div>
+                <div id="mine-marker-fields">
+                    <label class="block text-[0.72rem] font-bold text-[#aaa] mb-[5px]">Shape</label>
+                    <div id="mine-shapes" class="grid grid-cols-[repeat(4,1fr)] gap-1 mb-3"></div>
+                    <label class="block text-[0.72rem] font-bold text-[#aaa] mb-[5px]" for="mine-icon-search"
+                        >Icon</label
+                    >
+                    <input
+                        type="text"
+                        id="mine-icon-search"
+                        class="w-full bg-[#101010] border border-border rounded-[10px] text-[#eee] text-[0.82rem] px-[11px] py-[7px] outline-none focus:border-amber mb-1.5"
+                        placeholder="Search 4,000+ icons: sword, chest, boss…"
+                        autocomplete="off"
+                    />
+                    <div id="mine-icons" class="icon-selector h-[168px] [align-content:start]"></div>
+                    <p
+                        class="text-[0.65rem] text-[#666] mt-1.5 mb-4 [&_a]:text-[#999] [&_a]:underline [&_a:hover]:text-[#ff9a4d]"
+                    >
+                        Game icons by
+                        <a href="https://game-icons.net" target="_blank" rel="noopener">game-icons.net</a> (CC BY 3.0),
+                        via Iconify.
+                    </p>
+                </div>
+                <label id="mine-loop-row" class="found-toggle mb-4"
+                    ><input type="checkbox" id="mine-loop" /> <span>Loop back to the start</span></label
+                >
+                <button type="button" id="mine-redraw" class="link-btn mb-4 hidden">
+                    <i class="fas fa-pen"></i> Redraw the line
+                </button>
+                <div class="flex items-center justify-between gap-2">
+                    <button
+                        type="button"
+                        id="mine-delete"
+                        class="text-red-400 hover:text-red-300 text-sm flex items-center gap-1"
+                    >
+                        <i class="fas fa-trash"></i> <span>Delete</span>
+                    </button>
+                    <div class="flex gap-2">
+                        <button type="button" data-close-modal="mineModal" class="modal-btn">Cancel</button>
+                        <button type="button" id="mine-save" class="modal-btn primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="toastHost" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[2000]"></div>
+
+        <script src="js/shared/dom-basics.js"></script>
+        <script src="js/shared/map-schema.js"></script>
+        <script src="js/shared/store.js"></script>
+        <script src="js/shared/modal.js"></script>
+        <script src="js/shared/color-picker.js"></script>
+        <script src="js/shared/overlay-panels.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.3/dist/iconify-icon.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/7.0.0/fuse.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+        <script src="js/shared/leaflet-core.js"></script>
+        <script src="js/view/state.js"></script>
+        <script src="js/view/leaflet-map.js"></script>
+        <script src="js/view/layers.js"></script>
+        <script src="js/view/render.js"></script>
+        <script src="js/view/filters.js"></script>
+        <script src="js/view/found.js"></script>
+        <script src="js/view/tooltip.js"></script>
+        <script src="js/view/minimap.js"></script>
+        <script src="js/view/routes.js"></script>
+        <script src="js/shared/icon-picker.js"></script>
+        <script src="js/view/mine.js"></script>
+        <script src="js/view/share.js"></script>
+        <script src="js/view/copy.js"></script>
+        <script src="js/view/main.js"></script>
+    </body>
+</html>

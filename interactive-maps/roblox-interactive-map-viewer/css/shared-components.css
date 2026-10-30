@@ -1,0 +1,579 @@
+/* Shared components: the Tiptap editor and color picker (ported as-is from the tier hub), the range slider, and primitives used all over (.link-btn, kbd, .modal-btn, .btn, .icon-selector) */
+
+input[type='color'] {
+    -webkit-appearance: none;
+    appearance: none;
+}
+input[type='color']::-webkit-color-swatch-wrapper {
+    padding: 4px;
+}
+input[type='color']::-webkit-color-swatch {
+    border: none;
+    border-radius: 0.5rem;
+}
+input[type='color']::-moz-color-swatch {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.tiptap-dark {
+    border: 1px solid #262626;
+    border-radius: 0.75rem;
+}
+.tiptap-toolbar {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
+    gap: 0.3rem;
+    padding: 0.4rem 0.5rem;
+    background: #1c1c1c;
+    border-bottom: 1px solid #262626;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}
+.tt-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.035);
+}
+.tt-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.4rem;
+    color: #ccc;
+    font-size: 0.75rem;
+    border: 1px solid transparent;
+}
+.tt-btn:hover {
+    color: #fff;
+    border-color: #262626;
+    background: #262626;
+}
+.tt-btn.is-active {
+    color: #ff6900;
+    background: rgba(255, 105, 0, 0.14);
+    border-color: rgba(255, 105, 0, 0.4);
+}
+.tiptap-content {
+    overflow: hidden;
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+}
+.tiptap-content .ProseMirror {
+    min-height: 140px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 0.75rem;
+    color: #eee;
+    outline: none;
+}
+.tiptap-dark.compact .tiptap-content .ProseMirror {
+    min-height: 70px;
+    max-height: 200px;
+    font-size: 0.875rem;
+}
+.tiptap-content .ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    color: #666;
+    pointer-events: none;
+}
+.tiptap-content .ProseMirror img {
+    max-width: 100%;
+    border-radius: 0.5rem;
+    vertical-align: middle;
+}
+.tiptap-content .ProseMirror a {
+    color: #ff9a4d;
+    text-decoration: underline;
+}
+.tiptap-content [data-resize-wrapper] {
+    display: inline-block;
+}
+.tiptap-content [data-resize-handle] {
+    width: 10px;
+    height: 10px;
+    margin: -5px;
+    background: #ff6900;
+    border: 2px solid #101010;
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+}
+.tiptap-content [data-resize-handle='top-left'],
+.tiptap-content [data-resize-handle='bottom-right'] {
+    cursor: nwse-resize;
+}
+.tiptap-content [data-resize-handle='top-right'],
+.tiptap-content [data-resize-handle='bottom-left'] {
+    cursor: nesw-resize;
+}
+.tiptap-content [data-resize-wrapper]:hover [data-resize-handle],
+.tiptap-content [data-resize-container].ProseMirror-selectednode [data-resize-handle],
+.tiptap-content [data-resize-container][data-resize-state='true'] [data-resize-handle] {
+    opacity: 1;
+}
+.tt-link-popover {
+    position: absolute;
+    z-index: 60;
+    top: calc(100% + 6px);
+    left: 0;
+    background: #181818;
+    border: 1px solid #262626;
+    border-radius: 0.65rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    display: flex;
+    gap: 6px;
+    width: 15rem;
+}
+.tt-link-popover input {
+    flex: 1;
+    min-width: 0;
+    height: 30px;
+    padding: 0 8px;
+    border-radius: 0.5rem;
+    background: #1c1c1c;
+    border: 1px solid #262626;
+    color: #eee;
+    font-size: 0.75rem;
+    outline: none;
+}
+.tt-link-popover input:focus {
+    border-color: #ff6900;
+}
+.tt-link-popover button {
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border-radius: 0.5rem;
+    background: #1c1c1c;
+    border: 1px solid #262626;
+    color: #ccc;
+}
+.tt-link-popover button:hover {
+    color: #fff;
+    border-color: #ff6900;
+}
+.tt-dropdown {
+    position: relative;
+    display: inline-flex;
+}
+.tt-dd-panel {
+    position: fixed;
+    z-index: 1000;
+    background: #181818;
+    border: 1px solid #262626;
+    border-radius: 0.65rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    min-width: 140px;
+}
+.tt-dd-item {
+    text-align: left;
+    padding: 6px 10px;
+    border-radius: 0.4rem;
+    color: #ccc;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+.tt-dd-item:hover {
+    background: #262626;
+    color: #fff;
+}
+.tiptap-content .ProseMirror table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    margin: 0.5rem 0;
+}
+.tiptap-content .ProseMirror td,
+.tiptap-content .ProseMirror th {
+    border: 1px solid #333;
+    padding: 6px 8px;
+    vertical-align: top;
+    position: relative;
+}
+.tiptap-content .ProseMirror th {
+    background: #1c1c1c;
+    font-weight: 700;
+}
+.tiptap-content .ProseMirror .selectedCell {
+    background: rgba(255, 105, 0, 0.15);
+}
+.tiptap-content .ProseMirror .column-resize-handle {
+    position: absolute;
+    right: -2px;
+    top: 0;
+    bottom: -2px;
+    width: 4px;
+    background: #ff6900;
+    pointer-events: none;
+}
+.tiptap-content .ProseMirror ul {
+    list-style: disc;
+    padding-left: 1.4rem;
+}
+.tiptap-content .ProseMirror ol {
+    list-style: decimal;
+    padding-left: 1.4rem;
+}
+.tiptap-content .ProseMirror blockquote {
+    border-left: 3px solid #ff6900;
+    padding-left: 0.75rem;
+    color: #aaa;
+}
+.tiptap-content .ProseMirror pre {
+    background: #101010;
+    border: 1px solid #262626;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-family: monospace;
+    font-size: 0.85em;
+    overflow-x: auto;
+}
+.tiptap-content .ProseMirror h2 {
+    font-size: 1.25em;
+    font-weight: 700;
+    margin: 0.4em 0;
+}
+.tiptap-content .ProseMirror h3 {
+    font-size: 1.1em;
+    font-weight: 700;
+    margin: 0.3em 0;
+}
+
+.cp-trigger {
+    background: transparent;
+}
+.cp-trigger-checker,
+.cp-swatch-checker {
+    background-image: repeating-conic-gradient(#3a3a3a 0% 25%, #2a2a2a 0% 50%);
+    background-size: 10px 10px;
+}
+.cp-panel {
+    position: fixed;
+    z-index: 1000;
+    user-select: none;
+    width: 14.5rem;
+    background: #181818;
+    border: 1px solid #262626;
+    border-radius: 0.85rem;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+    padding: 12px;
+}
+.cp-sv {
+    position: relative;
+    width: 100%;
+    height: 130px;
+    border-radius: 0.6rem;
+    cursor: crosshair;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-drag: none;
+    touch-action: none;
+}
+.cp-sv-white {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
+}
+.cp-sv-black {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
+}
+.cp-sv-pointer {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.6),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+.cp-slider-row {
+    position: relative;
+    height: 12px;
+    border-radius: 9999px;
+    margin-top: 12px;
+}
+/* Hue/opacity sliders */
+.cp-slider {
+    cursor: pointer;
+    touch-action: none;
+    outline: none;
+    -webkit-user-drag: none;
+}
+.cp-slider:focus-visible {
+    box-shadow: 0 0 0 2px #ff6900;
+}
+.cp-thumb {
+    position: absolute;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #181818;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 2;
+}
+.cp-hue-track {
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+.cp-alpha-track {
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+}
+.ui-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 9999px;
+    outline: none;
+    cursor: pointer;
+    margin: 7px 0;
+    background: linear-gradient(
+        to right,
+        #ff6900 0%,
+        #ff6900 var(--range-fill, 0%),
+        #2c2c2c var(--range-fill, 0%),
+        #2c2c2c 100%
+    );
+}
+.ui-range::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 9999px;
+    background: transparent;
+}
+.ui-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    margin-top: -5px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #181818;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+}
+.ui-range::-moz-range-track {
+    height: 6px;
+    border-radius: 9999px;
+    background: linear-gradient(
+        to right,
+        #ff6900 0%,
+        #ff6900 var(--range-fill, 0%),
+        #2c2c2c var(--range-fill, 0%),
+        #2c2c2c 100%
+    );
+}
+.ui-range::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #181818;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+}
+.ui-range::-moz-focus-outer {
+    border: 0;
+}
+.cp-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+.cp-hex-input {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 0.5rem;
+    background: #1c1c1c;
+    border: 1px solid #262626;
+    color: #eee;
+    font-size: 0.75rem;
+    outline: none;
+    font-family: monospace;
+}
+.cp-hex-input:focus {
+    border-color: #ff6900;
+}
+.cp-eyedrop-btn {
+    width: 32px;
+    height: 32px;
+    flex: none;
+    border-radius: 0.5rem;
+    background: #1c1c1c;
+    border: 1px solid #262626;
+    color: #ccc;
+}
+.cp-eyedrop-btn:hover {
+    color: #fff;
+    border-color: #ff6900;
+}
+.cp-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+.cp-swatch-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 0.4rem;
+    border: 1px solid #262626;
+    position: relative;
+    overflow: hidden;
+}
+.cp-swatch-btn:hover {
+    transform: scale(1.12);
+    border-color: #fff;
+}
+.cp-swatch-none {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 0.625rem;
+}
+.cp-section-label {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #888;
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+/* Small buttons */
+.link-btn.danger {
+    color: #f87171;
+}
+kbd {
+    display: inline-block;
+    min-width: 22px;
+    padding: 1px 6px;
+    margin-right: 4px;
+    border-radius: 5px;
+    background: #1c1c1c;
+    border: 1px solid #333;
+    border-bottom-width: 2px;
+    color: #ddd;
+    font-family: inherit;
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-align: center;
+}
+.link-btn {
+    background: none;
+    border: none;
+    color: #ff9a4d;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+    padding: 0;
+    font-family: inherit;
+}
+.link-btn:hover {
+    text-decoration: underline;
+}
+.modal-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+.modal-btn {
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 10px;
+    background: #1c1c1c;
+    border: 1px solid #262626;
+    color: #ddd;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    font-family: inherit;
+}
+.modal-btn:hover {
+    border-color: #ff6900;
+}
+.modal-btn.primary {
+    background: #ff6900;
+    border-color: #ff6900;
+    color: white;
+}
+.modal-btn.primary:hover {
+    background: #e05f00;
+}
+.modal-btn.danger {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: white;
+}
+.modal-btn.danger:hover {
+    background: #b91c1c;
+}
+
+/* Page buttons */
+/* Shared primitive */
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: 0.2s;
+    text-decoration: none;
+}
+.btn.icon-only {
+    width: 40px;
+    padding: 10px 0;
+}
+
+/* Icon picker grid (js/maker/icon-picker.js) */
+.icon-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
+    gap: 4px;
+    max-height: 216px;
+    overflow-y: auto;
+    padding-right: 2px;
+}
