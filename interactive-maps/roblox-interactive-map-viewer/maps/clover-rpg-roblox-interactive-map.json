@@ -16469,7 +16469,7 @@
   }
  ],
  "defaultLayerId": "layer-072ak2x",
- "updatedAt": "2026-10-30T18:10:36.504Z",
+ "updatedAt": "2026-10-30T18:54:16.097Z",
  "game": "Clover RPG",
  "gameSlug": "clover-rpg",
  "categories": [
@@ -16899,8 +16899,9 @@
   "markerScaleIn": 90,
   "cluster": false,
   "clusterBy": "category",
-  "minZoom": 70,
-  "maxZoom": 6400
+  "minZoom": 130,
+  "maxZoom": 6400,
+  "surround": "#021623"
  },
  "schemaVersion": 1
 }
