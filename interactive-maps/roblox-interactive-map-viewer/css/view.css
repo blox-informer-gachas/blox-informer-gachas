@@ -1,0 +1,164 @@
+/* View page: Leaflet overrides, the found switches (pseudo-elements), popup content and description HTML */
+
+body.embed .map-viewport.leaflet-container.gesture-guard {
+    touch-action: pan-x pan-y;
+}
+.map-viewport.mine-placing,
+.map-viewport.mine-placing .leaflet-interactive {
+    cursor: crosshair;
+}
+.map-viewport.mine-placing .lf-route-hit {
+    pointer-events: none;
+}
+
+/* Route color swatch in a route's popup */
+.route-swatch {
+    width: 15px;
+    height: 15px;
+    border-radius: 4px;
+    flex: none;
+    display: inline-block;
+}
+
+/* "Hide what I've found" / "Labels & areas" */
+.found-toggle {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 0.8rem;
+    color: #ccc;
+    padding: 2px 0;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.found-toggle input {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    width: 34px;
+    height: 20px;
+    flex: none;
+    border-radius: 999px;
+    background: #333;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin: 0;
+}
+.found-toggle input::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #999;
+    transition:
+        transform 0.15s,
+        background 0.15s;
+}
+.found-toggle input:checked {
+    background: #ff6900;
+}
+.found-toggle input:checked::after {
+    transform: translateX(14px);
+    background: white;
+}
+.found-toggle input:focus-visible {
+    outline: 2px solid #ff6900;
+    outline-offset: 2px;
+}
+
+/* My markers: popup content */
+.mine-popup-head {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    color: #fcb900;
+    font-weight: 700;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+    padding-right: 22px;
+}
+.mine-note {
+    white-space: pre-wrap;
+}
+.mine-popup-hint {
+    color: #666;
+    font-size: 0.68rem;
+    align-self: center;
+}
+.cp-panel {
+    z-index: 1400;
+}
+
+/* Description sections (Tiptap HTML, no classes of its own) */
+.notes-content h2 {
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+.notes-content h3 {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+.notes-content p {
+    min-height: 1em;
+}
+.notes-content ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+}
+.notes-content ol {
+    list-style: decimal;
+    padding-left: 1.25rem;
+}
+.notes-content li {
+    margin-bottom: 0.4rem;
+}
+.notes-content img {
+    max-width: 100%;
+    border-radius: 0.5rem;
+    vertical-align: middle;
+}
+.notes-content a {
+    color: #ff9a4d;
+    text-decoration: underline;
+}
+.notes-content blockquote {
+    border-left: 3px solid #ff6900;
+    padding-left: 0.75rem;
+    color: #aaa;
+    margin: 0.5rem 0;
+}
+.notes-content pre {
+    background: #101010;
+    border: 1px solid #262626;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-family: monospace;
+    font-size: 0.85em;
+    overflow-x: auto;
+    margin: 0.5rem 0;
+}
+.notes-content table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    margin: 0.5rem 0;
+}
+.notes-content td,
+.notes-content th {
+    border: 1px solid #333;
+    padding: 6px 8px;
+    vertical-align: top;
+}
+.notes-content th {
+    background: #1c1c1c;
+    font-weight: 700;
+}
