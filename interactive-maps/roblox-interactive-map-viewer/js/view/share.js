@@ -10,7 +10,7 @@ function viewUrl(params) {
 }
 
 function syncUrlToElement(elId) {
-    const embed = document.body.classList.contains('embed') ? '1' : '';
+    const embed = isEmbedMode() ? '1' : '';
     const layer = activeLayerId !== (map.defaultLayerId || map.layers[0].id) ? activeLayerId : '';
     history.replaceState(null, '', viewUrl({ layer, marker: elId || '', embed }));
 }
@@ -77,7 +77,8 @@ function initEmbedMode() {
 
 // Embedded in someone's article, the map mustn't trap the page
 function initEmbedGestureGuard() {
-    if (!isEmbedMode()) return;
+    // the GitHub build's maps fill their iframe: the wheel zooms them, like the older maps
+    if (!isEmbedMode() || document.body.classList.contains('static')) return;
     const lmap = cam.lmap,
         el = lmap.getContainer(),
         hint = byId('gesture-hint');

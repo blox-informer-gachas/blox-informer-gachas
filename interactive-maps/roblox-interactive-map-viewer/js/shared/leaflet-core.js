@@ -9,10 +9,9 @@ function zoomLimitsFor(display, fitZoom) {
     const d = display || DEFAULT_DISPLAY;
     const snap = ZOOM_SNAP;
     const max = fitZoom + Math.log2((d.maxZoom || DEFAULT_DISPLAY.maxZoom) / 100);
-    return {
-        min: fitZoom + Math.log2((d.minZoom || DEFAULT_DISPLAY.minZoom) / 100),
-        max: Math.max(Math.floor(max / snap + 0.01) * snap, ZOOM_NATIVE_MAX),
-    };
+    // over 100% the map opens at this zoom (empty space around the image stays out of view)
+    const min = fitZoom + Math.log2((d.minZoom || DEFAULT_DISPLAY.minZoom) / 100);
+    return { min, max: Math.max(Math.floor(max / snap + 0.01) * snap, ZOOM_NATIVE_MAX, min) };
 }
 const MARKER_BASE_PX = 40;
 const MARKER_MAX_PX = 2000;
@@ -421,10 +420,13 @@ function createLeafletCamera(containerEl, opts) {
             cam.background.remove();
             cam.background = null;
         }
+        // display.surround: one color around the image, which then loses its frame and shadow
+        const surround = (opts.getDisplay && opts.getDisplay() ? opts.getDisplay() : {}).surround;
+        containerEl.style.backgroundColor = surround || '';
         if (layer.backgroundUrl) {
             cam.background = L.imageOverlay(layer.backgroundUrl, layerBounds(layer), {
                 pane: 'bgPane',
-                className: 'shadow-[0_0_0_1px_#262626,0_20px_60px_rgba(0,0,0,0.5)]',
+                className: surround ? '' : 'shadow-[0_0_0_1px_#262626,0_20px_60px_rgba(0,0,0,0.5)]',
             }).addTo(lmap);
         } else if (layer.backgroundColor === 'transparent') {
             if (opts.showBounds) {

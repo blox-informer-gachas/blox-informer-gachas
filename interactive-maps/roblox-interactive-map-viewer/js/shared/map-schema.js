@@ -53,7 +53,7 @@ const DEFAULT_DISPLAY = {
     minZoom: 70,
     maxZoom: 1600,
 };
-const ZOOM_MIN_RANGE = [10, 100];
+const ZOOM_MIN_RANGE = [10, 400];
 const ZOOM_MAX_RANGE = [200, 6400];
 const clampNum = (v, lo, hi, fallback) => (Number.isFinite(+v) ? Math.min(hi, Math.max(lo, +v)) : fallback);
 

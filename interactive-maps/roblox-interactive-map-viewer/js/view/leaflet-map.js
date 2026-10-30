@@ -4,7 +4,9 @@ let viewPanels = null;
 function initFilterPanel() {
     viewPanels = createOverlayPanels(byId('view-stage'), 'mapViewPanelPrefs');
     viewPanels.init();
-    if (document.body.classList.contains('embed')) viewPanels.setOpen('left', false, false);
+    // the GitHub build keeps the filters open on wide screens, like the older maps
+    if (document.body.classList.contains('embed') && !document.body.classList.contains('static'))
+        viewPanels.setOpen('left', false, false);
     qsa('[data-panel-toggle]').forEach((btn) =>
         btn.addEventListener('click', () => viewPanels.toggle(btn.dataset.panelToggle))
     );

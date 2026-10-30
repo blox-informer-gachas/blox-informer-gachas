@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const src = params.get('src');
     if (src) {
         // ?src= is a map JSON file next to this page (same origin only)
-        document.body.classList.add('static');
+        // GitHub build: always the full-window map, no header (like the embed layout)
+        document.body.classList.add('static', 'embed');
         let url;
         try {
             url = new URL(src, window.location.href);
